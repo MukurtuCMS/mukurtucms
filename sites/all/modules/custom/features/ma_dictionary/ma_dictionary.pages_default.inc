@@ -20,16 +20,16 @@ function ma_dictionary_default_page_manager_pages() {
   $page->access = array(
     'plugins' => array(
       0 => array(
+        'context' => 'logged-in-user',
         'name' => 'perm',
+        'not' => FALSE,
         'settings' => array(
           'perm' => 'access content',
         ),
-        'context' => 'logged-in-user',
-        'not' => FALSE,
       ),
     ),
-    'type' => 'none',
     'settings' => NULL,
+    'type' => 'none',
   );
   $page->menu = array();
   $page->arguments = array();
@@ -46,72 +46,72 @@ function ma_dictionary_default_page_manager_pages() {
   $handler->handler = 'panel_context';
   $handler->weight = 0;
   $handler->conf = array(
-    'title' => 'Panel',
+    'body_classes_to_add' => '',
+    'body_classes_to_remove' => '',
+    'contexts' => array(),
+    'css' => '',
+    'css_id' => '',
+    'name' => '',
     'no_blocks' => 0,
     'pipeline' => 'standard',
-    'body_classes_to_remove' => '',
-    'body_classes_to_add' => '',
-    'css_id' => '',
-    'css' => '',
-    'contexts' => array(),
     'relationships' => array(),
-    'name' => '',
+    'title' => 'Panel',
   );
   $display = new panels_display();
   $display->layout = 'flexible';
   $display->layout_settings = array(
     'items' => array(
       'canvas' => array(
-        'type' => 'row',
-        'contains' => 'column',
         'children' => array(
           0 => 'main',
         ),
+        'contains' => 'column',
         'parent' => NULL,
+        'type' => 'row',
+      ),
+      'center' => array(
+        'class' => '',
+        'parent' => 'main-row',
+        'title' => 'Left',
+        'type' => 'region',
+        'width' => '69.9671129903688',
+        'width_type' => '%',
       ),
       'main' => array(
-        'type' => 'column',
-        'width' => 100,
-        'width_type' => '%',
         'children' => array(
           0 => 'main-row',
         ),
         'parent' => 'canvas',
+        'type' => 'column',
+        'width' => 100,
+        'width_type' => '%',
       ),
       'main-row' => array(
-        'type' => 'row',
-        'contains' => 'region',
         'children' => array(
           0 => 'center',
           1 => 'right',
         ),
+        'contains' => 'region',
         'parent' => 'main',
-      ),
-      'center' => array(
-        'type' => 'region',
-        'title' => 'Left',
-        'width' => '69.9671129903688',
-        'width_type' => '%',
-        'parent' => 'main-row',
-        'class' => '',
+        'type' => 'row',
       ),
       'right' => array(
-        'type' => 'region',
+        'class' => '',
+        'parent' => 'main-row',
         'title' => 'Right',
+        'type' => 'region',
         'width' => '30.0328870096312',
         'width_type' => '%',
-        'parent' => 'main-row',
-        'class' => '',
       ),
     ),
   );
   $display->panel_settings = array(
     'style_settings' => array(
-      'default' => NULL,
       'center' => NULL,
+      'center_' => NULL,
+      'default' => NULL,
       'left' => NULL,
       'right' => NULL,
-      'center_' => NULL,
       'sort' => NULL,
     ),
   );
@@ -151,8 +151,8 @@ function ma_dictionary_default_page_manager_pages() {
   $pane->configuration = array(
     'inherit_path' => 1,
     'override_title' => 1,
-    'override_title_text' => 'Search',
     'override_title_heading' => 'h2',
+    'override_title_text' => 'Search',
   );
   $pane->cache = array();
   $pane->style = array(
@@ -174,8 +174,8 @@ function ma_dictionary_default_page_manager_pages() {
   $pane->access = array();
   $pane->configuration = array(
     'override_title' => 1,
-    'override_title_text' => 'Sort by',
     'override_title_heading' => 'h2',
+    'override_title_text' => 'Sort by',
   );
   $pane->cache = array();
   $pane->style = array(
@@ -197,8 +197,8 @@ function ma_dictionary_default_page_manager_pages() {
   $pane->access = array();
   $pane->configuration = array(
     'override_title' => 1,
-    'override_title_text' => 'Title',
     'override_title_heading' => 'h2',
+    'override_title_text' => 'Title',
   );
   $pane->cache = array();
   $pane->style = array(
@@ -220,8 +220,8 @@ function ma_dictionary_default_page_manager_pages() {
   $pane->access = array();
   $pane->configuration = array(
     'override_title' => 1,
-    'override_title_text' => 'Language',
     'override_title_heading' => 'h2',
+    'override_title_text' => 'Language',
   );
   $pane->cache = array();
   $pane->style = array(
@@ -243,8 +243,8 @@ function ma_dictionary_default_page_manager_pages() {
   $pane->access = array();
   $pane->configuration = array(
     'override_title' => 1,
-    'override_title_text' => 'Keywords',
     'override_title_heading' => 'h2',
+    'override_title_text' => 'Keywords',
   );
   $pane->cache = array();
   $pane->style = array(
@@ -266,8 +266,8 @@ function ma_dictionary_default_page_manager_pages() {
   $pane->access = array();
   $pane->configuration = array(
     'override_title' => 1,
-    'override_title_text' => 'Part of Speech',
     'override_title_heading' => 'h2',
+    'override_title_text' => 'Part of Speech',
   );
   $pane->cache = array();
   $pane->style = array(
@@ -289,8 +289,8 @@ function ma_dictionary_default_page_manager_pages() {
   $pane->access = array();
   $pane->configuration = array(
     'override_title' => 1,
-    'override_title_text' => 'Word Lists',
     'override_title_heading' => 'h2',
+    'override_title_text' => 'Word Lists',
   );
   $pane->cache = array();
   $pane->style = array(
@@ -316,93 +316,93 @@ function ma_dictionary_default_page_manager_pages() {
   $handler->handler = 'panel_context';
   $handler->weight = 1;
   $handler->conf = array(
-    'title' => 'Dictionary Browse Theme v2',
+    'body_classes_to_add' => '',
+    'body_classes_to_remove' => '',
+    'contexts' => array(),
+    'css' => '',
+    'css_id' => '',
+    'name' => 'dictionary-browse-theme-v2',
     'no_blocks' => 0,
     'pipeline' => 'standard',
-    'body_classes_to_remove' => '',
-    'body_classes_to_add' => '',
-    'css_id' => '',
-    'css' => '',
-    'contexts' => array(),
     'relationships' => array(),
-    'name' => 'dictionary-browse-theme-v2',
+    'title' => 'Dictionary Browse Theme v2',
   );
   $display = new panels_display();
   $display->layout = 'flexible';
   $display->layout_settings = array(
     'items' => array(
       'canvas' => array(
-        'type' => 'row',
-        'contains' => 'column',
         'children' => array(
           0 => 'main',
         ),
+        'contains' => 'column',
         'parent' => NULL,
+        'type' => 'row',
       ),
-      'main' => array(
-        'type' => 'column',
+      'center' => array(
+        'class' => '',
+        'hide_empty' => 0,
+        'parent' => 'main-row',
+        'title' => 'Dictionary Words',
+        'type' => 'region',
         'width' => 100,
         'width_type' => '%',
+      ),
+      'main' => array(
         'children' => array(
           0 => 1,
           1 => 'main-row',
         ),
         'parent' => 'canvas',
+        'type' => 'column',
+        'width' => 100,
+        'width_type' => '%',
       ),
       'main-row' => array(
-        'type' => 'row',
-        'contains' => 'region',
         'children' => array(
           0 => 'center',
         ),
+        'contains' => 'region',
         'parent' => 'main',
+        'type' => 'row',
       ),
-      'center' => array(
+      'search_facets' => array(
+        'class' => 'dictionary-facets-region',
+        'hide_empty' => 0,
+        'parent' => '1',
+        'title' => 'Search Facets',
         'type' => 'region',
-        'title' => 'Dictionary Words',
         'width' => 100,
         'width_type' => '%',
-        'parent' => 'main-row',
-        'class' => '',
-        'hide_empty' => 0,
       ),
       1 => array(
-        'type' => 'row',
-        'contains' => 'region',
         'children' => array(
           0 => 'search_facets',
         ),
-        'parent' => 'main',
         'class' => 'dictionary-facets',
+        'contains' => 'region',
         'hide_empty' => 0,
-      ),
-      'search_facets' => array(
-        'type' => 'region',
-        'title' => 'Search Facets',
-        'width' => 100,
-        'width_type' => '%',
-        'parent' => '1',
-        'class' => 'dictionary-facets-region',
-        'hide_empty' => 0,
+        'parent' => 'main',
+        'type' => 'row',
       ),
     ),
   );
   $display->panel_settings = array(
-    'style_settings' => array(
-      'default' => NULL,
-      'center' => NULL,
-      'left' => NULL,
-      'right' => NULL,
-      'center_' => NULL,
-      'sort' => NULL,
-      'middle' => NULL,
-      'search_facets' => NULL,
+    'center' => array(
+      'style' => 'default',
     ),
     'search_facets' => array(
       'style' => 'default',
     ),
-    'center' => array(
-      'style' => 'default',
+    'style_settings' => array(
+      'center' => NULL,
+      'center_' => NULL,
+      'default' => NULL,
+      'left' => NULL,
+      'middle' => NULL,
+      'right' => NULL,
+      'search_facets' => NULL,
+      'sort' => NULL,
     ),
   );
   $display->cache = array();
@@ -421,16 +421,16 @@ function ma_dictionary_default_page_manager_pages() {
   $pane->access = array();
   $pane->configuration = array(
     'override_title' => 1,
-    'override_title_text' => 'Title',
     'override_title_heading' => 'h2',
+    'override_title_text' => 'Title',
   );
   $pane->cache = array();
   $pane->style = array(
     'settings' => NULL,
   );
   $pane->css = array(
-    'css_id' => '',
     'css_class' => 'facet-glossary',
+    'css_id' => '',
   );
   $pane->extras = array();
   $pane->position = 0;
@@ -466,16 +466,16 @@ function ma_dictionary_default_page_manager_pages() {
   $pane->access = array();
   $pane->configuration = array(
     'override_title' => 1,
-    'override_title_text' => 'Sort by',
     'override_title_heading' => 'h2',
+    'override_title_text' => 'Sort by',
   );
   $pane->cache = array();
   $pane->style = array(
     'settings' => NULL,
   );
   $pane->css = array(
-    'css_id' => '',
     'css_class' => 'col-xs-12 col-md-4 col-lg-3',
+    'css_id' => '',
   );
   $pane->extras = array();
   $pane->position = 0;
@@ -492,16 +492,16 @@ function ma_dictionary_default_page_manager_pages() {
   $pane->access = array();
   $pane->configuration = array(
     'override_title' => 1,
-    'override_title_text' => 'Language',
     'override_title_heading' => 'h2',
+    'override_title_text' => 'Language',
   );
   $pane->cache = array();
   $pane->style = array(
     'settings' => NULL,
   );
   $pane->css = array(
-    'css_id' => '',
     'css_class' => 'col-xs-12 col-md-4 col-lg-3',
+    'css_id' => '',
   );
   $pane->extras = array();
   $pane->position = 1;
@@ -518,16 +518,16 @@ function ma_dictionary_default_page_manager_pages() {
   $pane->access = array();
   $pane->configuration = array(
     'override_title' => 1,
-    'override_title_text' => 'Keywords',
     'override_title_heading' => 'h2',
+    'override_title_text' => 'Keywords',
   );
   $pane->cache = array();
   $pane->style = array(
     'settings' => NULL,
   );
   $pane->css = array(
-    'css_id' => '',
     'css_class' => 'col-xs-12 col-md-4 col-lg-3',
+    'css_id' => '',
   );
   $pane->extras = array();
   $pane->position = 2;
@@ -544,16 +544,16 @@ function ma_dictionary_default_page_manager_pages() {
   $pane->access = array();
   $pane->configuration = array(
     'override_title' => 1,
-    'override_title_text' => 'Part of Speech',
     'override_title_heading' => 'h2',
+    'override_title_text' => 'Part of Speech',
   );
   $pane->cache = array();
   $pane->style = array(
     'settings' => NULL,
   );
   $pane->css = array(
-    'css_id' => '',
     'css_class' => 'col-xs-12 col-md-4 col-lg-3',
+    'css_id' => '',
   );
   $pane->extras = array();
   $pane->position = 3;
@@ -570,16 +570,16 @@ function ma_dictionary_default_page_manager_pages() {
   $pane->access = array();
   $pane->configuration = array(
     'override_title' => 1,
-    'override_title_text' => 'Word Lists',
     'override_title_heading' => 'h2',
+    'override_title_text' => 'Word Lists',
   );
   $pane->cache = array();
   $pane->style = array(
     'settings' => NULL,
   );
   $pane->css = array(
-    'css_id' => '',
     'css_class' => 'col-xs-12 col-md-4 col-lg-3',
+    'css_id' => '',
   );
   $pane->extras = array();
   $pane->position = 4;
@@ -597,16 +597,16 @@ function ma_dictionary_default_page_manager_pages() {
   $pane->configuration = array(
     'inherit_path' => 1,
     'override_title' => 1,
-    'override_title_text' => 'Search',
     'override_title_heading' => 'h2',
+    'override_title_text' => 'Search',
   );
   $pane->cache = array();
   $pane->style = array(
     'settings' => NULL,
   );
   $pane->css = array(
-    'css_id' => '',
     'css_class' => '',
+    'css_id' => '',
   );
   $pane->extras = array();
   $pane->position = 5;

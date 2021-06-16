@@ -242,7 +242,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 32,
+        'weight' => 36,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -345,7 +345,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 31,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -442,7 +442,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 33,
+        'weight' => 37,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -473,6 +473,7 @@ function ma_dictionary_field_default_field_instances() {
       'active' => 1,
       'module' => 'options',
       'settings' => array(
+        'apply_chosen' => '',
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
@@ -519,7 +520,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 38,
+        'weight' => 42,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -588,7 +589,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 39,
+        'weight' => 43,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -671,7 +672,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 34,
+        'weight' => 38,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -735,7 +736,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 33,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -813,7 +814,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 30,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -890,7 +891,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 29,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -973,7 +974,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 27,
+        'weight' => 35,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1044,7 +1045,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 28,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1127,7 +1128,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 34,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1222,7 +1223,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 35,
+        'weight' => 39,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1313,7 +1314,7 @@ function ma_dictionary_field_default_field_instances() {
           'view_mode' => 'word_entry_search_results',
         ),
         'type' => 'paragraphs_view',
-        'weight' => 2,
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -1408,7 +1409,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 32,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1507,7 +1508,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 37,
+        'weight' => 41,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2553,6 +2554,7 @@ function ma_dictionary_field_default_field_instances() {
       'active' => 1,
       'module' => 'options',
       'settings' => array(
+        'apply_chosen' => '',
         'treeable' => 0,
         'use_select2' => FALSE,
       ),

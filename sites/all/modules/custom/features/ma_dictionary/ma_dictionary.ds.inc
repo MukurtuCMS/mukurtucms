@@ -18,45 +18,35 @@ function ma_dictionary_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'dictionary_word';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
-    'mukurtu_mobile_sync' => array(
-      'weight' => '0',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
     'extracted_dh_from_relationships' => array(
-      'weight' => '3',
-      'label' => 'above',
       'format' => 'default',
       'formatter_settings' => array(
         'ft' => array(
           'lb' => 'Related Digital Heritage Items',
         ),
       ),
+      'label' => 'above',
+      'weight' => '3',
     ),
     'extracted_dw_from_relationships' => array(
-      'weight' => '3',
-      'label' => 'above',
       'format' => 'default',
       'formatter_settings' => array(
         'ft' => array(
           'lb' => 'Related Dictionary Words',
         ),
       ),
+      'label' => 'above',
+      'weight' => '3',
     ),
     'extracted_wl_from_relationships' => array(
-      'weight' => '8',
-      'label' => 'above',
       'format' => 'default',
       'formatter_settings' => array(
         'ft' => array(
           'lb' => 'Word List',
         ),
       ),
-    ),
-    'mukurtu_icon_actions' => array(
-      'weight' => '0',
-      'label' => 'hidden',
-      'format' => 'default',
+      'label' => 'above',
+      'weight' => '8',
     ),
     'field_additional_media' => array(
       'formatter_settings' => array(
@@ -77,6 +67,16 @@ function ma_dictionary_ds_field_settings_info() {
         'ft' => array(),
       ),
     ),
+    'mukurtu_icon_actions' => array(
+      'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '0',
+    ),
+    'mukurtu_mobile_sync' => array(
+      'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '0',
+    ),
     'og_group_ref' => array(
       'formatter_settings' => array(
         'ft' => array(
@@ -95,25 +95,25 @@ function ma_dictionary_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'featured_content';
   $ds_fieldsetting->settings = array(
     'featured_content_type' => array(
-      'weight' => '1',
-      'label' => 'hidden',
       'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '1',
     ),
     'featured_content_view_link' => array(
-      'weight' => '0',
-      'label' => 'hidden',
       'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '0',
     ),
     'title' => array(
-      'weight' => '2',
-      'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
-        'link' => '1',
-        'wrapper' => 'h2',
         'class' => '',
         'ft' => array(),
+        'link' => '1',
+        'wrapper' => 'h2',
       ),
+      'label' => 'hidden',
+      'weight' => '2',
     ),
   );
   $export['node|dictionary_word|featured_content'] = $ds_fieldsetting;
@@ -126,44 +126,44 @@ function ma_dictionary_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'mukurtu_mobile';
   $ds_fieldsetting->settings = array(
     'extracted_dh_from_relationships' => array(
-      'weight' => '3',
-      'label' => 'above',
       'format' => 'default',
       'formatter_settings' => array(
         'ft' => array(
           'lb' => 'Related Digital Heritage Items',
         ),
       ),
+      'label' => 'above',
+      'weight' => '3',
     ),
     'extracted_dw_from_relationships' => array(
-      'weight' => '4',
-      'label' => 'above',
       'format' => 'default',
       'formatter_settings' => array(
         'ft' => array(
           'lb' => '  Related Dictionary Words',
         ),
       ),
+      'label' => 'above',
+      'weight' => '4',
     ),
     'extracted_wl_from_relationships' => array(
-      'weight' => '9',
-      'label' => 'above',
       'format' => 'default',
       'formatter_settings' => array(
         'ft' => array(
           'lb' => 'Word List',
         ),
       ),
-    ),
-    'title' => array(
-      'weight' => '0',
-      'label' => 'hidden',
-      'format' => 'default',
+      'label' => 'above',
+      'weight' => '9',
     ),
     'field_collection' => array(
       'formatter_settings' => array(
         'ft' => array(),
       ),
+    ),
+    'title' => array(
+      'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '0',
     ),
   );
   $export['node|dictionary_word|mukurtu_mobile'] = $ds_fieldsetting;
@@ -176,30 +176,40 @@ function ma_dictionary_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'search_result';
   $ds_fieldsetting->settings = array(
     'dictionary_word_one_media_asset' => array(
-      'weight' => '0',
-      'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
         'ft' => array(
           'func' => 'theme_field',
         ),
       ),
+      'label' => 'hidden',
+      'weight' => '0',
     ),
     'featured_content_type' => array(
-      'weight' => '1',
-      'label' => 'hidden',
       'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '4',
+    ),
+    'mukurtu_icon_actions' => array(
+      'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '3',
+    ),
+    'mukurtu_mobile_sync' => array(
+      'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '2',
     ),
     'title' => array(
-      'weight' => '0',
-      'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
-        'link' => '1',
-        'wrapper' => 'h2',
         'class' => '',
         'ft' => array(),
+        'link' => '1',
+        'wrapper' => 'h2',
       ),
+      'label' => 'hidden',
+      'weight' => '1',
     ),
   );
   $export['node|dictionary_word|search_result'] = $ds_fieldsetting;
@@ -212,25 +222,25 @@ function ma_dictionary_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'teaser';
   $ds_fieldsetting->settings = array(
     'featured_content_type' => array(
+      'format' => 'default',
+      'label' => 'hidden',
       'weight' => '1',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'title' => array(
-      'weight' => '0',
-      'label' => 'hidden',
-      'format' => 'default',
-      'formatter_settings' => array(
-        'link' => '1',
-        'wrapper' => 'h2',
-        'class' => '',
-        'ft' => array(),
-      ),
     ),
     'field_word_entry' => array(
       'formatter_settings' => array(
         'ft' => array(),
       ),
+    ),
+    'title' => array(
+      'format' => 'default',
+      'formatter_settings' => array(
+        'class' => '',
+        'ft' => array(),
+        'link' => '1',
+        'wrapper' => 'h2',
+      ),
+      'label' => 'hidden',
+      'weight' => '0',
     ),
   );
   $export['node|dictionary_word|teaser'] = $ds_fieldsetting;
@@ -243,25 +253,25 @@ function ma_dictionary_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'featured_content';
   $ds_fieldsetting->settings = array(
     'featured_content_type' => array(
-      'weight' => '2',
-      'label' => 'hidden',
       'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '2',
     ),
     'featured_content_view_link' => array(
-      'weight' => '0',
-      'label' => 'hidden',
       'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '0',
     ),
     'title' => array(
-      'weight' => '3',
-      'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
-        'link' => '1',
-        'wrapper' => 'h2',
         'class' => '',
         'ft' => array(),
+        'link' => '1',
+        'wrapper' => 'h2',
       ),
+      'label' => 'hidden',
+      'weight' => '3',
     ),
   );
   $export['node|word_list|featured_content'] = $ds_fieldsetting;
@@ -273,25 +283,25 @@ function ma_dictionary_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'word_list';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
-    'mukurtu_icon_actions' => array(
-      'weight' => '0',
-      'label' => 'hidden',
+    'comments' => array(
       'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '7',
+    ),
+    'mukurtu_icon_actions' => array(
+      'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '0',
     ),
     'mukurtu_mobile_sync_white' => array(
-      'weight' => '1',
-      'label' => 'hidden',
       'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '1',
     ),
     'title' => array(
+      'format' => 'default',
+      'label' => 'hidden',
       'weight' => '2',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'comments' => array(
-      'weight' => '7',
-      'label' => 'hidden',
-      'format' => 'default',
     ),
   );
   $export['node|word_list|full'] = $ds_fieldsetting;
@@ -303,15 +313,15 @@ function ma_dictionary_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'word_list';
   $ds_fieldsetting->view_mode = 'mukurtu_mobile';
   $ds_fieldsetting->settings = array(
-    'title' => array(
-      'weight' => '0',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
     'field_words' => array(
       'formatter_settings' => array(
         'ft' => array(),
       ),
+    ),
+    'title' => array(
+      'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '0',
     ),
   );
   $export['node|word_list|mukurtu_mobile'] = $ds_fieldsetting;
@@ -323,29 +333,29 @@ function ma_dictionary_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'word_list';
   $ds_fieldsetting->view_mode = 'search_result';
   $ds_fieldsetting->settings = array(
-    'word_list_count' => array(
-      'weight' => '3',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
     'featured_content_type' => array(
-      'weight' => '2',
-      'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
         'ft' => array(),
       ),
+      'label' => 'hidden',
+      'weight' => '2',
     ),
     'title' => array(
-      'weight' => '1',
-      'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
-        'link' => '1',
-        'wrapper' => 'h2',
         'class' => '',
         'ft' => array(),
+        'link' => '1',
+        'wrapper' => 'h2',
       ),
+      'label' => 'hidden',
+      'weight' => '1',
+    ),
+    'word_list_count' => array(
+      'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '3',
     ),
   );
   $export['node|word_list|search_result'] = $ds_fieldsetting;
@@ -358,20 +368,9 @@ function ma_dictionary_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'teaser';
   $ds_fieldsetting->settings = array(
     'featured_content_type' => array(
+      'format' => 'default',
+      'label' => 'hidden',
       'weight' => '2',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'title' => array(
-      'weight' => '1',
-      'label' => 'hidden',
-      'format' => 'default',
-      'formatter_settings' => array(
-        'link' => '1',
-        'wrapper' => 'h2',
-        'class' => '',
-        'ft' => array(),
-      ),
     ),
     'field_collection_credit' => array(
       'formatter_settings' => array(
@@ -386,6 +385,17 @@ function ma_dictionary_ds_field_settings_info() {
           'lb-col' => TRUE,
         ),
       ),
+    ),
+    'title' => array(
+      'format' => 'default',
+      'formatter_settings' => array(
+        'class' => '',
+        'ft' => array(),
+        'link' => '1',
+        'wrapper' => 'h2',
+      ),
+      'label' => 'hidden',
+      'weight' => '1',
     ),
   );
   $export['node|word_list|teaser'] = $ds_fieldsetting;
@@ -517,6 +527,7 @@ function ma_dictionary_ds_custom_fields_info() {
   $ds_field->ui_limit = 'dictionary_word|*';
   $ds_field->properties = array(
     'code' => array(
+      'format' => 'ds_code',
       'value' => '<?php
 if (!empty($entity->field_word_entry[LANGUAGE_NONE][0][\'value\'])) {
   $id = $entity->field_word_entry[LANGUAGE_NONE][0][\'value\'];
@@ -534,7 +545,6 @@ if (!empty($entity->field_word_entry[LANGUAGE_NONE][0][\'value\'])) {
 }
 
 ?>',
-      'format' => 'ds_code',
     ),
     'use_token' => 0,
   );
@@ -566,6 +576,7 @@ if (!empty($entity->field_word_entry[LANGUAGE_NONE][0][\'value\'])) {
   $ds_field->ui_limit = 'word_list|*';
   $ds_field->properties = array(
     'code' => array(
+      'format' => 'ds_code',
       'value' => '<?php 
 $count = ma_dictionary_get_word_count($entity);
 if($count == 1) {
@@ -575,7 +586,6 @@ if($count == 1) {
 }
 
 ?>',
-      'format' => 'ds_code',
     ),
     'use_token' => 0,
   );
@@ -598,10 +608,35 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->view_mode = 'default';
   $ds_layout->layout = 'bootstrap_6_6_stacked';
   $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      'extracted_dh_from_relationships' => 'right',
+      'extracted_dw_from_relationships' => 'right',
+      'extracted_wl_from_relationships' => 'right',
+      'field_additional_media' => 'bottom',
+      'field_collection' => 'right',
+      'field_community_ref' => 'right',
+      'field_dictionary_word_language' => 'right',
+      'field_related_content' => 'bottom',
+      'field_tags' => 'right',
+      'field_word_entry' => 'left',
+      'field_word_list' => 'right',
+      'og_group_ref' => 'right',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
     'regions' => array(
-      'top' => array(
-        0 => 'mukurtu_mobile_sync',
-        1 => 'mukurtu_icon_actions',
+      'bottom' => array(
+        12 => 'field_additional_media',
+        13 => 'field_related_content',
       ),
       'left' => array(
         2 => 'field_word_entry',
@@ -617,42 +652,17 @@ function ma_dictionary_ds_layout_settings_info() {
         9 => 'extracted_wl_from_relationships',
         12 => 'field_word_list',
       ),
-      'bottom' => array(
-        12 => 'field_additional_media',
-        13 => 'field_related_content',
-      ),
-    ),
-    'fields' => array(
-      'field_word_entry' => 'left',
-      'field_dictionary_word_language' => 'right',
-      'extracted_dh_from_relationships' => 'right',
-      'extracted_dw_from_relationships' => 'right',
-      'field_community_ref' => 'right',
-      'og_group_ref' => 'right',
-      'field_tags' => 'right',
-      'field_collection' => 'right',
-      'extracted_wl_from_relationships' => 'right',
-      'field_additional_media' => 'bottom',
-      'field_related_content' => 'bottom',
-      'field_word_list' => 'right',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
+      'top' => array(
+        0 => 'mukurtu_mobile_sync',
+        1 => 'mukurtu_icon_actions',
       ),
     ),
     'wrappers' => array(
-      'top' => 'div',
+      'bottom' => 'div',
       'left' => 'div',
       'right' => 'div',
-      'bottom' => 'div',
+      'top' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['node|dictionary_word|default'] = $ds_layout;
 
@@ -664,30 +674,30 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->view_mode = 'dictionary_word_summary';
   $ds_layout->layout = 'bootstrap_12';
   $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      'field_word_entry' => 'central',
+      'mukurtu_mobile_sync_white' => 'central',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
     'regions' => array(
       'central' => array(
         0 => 'mukurtu_mobile_sync_white',
         1 => 'field_word_entry',
       ),
     ),
-    'fields' => array(
-      'mukurtu_mobile_sync_white' => 'central',
-      'field_word_entry' => 'central',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
     'wrappers' => array(
       'central' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['node|dictionary_word|dictionary_word_summary'] = $ds_layout;
 
@@ -699,6 +709,23 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->view_mode = 'featured_content';
   $ds_layout->layout = 'bootstrap_12';
   $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      'featured_content_type' => 'central',
+      'featured_content_view_link' => 'central',
+      'field_word_entry' => 'central',
+      'title' => 'central',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
     'regions' => array(
       'central' => array(
         0 => 'featured_content_view_link',
@@ -707,26 +734,9 @@ function ma_dictionary_ds_layout_settings_info() {
         3 => 'field_word_entry',
       ),
     ),
-    'fields' => array(
-      'featured_content_view_link' => 'central',
-      'featured_content_type' => 'central',
-      'title' => 'central',
-      'field_word_entry' => 'central',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
     'wrappers' => array(
       'central' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['node|dictionary_word|featured_content'] = $ds_layout;
 
@@ -738,6 +748,42 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->view_mode = 'form';
   $ds_layout->layout = 'ds_1col';
   $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      '_add_existing_field' => 'hidden',
+      'field_additional_media' => 'ds_content',
+      'field_collection' => 'ds_content',
+      'field_community_ref' => 'hidden',
+      'field_dictionary_word_language' => 'ds_content',
+      'field_dictionary_word_related_dh' => 'hidden',
+      'field_item_privacy_setting' => 'ds_content',
+      'field_language_community' => 'hidden',
+      'field_media_asset' => 'hidden',
+      'field_personal_collections' => 'ds_content',
+      'field_pre_actions' => 'ds_content',
+      'field_related_content' => 'ds_content',
+      'field_related_dictionary_words' => 'hidden',
+      'field_tags' => 'ds_content',
+      'field_word_entry' => 'ds_content',
+      'field_word_list' => 'ds_content',
+      'group_dictionary_word_basic' => 'ds_content',
+      'group_dictionary_word_relations' => 'ds_content',
+      'group_tabs' => 'ds_content',
+      'og_group_ref' => 'ds_content',
+      'path' => 'ds_content',
+      'redirect' => 'ds_content',
+      'title' => 'ds_content',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
     'regions' => array(
       'ds_content' => array(
         0 => 'field_pre_actions',
@@ -767,45 +813,9 @@ function ma_dictionary_ds_layout_settings_info() {
         22 => '_add_existing_field',
       ),
     ),
-    'fields' => array(
-      'field_pre_actions' => 'ds_content',
-      'group_tabs' => 'ds_content',
-      'redirect' => 'ds_content',
-      'path' => 'ds_content',
-      'field_dictionary_word_related_dh' => 'hidden',
-      'field_related_dictionary_words' => 'hidden',
-      'field_language_community' => 'hidden',
-      'field_community_ref' => 'hidden',
-      'field_media_asset' => 'hidden',
-      'group_dictionary_word_basic' => 'ds_content',
-      'group_dictionary_word_relations' => 'ds_content',
-      'title' => 'ds_content',
-      'field_dictionary_word_language' => 'ds_content',
-      'field_word_entry' => 'ds_content',
-      'field_tags' => 'ds_content',
-      'field_additional_media' => 'ds_content',
-      'field_related_content' => 'ds_content',
-      'field_word_list' => 'ds_content',
-      'field_collection' => 'ds_content',
-      'field_personal_collections' => 'ds_content',
-      'og_group_ref' => 'ds_content',
-      'field_item_privacy_setting' => 'ds_content',
-      '_add_existing_field' => 'hidden',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
     'wrappers' => array(
       'ds_content' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['node|dictionary_word|form'] = $ds_layout;
 
@@ -817,6 +827,30 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->view_mode = 'mukurtu_mobile';
   $ds_layout->layout = 'ds_1col';
   $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      'extracted_dh_from_relationships' => 'ds_content',
+      'extracted_dw_from_relationships' => 'ds_content',
+      'extracted_wl_from_relationships' => 'ds_content',
+      'field_additional_media' => 'ds_content',
+      'field_collection' => 'ds_content',
+      'field_community_ref' => 'ds_content',
+      'field_dictionary_word_language' => 'ds_content',
+      'field_tags' => 'ds_content',
+      'field_word_entry' => 'ds_content',
+      'og_group_ref' => 'ds_content',
+      'title' => 'ds_content',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
     'regions' => array(
       'ds_content' => array(
         0 => 'title',
@@ -832,33 +866,9 @@ function ma_dictionary_ds_layout_settings_info() {
         10 => 'field_additional_media',
       ),
     ),
-    'fields' => array(
-      'title' => 'ds_content',
-      'field_word_entry' => 'ds_content',
-      'field_dictionary_word_language' => 'ds_content',
-      'extracted_dh_from_relationships' => 'ds_content',
-      'extracted_dw_from_relationships' => 'ds_content',
-      'field_community_ref' => 'ds_content',
-      'og_group_ref' => 'ds_content',
-      'field_tags' => 'ds_content',
-      'field_collection' => 'ds_content',
-      'extracted_wl_from_relationships' => 'ds_content',
-      'field_additional_media' => 'ds_content',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
     'wrappers' => array(
       'ds_content' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['node|dictionary_word|mukurtu_mobile'] = $ds_layout;
 
@@ -870,37 +880,41 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->view_mode = 'search_result';
   $ds_layout->layout = 'bootstrap_4_8';
   $ds_layout->settings = array(
-    'regions' => array(
-      'right' => array(
-        0 => 'title',
-        2 => 'featured_content_type',
-        3 => 'field_word_entry',
-      ),
-      'left' => array(
-        1 => 'dictionary_word_one_media_asset',
-      ),
-    ),
-    'fields' => array(
-      'title' => 'right',
-      'dictionary_word_one_media_asset' => 'left',
-      'featured_content_type' => 'right',
-      'field_word_entry' => 'right',
-    ),
     'classes' => array(
       'layout_class' => array(
         '' => '',
+      ),
+    ),
+    'fields' => array(
+      'dictionary_word_one_media_asset' => 'left',
+      'featured_content_type' => 'right',
+      'field_word_entry' => 'right',
+      'mukurtu_icon_actions' => 'right',
+      'mukurtu_mobile_sync' => 'right',
+      'title' => 'right',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
+    'regions' => array(
+      'left' => array(
+        0 => 'dictionary_word_one_media_asset',
+      ),
+      'right' => array(
+        1 => 'title',
+        2 => 'mukurtu_mobile_sync',
+        3 => 'mukurtu_icon_actions',
+        4 => 'featured_content_type',
+        5 => 'field_word_entry',
       ),
     ),
     'wrappers' => array(
       'left' => 'div',
       'right' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['node|dictionary_word|search_result'] = $ds_layout;
 
@@ -912,6 +926,22 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->view_mode = 'teaser';
   $ds_layout->layout = 'bootstrap_12';
   $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      'featured_content_type' => 'central',
+      'field_word_entry' => 'central',
+      'title' => 'central',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
     'regions' => array(
       'central' => array(
         0 => 'title',
@@ -919,25 +949,9 @@ function ma_dictionary_ds_layout_settings_info() {
         2 => 'field_word_entry',
       ),
     ),
-    'fields' => array(
-      'title' => 'central',
-      'featured_content_type' => 'central',
-      'field_word_entry' => 'central',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
     'wrappers' => array(
       'central' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['node|dictionary_word|teaser'] = $ds_layout;
 
@@ -949,6 +963,24 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->view_mode = 'featured_content';
   $ds_layout->layout = 'bootstrap_12';
   $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      'featured_content_type' => 'central',
+      'featured_content_view_link' => 'central',
+      'field_collection_image' => 'central',
+      'field_collection_summary' => 'central',
+      'title' => 'central',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
     'regions' => array(
       'central' => array(
         0 => 'featured_content_view_link',
@@ -958,27 +990,9 @@ function ma_dictionary_ds_layout_settings_info() {
         4 => 'field_collection_summary',
       ),
     ),
-    'fields' => array(
-      'featured_content_view_link' => 'central',
-      'field_collection_image' => 'central',
-      'featured_content_type' => 'central',
-      'title' => 'central',
-      'field_collection_summary' => 'central',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
     'wrappers' => array(
       'central' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['node|word_list|featured_content'] = $ds_layout;
 
@@ -990,7 +1004,36 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->view_mode = 'full';
   $ds_layout->layout = 'bootstrap_6_6_stacked';
   $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      'comments' => 'bottom',
+      'field_collection' => 'top',
+      'field_collection_credit' => 'top',
+      'field_collection_image' => 'top',
+      'field_collection_summary' => 'top',
+      'field_description' => 'top',
+      'field_related_content' => 'bottom',
+      'field_words' => 'bottom',
+      'mukurtu_icon_actions' => 'top',
+      'mukurtu_mobile_sync_white' => 'top',
+      'title' => 'top',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
     'regions' => array(
+      'bottom' => array(
+        9 => 'field_words',
+        10 => 'field_related_content',
+        11 => 'comments',
+      ),
       'top' => array(
         0 => 'field_collection_image',
         1 => 'mukurtu_icon_actions',
@@ -1001,42 +1044,13 @@ function ma_dictionary_ds_layout_settings_info() {
         7 => 'field_collection_credit',
         8 => 'field_description',
       ),
-      'bottom' => array(
-        9 => 'field_words',
-        10 => 'field_related_content',
-        11 => 'comments',
-      ),
-    ),
-    'fields' => array(
-      'mukurtu_icon_actions' => 'top',
-      'field_collection_image' => 'top',
-      'mukurtu_mobile_sync_white' => 'top',
-      'title' => 'top',
-      'field_collection_summary' => 'top',
-      'field_collection_credit' => 'top',
-      'field_description' => 'top',
-      'field_collection' => 'top',
-      'field_words' => 'bottom',
-      'field_related_content' => 'bottom',
-      'comments' => 'bottom',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
     ),
     'wrappers' => array(
-      'top' => 'div',
+      'bottom' => 'div',
       'left' => 'div',
       'right' => 'div',
-      'bottom' => 'div',
+      'top' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['node|word_list|full'] = $ds_layout;
 
@@ -1048,6 +1062,25 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->view_mode = 'mukurtu_mobile';
   $ds_layout->layout = 'ds_1col';
   $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      'field_collection_credit' => 'ds_content',
+      'field_collection_image' => 'ds_content',
+      'field_collection_summary' => 'ds_content',
+      'field_description' => 'ds_content',
+      'field_words' => 'ds_content',
+      'title' => 'ds_content',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
     'regions' => array(
       'ds_content' => array(
         0 => 'title',
@@ -1058,28 +1091,9 @@ function ma_dictionary_ds_layout_settings_info() {
         5 => 'field_words',
       ),
     ),
-    'fields' => array(
-      'title' => 'ds_content',
-      'field_collection_image' => 'ds_content',
-      'field_collection_summary' => 'ds_content',
-      'field_collection_credit' => 'ds_content',
-      'field_description' => 'ds_content',
-      'field_words' => 'ds_content',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
     'wrappers' => array(
       'ds_content' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['node|word_list|mukurtu_mobile'] = $ds_layout;
 
@@ -1091,6 +1105,24 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->view_mode = 'search_result';
   $ds_layout->layout = 'bootstrap_4_8';
   $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      'featured_content_type' => 'right',
+      'field_collection_image' => 'left',
+      'field_collection_summary' => 'right',
+      'title' => 'right',
+      'word_list_count' => 'right',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
     'regions' => array(
       'left' => array(
         0 => 'field_collection_image',
@@ -1102,28 +1134,10 @@ function ma_dictionary_ds_layout_settings_info() {
         4 => 'field_collection_summary',
       ),
     ),
-    'fields' => array(
-      'field_collection_image' => 'left',
-      'title' => 'right',
-      'featured_content_type' => 'right',
-      'word_list_count' => 'right',
-      'field_collection_summary' => 'right',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
     'wrappers' => array(
       'left' => 'div',
       'right' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['node|word_list|search_result'] = $ds_layout;
 
@@ -1135,6 +1149,24 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->view_mode = 'teaser';
   $ds_layout->layout = 'bootstrap_4_8';
   $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      'featured_content_type' => 'right',
+      'field_collection_credit' => 'right',
+      'field_collection_image' => 'left',
+      'field_collection_summary' => 'right',
+      'title' => 'right',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
     'regions' => array(
       'left' => array(
         0 => 'field_collection_image',
@@ -1146,28 +1178,10 @@ function ma_dictionary_ds_layout_settings_info() {
         4 => 'field_collection_credit',
       ),
     ),
-    'fields' => array(
-      'field_collection_image' => 'left',
-      'title' => 'right',
-      'featured_content_type' => 'right',
-      'field_collection_summary' => 'right',
-      'field_collection_credit' => 'right',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
     'wrappers' => array(
       'left' => 'div',
       'right' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['node|word_list|teaser'] = $ds_layout;
 
@@ -1179,7 +1193,34 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->view_mode = 'default';
   $ds_layout->layout = 'bootstrap_6_6_bricks';
   $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      'field_alternate_spelling' => 'top',
+      'field_definition' => 'central',
+      'field_dictionary_word_recording' => 'central',
+      'field_part_of_speech' => 'topright',
+      'field_pronunciation' => 'topleft',
+      'field_sample_sentence' => 'central',
+      'field_source' => 'central',
+      'field_translation' => 'top',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
     'regions' => array(
+      'central' => array(
+        4 => 'field_definition',
+        5 => 'field_dictionary_word_recording',
+        6 => 'field_sample_sentence',
+        7 => 'field_source',
+      ),
       'top' => array(
         0 => 'field_alternate_spelling',
         1 => 'field_translation',
@@ -1190,43 +1231,16 @@ function ma_dictionary_ds_layout_settings_info() {
       'topright' => array(
         3 => 'field_part_of_speech',
       ),
-      'central' => array(
-        4 => 'field_definition',
-        5 => 'field_dictionary_word_recording',
-        6 => 'field_sample_sentence',
-        7 => 'field_source',
-      ),
-    ),
-    'fields' => array(
-      'field_alternate_spelling' => 'top',
-      'field_translation' => 'top',
-      'field_pronunciation' => 'topleft',
-      'field_part_of_speech' => 'topright',
-      'field_definition' => 'central',
-      'field_dictionary_word_recording' => 'central',
-      'field_sample_sentence' => 'central',
-      'field_source' => 'central',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
     ),
     'wrappers' => array(
+      'bottom' => 'div',
+      'bottomleft' => 'div',
+      'bottomright' => 'div',
+      'central' => 'div',
       'top' => 'div',
       'topleft' => 'div',
       'topright' => 'div',
-      'central' => 'div',
-      'bottomleft' => 'div',
-      'bottomright' => 'div',
-      'bottom' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['paragraphs_item|dictionary_word_bundle|default'] = $ds_layout;
 
@@ -1238,41 +1252,41 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->view_mode = 'featured_content';
   $ds_layout->layout = 'bootstrap_6_6_stacked';
   $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      'field_alternate_spelling' => 'left',
+      'field_definition' => 'bottom',
+      'field_dictionary_word_recording' => 'bottom',
+      'field_translation' => 'right',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
     'regions' => array(
+      'bottom' => array(
+        2 => 'field_dictionary_word_recording',
+        3 => 'field_definition',
+      ),
       'left' => array(
         0 => 'field_alternate_spelling',
       ),
       'right' => array(
         1 => 'field_translation',
       ),
-      'bottom' => array(
-        2 => 'field_dictionary_word_recording',
-        3 => 'field_definition',
-      ),
-    ),
-    'fields' => array(
-      'field_alternate_spelling' => 'left',
-      'field_translation' => 'right',
-      'field_dictionary_word_recording' => 'bottom',
-      'field_definition' => 'bottom',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
     ),
     'wrappers' => array(
-      'top' => 'div',
+      'bottom' => 'div',
       'left' => 'div',
       'right' => 'div',
-      'bottom' => 'div',
+      'top' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['paragraphs_item|dictionary_word_bundle|featured_content'] = $ds_layout;
 
@@ -1284,6 +1298,27 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->view_mode = 'mukurtu_mobile';
   $ds_layout->layout = 'ds_1col';
   $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      'field_alternate_spelling' => 'ds_content',
+      'field_definition' => 'ds_content',
+      'field_dictionary_word_recording' => 'ds_content',
+      'field_part_of_speech' => 'ds_content',
+      'field_pronunciation' => 'ds_content',
+      'field_sample_sentence' => 'ds_content',
+      'field_source' => 'ds_content',
+      'field_translation' => 'ds_content',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
     'regions' => array(
       'ds_content' => array(
         0 => 'field_alternate_spelling',
@@ -1296,30 +1331,9 @@ function ma_dictionary_ds_layout_settings_info() {
         7 => 'field_source',
       ),
     ),
-    'fields' => array(
-      'field_alternate_spelling' => 'ds_content',
-      'field_translation' => 'ds_content',
-      'field_pronunciation' => 'ds_content',
-      'field_part_of_speech' => 'ds_content',
-      'field_definition' => 'ds_content',
-      'field_dictionary_word_recording' => 'ds_content',
-      'field_sample_sentence' => 'ds_content',
-      'field_source' => 'ds_content',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
     'wrappers' => array(
       'ds_content' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['paragraphs_item|dictionary_word_bundle|mukurtu_mobile'] = $ds_layout;
 
@@ -1331,30 +1345,30 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->view_mode = 'word_entry_search_results';
   $ds_layout->layout = 'bootstrap_12';
   $ds_layout->settings = array(
-    'regions' => array(
-      'central' => array(
-        0 => 'field_alternate_spelling',
-        1 => 'field_translation',
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
       ),
     ),
     'fields' => array(
       'field_alternate_spelling' => 'central',
       'field_translation' => 'central',
     ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
+    'regions' => array(
+      'central' => array(
+        0 => 'field_alternate_spelling',
+        1 => 'field_translation',
       ),
     ),
     'wrappers' => array(
       'central' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['paragraphs_item|dictionary_word_bundle|word_entry_search_results'] = $ds_layout;
 
