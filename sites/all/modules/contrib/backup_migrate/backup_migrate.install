@@ -18,7 +18,8 @@ function backup_migrate_requirements($phase) {
     // Get a list of all destinations, make sure none of them are publicly
     // accessible.
     // @todo Expand the API to add methods to specifically check this.
-    backup_migrate_include('destinations');
+    require_once dirname(__FILE__) . '/includes/destinations.inc';
+
     foreach (backup_migrate_get_destinations() as $dest_name => $destination) {
       if (method_exists($destination, 'get_display_location')) {
         $dest_path = $destination->get_display_location();
@@ -198,6 +199,7 @@ function backup_migrate_schema() {
       'filters' => array(
         'description' => 'The filter settings for the profile.',
         'type' => 'text',
+        'size' => 'medium',
         'not null' => TRUE,
         'serialize' => TRUE,
         'serialized default' => 'a:0:{}',
@@ -442,14 +444,18 @@ function backup_migrate_schema() {
  */
 function backup_migrate_uninstall() {
   variable_del('backup_migrate_backup_max_time');
+  variable_del('backup_migrate_cleanup_temp_files');
+  variable_del('backup_migrate_cleanup_time');
   variable_del('backup_migrate_copy_destination_id');
   variable_del('backup_migrate_data_bytes_per_line');
   variable_del('backup_migrate_data_rows_per_line');
   variable_del('backup_migrate_data_rows_per_query');
   variable_del('backup_migrate_destination_id');
   variable_del('backup_migrate_disable_cron');
+  variable_del('backup_migrate_max_email_size');
   variable_del('backup_migrate_memory_limit');
   variable_del('backup_migrate_profile_id');
+  variable_del('backup_migrate_schedule_buffer');
   variable_del('backup_migrate_schedule_last_run_');
   variable_del('backup_migrate_source_id');
   variable_del('backup_migrate_timeout_buffer');
@@ -459,6 +465,16 @@ function backup_migrate_uninstall() {
   variable_del('nodesquirrel_schedule_enabled');
   variable_del('nodesquirrel_schedule_source_id');
   variable_del('nodesquirrel_secret_key');
+
+  // Remove the dynamic generated 'last run' variables.
+  $last_ran_schedules = db_select('variable', 'var')
+    ->fields('var', array('name'))
+    ->condition('name', 'backup\_migrate\_schedule\_last\_run\_%', 'LIKE')
+    ->execute()
+    ->fetchAllAssoc('name', PDO::FETCH_ASSOC);
+  foreach ($last_ran_schedules as $key => $schedule) {
+    variable_del($key);
+  }
 }
 
 /**
@@ -662,7 +678,11 @@ function backup_migrate_update_7203() {
 }
 
 /**
- * Uninstall backup migrate files if it's installed.
+ * Upgrade from Backup & Migrate 7.x-2.x.
+ *
+ * - Uninstall the Backup Migrate Files module if it's installed.
+ * - Uninstall the NodeSquirrel module if it's installed.
+ * - Upgrade the configurations.
  */
 function backup_migrate_update_7300() {
   if (module_exists('backup_migrate_files')) {
@@ -737,6 +757,12 @@ function backup_migrate_update_7300() {
     unset($item['filters']['destinations']);
     drupal_write_record('backup_migrate_profiles', $item, array('profile_id'));
   }
+
+  // Clear the plugins caches.
+  cache_clear_all('*', 'cache', TRUE);
+
+  // Rebuild the menus.
+  variable_set('menu_rebuild_needed', TRUE);
 }
 
 /**
@@ -844,7 +870,7 @@ function backup_migrate_update_7305() {
     'backup_migrate_sources',
     'backup_migrate_schedules',
   ) as $table) {
-    if (!db_field_exists($table, $machine_name)) {
+    if (!db_field_exists($table, 'machine_name')) {
       try {
         db_add_field($table, 'machine_name', $field_spec);
       }
@@ -885,12 +911,158 @@ function backup_migrate_update_7306() {
 }
 
 /**
- * 'backup_migrate_backup_memory_limit' vs 'backup_migrate_memory_limit'.
+ * - 'backup_migrate_backup_memory_limit' vs 'backup_migrate_memory_limit'.
  */
 function backup_migrate_update_7307() {
   $limit = variable_get('backup_migrate_backup_memory_limit');
   if (!empty($limit)) {
     variable_set('backup_migrate_memory_limit', $limit);
     variable_del('backup_migrate_backup_memory_limit');
+  }
+}
+
+/**
+ * Update profiles table filter field to accommodate larger serialized strings.
+ */
+function backup_migrate_update_7308() {
+  db_change_field('backup_migrate_profiles', 'filters', 'filters', array(
+    'description' => 'The filter settings for the profile.',
+    'type' => 'text',
+    'size' => 'medium',
+    'not null' => TRUE,
+    'serialize' => TRUE,
+    'serialized default' => 'a:0:{}',
+  ));
+}
+
+/**
+ * NodeSquirrel support has been removed.
+ */
+function backup_migrate_update_7309() {
+  require_once dirname(__FILE__) . '/includes/destinations.inc';
+  require_once dirname(__FILE__) . '/includes/schedules.inc';
+
+  foreach (backup_migrate_get_schedules() as $schedule) {
+    // Look for backups which use NodeSquirrel as its destination.
+    if ($schedule->destination_id == 'nodesquirrel') {
+      $name = $schedule->name;
+
+      // If this schedule had a second destination, swap the destinations.
+      if (!empty($schedule->copy_destination_id)) {
+        $destination = backup_migrate_get_destination($schedule->copy_destination_id);
+        $schedule->destination_id = $schedule->copy_destination_id;
+        $schedule->copy_destination_id = '';
+        $schedule->name = $destination->name;
+        $schedule->save();
+        drupal_set_message(t('The backup schedule named "%backup" was renamed and now just backups to %destination.', array('%backup' => $name, '%destination' => $destination->name)));
+      }
+
+      // Just delete it.
+      else {
+        $schedule->delete();
+        drupal_set_message(t('The backup schedule named "%backup" as been deleted.', array('%backup' => $name)));
+      }
+    }
+
+    // Backups which used NodeSquirrel as the second destination will have the
+    // second destination disabled.
+    elseif ($schedule->copy_destination_id == 'nodesquirrel') {
+      $schedule->copy_destination_id = '';
+      $schedule->save();
+      drupal_set_message(t('The backup schedule named "%backup" no longer keeps a second backup on NodeSquirrel.', array('%backup' => $schedule->name)));
+    }
+  }
+
+  // Clear the cache so that the NodeSquirrel plugin is no longer loaded.
+  cache_clear_all('*', 'cache', TRUE);
+
+  // Rebuild the menus so that the NodeSquirrel menu item is removed.
+  variable_set('menu_rebuild_needed', TRUE);
+
+  // @todo Remove the configuration later.
+  drupal_set_message(t('<a href="!url">NodeSquirrel stopped being usable as a backup destination</a> on October 1st, 2019 and ceased operations entirely on November 1st, 2019. Because of this, the NodeSquirrel functionality has been disabled. Please switch to an alternate destination if necessary. Please note that the NodeSquirrel configuration itself has not been removed.', array('!url' => 'https://pantheon.io/nodesquirrel-service-end-life')));
+}
+
+/**
+ * Disable e-mail destinations.
+ */
+function backup_migrate_update_7310() {
+  $out = '';
+
+  // Disable scheduled e-mail back-ups to allow users to review their
+  // destinations first.
+  //
+  // Which e-mail destinations exist?
+  $destinations = db_select('backup_migrate_destinations', 'bmd')
+    ->fields('bmd', array('machine_name'))
+    ->condition('subtype', 'email', '=')
+    ->execute()
+    ->fetchAllAssoc('machine_name', PDO::FETCH_ASSOC);
+  $destinations = array_keys($destinations);
+
+  if (!empty($destinations)) {
+    // Which schedules contain enabled e-mail destinations?
+    $or = db_or();
+    $or->condition('destination_id', $destinations, 'IN');
+    $or->condition('copy_destination_id', $destinations, 'IN');
+    $schedules_query = db_select('backup_migrate_schedules', 'bms')
+      ->fields('bms', array('schedule_id', 'name'))
+      ->condition($or)
+      ->condition('enabled', 1, '=');
+    $schedules = $schedules_query->execute()->fetchAllAssoc('schedule_id', PDO::FETCH_ASSOC);
+
+    // Disable the relevant schedules.
+    if (count($schedules) > 0) {
+      $email_schedules = array_keys($schedules);
+      $names = array_column($schedules, 'name');
+      $replacements = array('@schedules' => '<ul><li>' . implode('</li><li>', $names) . '</li></ul>');
+      db_update('backup_migrate_schedules')
+        ->fields(['enabled' => '0'])
+        ->condition('schedule_id', $email_schedules, 'IN')
+        ->execute();
+      $out .= t('Schedules that back up to e-mail destinations have been disabled. Check that you are using the correct e-mail addresses, then re-enable manually. The following schedules have been disabled: @schedules', $replacements);
+    }
+  }
+
+  if (!empty($out)) {
+    return $out;
+  }
+  else {
+    return t('No destinations were affected by this change.');
+  }
+}
+
+/**
+ * Adjust the default performance settings.
+ */
+function backup_migrate_update_7311() {
+  $settings = array(
+    'backup_migrate_data_rows_per_query' => array(
+      'old' => 1000,
+      'new' => 50000,
+    ),
+    'backup_migrate_data_rows_per_line' => array(
+      'old' => 30,
+      'new' => 10,
+    ),
+    'backup_migrate_data_bytes_per_line' => array(
+      'old' => 2000,
+      'new' => 2 * 1024,
+    ),
+  );
+  foreach ($settings as $var_name => $data) {
+    $stored = variable_get($var_name);
+
+    // Nothing was stored in the database.
+    if (empty($stored)) {
+      // Don't do anything, the new default will be picked up automatically.
+    }
+    // The old value was smaller than or equal to the new value, or was the
+    // same as the old default, delete it so that the new default can be picked
+    // up.
+    elseif (intval($stored) <= $data['new'] || $stored == $data['old']) {
+      variable_del($var_name);
+      drupal_set_message(t('!var setting reset to the new default of !val.', array('!var' => $var_name, '!val' => $data['new'])));
+    }
   }
 }

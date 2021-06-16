@@ -13,6 +13,9 @@
 class backup_migrate_destination_files extends backup_migrate_destination {
   public $supported_ops = array('scheduled backup', 'manual backup', 'local backup', 'restore', 'list files', 'configure', 'delete');
 
+  /**
+   *
+   */
   public function type_name() {
     return t("Server Directory");
   }
@@ -74,7 +77,8 @@ class backup_migrate_destination_files extends backup_migrate_destination {
   public function load_file($file_id) {
     $filepath = $this->get_filepath($file_id);
     if (file_exists($filepath)) {
-      backup_migrate_include('files');
+      require_once dirname(__FILE__) . '/files.inc';
+
       return new backup_file(array('filepath' => $filepath));
     }
   }
@@ -97,7 +101,8 @@ class backup_migrate_destination_files extends backup_migrate_destination {
     $files = array();
     if ($dir = $this->get_realpath()) {
       if ($handle = @opendir($dir)) {
-        backup_migrate_include('files');
+        require_once dirname(__FILE__) . '/files.inc';
+
         while (FALSE !== ($file = readdir($handle))) {
           if (substr($file, 0, 1) !== '.') {
             $filepath = $dir . "/" . $file;
@@ -250,11 +255,12 @@ class backup_migrate_destination_files extends backup_migrate_destination {
         }
       }
 
-      // Attempt to read the test file via http. This may fail for other reasons,
-      // so it's not a bullet-proof check.
+      // Attempt to read the test file via http. This may fail for other
+      // reasons, so it's not a bullet-proof check.
       if ($this->test_file_readable_remotely($directory . '/test.txt', $test_contents)) {
         $message = t("Security notice: Backup and Migrate will not save backup files to the server because the destination directory is publicly accessible. If you want to save files to the server, please secure the '%directory' directory", array('%directory' => $directory));
         drupal_set_message($message, "error");
+        unlink($directory . '/test.txt');
         return FALSE;
       }
       // Directory tested OK, so we mark it as tested.
@@ -305,6 +311,10 @@ class backup_migrate_destination_files extends backup_migrate_destination {
  */
 class backup_migrate_destination_files_manual extends backup_migrate_destination_files {
   public $supported_ops = array('manual backup', 'restore', 'list files', 'configure', 'delete');
+
+  /**
+   *
+   */
   public function __construct($params = array()) {
     $dir = 'private://backup_migrate/manual';
     parent::__construct($params + array('location' => $dir, 'name' => t('Manual Backups Directory')));
@@ -317,6 +327,10 @@ class backup_migrate_destination_files_manual extends backup_migrate_destination
  */
 class backup_migrate_destination_files_scheduled extends backup_migrate_destination_files {
   public $supported_ops = array('scheduled backup', 'restore', 'list files', 'configure', 'delete');
+
+  /**
+   *
+   */
   public function __construct($params = array()) {
     $dir = 'private://backup_migrate/scheduled';
     parent::__construct($params + array('location' => $dir, 'name' => t('Scheduled Backups Directory')));

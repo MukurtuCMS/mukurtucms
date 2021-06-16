@@ -137,6 +137,12 @@ Fulltext search" filter or contextual filter – using a normal filter on a
 fulltext field won't parse the search keys, which means multiple words will only
 be found when they appear as that exact phrase.
 
+- Preserve facets while using filters
+This is another option under "Advanced" > "Query settings", only available when
+the Search Facets module is installed. When enabled, facet filters are persisted
+when submitting an exposed filters form. When disabled (the default), exposed
+filters will override and reset the selected facet filters.
+
 FAQ: Why „*Indexed* Node“?
 --------------------------
 The group name used for the search result itself (in fields, filters, etc.) is

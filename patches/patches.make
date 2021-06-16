@@ -64,7 +64,7 @@ projects[community_tags][patch][] = https://www.drupal.org/files/issues/communit
 
 ;;; Ctools
 ; Modal dialog position after ajax load is not refreshed
-projects[ctools][patch][] = https://www.drupal.org/files/issues/ctools-fix_modal_position_after_ajax-1803104-25.patch
+projects[ctools][patch][] = https://www.drupal.org/files/issues/2021-02-03/ctools-fix_modal_position_after_ajax-1803104-28.patch
 
 ;;; Dummy Image
 ; The 'For missing images' option will always fail

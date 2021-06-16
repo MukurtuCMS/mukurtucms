@@ -206,7 +206,7 @@ function media_field_widget_form(&$form, &$form_state, $field, $instance, $langc
 /**
  * The #value_callback for the media field element.
  */
-function media_field_widget_value($element, $input = FALSE, $form_state) {
+function media_field_widget_value($element, $input = FALSE, $form_state = array()) {
   if ($input) {
     // Checkboxes lose their value when empty.
     // If the display field is present make sure its unchecked value is saved.

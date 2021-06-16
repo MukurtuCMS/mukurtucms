@@ -1112,6 +1112,15 @@ function file_entity_settings_form($form, &$form_state) {
     '#maxlength' => NULL,
   );
 
+  $form['file_entity_max_filesize_extensions'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Maximum upload size per extension'),
+    '#default_value' => variable_get('file_entity_max_filesize_extensions', ''),
+    '#description' => t('Set the maximum filesize for specific extensions. Enter one value per line, in the format <strong>extension|filesize</strong>. When an extension does not have a file size limit, the default maximum file size is used.'),
+    '#rows' => 10,
+    '#element_validate' => array('file_entity_max_filesize_extensions_validate'),
+  );
+
   $form['file_entity_alt'] = array(
     '#type' => 'textfield',
     '#title' => t('Alt attribute'),
@@ -1182,4 +1191,33 @@ function file_entity_settings_form($form, &$form_state) {
   );
 
   return system_settings_form($form);
+}
+
+/**
+ * Element validate callback for the maximum upload size / file extension field.
+ * Only validates non-empty values.
+ */
+function file_entity_max_filesize_extensions_validate($element, &$form_state) {
+  $list = explode("\n", $element['#value']);
+
+  foreach ($list as $position => $text) {
+    $matches = array();
+    preg_match('/(.*)\|(.*)/', $text, $matches);
+
+    if (isset($matches[1]) && isset($matches[2]) && !empty($matches[1]) && !empty($matches[2])) {
+      // Only validate non-empty values.
+      $extension = $matches[1];
+      $filesize = $matches[2];
+
+      //Validate filesize.
+      $element['#value'] = $filesize;
+      _file_generic_settings_max_filesize($element, $form_state);
+
+      //Validate extension.
+      $extensions = explode(' ', $form_state['input']['file_entity_default_allowed_extensions']);
+      if (!in_array($extension, $extensions)) {
+        form_error($element, t('"!extension" was not found in the list of allowed extensions.', array('!extension' => $extension)));
+      }
+    }
+  }
 }

@@ -531,7 +531,12 @@ function scald_youtube_video_get_info($id) {
 
   $info = array();
   $url = SCALD_YOUTUBE_WEB . '?v=' . $id;
-  $response = drupal_http_request($url);
+  $options = array(
+    'headers' => array(
+      'User-Agent' => NULL,
+    ),
+  );
+  $response = drupal_http_request($url, $options);
   if ($response->code >= 200 && $response->code < 400 && !empty($response->data)) {
     // Initialize default values.
     $info = scald_youtube_create_default_info($id);

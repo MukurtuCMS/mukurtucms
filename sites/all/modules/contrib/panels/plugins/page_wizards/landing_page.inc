@@ -278,5 +278,5 @@ function panels_landing_page_finish(&$form_state) {
   page_manager_save_page_cache($page);
 
   // Send us to the new page immediately.
-  $form_state['redirect'] = url($cache->path);
+  $form_state['redirect'] = $cache->path;
 }

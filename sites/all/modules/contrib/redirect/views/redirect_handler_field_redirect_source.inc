@@ -41,7 +41,7 @@ class redirect_handler_field_redirect_source extends views_handler_field {
       '#type' => 'checkbox',
       '#title' => t('Use absolute link (begins with "http://")'),
       '#default_value' => $this->options['absolute'],
-      '#description' => t('If you want to use this as in "output this field as link" in "link path", you have to enabled this option.'),
+      '#description' => t('If you want to use this as in <em>output this field as link</em> in <em>link path</em>, you have to enable this option.'),
     );
   }
 

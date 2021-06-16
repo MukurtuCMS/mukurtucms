@@ -7,7 +7,7 @@
 
 Drupal.behaviors.initColorbox = {
   attach: function (context, settings) {
-    if (!$.isFunction($.colorbox) || typeof settings.colorbox === 'undefined') {
+    if (!$.isFunction($('a, area, input', context).colorbox) || typeof settings.colorbox === 'undefined') {
       return;
     }
 
@@ -31,8 +31,9 @@ Drupal.behaviors.initColorbox = {
     };
 
     $('.colorbox', context)
-      .once('init-colorbox')
-      .colorbox(settings.colorbox);
+      .once('init-colorbox').each(function(){
+        $(this).colorbox(settings.colorbox);
+      });
 
     $(context).bind('cbox_complete', function () {
       Drupal.attachBehaviors('#cboxLoadedContent');

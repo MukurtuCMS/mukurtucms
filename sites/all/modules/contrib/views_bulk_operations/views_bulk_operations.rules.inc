@@ -114,8 +114,8 @@ function views_bulk_operations_rules_action_info() {
 function views_bulk_operations_views_list() {
   $selectable_displays = array();
   foreach (views_get_enabled_views() as $name => $base_view) {
-    $view = $base_view->clone_view();
     foreach ($base_view->display as $display_name => $display) {
+      $view = $base_view->clone_view();
       if (!$view->set_display($display_name)) {
         continue;
       }

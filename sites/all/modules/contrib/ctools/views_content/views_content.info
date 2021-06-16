@@ -8,9 +8,10 @@ package = Chaos tool suite
 files[] = plugins/views/views_content_plugin_display_ctools_context.inc
 files[] = plugins/views/views_content_plugin_display_panel_pane.inc
 files[] = plugins/views/views_content_plugin_style_ctools_context.inc
+files[] = tests/src/views_content.test
 
-; Information added by Drupal.org packaging script on 2020-10-23
-version = "7.x-1.17"
+; Information added by Drupal.org packaging script on 2021-01-30
+version = "7.x-1.19"
 core = "7.x"
 project = "ctools"
-datestamp = "1603490551"
+datestamp = "1611988843"

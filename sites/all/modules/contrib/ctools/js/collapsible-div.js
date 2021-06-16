@@ -194,7 +194,7 @@
             Drupal.CTools.CollapsibleCallbacksAfterToggle[i]($container, handle, content, toggle);
           }
         }
-      }
+      };
 
       var clickMe = function () {
         if (Drupal.CTools.CollapsibleCallbacks) {
@@ -222,7 +222,7 @@
         }
 
         return false;
-      }
+      };
 
       // Let both the toggle and the handle be clickable.
       toggle.click(clickMe);
@@ -237,5 +237,5 @@
     attach: function(context) {
       $('.ctools-collapsible-container', context).once('ctools-collapsible', Drupal.CTools.bindCollapsible);
     }
-  }
+  };
 })(jQuery);

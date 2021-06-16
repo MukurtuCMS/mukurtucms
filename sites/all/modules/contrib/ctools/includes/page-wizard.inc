@@ -97,7 +97,7 @@ function page_manager_page_wizard($name, $step = NULL) {
   }
 
   // Check for possibly more complex access callback on plugin.
-  if ($function = ctools_plugin_get_function($plugin, 'access callback') && !$function($plugin)) {
+  if (($function = ctools_plugin_get_function($plugin, 'access callback')) && !$function($plugin)) {
     return MENU_ACCESS_DENIED;
   }
 

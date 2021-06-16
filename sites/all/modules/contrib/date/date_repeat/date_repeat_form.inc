@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Code to add a date repeat selection form to a date field and create
@@ -35,13 +36,10 @@
  * Generate the repeat setting form.
  */
 function _date_repeat_rrule_process($element, &$form_state, $form) {
-
-  // If the RRULE field is not visible to the user,
-  // needs no processing or validation.
-  // The Date field module is not adding this element to forms
-  // if the field is hidden,
-  // this test is just in case some other module attempts to do so.
-
+  // If the RRULE field is not visible to the user, needs no processing or
+  // validation. The Date field module is not adding this element to forms if
+  // the field is hidden, this test is just in case some other module attempts
+  // to do so.
   if (date_hidden_element($element)) {
     return $element;
   }
@@ -58,8 +56,8 @@ function _date_repeat_rrule_process($element, &$form_state, $form) {
     $rrule = $element['#default_value'];
   }
 
-  // Empty the original string value of the RRULE so we can create
-  // an array of values for the form from the RRULE's contents.
+  // Empty the original string value of the RRULE so we can create an array of
+  // values for the form from the RRULE's contents.
   $element['#value'] = '';
 
   $parts = date_repeat_split_rrule($rrule);
@@ -554,8 +552,8 @@ function _date_repeat_rrule_process($element, &$form_state, $form) {
   $parents = $element['#array_parents'];
   $instance = implode('-', $parents);
 
-  // Make sure this will work right either in the normal
-  // form or in an ajax callback from the 'Add more' button.
+  // Make sure this will work right either in the normal form or in an AJAX
+  // callback from the 'Add more' button.
   if (empty($form_state['num_exceptions'][$instance])) {
     $form_state['num_exceptions'][$instance] = count($exceptions);
   }
@@ -875,9 +873,6 @@ function date_repeat_merge($form_values, $element) {
           }
         }
         break;
-
-      default:
-        break;
     }
   }
 
@@ -967,7 +962,6 @@ function date_repeat_merge($form_values, $element) {
  * Build a RRULE out of the form values.
  */
 function date_repeat_rrule_validate($element, &$form_state) {
-
   if (date_hidden_element($element)) {
     return;
   }
@@ -980,9 +974,9 @@ function date_repeat_rrule_validate($element, &$form_state) {
     return;
   }
 
-  // Clean the buttons off of the form. Needed to avoid errors when
-  // the date is used on a user object, which then passes the form
-  // through form_state_values_clean().
+  // Clean the buttons off of the form. Needed to avoid errors when the date is
+  // used on a user object, which then passes the form through
+  // form_state_values_clean().
   foreach ($form_state['buttons'] as $delta => $item) {
     if (!empty($item['#ajax']['callback']) && in_array($item['#ajax']['callback'], array('date_repeat_add_exception_callback', 'date_repeat_add_addition_callback'))) {
       unset($form_state['buttons'][$delta]);
@@ -1070,8 +1064,8 @@ function date_repeat_filter_non_zero_value($value) {
 /**
  * Helper function for transforming the return value of checkbox(es) element.
  *
- * Can be used for transforming the returned value of checkbox(es) element
- * to the format of returned value of multiple select element.
+ * Can be used for transforming the returned value of checkbox(es) element to
+ * the format of returned value of multiple select element.
  */
 function date_repeat_transform_checkbox_values_to_select_values($values) {
   return array_filter($values, 'date_repeat_filter_non_zero_value');

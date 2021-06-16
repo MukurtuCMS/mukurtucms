@@ -90,6 +90,7 @@ function template_preprocess_panels_ipe_pane_wrapper(&$vars) {
     $vars['links']['edit'] = array(
       'title' => isset($content_type['edit text']) ? '<span>' . $content_type['edit text'] . '</span>' : '<span>' . t('Settings') . '</span>',
       'href' => $renderer->get_url('edit-pane', $pane->pid),
+      'query' => drupal_get_destination(),
       'html' => TRUE,
       'attributes' => array(
         'class' => array('ctools-use-modal', 'panels-ipe-hide-bar'),
@@ -104,6 +105,7 @@ function template_preprocess_panels_ipe_pane_wrapper(&$vars) {
     $vars['links']['style'] = array(
       'title' => '<span>' . t('Style') . '</span>',
       'href' => $renderer->get_url('style-type', 'pane', $pane->pid),
+      'query' => drupal_get_destination(),
       'html' => TRUE,
       'attributes' => array(
         'class' => array('ctools-use-modal', 'panels-ipe-hide-bar'),
@@ -117,6 +119,7 @@ function template_preprocess_panels_ipe_pane_wrapper(&$vars) {
     $vars['links']['css'] = array(
       'title' => '<span>' . t('CSS') . '</span>',
       'href' => $renderer->get_url('pane-css', $pane->pid),
+      'query' => drupal_get_destination(),
       'html' => TRUE,
       'attributes' => array(
         'class' => array('ctools-use-modal', 'panels-ipe-hide-bar'),
@@ -224,13 +227,6 @@ function theme_panels_ipe_add_pane_button($vars) {
   $links = theme('links', array('links' => $vars['links'], 'attributes' => $attributes));
 
   return '<div class="panels-ipe-newblock panels-ipe-on">' . $links . '</div>';
-}
-
-/**
- * @deprecated
- */
-function panels_ipe_get_cache_key($key = NULL) {
-  return array();
 }
 
 /**

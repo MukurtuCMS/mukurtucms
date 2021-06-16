@@ -37,6 +37,7 @@ function redirect_entity_info() {
     'entity keys' => array(
       'id' => 'rid',
       'bundle' => 'type',
+      'language' => 'language',
     ),
     'fieldable' => FALSE,
     'uuid' => FALSE,
@@ -70,10 +71,14 @@ function redirect_hook_info() {
  * Implements hook_permission().
  */
 function redirect_permission() {
-  $permissions['administer redirects'] = array(
-    'title' => t('Administer URL redirections'),
+  return array(
+    'administer redirects' => array(
+      'title' => t('Administer URL redirections'),
+    ),
+    'administer own redirects' => array(
+      'title' => t('Administer own redirections'),
+    ),
   );
-  return $permissions;
 }
 
 /**
@@ -100,7 +105,8 @@ function redirect_menu() {
     'description' => 'Redirect users from one URL to another.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('redirect_list_form'),
-    'access arguments' => array('administer redirects'),
+    'access callback' => 'redirect_access',
+    'access arguments' => array('list', 'redirect'),
     'file' => 'redirect.admin.inc',
   );
   $items['admin/config/search/redirect/list'] = array(
@@ -147,7 +153,7 @@ function redirect_menu() {
   // If the database logging module is enabled, add special 404 listing pages.
   if (module_exists('dblog')) {
     $items['admin/config/search/redirect/404'] = array(
-      'title' => 'Fix 404 pages',
+      'title' => 'Add redirects for 404 pages.',
       'description' => 'Add redirects for 404 pages.',
       'page callback' => 'redirect_404_list',
       'access arguments' => array('administer redirects'),
@@ -156,7 +162,7 @@ function redirect_menu() {
       'weight' => 20,
     );
     $items['admin/reports/page-not-found/redirect'] = array(
-      'title' => 'Fix 404 pages with URL redirects',
+      'title' => 'Fix file not found (404) errors with URL redirects',
       'page callback' => 'drupal_goto',
       'page arguments' => array('admin/config/search/redirect/404'),
       'access arguments' => array('administer redirects'),
@@ -193,7 +199,7 @@ function redirect_get_current_redirect() {
   // attempt to find a redirect matching the current path, query string, and
   // language code.
   if (!isset($redirect)) {
-    $redirect = redirect_load_by_source(current_path(), $GLOBALS['language']->language, drupal_get_query_parameters());
+    $redirect = redirect_load_by_source(current_path(), $GLOBALS['language_url']->language, drupal_get_query_parameters());
   }
 
   // @todo Add an alter hook here?
@@ -219,7 +225,7 @@ function redirect_url_inbound_alter(&$path, $original_path, $path_language) {
   // the path 'foo/redirect', then redirect_init() would normally fail since it
   // would not find a match.
   if ($path != $original_path && $original_path == current_path()) {
-    $current_langcode = !empty($path_language) ? $path_language : $GLOBALS['language']->language;
+    $current_langcode = !empty($path_language) ? $path_language : $GLOBALS['language_url']->language;
     $current_query = drupal_get_query_parameters();
     if ($redirect = redirect_load_by_source($original_path, $current_langcode, $current_query)) {
       redirect_set_current_redirect($redirect);
@@ -412,7 +418,7 @@ function redirect_path_insert(array $path) {
  * Implements hook_path_delete().
  */
 function redirect_path_delete($path) {
-  if (!variable_get('redirect_auto_redirect', TRUE)) {
+  if (!variable_get('redirect_auto_redirect_delete', FALSE)) {
     return;
   }
   elseif (isset($path['redirect']) && !$path['redirect']) {
@@ -425,14 +431,24 @@ function redirect_path_delete($path) {
   }
 
   // Redirect from a deleted alias to the system path.
-  //if (!redirect_load_by_source($path['alias'], $path['language'])) {
-  //  $redirect = new stdClass();
-  //  redirect_object_prepare($redirect);
-  //  $redirect->source = $path['alias'];
-  //  $redirect->redirect = $path['source'];
-  //  $redirect->language = $path['language'];
-  //  redirect_save($redirect);
-  //}
+  if (!redirect_load_by_source($path['alias'], $path['language']) && drupal_valid_path($path['source'])) {
+    $redirect = new stdClass();
+    redirect_object_prepare($redirect);
+    $redirect->source = $path['alias'];
+    $redirect->redirect = $path['source'];
+    $redirect->language = $path['language'];
+    // Check if the redirect exists before saving.
+    $hash = redirect_hash($redirect);
+    $existing = redirect_load_by_hash($hash);
+    if (!$existing) {
+      redirect_save($redirect);
+    }
+    // If the existing redirect is disabled, re-enable it.
+    elseif (property_exists($existing, 'status') && $existing->status == 0) {
+      $existing->status = 1;
+      redirect_save($existing);
+    }
+  }
 }
 
 /**
@@ -521,7 +537,13 @@ function redirect_form_path_admin_form_alter(&$form, $form_state) {
  */
 function redirect_load($rid, $reset = FALSE) {
   $redirects = entity_load('redirect', array($rid), array(), $reset);
-  return !empty($redirects) ? reset($redirects) : FALSE;
+
+  if(!empty($redirects)) {
+    drupal_alter('redirect_load', $redirects);
+
+    return !empty($redirects) ? reset($redirects) : FALSE;
+  }
+  return FALSE;
 }
 
 /**
@@ -556,11 +578,16 @@ function redirect_load_by_hash($hash, $reset = FALSE) {
  *   An indexed array of IDs, or an empty array if there is no result set.
  */
 function redirect_fetch_rids_by_path($source, $language, $enabled_only = FALSE) {
+  static $status_field_exists = NULL;
+  if (!isset($status_field_exists)) {
+    // Prevent errors if redirect_update_7101() has not yet been run.
+    $status_field_exists = db_field_exists('redirect', 'status');
+  }
+
   // Run a case-insensitive query for matching RIDs first.
   $rid_query = db_select('redirect');
   $rid_query->addField('redirect', 'rid');
-  // Prevent errors if redirect_update_7101() has not yet been run.
-  if ($enabled_only && db_field_exists('redirect', 'status')) {
+  if ($enabled_only && $status_field_exists) {
     $rid_query->condition('status', 1);
   }
   if ($source != variable_get('site_frontpage', 'node')) {
@@ -573,6 +600,7 @@ function redirect_fetch_rids_by_path($source, $language, $enabled_only = FALSE) 
     $rid_query->condition($source_condition);
   }
   $rid_query->condition('language', array($language, LANGUAGE_NONE));
+  $rid_query->addTag('redirect_fetch');
   $rids = $rid_query->execute()->fetchCol();
   return $rids;
 }
@@ -676,7 +704,7 @@ function redirect_access($op, $redirect, $account = NULL) {
 
   $rights = &drupal_static(__FUNCTION__, array());
 
-  if (!$redirect || !in_array($op, array('create', 'update', 'delete'), TRUE)) {
+  if (!$redirect || !in_array($op, array('create', 'update', 'delete', 'list'), TRUE)) {
     // If there was no redirect to check against, or the $op was not one of the
     // supported ones, we return access denied.
     return FALSE;
@@ -693,10 +721,16 @@ function redirect_access($op, $redirect, $account = NULL) {
     return $rights[$account->uid][$cid][$op];
   }
 
-  // Administrators can access all redirects.
+  // Initialize the array value
+  $rights[$account->uid][$cid][$op] = FALSE;
+
   if (user_access('administer redirects', $account)) {
+    // Can access all redirects.
     $rights[$account->uid][$cid][$op] = TRUE;
-    return TRUE;
+  }
+  elseif (user_access('administer own redirects')) {
+    // Redirect needs to be the user's redirect
+    $rights[$account->uid][$cid][$op] = ($op == 'create' || $op == 'list' || $redirect->uid == $account->uid);
   }
 
   // We grant access to the redirect if both of the following conditions are met:
@@ -705,14 +739,12 @@ function redirect_access($op, $redirect, $account = NULL) {
   $access = module_invoke_all('redirect_access', $op, $redirect, $account);
   if (in_array(REDIRECT_ACCESS_DENY, $access, TRUE)) {
     $rights[$account->uid][$cid][$op] = FALSE;
-    return FALSE;
   }
   elseif (in_array(REDIRECT_ACCESS_ALLOW, $access, TRUE)) {
     $rights[$account->uid][$cid][$op] = TRUE;
-    return TRUE;
   }
 
-  return FALSE;
+  return $rights[$account->uid][$cid][$op];
 }
 
 /**
@@ -800,6 +832,14 @@ function redirect_save($redirect) {
     module_invoke_all('redirect_presave', $redirect);
     module_invoke_all('entity_presave', $redirect, 'redirect');
 
+    // If a duplicate redirect exists, we need to update it, rather than save a
+    // new one because the UUID hash will be the same. This will produce an
+    // integrity constraint violation in MySQL.
+    if ($exists = redirect_load_by_hash($redirect->hash)) {
+      $redirect->rid = $exists->rid;
+      $redirect->is_new = FALSE;
+    }
+
     // Save the redirect to the database and invoke the post-save hooks.
     if ($redirect->is_new) {
       drupal_write_record('redirect', $redirect);
@@ -883,8 +923,10 @@ function redirect_delete_by_path($path) {
   $query = db_select('redirect');
   $query->addField('redirect', 'rid');
   $query_or = db_or();
-  $query_or->condition('source', db_like($path), 'LIKE');
-  $query_or->condition('source', db_like($path . '/') . '%', 'LIKE');
+  if (variable_get('redirect_delete_by_source_path', TRUE)) {
+    $query_or->condition('source', db_like($path), 'LIKE');
+    $query_or->condition('source', db_like($path . '/') . '%', 'LIKE');
+  }
   $query_or->condition('redirect', db_like($path), 'LIKE');
   $query_or->condition('redirect', db_like($path . '/') . '%', 'LIKE');
   $query->condition($query_or);
@@ -978,11 +1020,11 @@ function redirect_change_status_multiple(array $rids, $status) {
 
       if ($status) {
         $redirect_link = l($redirect->redirect, $redirect->redirect) . '=> ' . l($redirect->source, $redirect->source);
-        watchdog('redirect', 'Enabled redirect: !redirect_source_link', array('!redirect_link' => $redirect_link));
+        watchdog('redirect', 'Enabled redirect: !redirect_link', array('!redirect_link' => $redirect_link));
       }
       else {
         $redirect_link = l($redirect->redirect, $redirect->redirect) . '=> ' . l($redirect->source, $redirect->source);
-        watchdog('redirect', 'Disabled redirect: !redirect_source_link', array('!redirect_link' => $redirect_link));
+        watchdog('redirect', 'Disabled redirect: !redirect_link', array('!redirect_link' => $redirect_link));
       }
     }
   }
@@ -1060,6 +1102,7 @@ function redirect_purge_inactive_redirects(array $types = array('redirect'), $in
     $query->condition('type', $types);
   }
   $query->condition('access', REQUEST_TIME - $interval, '<');
+  $query->range(0, variable_get('redirect_purge_amount', 100));
   $query->addTag('redirect_purge');
   $rids = $query->execute()->fetchCol();
 
@@ -1084,11 +1127,29 @@ function redirect_redirect($redirect = NULL) {
   }
   redirect_object_prepare($redirect, array('redirect' => current_path(), 'type' => 'manual', 'callback' => 'redirect_goto', 'cache' => TRUE));
 
+
+  // Rewrite redirect URLs to absolute file URIs.
+  if ($scheme = file_uri_scheme($redirect->redirect)) {
+    if (file_stream_wrapper_valid_scheme($scheme)) {
+      if ($external_path = file_create_url($redirect->redirect)) {
+        $redirect->redirect = $external_path;
+      }
+    }
+  }
+
   if (empty($redirect->status_code)) {
     $redirect->status_code = variable_get('redirect_default_status_code', 301);
   }
 
-  if (variable_get('redirect_passthrough_querystring', 1)) {
+  // Get global passthrough configuration by default.
+  $passthrough_querystring = variable_get('redirect_passthrough_querystring', 1);
+
+  // Individual redirects can be configured to override the global configuration.
+  if (isset($redirect->redirect_options['passthrough_querystring'])) {
+    $passthrough_querystring = $redirect->redirect_options['passthrough_querystring'];
+  }
+
+  if ($passthrough_querystring) {
     // Preserve the current query parameters in the redirect.
     $redirect->redirect_options += array('query' => array());
     $redirect->redirect_options['query'] += drupal_get_query_parameters();
@@ -1121,7 +1182,14 @@ function redirect_redirect($redirect = NULL) {
  */
 function redirect_goto($redirect) {
   $redirect->redirect_options['absolute'] = TRUE;
-  $url = url($redirect->redirect, $redirect->redirect_options);
+  // Check if this points on a file on the server.
+  if (file_exists(DRUPAL_ROOT . '/' . $redirect->redirect)) {
+    // We don't use url() directly for files to avoid a language prefix being added.
+    $url = url(file_create_url($redirect->redirect), $redirect->redirect_options);
+  }
+  else {
+    $url = url($redirect->redirect, $redirect->redirect_options);
+  }
   drupal_add_http_header('Location', $url);
   drupal_add_http_header('Status', redirect_status_code_options($redirect->status_code));
 
@@ -1391,6 +1459,8 @@ function redirect_url($path, array $options = array(), $clean_url = NULL) {
     $url .= '#' . $options['fragment'];
   }
 
+  $url = str_replace($GLOBALS['base_url'] . '/', '', $url);
+
   return $url;
 }
 
@@ -1398,10 +1468,12 @@ function redirect_variables() {
   return array(
     'redirect_default_status_code' => 301,
     'redirect_auto_redirect' => TRUE,
+    'redirect_auto_redirect_delete' => FALSE,
     'redirect_warning' => FALSE,
     'redirect_passthrough_querystring' => 1,
     'redirect_page_cache' => 0,
     'redirect_purge_inactive' => 0,
+    'redirect_purge_amount' => 100,
     'redirect_global_home' => 1,
     'redirect_global_clean' => 1,
     'redirect_global_canonical' => 1,
@@ -1428,17 +1500,33 @@ function redirect_variables() {
 
 function redirect_parse_url($url) {
   $original_url = $url;
-  $url = trim($url, " \t\n\r\0\x0B\/");
+  $is_external = url_is_external($url);
+  if (!$is_external) {
+    // Include trailing slashes in character trim list.
+    $url = trim($url, " \t\n\r\0\x0B\/");
+  }
+  else {
+    // Use the default trim() $charlist parameter.
+    $url = trim($url);
+  }
   $parsed = parse_url($url);
 
   if (isset($parsed['fragment'])) {
     $url = substr($url, 0, -strlen($parsed['fragment']));
     $url = trim($url, '#');
   }
+
+  // When Clean URLs are off, if a query component exists, it will be
+  // separated from the path component by "&" rather than "?".
+  if (variable_get('clean_url', 0) == 0 && strpos($url, '&')) {
+    $parsed['path'] = substr($url, 0, strpos($url, '&'));
+    $parsed['query'] = substr($url, strpos($url, '&') + 1);
+  }
+
   if (isset($parsed['query'])) {
     $url = substr($url, 0, -strlen($parsed['query']));
     $url = trim($url, '?&');
-    $parsed['query'] = drupal_get_query_array($parsed['query']);
+    parse_str($parsed['query'], $parsed['query']);
   }
 
   // Convert absolute to relative.
@@ -1454,7 +1542,12 @@ function redirect_parse_url($url) {
     }
   }
 
-  $url = trim($url, '/');
+  // At this point, a URL with a query or fragment may still have a trailing
+  // slash. Trim the trailing slash from "internal" Drupal paths (and other
+  // local paths).
+  if (!$is_external) {
+    $url = trim($url, '/');
+  }
 
   // Convert to frontpage paths.
   if ($url == '<front>') {
@@ -1472,13 +1565,13 @@ function redirect_parse_url($url) {
 
 function redirect_status_code_options($code = NULL) {
   $codes = array(
-    300 => t('300 Multiple Choices'),
-    301 => t('301 Moved Permanently'),
-    302 => t('302 Found'),
-    303 => t('303 See Other'),
-    304 => t('304 Not Modified'),
-    305 => t('305 Use Proxy'),
-    307 => t('307 Temporary Redirect'),
+    300 => '300 ' . t('Multiple Choices'),
+    301 => '301 ' . t('Moved Permanently'),
+    302 => '302 ' . t('Found'),
+    303 => '303 ' . t('See Other'),
+    304 => '304 ' . t('Not Modified'),
+    305 => '305 ' . t('Use Proxy'),
+    307 => '307 ' . t('Temporary Redirect'),
   );
   return isset($codes[$code]) ? $codes[$code] : $codes;
 }
@@ -1501,22 +1594,26 @@ function redirect_is_current_page_404() {
 function _redirect_uasort($a, $b) {
   $a_weight = isset($a->weight) ? $a->weight : 0;
   $b_weight = isset($b->weight) ? $b->weight : 0;
+
+  // First sort by weight (case sensitivity).
   if ($a_weight != $b_weight) {
-    // First sort by weight (case sensitivity).
-    return $a_weight > $b_weight;
+    return ($a_weight > $b_weight) ? -1 : 1;
   }
-  elseif ($a->language != $b->language) {
-    // Then sort by language specific over language neutral.
-    return $a->language == LANGUAGE_NONE;
+
+  // Then sort by language specific over language neutral.
+  if ($a->language != $b->language) {
+    return ($a->language != LANGUAGE_NONE) ? -1 : 1;
   }
-  elseif (!empty($a->source_options['query']) != !empty($b->source_options['query'])) {
-    // Then sort by redirects that do not have query strings over ones that do.
-    return empty($a->source_options['query']);
+
+  // Prioritize redirects that have more query parameters over those with less.
+  $a_query_count = isset($a->source_options['query']) ? count($a->source_options['query']) : 0;
+  $b_query_count = isset($b->source_options['query']) ? count($b->source_options['query']) : 0;
+  if ($a_query_count != $b_query_count) {
+    return ($a_query_count > $b_query_count) ? -1 : 1;
   }
-  else {
-    // Lastly sort by the highest redirect ID.
-    return $a->rid < $b->rid;
-  }
+
+  // Lastly sort by the highest redirect ID.
+  return ($a->rid > $b->rid) ? -1 : 1;
 }
 
 /**
@@ -1562,7 +1659,7 @@ function redirect_field_attach_form($entity_type, $entity, &$form, &$form_state,
     '#title' => t('URL redirects'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
-    '#access' => user_access('administer redirects'),
+    '#access' => redirect_access('list', 'redirect'),
     '#weight' => 30,
     '#attributes' => array('class' => array('redirect-list')),
   );
@@ -1588,7 +1685,7 @@ function redirect_field_attach_form($entity_type, $entity, &$form, &$form_state,
   );
   if (redirect_access('create', 'redirect')) {
     $form['redirect']['actions']['#links']['add'] = array(
-      'title' => t('Add URL redirect to this @entitytype', array('@entitytype' => drupal_strtolower($info['label']))),
+      'title' => t('Add URL redirect'),
       'href' => 'admin/config/search/redirect/add',
       'query' => array_filter($redirect) + drupal_get_destination(),
     );
@@ -1607,23 +1704,26 @@ function redirect_field_attach_form($entity_type, $entity, &$form, &$form_state,
  */
 function redirect_field_extra_fields() {
   $entity_info = entity_get_info();
+  $info = array();
   foreach (array_keys($entity_info) as $entity_type) {
     if (!redirect_entity_type_supports_redirects($entity_type)) {
       // Redirect is explicitly disabled for this entity type.
       continue;
     }
-    foreach (array_keys($entity_info[$entity_type]['bundles']) as $bundle) {
-      if (!isset($entity_info[$entity_type]['bundles'][$bundle]['uri callback']) && !isset($entity_info[$entity_type]['uri callback'])) {
-        // The bundle or base entity must have an URI callback defined otherwise
-        // we cannot use the entity_uri() function to lookup the entity's source
-        // path.
-        continue;
+    if (!empty($entity_info[$entity_type]['bundles'])) {
+      foreach (array_keys($entity_info[$entity_type]['bundles']) as $bundle) {
+        if (!isset($entity_info[$entity_type]['bundles'][$bundle]['uri callback']) && !isset($entity_info[$entity_type]['uri callback'])) {
+          // The bundle or base entity must have an URI callback defined otherwise
+          // we cannot use the entity_uri() function to lookup the entity's source
+          // path.
+          continue;
+        }
+        $info[$entity_type][$bundle]['form']['redirect'] = array(
+          'label' => t('URL redirects'),
+          'description' => t('Redirect module form elements'),
+          'weight' => 30,
+        );
       }
-      $info[$entity_type][$bundle]['form']['redirect'] = array(
-        'label' => t('URL redirects'),
-        'description' => t('Redirect module form elements'),
-        'weight' => 30,
-      );
     }
   }
   return $info;
@@ -1671,4 +1771,17 @@ function redirect_redirect_operations() {
     'confirm' => TRUE,
   );
   return $operations;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() on behalf of mpac.module.
+ */
+function mpac_form_redirect_edit_form_alter(&$form, &$form_state) {
+  if ($form['redirect']['#type'] == 'textfield') {
+    $form['redirect']['#autocomplete_path'] = 'mpac/autocomplete/menu';
+    $form['redirect']['#description'] .= '<br />' . t("You may enter the title of the node you'd like to link to to get a list of all possible matches.");
+    if (module_exists('path')) {
+      $form['redirect']['#description'] .= ' ' . t('Matches marked with %marker are URL aliases.', array('%marker' => t('*')));
+    }
+  }
 }

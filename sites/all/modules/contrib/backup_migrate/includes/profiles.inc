@@ -5,17 +5,15 @@
  * All of the settings profiles handling code for Backup and Migrate.
  */
 
-backup_migrate_include('crud');
-
+require_once dirname(__FILE__) . '/crud.inc';
 
 /**
- * Implementation of hook_backup_migrate_profile_subtypes().
+ * Implements hook_backup_migrate_profile_subtypes().
  *
  * Get the built in Backup and Migrate profile types.
  */
 function backup_migrate_backup_migrate_profile_subtypes() {
-  $out = array();
-  $out += array(
+  $out = array(
     'backup' => array(
       'include' => 'profiles',
       'type_name' => t('Backup Settings Profile'),
@@ -25,18 +23,23 @@ function backup_migrate_backup_migrate_profile_subtypes() {
   return $out;
 }
 
-
 /**
  * Get all the available backup profiles.
  */
 function backup_migrate_get_profiles() {
-  backup_migrate_include('filters');
-  $profiles = backup_migrate_crud_get_items('profile');
+  require_once dirname(__FILE__) . '/filters.inc';
+
+  $profiles = &drupal_static('backup_migrate_get_profiles', NULL);
+
+  // Get the list of profiles and cache them locally.
+  if ($profiles === NULL) {
+    $profiles = backup_migrate_crud_get_items('profile');
+  }
   return $profiles;
 }
 
 /**
- * Implementation of hook_backup_migrate_profiles_alter().
+ * Implements hook_backup_migrate_profiles_alter().
  *
  * Add default settings for any plugins which didn't exist when the profile was saved.
  */
@@ -56,7 +59,7 @@ function backup_migrate_get_profile($profile_id) {
 }
 
 /**
- * Implementation of hook_backup_migrate_profiles().
+ * Implements hook_backup_migrate_profiles().
  */
 function backup_migrate_backup_migrate_profiles() {
   $out = array();
@@ -84,13 +87,15 @@ function _backup_migrate_get_profile_form_item_options() {
  * Get a form to configure the profile.
  */
 function _backup_migrate_ui_backup_settings_form($profile) {
+  require_once dirname(__FILE__) . '/destinations.inc';
+  require_once dirname(__FILE__) . '/files.inc';
+  require_once dirname(__FILE__) . '/filters.inc';
+
   drupal_add_js(array('backup_migrate' => array('checkboxLinkText' => t('View as checkboxes'))), array('type' => 'setting'));
   drupal_add_js(drupal_get_path('module', 'backup_migrate') . '/backup_migrate.js', array('type' => 'file', 'scope' => 'footer'));
   drupal_add_css(drupal_get_path('module', 'backup_migrate') . '/backup_migrate.css');
 
-  backup_migrate_include('files', 'destinations', 'filters');
-
-  $form    = array();
+  $form = array();
 
   $form['file'] = array(
     "#type" => "fieldset",
@@ -153,8 +158,8 @@ function _backup_migrate_ui_backup_settings_form($profile) {
     $form['advanced']['#collapsible'] = TRUE;
   }
 
-  $form['#validate'][]  = '_backup_migrate_ui_backup_settings_form_validate';
-  $form['#submit'][]    = '_backup_migrate_ui_backup_settings_form_submit';
+  $form['#validate'][] = '_backup_migrate_ui_backup_settings_form_validate';
+  $form['#submit'][]   = '_backup_migrate_ui_backup_settings_form_submit';
 
   return $form;
 }
@@ -177,7 +182,9 @@ function _backup_migrate_ui_backup_settings_form_submit($form, &$form_state) {
  * Get the default profile.
  */
 function _backup_migrate_profile_default_profile() {
-  backup_migrate_include('files', 'filters');
+  require_once dirname(__FILE__) . '/files.inc';
+  require_once dirname(__FILE__) . '/filters.inc';
+
   return array(
     'source_id' => 'db',
     'filename' => _backup_migrate_default_filename(),
@@ -289,7 +296,8 @@ class backup_migrate_profile extends backup_migrate_item {
    * Get the source of the profile.
    */
   public function get_source() {
-    backup_migrate_include('locations');
+    require_once dirname(__FILE__) . '/locations.inc';
+
     if (!empty($this->source_id) && (empty($this->source) || $this->source->get_id() !== $this->source_id)) {
       $this->source = backup_migrate_get_source($this->source_id);
     }
@@ -318,7 +326,8 @@ class backup_migrate_profile extends backup_migrate_item {
    * Get the destination of the profile.
    */
   public function get_destinations() {
-    backup_migrate_include('destinations');
+    require_once dirname(__FILE__) . '/destinations.inc';
+
     if (empty($this->destinations)) {
       $this->destinations = array();
       $ids = $weights = array();

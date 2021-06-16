@@ -27,7 +27,9 @@ function views_php_check_access($php_access, $view_name, $display_id, $account =
   }
 
   if (!isset($function[$view_name . ':' . $display_id])) {
-    $function[$view_name . ':' . $display_id] = create_function('$view_name, $display_id, $account', $php_access . ';');
+    $function[$view_name . ':' . $display_id] = function ($view_name, $display_id, $account) use ($php_access) {
+      return eval($php_access . ';');
+    };
   }
 
   ob_start();
@@ -84,7 +86,7 @@ function views_php_form_element($handler, $checkbox = FALSE, $input, $variables 
     '#description' => $description . ' <strong>' . ($use_delimiters
       ? t('Use &lt;?php ?&gt; delimiters to enclose PHP code.')
       : t('Do not use &lt;?php ?&gt; delimiters.'))
-      . '</strong>',
+    . '</strong>',
   );
   // Only users with use PHP permission can set/modify input.
   if (!user_access('use PHP for settings')) {
@@ -115,7 +117,7 @@ function views_php_form_element($handler, $checkbox = FALSE, $input, $variables 
     '#attributes' => array('class' => array('views-php-variables')),
     '#attached' => array(
       'js' => array(drupal_get_path('module', 'views_php') . '/views_php.js'),
-    )
+    ),
   );
   $container[$name . '_variables']['variables'] = array(
     '#theme' => 'item_list',
@@ -132,7 +134,7 @@ function views_php_form_element($handler, $checkbox = FALSE, $input, $variables 
  * Implements hook_views_pre_execute().
  */
 function views_php_views_pre_execute($view) {
-  // Seize control over the query plugin if a views handler requested so.
+  // Seize control over the query plugin if requested by a views handler.
   if (!empty($view->views_php)) {
     $query = new views_php_plugin_query();
     $query->php_wrap($view->query);
@@ -153,7 +155,7 @@ function views_php_views_post_execute($view) {
  * Implements hook_views_post_build().
  */
 function views_php_views_post_build($view) {
-  // Clear the limit and offset
+  // Clear the limit and offset.
   if (!empty($view->views_php) && !empty($view->build_info['query']) && is_object($view->build_info['query'])) {
     $view->build_info['query']->range();
   }

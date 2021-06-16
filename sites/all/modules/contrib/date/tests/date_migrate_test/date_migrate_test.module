@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @file
+ * Primary hook implementations for the Date Migrate Test module.
+ */
+
+/**
+ * Implements hook_migrate_api().
+ */
+function date_migrate_test_migrate_api() {
+  $api = array(
+    'api' => 2,
+    'migrations' => array(
+      'DateExample' => array('class_name' => 'DateExampleMigration'),
+    ),
+  );
+  return $api;
+}

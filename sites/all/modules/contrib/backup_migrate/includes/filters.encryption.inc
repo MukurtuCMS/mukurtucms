@@ -40,7 +40,8 @@ class backup_migrate_filter_encryption extends backup_migrate_filter {
   public function backup_settings_form($settings) {
     $form = array();
     $options = $this->_backup_migrate_get_encryption_form_item_options();
-    if (count($options) > 1) {
+
+    if (array_intersect_key($options, array_flip(array('aes', 'encrypt')))) {
       $form['file']['encryption'] = array(
         "#type" => "select",
         "#title" => t("File Encryption"),
@@ -53,8 +54,25 @@ class backup_migrate_filter_encryption extends backup_migrate_filter {
       $form['file']['encryption'] = array(
         "#type" => 'item',
         "#title" => t("File Encryption"),
-        "#markup" => t('Install the !link to enable backup file encryption.', array('!link' => l(t('AES Encryption Module'), 'http://drupal.org/project/aes'))),
+        "#markup" => t('Install the !link to enable backup file encryption.', array('!link' => l(t('Encrypt module'), 'http://drupal.org/project/encrypt'))),
       );
+    }
+
+    // If the Encrypt method is available add a configuration field.
+    if (array_key_exists('encrypt', $options)) {
+      $form['file']['encrypt_config'] = array(
+        '#type' => 'select',
+        '#title' => t('Encryption Configuration'),
+        '#options' => encrypt_get_configs_as_options(),
+        '#default_value' => @$settings['encrypt_config'],
+        '#description' => t('Select a configuration to use for encryption.'),
+        '#states' => array(
+          'visible' => array(
+            ':input[name="filters[encryption]"]' => array('value' => 'encrypt'),
+          ),
+        ),
+      );
+
     }
 
     return $form;
@@ -71,6 +89,12 @@ class backup_migrate_filter_encryption extends backup_migrate_filter {
         "backup" => TRUE,
         "restore" => TRUE,
       ),
+      "encrypt" => array(
+        "extension" => "encrypt",
+        "filemime" => "application/octet-stream",
+        "backup" => TRUE,
+        "restore" => TRUE,
+      ),
     );
   }
 
@@ -82,6 +106,9 @@ class backup_migrate_filter_encryption extends backup_migrate_filter {
     $options = array('' => t('No Encryption'));
     if (@function_exists("aes_encrypt")) {
       $options['aes'] = t("AES Encryption");
+    }
+    if (@function_exists("encrypt")) {
+      $options['encrypt'] = t("Encryption With Encrypt Module");
     }
     return $options;
   }
@@ -124,7 +151,50 @@ class backup_migrate_filter_encryption extends backup_migrate_filter {
   }
 
   /**
-   * Compresses a file with the given settings.
+   * Encrypts a file with the Encrypt module.
+   */
+  public function encrypt($source, $dest, $settings) {
+    $success = FALSE;
+    if (function_exists('encrypt')) {
+      if (!empty($settings->filters['encrypt_config'])) {
+        $config_name = $settings->filters['encrypt_config'];
+      }
+      else {
+        $config = encrypt_get_default_config();
+        $config_name = $config['name'];
+      }
+      if ($data = $source->get_contents()) {
+        // Add a marker to the end of the data so we can trim the padding on decrypt.
+        $data = pack("a*H2", $data, "80");
+        if ($data = encrypt($data, array('base64' => FALSE), NULL, NULL, $config_name)) {
+          $dest->put_contents($data);
+          $success = TRUE;
+        }
+      }
+    }
+    return $success;
+  }
+
+  /**
+   * Decrypts a file with the Encrypt module.
+   */
+  public function decrypt($source, $dest) {
+    $success = FALSE;
+    if (function_exists('decrypt')) {
+      if ($data = $source->get_contents()) {
+        if ($data = decrypt($data)) {
+          // Trim all the padding zeros plus our non-zero marker.
+          $data = substr(rtrim($data, "\0"), 0, -1);
+          $dest->put_contents($data);
+          $success = TRUE;
+        }
+      }
+    }
+    return $success;
+  }
+
+  /**
+   * Encrypts a file with the given settings.
    *
    * Also updates settings to reflect new file mime and file extension.
    */
@@ -138,6 +208,14 @@ class backup_migrate_filter_encryption extends backup_migrate_filter {
             $file = NULL;
           }
           break;
+
+        case "encrypt":
+          $from = $file->push_type('encrypt');
+          $from = new backup_file(array('filepath' => $from));
+          if (!$success = $this->encrypt($from, $file, $settings)) {
+            $file = NULL;
+          }
+          break;
       }
       if (!$file) {
         _backup_migrate_message("Could not encrypt backup file. Try backing up without encryption.", array(), 'error');
@@ -147,7 +225,7 @@ class backup_migrate_filter_encryption extends backup_migrate_filter {
   }
 
   /**
-   * Decompresses a file with the given settings.
+   * Decrypts a file with the given settings.
    *
    * Also updates settings to reflect new file mime and file extension.
    */
@@ -160,16 +238,34 @@ class backup_migrate_filter_encryption extends backup_migrate_filter {
           $success = $this->aes_decrypt($from, $file);
           break;
 
+        case "encrypt":
+          $from = $file->pop_type();
+          $success = $this->decrypt($from, $file);
+          break;
+
         default:
           return $file;
       }
 
       if (!$success) {
-        if (function_exists('aes_decrypt')) {
-          _backup_migrate_message("Could not decrpyt backup file. Please check that the file is valid and that the encryption key of the server matches the server that created the backup.", array(), 'error');
-        }
-        else {
-          _backup_migrate_message('You must install the !link to restore encrypted backkups.', array('!link' => l(t('AES Encryption Module'), 'http://drupal.org/project/aes')), 'error');
+        switch ($file->type_id()) {
+          case 'aes':
+            if (function_exists('aes_decrypt')) {
+              _backup_migrate_message("Could not decrpyt backup file. Please check that the file is valid and that the encryption key of the server matches the server that created the backup.", array(), 'error');
+            }
+            else {
+              _backup_migrate_message('You must install the !link to restore encrypted backkups.', array('!link' => l(t('AES Encryption Module'), 'http://drupal.org/project/aes')), 'error');
+            }
+            break;
+
+          case 'encrypt':
+            if (function_exists('decrypt')) {
+              _backup_migrate_message("Could not decrypt backup file. Please check that the file is valid and that the encryption key of the server matches the server that created the backup.", array(), 'error');
+            }
+            else {
+              _backup_migrate_message('You must install the !link to restore encrypted backups.', array('!link' => l(t('Encrypt module'), 'http://drupal.org/project/encrypt')), 'error');
+            }
+            break;
         }
       }
     }

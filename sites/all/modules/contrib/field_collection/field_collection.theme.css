@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 .field-collection-container {
-  border-bottom: 1px solid #D3D7D9;
+  border-bottom: 1px solid #d3d7d9;
   margin-bottom: 1em;
 }
 
@@ -16,7 +16,7 @@
 .field-collection-view {
   padding: 1em 0 0.3em 0;
   margin: 0 1em 0 1em;
-  border-bottom: 1px dotted #D3D7D9;
+  border-bottom: 1px dotted #d3d7d9;
 }
 
 /* If there is no add link, don't show the final border. */
