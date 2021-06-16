@@ -2,11 +2,11 @@
 
 /**
  * @file
- * File hash configuration.
+ * File Hash configuration.
  */
 
 /**
- * Builds the file hash settings form.
+ * Builds the File Hash settings form.
  */
 function filehash_settings() {
   $form['filehash_algos'] = array(
@@ -26,7 +26,7 @@ function filehash_settings() {
 }
 
 /**
- * Builds the file hash bulk generate form.
+ * Builds the File Hash bulk generate form.
  */
 function filehash_bulk() {
   $form['explanation'] = array(
@@ -41,7 +41,7 @@ function filehash_bulk() {
 }
 
 /**
- * Submit callback for file hash bulk generate.
+ * Submit callback for File Hash bulk generate.
  */
 function filehash_bulk_submit($form, &$form_state) {
   if (!filehash_algos()) {
