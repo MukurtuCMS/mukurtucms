@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Testing CRUD API in the browser.
+ * Testing that users can not input bad URLs or labels.
  */
 
 /**
  * Testing that users can not input bad URLs or labels.
  */
-class LinkUiTest extends DrupalWebTestcase {
+class LinkFieldCrudTest extends LinkBaseTestClass {
 
   /**
    * Link supposed to be good.
@@ -98,37 +98,43 @@ class LinkUiTest extends DrupalWebTestcase {
       array(
         'href' => 'http://example.com/' . $this->randomName(),
         'label' => $this->randomName() . '<script>alert("hi");</script>',
-        'msg' => 'js label',
+        'msg' => 'JS in label',
         'type' => self::LINK_INPUT_TYPE_BAD_TITLE,
       ),
       array(
         'href' => 'http://example.com/' . $this->randomName(),
         'label' => $this->randomName() . '<script src="http://devil.site.com"></script>',
-        'msg' => 'js label',
+        'msg' => 'Remote JS in label',
         'type' => self::LINK_INPUT_TYPE_BAD_TITLE,
       ),
       array(
         'href' => 'http://example.com/' . $this->randomName(),
         'label' => $this->randomName() . '" onmouseover="alert(\'hi\')',
-        'msg' => 'js label',
+        'msg' => 'JS in label',
         'type' => self::LINK_INPUT_TYPE_BAD_TITLE,
       ),
       array(
         'href' => 'http://example.com/' . $this->randomName(),
         'label' => $this->randomName() . '\' onmouseover="alert(\'hi\')',
-        'msg' => 'js label',
+        'msg' => 'Escaped JS in label',
         'type' => self::LINK_INPUT_TYPE_BAD_TITLE,
       ),
       array(
         'href' => 'javascript:alert("http://example.com/' . $this->randomName() . '")',
         'label' => $this->randomName(),
-        'msg' => 'js url',
+        'msg' => 'JS in URL',
         'type' => self::LINK_INPUT_TYPE_BAD_URL,
+      ),
+      array(
+        'href' => 'http://example.com?foo=bar&fruit=mango',
+        'label' => $this->randomName(),
+        'msg' => 'URL with querystring',
+        'type' => self::LINK_INPUT_TYPE_GOOD,
       ),
       array(
         'href' => 'http://ecs-es.kelkoo.es/ctl/go/sitesearchGo?.ts=1338833010331&.sig=qP9GXeEFH6syBzwmzYkxmsvp1EI-',
         'label' => 'http://ecs-es.kelkoo.es/ctl/go/sitesearchGo?.ts=1338833010331&.sig=qP9GXeEFH6syBzwmzYkxmsvp1EI-',
-        'msg' => 'Url with . in querystring',
+        'msg' => 'URL with . in querystring',
         'type' => self::LINK_INPUT_TYPE_GOOD,
       ),
     );
@@ -173,13 +179,11 @@ class LinkUiTest extends DrupalWebTestcase {
       // If simpletest starts using something to override the error system, this
       // will flag us and let us know it's broken.
       $this->assertFalse(libxml_use_internal_errors(TRUE));
+      $expected_href = $input['href'];
       if (isset($input['expected_href'])) {
-        $path = '//a[@href="' . $input['expected_href'] . '" and text()="' . $input['label'] . '"]';
+        $expected_href = $input['expected_href'];
       }
-      else {
-        $path = '//a[@href="' . $input['href'] . '" and text()="' . $input['label'] . '"]';
-      }
-      $elements = $this->xpath($path);
+      $elements = $this->xpath('//a[@href="' . $expected_href . '" and text()="' . $input['label'] . '"]');
       libxml_use_internal_errors(FALSE);
       $this->assertIdentical(isset($elements[0]), $input['type'] == self::LINK_INPUT_TYPE_GOOD, $input['msg']);
     }
@@ -506,6 +510,63 @@ class LinkUiTest extends DrupalWebTestcase {
 
     $this->assertRaw('This &amp; That');
     $this->assertPattern('|class\s?=\s?"' . $link_class_name . '"|', "Classes $link_class_name exist on page.");
+  }
+
+  /**
+   * Tests that link titles properly preserve the query params.
+   */
+  public function testLinkTitlePreservesQueryParams() {
+    // Create field.
+    $field_name = $this->createLinkField();
+
+    // Create page form.
+    $this->drupalGet('node/add/page');
+    $this->assertField($field_name . '[und][0][title]', 'Title found');
+    $this->assertField($field_name . '[und][0][url]', 'URL found');
+
+    $link_title_tests = array(
+      array(
+        'href' => 'http://example.com/' . $this->randomName(),
+      ),
+      array(
+        'href' => 'http://example.com/' . $this->randomName() . '?property=value',
+      ),
+      array(
+        'href' => 'http://example.com/' . $this->randomName() . '#position',
+      ),
+      array(
+        'href' => 'http://example.com/' . $this->randomName() . '#lower?property=value2',
+      ),
+      array(
+        'href' => 'http://example.com/' . $this->randomName() . '?property=value2#lower',
+      ),
+    );
+
+    foreach ($link_title_tests as &$input) {
+      $this->drupalGet('node/add/page');
+      $this->assertResponse(200);
+
+      // Intentionally set empty title, to force using the url as the title.
+      $edit = array(
+        'title' => 'Some node title',
+        $field_name . '[und][0][title]' => '',
+        $field_name . '[und][0][url]' => $input['href'],
+      );
+      $this->drupalPost(NULL, $edit, t('Save'));
+      // Confirm the node saved correctly.
+      $this->assertResponse(200);
+      $this->assertText($edit['title']);
+      $input['url'] = $this->getUrl();
+    }
+
+    // Change to anonymous user.
+    $this->drupalLogout();
+
+    // Loop over the nodes, confirm each URL is rendered correctly.
+    foreach ($link_title_tests as $input) {
+      $this->drupalGet($input['url']);
+      $this->assertRaw(l($input['href'], $input['href']), "Test that the link title has been set to " . $input['href']);
+    }
   }
 
 }

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains simpletests making sure entity_token integration works.
+ * Testing that tokens can be used in link titles.
  */
 
 /**

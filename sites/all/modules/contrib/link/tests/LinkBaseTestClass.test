@@ -2,14 +2,19 @@
 
 /**
  * @file
- * Link base test file - contains common functions for testing links.
+ * Base test class with helper methods, etc.
  */
 
 /**
- * Base Test Class.
+ * Base test class with helper methods, etc.
  */
 class LinkBaseTestClass extends DrupalWebTestCase {
 
+  /**
+   * Default permissions used on tests.
+   *
+   * @var array
+   */
   protected $permissions = array(
     'access content',
     'administer content types',
@@ -26,8 +31,12 @@ class LinkBaseTestClass extends DrupalWebTestCase {
    * {@inheritdoc}
    */
   public function setUp(array $modules = array()) {
+    // Most of the tests require the field UI to create & modify fields.
     $modules[] = 'field_ui';
+
+    // This module.
     $modules[] = 'link';
+
     parent::setUp($modules);
 
     $this->web_user = $this->drupalCreateUser($this->permissions);

@@ -2,33 +2,27 @@
 
 /**
  * @file
- * Basic simpletests to test options on link module.
+ * Field attributes test.
  */
 
 /**
- * Attribute Crud Test.
+ * Field attributes test.
  */
-class LinkAttributeCrudTest extends DrupalWebTestCase {
+class LinkFieldAttributesTest extends LinkBaseTestClass {
 
+  /**
+   * Track a zebra value, used to alternate the output.
+   *
+   * @var int
+   */
   private $zebra;
-
-  protected $permissions = array(
-    'access content',
-    'administer content types',
-    'administer nodes',
-    'administer filters',
-    'access comments',
-    'post comments',
-    'skip comment approval',
-    'access administration pages',
-  );
 
   /**
    * Get Info.
    */
   public static function getInfo() {
     return array(
-      'name' => 'Link Attribute Tests',
+      'name' => 'Link field attribute Tests',
       'description' => 'Tests the field attributes, making sure they appear in various displayed situations.',
       'group' => 'Link',
     );
@@ -38,18 +32,9 @@ class LinkAttributeCrudTest extends DrupalWebTestCase {
    * {@inheritdoc}
    */
   public function setUp(array $modules = array()) {
-    $modules[] = 'field_ui';
-    $modules[] = 'link';
     parent::setUp($modules);
 
     $this->zebra = 0;
-
-    // Create and login user.
-    $this->web_user = $this->drupalCreateUser(array(
-      'administer content types',
-      'administer fields',
-    ));
-    $this->drupalLogin($this->web_user);
   }
 
   /**
