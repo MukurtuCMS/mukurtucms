@@ -10,6 +10,10 @@
   margin-right: auto;
 }
 
+.layout-link span {
+  display: block;
+}
+
 /* general style for the layout-icon */
 .layout-icon .caption {
   width: 90px;

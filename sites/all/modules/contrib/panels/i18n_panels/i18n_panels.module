@@ -350,9 +350,51 @@ function i18n_panels_i18n_string_list($group) {
  *   TRUE if the display is available from code.
  */
 function _18n_panels_is_exported_panels_display($display) {
-  if (isset($display->uuid)) {
-    $displays = _18n_panels_fetch_all_panel_displays();
-    return isset($displays['exported-' . $display->uuid]);
+  if (!isset($display->uuid)) {
+    return FALSE;
+  }
+  $uuid = $display->uuid;
+  // Check exported displays.
+  ctools_include('export');
+  $panels_display_temp = ctools_export_crud_load('panels_display', $uuid);
+  $panels_mini_temp = ctools_export_crud_load('panels_mini', $uuid);
+  if (
+    !empty($panels_display_temp)
+    || !empty($panels_mini_temp)
+    || (module_exists('panelizer') && ctools_export_crud_load('panelizer_defaults', $uuid))
+  ) {
+    return TRUE;
+  }
+
+  // Check page manager embedded displays.
+  // @see _18n_panels_fetch_all_panel_displays()
+  if (module_exists('page_manager')) {
+    module_load_include('inc', 'page_manager', 'page_manager.admin');
+    $tasks = page_manager_get_tasks_by_type('page');
+    $pages = array('operations' => array(), 'tasks' => array());
+    page_manager_get_pages($tasks, $pages);
+
+    foreach ($pages['tasks'] as $task) {
+      $page = page_manager_cache_load($task);
+      foreach ($page->handler_info as $id => $info) {
+        $page_manager_handler = $page->handlers[$id];
+        if ($page_manager_handler->handler == 'panel_context') {
+          $is_exported = ($page_manager_handler->export_type == (EXPORT_IN_CODE | EXPORT_IN_DATABASE) || (isset($page->subtask['storage']) && $page->subtask['storage'] == t('Overridden')));
+          if (!empty($page_manager_handler->conf['display'])) {
+            $panels_display = $page_manager_handler->conf['display'];
+            if ($panels_display->uuid == $uuid) {
+              return TRUE;
+            }
+          }
+          elseif ($is_exported && isset($page_manager_handler->conf['did'])) {
+            $panels_display = panels_load_display($page_manager_handler->conf['did']);
+            if (isset($panels_display->uuid) && $panels_display->uuid == $uuid) {
+              return TRUE;
+            }
+          }
+        }
+      }
+    }
   }
   return FALSE;
 }

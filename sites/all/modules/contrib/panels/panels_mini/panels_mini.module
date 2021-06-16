@@ -143,6 +143,7 @@ function panels_mini_block_configure($delta = 0) {
  * Remove the block if the required contexts are not available.
  */
 function panels_mini_block_list_alter(&$blocks) {
+  $current_page = FALSE;
   if (module_exists('page_manager')) {
     $current_page = page_manager_get_current_page();
   }
