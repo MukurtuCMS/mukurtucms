@@ -94,7 +94,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 6,
+        'weight' => 5,
       ),
       'map_popup' => array(
         'label' => 'hidden',
@@ -207,7 +207,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 57,
+        'weight' => 64,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -279,6 +279,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'active' => 1,
       'module' => 'options',
       'settings' => array(
+        'apply_chosen' => '',
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
@@ -323,7 +324,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 56,
+        'weight' => 63,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -453,7 +454,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 15,
+        'weight' => 16,
       ),
       'map_popup' => array(
         'label' => 'inline',
@@ -614,7 +615,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 19,
+        'weight' => 18,
       ),
       'map_popup' => array(
         'label' => 'inline',
@@ -733,7 +734,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 2,
+        'weight' => 58,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -791,6 +792,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'target' => 'default',
         'title' => '',
       ),
+      'convert_aliases' => 0,
       'custom_add_another' => '',
       'custom_remove' => '',
       'display' => array(
@@ -855,7 +857,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 58,
+        'weight' => 65,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -927,6 +929,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'active' => 1,
       'module' => 'options',
       'settings' => array(
+        'apply_chosen' => '',
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
@@ -970,7 +973,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 59,
+        'weight' => 66,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1206,6 +1209,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'active' => 1,
       'module' => 'options',
       'settings' => array(
+        'apply_chosen' => '',
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
@@ -1289,7 +1293,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 21,
+        'weight' => 22,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1491,7 +1495,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'geofield_map_zoom' => 8,
         ),
         'type' => 'geofield_map_map',
-        'weight' => 10,
+        'weight' => 9,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1638,7 +1642,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 11,
+        'weight' => 10,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1787,7 +1791,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 20,
+        'weight' => 21,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2029,7 +2033,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 5,
+        'weight' => 4,
       ),
       'map_popup' => array(
         'label' => 'hidden',
@@ -2149,7 +2153,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 31,
+        'weight' => 32,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2277,7 +2281,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'textformatter_type' => 'ul',
         ),
         'type' => 'textformatter_list',
-        'weight' => 27,
+        'weight' => 28,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2331,6 +2335,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'target' => '_blank',
         'title' => '',
       ),
+      'convert_aliases' => 0,
       'custom_add_another' => '',
       'custom_remove' => '',
       'display' => array(
@@ -2415,7 +2420,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 32,
+        'weight' => 33,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2538,7 +2543,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 29,
+        'weight' => 30,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2659,7 +2664,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 60,
+        'weight' => 67,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2778,7 +2783,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 22,
+        'weight' => 23,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2903,7 +2908,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'license',
         'settings' => array(),
         'type' => 'license_formatter',
-        'weight' => 25,
+        'weight' => 26,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -3026,7 +3031,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'license',
         'settings' => array(),
         'type' => 'license_formatter',
-        'weight' => 24,
+        'weight' => 25,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -3094,6 +3099,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
       'active' => 1,
       'module' => 'options',
       'settings' => array(
+        'apply_chosen' => '',
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
@@ -3159,7 +3165,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'override' => 0,
         ),
         'type' => 'ma_colorbox',
-        'weight' => 3,
+        'weight' => 2,
       ),
       'map_popup' => array(
         'label' => 'hidden',
@@ -3653,7 +3659,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 54,
+        'weight' => 61,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -3761,7 +3767,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 55,
+        'weight' => 62,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -3873,7 +3879,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 28,
+        'weight' => 29,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -4102,7 +4108,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 12,
+        'weight' => 60,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -4224,7 +4230,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 10,
+        'weight' => 59,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -4347,7 +4353,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 23,
+        'weight' => 24,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -4465,7 +4471,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 26,
+        'weight' => 27,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -4591,7 +4597,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 30,
+        'weight' => 31,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -4719,7 +4725,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 4,
+        'weight' => 3,
       ),
       'map_popup' => array(
         'label' => 'inline',
@@ -4848,7 +4854,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 16,
+        'weight' => 17,
       ),
       'map_popup' => array(
         'label' => 'inline',
@@ -4972,7 +4978,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 7,
+        'weight' => 6,
       ),
       'map_popup' => array(
         'label' => 'above',
