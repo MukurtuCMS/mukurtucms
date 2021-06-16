@@ -19,7 +19,7 @@ class views_php_handler_field extends views_handler_field {
   /**
    * Implements views_object#option_definition().
    */
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $options['use_php_setup'] = array('default' => FALSE);
     $options['php_setup'] = array('default' => '');
@@ -33,7 +33,7 @@ class views_php_handler_field extends views_handler_field {
   /**
    * Implements views_handler#options_form().
    */
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
 
     $form += views_php_form_element($this,
@@ -68,7 +68,7 @@ class views_php_handler_field extends views_handler_field {
     $form['use_php_click_sortable']['#default_value'] = $this->options['use_php_click_sortable'];
     $form['php_click_sortable']['#states'] = array(
       'visible' => array(
-        ':input[name="options[use_php_click_sortable]"]' => array('value' => (string)self::CLICK_SORT_PHP),
+        ':input[name="options[use_php_click_sortable]"]' => array('value' => (string) self::CLICK_SORT_PHP),
       ),
     );
     $form += views_php_form_element($this,
@@ -83,7 +83,7 @@ class views_php_handler_field extends views_handler_field {
    *
    * @see views_php_views_pre_execute()
    */
-  function query() {
+  public function query() {
     // Provide an field alias but don't actually alter the query.
     $this->field_alias = 'views_php_' . $this->position;
     // Inform views_php_views_pre_execute() to seize control over the query.
@@ -93,7 +93,7 @@ class views_php_handler_field extends views_handler_field {
   /**
    * Implements views_handler_field#click_sortable().
    */
-  function click_sortable() {
+  public function click_sortable() {
     return $this->options['use_php_click_sortable'] != self::CLICK_SORT_DISABLED;
   }
 
@@ -102,7 +102,7 @@ class views_php_handler_field extends views_handler_field {
    *
    * @see self::php_post_execute()
    */
-  function click_sort($order) {
+  public function click_sort($order) {
     $this->php_click_sort_order = $order;
   }
 
@@ -111,10 +111,13 @@ class views_php_handler_field extends views_handler_field {
    * @see views_php_views_pre_execute()
    * @see self::php_post_execute()
    */
-  function php_pre_execute() {
-    // Ecexute static PHP code.
+  public function php_pre_execute() {
+    // Execute static PHP code.
     if (!empty($this->options['php_setup'])) {
-      $function = create_function('$view, $handler, &$static', $this->options['php_setup'] . ';');
+      $code = $this->options['php_setup'] . ';';
+      $function = function ($view, $handler, &$static) use ($code) {
+        eval($code);
+      };
       ob_start();
       $function($this->view, $this, $this->php_static_variable);
       ob_end_clean();
@@ -125,13 +128,16 @@ class views_php_handler_field extends views_handler_field {
    *
    * @see views_php_views_post_execute()
    */
-  function php_post_execute() {
-    // Ecexute value PHP code.
+  public function php_post_execute() {
+    // Execute value PHP code.
     if (!empty($this->options['php_value'])) {
-      $function = create_function('$view, $handler, &$static, $row, $data', $this->options['php_value'] . ';');
+      $code = $this->options['php_value'] . ';';
+      $function = function ($view, $handler, &$static, $row, $data) use ($code) {
+        return eval($code);
+      };
       ob_start();
       foreach ($this->view->result as $i => &$row) {
-        $normalized_row = new stdClass;
+        $normalized_row = new stdClass();
         foreach ($this->view->display_handler->get_handlers('field') as $field => $handler) {
           $normalized_row->$field = isset($row->{$handler->field_alias}) ? $row->{$handler->field_alias} : NULL;
         }
@@ -144,7 +150,7 @@ class views_php_handler_field extends views_handler_field {
     if (!empty($this->options['use_php_click_sortable']) && !empty($this->php_click_sort_order)) {
       if ($this->options['use_php_click_sortable'] == self::CLICK_SORT_PHP) {
         if (!empty($this->options['php_click_sortable'])) {
-          $this->php_click_sort_function = create_function('$view, $handler, &$static, $row1, $row2', $this->options['php_click_sortable'] . ';');
+          $this->php_click_sort_function = TRUE;
         }
       }
       else {
@@ -167,18 +173,25 @@ class views_php_handler_field extends views_handler_field {
   /**
    * Helper function; usort() callback for click sort support.
    */
-  function php_click_sort($row1, $row2) {
+  public function php_click_sort($row1, $row2) {
     $factor = strtoupper($this->php_click_sort_order) == 'ASC' ? 1 : -1;
     $function = $this->php_click_sort_function;
+    if (is_bool($this->php_click_sort_function)) {
+      $code = $this->options['php_click_sortable'] . ';';
+      $function = function ($view, $handler, &$static, $row1, $row2) use ($code) {
+        return eval($code);
+      };
+    }
+
     if ($this->options['use_php_click_sortable'] == self::CLICK_SORT_PHP) {
       foreach (array('row1' => 'normalized_row1', 'row2' => 'normalized_row2') as $name => $normalized_name) {
-        $$normalized_name = new stdClass;
+        $$normalized_name = new stdClass();
         foreach ($this->view->display_handler->get_handlers('field') as $field => $handler) {
           $$normalized_name->$field = isset($$name->{$handler->field_alias}) ? $$name->{$handler->field_alias} : NULL;
         }
       }
       ob_start();
-      $result = (int)$function($this->view, $this, $this->php_static_variable, $normalized_row1, $normalized_row2);
+      $result = (int) $function($this->view, $this, $this->php_static_variable, $normalized_row1, $normalized_row2);
       ob_end_clean();
     }
     else {
@@ -190,31 +203,25 @@ class views_php_handler_field extends views_handler_field {
   /**
    * Helper function; usort callback for numeric sort.
    */
-  function php_click_sort_numeric($a, $b) {
+  public function php_click_sort_numeric($a, $b) {
     return $a - $b;
-  }
-
-  /**
-   * Implements views_handler_field#pre_render().
-   */
-  function pre_render(&$values) {
-    if (!empty($this->options['php_output'])) {
-      $this->php_output_lamda_function = create_function('$view, $handler, &$static, $row, $data, $value', ' ?>' . $this->options['php_output'] . '<?php ');
-    }
   }
 
   /**
    * Implements views_handler_field#render().
    */
-  function render($values) {
-    // Ecexute output PHP code.
-    if (!empty($this->options['php_output']) && isset($this->php_output_lamda_function)) {
-      $normalized_row = new stdClass;
+  public function render($values) {
+    // Execute output PHP code.
+    if (!empty($this->options['php_output'])) {
+      $normalized_row = new stdClass();
       foreach ($this->view->display_handler->get_handlers('field') as $field => $handler) {
         $normalized_row->$field = isset($values->{$handler->field_alias}) ? $values->{$handler->field_alias} : NULL;
       }
 
-      $function = $this->php_output_lamda_function;
+      $code = ' ?>' . $this->options['php_output'];
+      $function = function ($view, $handler, &$static, $row, $data, $value) use ($code) {
+        eval($code);
+      };
       ob_start();
       $function($this->view, $this, $this->php_static_variable, $normalized_row, $values, isset($values->{$this->field_alias}) ? $values->{$this->field_alias} : NULL);
       $value = ob_get_clean();
@@ -229,4 +236,5 @@ class views_php_handler_field extends views_handler_field {
       return $value;
     }
   }
+
 }

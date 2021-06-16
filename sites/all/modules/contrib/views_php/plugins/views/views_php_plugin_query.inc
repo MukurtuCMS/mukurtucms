@@ -10,7 +10,7 @@ class views_php_plugin_query extends views_php_plugin_wrapper {
   /**
    * Implements views_plugin_query#execute().
    */
-  function execute(&$view) {
+  public function execute(&$view) {
     $pager = new views_php_plugin_pager();
     $pager->php_wrap($this->wrapped->pager);
 
@@ -18,4 +18,5 @@ class views_php_plugin_query extends views_php_plugin_wrapper {
 
     $pager->php_unwrap();
   }
+
 }
