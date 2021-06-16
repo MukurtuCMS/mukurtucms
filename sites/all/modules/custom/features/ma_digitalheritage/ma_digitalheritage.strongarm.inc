@@ -187,6 +187,24 @@ function ma_digitalheritage_strongarm() {
       'featured_content' => array(
         'custom_settings' => TRUE,
       ),
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
+      ),
+      'ical' => array(
+        'custom_settings' => FALSE,
+      ),
+      'collections_browse' => array(
+        'custom_settings' => FALSE,
+      ),
+      'dictionary_word_summary' => array(
+        'custom_settings' => FALSE,
+      ),
+      'teacher_view' => array(
+        'custom_settings' => FALSE,
+      ),
+      'related_person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(

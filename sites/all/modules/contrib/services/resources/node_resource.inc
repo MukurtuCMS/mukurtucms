@@ -343,8 +343,16 @@ function _node_resource_create($node) {
   );
   $stub_form = drupal_build_form($node_type . '_node_form', $stub_form_state);
   $form_state['triggering_element'] = $stub_form['actions']['submit'];
+  $node = (object) array_merge((array) $stub_node, (array) $node);
 
-  drupal_form_submit($node_type . '_node_form', $form_state, (object)$stub_node);
+  drupal_form_submit($node_type . '_node_form', $form_state, $node);
+
+  // Mukurtu patch - check for our custom paragraph validation errors.
+  if (count($_SESSION['paragraph validation errors'])) {
+    $paragraph_validation_errors = $_SESSION['paragraph validation errors'];
+    unset ($_SESSION['paragraph validation errors']);
+    return services_error(implode(" ", $paragraph_validation_errors), 406, array('form_errors' => $paragraph_validation_errors));
+  }
 
   if ($errors = form_get_errors()) {
     return services_error(implode(" ", $errors), 406, array('form_errors' => $errors));
@@ -427,6 +435,7 @@ function _node_resource_update($nid, $node) {
 
   $node_type = $node['type'];
   node_object_prepare($old_node);
+  $old_node = (object) array_merge((array) $old_node, (array) $node);
 
   // Setup form_state.
   $form_state = array();

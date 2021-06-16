@@ -211,17 +211,23 @@ function ma_lesson_plan_strongarm() {
       'teacher_view' => array(
         'custom_settings' => TRUE,
       ),
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
+      ),
+      'ical' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
         'title' => array(
-          'weight' => '1',
+          'weight' => '2',
         ),
         'path' => array(
-          'weight' => '11',
+          'weight' => '12',
         ),
         'redirect' => array(
-          'weight' => '10',
+          'weight' => '11',
         ),
       ),
       'display' => array(),
@@ -290,6 +296,9 @@ function ma_lesson_plan_strongarm() {
         'custom_settings' => TRUE,
       ),
       'teacher_view' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_mobile' => array(
         'custom_settings' => TRUE,
       ),
       'ical' => array(

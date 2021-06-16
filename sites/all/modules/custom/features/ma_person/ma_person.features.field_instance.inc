@@ -48,6 +48,12 @@ function ma_person_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
       'person_teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -156,6 +162,20 @@ function ma_person_field_default_field_instances() {
         'type' => 'date_default',
         'weight' => 1,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'date',
+        'settings' => array(
+          'format_type' => 'exif',
+          'fromto' => 'both',
+          'multiple_from' => '',
+          'multiple_number' => '',
+          'multiple_to' => '',
+          'show_remaining_days' => 0,
+        ),
+        'type' => 'date_default',
+        'weight' => 2,
+      ),
       'person_teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -226,7 +246,7 @@ function ma_person_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_text',
-      'weight' => 3,
+      'weight' => 19,
     ),
   );
 
@@ -271,6 +291,20 @@ function ma_person_field_default_field_instances() {
         ),
         'type' => 'date_default',
         'weight' => 2,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'date',
+        'settings' => array(
+          'format_type' => 'exif',
+          'fromto' => 'both',
+          'multiple_from' => '',
+          'multiple_number' => '',
+          'multiple_to' => '',
+          'show_remaining_days' => 0,
+        ),
+        'type' => 'date_default',
+        'weight' => 3,
       ),
       'person_teaser' => array(
         'label' => 'above',
@@ -342,7 +376,7 @@ function ma_person_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_text',
-      'weight' => 4,
+      'weight' => 20,
     ),
   );
 
@@ -374,6 +408,12 @@ function ma_person_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 19,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 35,
       ),
       'person_teaser' => array(
         'label' => 'above',
@@ -423,7 +463,7 @@ function ma_person_field_default_field_instances() {
         'display_label' => 1,
       ),
       'type' => 'options_onoff',
-      'weight' => 5,
+      'weight' => 21,
     ),
   );
 
@@ -462,6 +502,12 @@ function ma_person_field_default_field_instances() {
         ),
         'type' => 'entityreference_entity_view',
         'weight' => 6,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 34,
       ),
       'person_teaser' => array(
         'label' => 'hidden',
@@ -555,6 +601,16 @@ function ma_person_field_default_field_instances() {
         'type' => 'mukurtu_image_carousel_formatter',
         'weight' => 5,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'ma_colorbox',
+        'weight' => 1,
+      ),
       'person_teaser' => array(
         'label' => 'hidden',
         'module' => 'atom_reference',
@@ -630,7 +686,7 @@ function ma_person_field_default_field_instances() {
         'context' => 'sdl_editor_representation',
       ),
       'type' => 'atom_reference_textfield',
-      'weight' => 2,
+      'weight' => 16,
     ),
   );
 
@@ -659,6 +715,12 @@ function ma_person_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 21,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 37,
       ),
       'person_teaser' => array(
         'label' => 'above',
@@ -723,6 +785,8 @@ function ma_person_field_default_field_instances() {
   // Exported field_instance: 'node-person-field_node_aggregate'.
   $field_instances['node-person-field_node_aggregate'] = array(
     'bundle' => 'person',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -751,6 +815,12 @@ function ma_person_field_default_field_instances() {
         ),
         'type' => 'entityreference_entity_view',
         'weight' => 5,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 7,
       ),
       'person_teaser' => array(
         'label' => 'hidden',
@@ -796,6 +866,13 @@ function ma_person_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -803,6 +880,7 @@ function ma_person_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => '',
+        'treeable' => 0,
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
@@ -827,6 +905,12 @@ function ma_person_field_default_field_instances() {
         'weight' => 37,
       ),
       'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -921,6 +1005,12 @@ function ma_person_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 26,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 38,
+      ),
       'person_teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -998,6 +1088,12 @@ function ma_person_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
       'person_teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1067,6 +1163,8 @@ function ma_person_field_default_field_instances() {
   // Exported field_instance: 'node-person-field_related_people'.
   $field_instances['node-person-field_related_people'] = array(
     'bundle' => 'person',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -1092,6 +1190,15 @@ function ma_person_field_default_field_instances() {
         'settings' => array(),
         'type' => 'mukurtu_paragraphs_carousel_formatter',
         'weight' => 2,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'paragraphs',
+        'settings' => array(
+          'view_mode' => 'mukurtu_mobile',
+        ),
+        'type' => 'paragraphs_view',
+        'weight' => 5,
       ),
       'person_teaser' => array(
         'label' => 'above',
@@ -1124,6 +1231,7 @@ function ma_person_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_related_people',
@@ -1134,10 +1242,12 @@ function ma_person_field_default_field_instances() {
       'allowed_bundles' => array(
         'dictionary_word_bundle' => -1,
         'person_relationship_bundle' => 'person_relationship_bundle',
+        'text_section' => -1,
       ),
       'bundle_weights' => array(
         'dictionary_word_bundle' => 2,
         'person_relationship_bundle' => 3,
+        'text_section' => -6,
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
@@ -1149,7 +1259,9 @@ function ma_person_field_default_field_instances() {
     'widget' => array(
       'active' => 0,
       'module' => 'paragraphs',
-      'settings' => array(),
+      'settings' => array(
+        'treeable' => 0,
+      ),
       'type' => 'paragraphs_embed',
       'weight' => 12,
     ),
@@ -1158,7 +1270,9 @@ function ma_person_field_default_field_instances() {
   // Exported field_instance: 'node-person-field_sections'.
   $field_instances['node-person-field_sections'] = array(
     'bundle' => 'person',
-    'default_value' => array(),
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -1185,6 +1299,15 @@ function ma_person_field_default_field_instances() {
         ),
         'type' => 'paragraphs_view',
         'weight' => 4,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'hidden',
+        'module' => 'paragraphs',
+        'settings' => array(
+          'view_mode' => 'mukurtu_mobile',
+        ),
+        'type' => 'paragraphs_view',
+        'weight' => 6,
       ),
       'person_teaser' => array(
         'label' => 'above',
@@ -1217,6 +1340,7 @@ function ma_person_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_sections',
@@ -1244,15 +1368,19 @@ function ma_person_field_default_field_instances() {
     'widget' => array(
       'active' => 0,
       'module' => 'paragraphs',
-      'settings' => array(),
+      'settings' => array(
+        'treeable' => 0,
+      ),
       'type' => 'paragraphs_embed',
-      'weight' => 7,
+      'weight' => 18,
     ),
   );
 
   // Exported field_instance: 'node-person-field_tags'.
   $field_instances['node-person-field_tags'] = array(
     'bundle' => 'person',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => 'Keywords provide added ways to group your content. They make it easier for users to search and retrieve content.',
@@ -1286,6 +1414,30 @@ function ma_person_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => TRUE,
+            'field_collection_view_mode' => 'full',
+            'link_field_display_type' => 'link_default',
+            'node_reference_link' => TRUE,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 4,
       ),
       'person_teaser' => array(
         'label' => 'above',
@@ -1327,18 +1479,27 @@ function ma_person_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'allow_add_onfly' => 1,
+        'show_voc_terms_page_link' => 0,
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'active' => 0,
-      'module' => 'taxonomy',
+      'active' => 1,
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_path' => 'taxonomy/autocomplete',
-        'size' => 60,
+        'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
-      'weight' => 6,
+      'type' => 'options_select',
+      'weight' => 17,
     ),
   );
 
@@ -1366,6 +1527,12 @@ function ma_person_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 20,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 36,
       ),
       'person_teaser' => array(
         'label' => 'above',
@@ -1442,6 +1609,8 @@ function ma_person_field_default_field_instances() {
   // 'paragraphs_item-person_relationship_bundle-field_related_person'.
   $field_instances['paragraphs_item-person_relationship_bundle-field_related_person'] = array(
     'bundle' => 'person_relationship_bundle',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -1456,6 +1625,16 @@ function ma_person_field_default_field_instances() {
           'view_mode' => 'related_person_teaser',
         ),
         'type' => 'entityreference_entity_view',
+        'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'hidden',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 0,
+          'link' => 0,
+        ),
+        'type' => 'entityreference_label',
         'weight' => 0,
       ),
       'paragraphs_editor_preview' => array(
@@ -1478,17 +1657,24 @@ function ma_person_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'entityreference',
+      'module' => 'options',
       'settings' => array(
-        'match_operator' => 'CONTAINS',
-        'path' => '',
-        'size' => 60,
+        'apply_chosen' => '',
+        'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'entityreference_autocomplete',
+      'type' => 'options_select',
       'weight' => 1,
     ),
   );
@@ -1497,11 +1683,37 @@ function ma_person_field_default_field_instances() {
   // 'paragraphs_item-person_relationship_bundle-field_relationship_type'.
   $field_instances['paragraphs_item-person_relationship_bundle-field_relationship_type'] = array(
     'bundle' => 'person_relationship_bundle',
-    'default_value' => NULL,
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
       'default' => array(
+        'label' => 'hidden',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => TRUE,
+            'field_collection_view_mode' => 'full',
+            'link_field_display_type' => 'link_default',
+            'node_reference_link' => TRUE,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 1,
+      ),
+      'mukurtu_mobile' => array(
         'label' => 'hidden',
         'module' => 'textformatter',
         'settings' => array(
@@ -1540,16 +1752,26 @@ function ma_person_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'allow_add_onfly' => 1,
+        'show_voc_terms_page_link' => 0,
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'active' => 0,
-      'module' => 'taxonomy',
+      'active' => 1,
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_path' => 'taxonomy/autocomplete',
-        'size' => 60,
+        'apply_chosen' => '',
+        'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
+      'type' => 'options_select',
       'weight' => 2,
     ),
   );
@@ -1566,6 +1788,16 @@ function ma_person_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 1,
+          'override' => 0,
+        ),
+        'type' => 'ma_colorbox',
+        'weight' => 1,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
           'override' => 0,
         ),
         'type' => 'ma_colorbox',
@@ -1623,6 +1855,16 @@ function ma_person_field_default_field_instances() {
         'type' => 'ma_colorbox',
         'weight' => 3,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'ma_colorbox',
+        'weight' => 3,
+      ),
       'paragraphs_editor_preview' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1666,6 +1908,13 @@ function ma_person_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 2,
+      ),
+      'mukurtu_mobile' => array(
         'label' => 'hidden',
         'module' => 'text',
         'settings' => array(),
@@ -1716,6 +1965,13 @@ function ma_person_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
         'label' => 'hidden',
         'module' => 'text',
         'settings' => array(),

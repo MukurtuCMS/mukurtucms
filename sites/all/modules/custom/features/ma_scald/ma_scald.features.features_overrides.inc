@@ -20,40 +20,22 @@ function ma_scald_features_override_default_overrides() {
   $overrides["image.large.effects|0|weight"] = -1;
   $overrides["image.large.effects|1"] = array(
     'data' => array(
-      'height' => 960,
+      'height' => 480,
       'upscale' => 0,
-      'width' => 960,
+      'width' => 480,
     ),
     'name' => 'image_scale',
     'weight' => 0,
   );
-  $overrides["image.medium.effects|0|data|height"]["DELETED"] = TRUE;
-  $overrides["image.medium.effects|0|data|upscale"]["DELETED"] = TRUE;
-  $overrides["image.medium.effects|0|data|width"]["DELETED"] = TRUE;
-  $overrides["image.medium.effects|0|name"] = 'imagecache_autorotate';
-  $overrides["image.medium.effects|0|weight"] = -1;
   $overrides["image.medium.effects|1"] = array(
-    'data' => array(
-      'height' => 440,
-      'upscale' => 1,
-      'width' => 440,
-    ),
-    'name' => 'image_scale',
-    'weight' => 0,
+    'data' => array(),
+    'name' => 'imagecache_autorotate',
+    'weight' => -1,
   );
-  $overrides["image.thumbnail.effects|0|data|height"]["DELETED"] = TRUE;
-  $overrides["image.thumbnail.effects|0|data|upscale"]["DELETED"] = TRUE;
-  $overrides["image.thumbnail.effects|0|data|width"]["DELETED"] = TRUE;
-  $overrides["image.thumbnail.effects|0|name"] = 'imagecache_autorotate';
-  $overrides["image.thumbnail.effects|0|weight"] = -1;
   $overrides["image.thumbnail.effects|1"] = array(
-    'data' => array(
-      'height' => 200,
-      'upscale' => 1,
-      'width' => 200,
-    ),
-    'name' => 'image_scale',
-    'weight' => 0,
+    'data' => array(),
+    'name' => 'imagecache_autorotate',
+    'weight' => -1,
   );
 
  return $overrides;
