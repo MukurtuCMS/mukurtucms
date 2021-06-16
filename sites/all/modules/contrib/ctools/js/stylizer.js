@@ -180,7 +180,7 @@
         );
         $(this).after(lock);
         locks.push(lock);
-      };
+      }
 
       // Add hook
       var $this = $(this);
@@ -216,5 +216,5 @@
           $widget.attr('checked', !$widget.attr('checked') || $widget.is('input[type=radio]'));
         });
     }
-  }
+  };
 })(jQuery);

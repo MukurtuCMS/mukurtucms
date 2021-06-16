@@ -61,7 +61,7 @@
             $("div.ctools-dropdown-container", $dropdown)
               .animate({height: "show", opacity: "show"}, 100);
           }
-        }
+        };
         $("a.ctools-dropdown-link", $dropdown).click(function() {
           toggle();
           return false;
@@ -83,5 +83,5 @@
         );
       });
     }
-  }
+  };
 })(jQuery);
