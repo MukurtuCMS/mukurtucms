@@ -35,9 +35,9 @@ class FieldCollectionBasicTestCase extends DrupalWebTestCase {
       'field_name' => $this->field_name,
       'entity_type' => 'node',
       'bundle' => 'article',
-      'label' => $this->randomName() . '_label',
-      'description' => $this->randomName() . '_description',
-      'weight' => mt_rand(0, 127),
+      'label' => self::randomName() . '_label',
+      'description' => self::randomName() . '_description',
+      'weight' => random_int(0, 127),
       'settings' => array(),
       'widget' => array(
         'type' => 'hidden',
@@ -340,13 +340,13 @@ class FieldCollectionBasicTestCase extends DrupalWebTestCase {
     $this->drupalGet($path);
     $this->assertText(t('Test text field'), 'Add form is shown.');
 
-    $edit['field_text[und][0][value]'] = $this->randomName();
+    $edit['field_text[und][0][value]'] = self::randomName();
     $this->drupalPost($path, $edit, t('Save'));
     $this->assertText(t('The changes have been saved.'), 'Field collection saved.');
 
     $this->assertText($edit['field_text[und][0][value]'], 'Added field value is shown.');
 
-    $edit['field_text[und][0][value]'] = $this->randomName();
+    $edit['field_text[und][0][value]'] = self::randomName();
     $this->drupalPost('field-collection/field-test-collection/1/edit', $edit, t('Save'));
     $this->assertText(t('The changes have been saved.'), 'Field collection saved.');
     $this->assertText($edit['field_text[und][0][value]'], 'Field collection has been edited.');
@@ -361,7 +361,7 @@ class FieldCollectionBasicTestCase extends DrupalWebTestCase {
     // Make sure adding doesn't work any more as we have restricted cardinality
     // to 1.
     $this->drupalGet($path);
-    $this->assertText(t('Too many items.'), 'Maxium cardinality has been reached.');
+    $this->assertResponse(403);
 
     $this->drupalPost('field-collection/field-test-collection/1/delete', array(), t('Delete'));
     $this->drupalGet($path);
@@ -457,9 +457,9 @@ class FieldCollectionRulesIntegrationTestCase extends DrupalWebTestCase {
       'field_name' => $this->field_name,
       'entity_type' => 'node',
       'bundle' => 'article',
-      'label' => $this->randomName() . '_label',
-      'description' => $this->randomName() . '_description',
-      'weight' => mt_rand(0, 127),
+      'label' => self::randomName() . '_label',
+      'description' => self::randomName() . '_description',
+      'weight' => random_int(0, 127),
       'settings' => array(),
       'widget' => array(
         'type' => 'hidden',
@@ -572,9 +572,9 @@ class FieldCollectionContentTranslationTestCase extends DrupalWebTestCase {
       'field_name' => $this->field_name,
       'entity_type' => 'node',
       'bundle' => 'article',
-      'label' => $this->randomName() . '_label',
-      'description' => $this->randomName() . '_description',
-      'weight' => mt_rand(0, 127),
+      'label' => self::randomName() . '_label',
+      'description' => self::randomName() . '_description',
+      'weight' => random_int(0, 127),
       'settings' => array(),
       'widget' => array(
         'type' => 'field_collection_embed',
@@ -618,11 +618,11 @@ class FieldCollectionContentTranslationTestCase extends DrupalWebTestCase {
    */
   public function testContentTranslation() {
     // Create "Article" content.
-    $edit['title'] = $this->randomName();
-    $edit['body[' . LANGUAGE_NONE . '][0][value]'] = $this->randomName();
+    $edit['title'] = self::randomName();
+    $edit['body[' . LANGUAGE_NONE . '][0][value]'] = self::randomName();
     $edit['language'] = 'en';
     $field_collection_name = 'field_test_collection[' . LANGUAGE_NONE . '][0][field_text][' . LANGUAGE_NONE . '][0][value]';
-    $edit[$field_collection_name] = $this->randomName();
+    $edit[$field_collection_name] = self::randomName();
 
     $this->drupalPost('node/add/article', $edit, t('Save'));
     $this->assertRaw(t('Article %title has been created.', array('%title' => $edit['title'])), 'Article created.');
@@ -787,9 +787,9 @@ class FieldCollectionEntityTranslationTestCase extends DrupalWebTestCase {
       'field_name' => $this->field_name,
       'entity_type' => 'node',
       'bundle' => 'page',
-      'label' => $this->randomName() . '_label',
-      'description' => $this->randomName() . '_description',
-      'weight' => mt_rand(0, 127),
+      'label' => self::randomName() . '_label',
+      'description' => self::randomName() . '_description',
+      'weight' => random_int(0, 127),
       'settings' => array(),
       'widget' => array(
         'type' => 'field_collection_embed',
@@ -864,7 +864,7 @@ class FieldCollectionEntityTranslationTestCase extends DrupalWebTestCase {
       $num_values = self::NUM_VALUES;
     }
 
-    $title = $this->randomName();
+    $title = self::randomName();
 
     $this->drupalGet('node/add/page');
 

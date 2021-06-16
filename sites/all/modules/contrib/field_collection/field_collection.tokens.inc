@@ -66,7 +66,6 @@ function field_collection_token_info_alter(&$data) {
   );
 }
 
-
 /**
  * Implements hook_tokens().
  */
@@ -75,7 +74,7 @@ function field_collection_tokens($type, $tokens, array $data = array(), array $o
 
   // Provide a complete set of tokens for type == 'host', and a supplementary
   // token 'host' for type == 'field_collection_item'.
-  if (($type == 'field_collection_item' or $type == 'host') and !empty($data['field_collection_item'])) {
+  if (($type === 'field_collection_item' || $type === 'host') && !empty($data['field_collection_item'])) {
     $collection = $data['field_collection_item'];
     // When saving revisions, only $collection->original has valid state about
     // its host entity.
@@ -83,7 +82,7 @@ function field_collection_tokens($type, $tokens, array $data = array(), array $o
       $collection = $collection->original;
     }
 
-    if ($type == 'field_collection_item') {
+    if ($type === 'field_collection_item') {
       if (!empty($tokens['host'])) {
         $replacements[$tokens['host']] = $collection->hostEntityId();
       }

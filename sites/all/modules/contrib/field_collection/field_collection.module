@@ -44,7 +44,7 @@ function field_collection_form_field_ui_field_overview_form_alter(&$form, &$form
       if (!isset($field['type']['#title'])) {
         continue;
       }
-      if ($field['type']['#title'] == 'Field collection') {
+      if ($field['type']['#title'] === 'Field collection') {
         $form['fields'][$fieldname]['field_name']['#markup'] =
           l($form['fields'][$fieldname]['field_name']['#markup'], 'admin/structure/field-collections/' . str_replace('_', '-', $fieldname) . '/fields');
       }
@@ -56,7 +56,7 @@ function field_collection_form_field_ui_field_overview_form_alter(&$form, &$form
  * Implements hook_ctools_plugin_directory().
  */
 function field_collection_ctools_plugin_directory($module, $plugin) {
-  if ($module == 'ctools') {
+  if ($module === 'ctools') {
     return 'ctools/' . $plugin;
   }
 }
@@ -164,7 +164,7 @@ function field_collection_entity_language($entity_type, $entity) {
  */
 function field_collection_field_name_load($arg) {
   $field_name = strtr($arg, array('-' => '_'));
-  if (($field = field_info_field($field_name)) && $field['type'] == 'field_collection') {
+  if (($field = field_info_field($field_name)) && $field['type'] === 'field_collection') {
     return $field_name;
   }
 }
@@ -232,7 +232,7 @@ function field_collection_menu() {
 
   // Add menu paths for viewing/editing/deleting field collection items.
   foreach (field_info_fields() as $field) {
-    if ($field['type'] == 'field_collection') {
+    if ($field['type'] === 'field_collection') {
       $path = field_collection_field_get_path($field);
       $count = substr_count($path, '/') + 1;
 
@@ -291,7 +291,9 @@ function field_collection_menu() {
 }
 
 /**
- * Implements hook_menu_alter() to fix the field collections admin UI tabs.
+ * Implements hook_menu_alter().
+ *
+ * Fix the field collections admin UI tabs.
  */
 function field_collection_menu_alter(&$items) {
   if (isset($items['admin/structure/field-collections/%field_collection_field_name/fields']) && module_exists('field_ui')) {
@@ -369,7 +371,7 @@ function field_collection_item_access($op, FieldCollectionItemEntity $item = NUL
   // We do not support editing field collection revisions that are not used at
   // the hosts default revision as saving the host might result in a new default
   // revision.
-  if ($op != 'view' && isset($item) && !$item->isInUse()) {
+  if ($op !== 'view' && isset($item) && !$item->isInUse()) {
     return FALSE;
   }
   if (user_access('edit field collections', $account)) {
@@ -381,12 +383,12 @@ function field_collection_item_access($op, FieldCollectionItemEntity $item = NUL
   if (!isset($item)) {
     return FALSE;
   }
-  $op = $op == 'view' ? 'view' : 'edit';
+  $op = $op === 'view' ? 'view' : 'edit';
 
   // Access is determined by the entity and field containing the reference.
   $field = field_info_field($item->field_name);
   $hostEntity = $item->hostEntity() !== FALSE ? $item->hostEntity() : NULL;
-  $entity_access = entity_access($op == 'view' ? 'view' : 'update', $item->hostEntityType(), $hostEntity, $account);
+  $entity_access = entity_access($op === 'view' ? 'view' : 'update', $item->hostEntityType(), $hostEntity, $account);
 
   return $entity_access && field_access($op, $field, $item->hostEntityType(), $hostEntity, $account);
 }
@@ -535,6 +537,11 @@ function field_collection_field_insert($host_entity_type, $host_entity, $field, 
         'value' => $entity->item_id,
         'revision_id' => $entity->revision_id,
       );
+
+      if (module_exists('pathauto')) {
+        module_load_include('inc', 'field_collection', 'field_collection.pathauto');
+        field_collection_pathauto_create_alias($host_entity, $entity, 'insert');
+      }
     }
   }
 }
@@ -583,7 +590,8 @@ function field_collection_field_update($host_entity_type, $host_entity, $field, 
         if (!empty($host_entity->revision) || !empty($host_entity->is_new_revision)) {
           $entity->revision = TRUE;
           // Without this cache clear entity_revision_is_default will
-          // incorrectly return false here when creating a new published revision
+          // incorrectly return false here when creating a new published
+          // revision.
           if (!isset($cleared_host_entity_cache)) {
             list($entity_id) = entity_extract_ids($host_entity_type, $host_entity);
             entity_get_controller($host_entity_type)->resetCache(array($entity_id));
@@ -614,6 +622,11 @@ function field_collection_field_update($host_entity_type, $host_entity, $field, 
           'value' => $entity->item_id,
           'revision_id' => $entity->revision_id,
         );
+
+        if (module_exists('pathauto')) {
+          module_load_include('inc', 'field_collection', 'field_collection.pathauto');
+          field_collection_pathauto_create_alias($host_entity, $entity, 'update');
+        }
       }
     }
 
@@ -631,6 +644,13 @@ function field_collection_field_update($host_entity_type, $host_entity, $field, 
         ->fields(array('archived' => 1))
         ->condition('item_id', $ids, 'IN')
         ->execute();
+
+      // Let other modules know about the archived items.
+      foreach (field_collection_item_load_multiple($ids) as $un_item) {
+        entity_get_controller('field_collection_item')->invoke('archive', $un_item);
+
+        entity_get_controller('field_collection_item')->resetCache(array($un_item->item_id));
+      }
     }
     else {
       // Load items from the original entity from all languages checking which
@@ -646,6 +666,10 @@ function field_collection_field_update($host_entity_type, $host_entity, $field, 
       foreach (field_collection_item_load_multiple($items_to_remove) as $un_item) {
         $un_item->updateHostEntity($host_entity, $host_entity_type);
         $un_item->deleteRevision(TRUE);
+
+        if (module_exists('pathauto')) {
+          pathauto_entity_path_delete_all('field_collection_item', $un_item);
+        }
       }
     }
   }
@@ -688,6 +712,10 @@ function field_collection_field_delete($entity_type, $entity, $field, $instance,
         if (!empty($hostEntity)) {
           $hostEntity->field_collection_deleting = TRUE;
         }
+      }
+
+      if (module_exists('pathauto')) {
+        pathauto_path_delete_all('field-collection/' . str_replace('_', '-', $field['field_name']) . '/' . $id);
       }
     }
 
@@ -752,7 +780,8 @@ function field_collection_field_is_empty($item, $field) {
 }
 
 /**
- * Determines whether a field collection item entity is empty based on the collection-fields.
+ * Determines whether a field collection item entity is empty based on the
+ * collection-fields.
  */
 function field_collection_item_is_empty(FieldCollectionItemEntity $item) {
   $instances = field_info_instances('field_collection_item', $item->field_name);
@@ -767,7 +796,7 @@ function field_collection_item_is_empty(FieldCollectionItemEntity $item) {
 
     // Boolean fields as those are always considered non-empty, thus their
     // information is not useful and can be skipped by default.
-    if (!$all_boolean && $field['type'] == 'list_boolean') {
+    if (!$all_boolean && $field['type'] === 'list_boolean') {
       continue;
     }
 
@@ -797,7 +826,7 @@ function field_collection_item_is_empty(FieldCollectionItemEntity $item) {
  */
 function _field_collection_field_is_not_boolean($instance) {
   $field = field_info_field($instance['field_name']);
-  return $field['type'] != 'list_boolean';
+  return $field['type'] !== 'list_boolean';
 }
 
 /**
@@ -846,7 +875,7 @@ function field_collection_field_formatter_settings_form($field, $instance, $view
   $settings = $display['settings'];
   $elements = array();
 
-  if ($display['type'] != 'field_collection_fields') {
+  if ($display['type'] !== 'field_collection_fields') {
     $elements['add'] = array(
       '#type' => 'textfield',
       '#title' => t('Add link title'),
@@ -880,7 +909,8 @@ function field_collection_field_formatter_settings_form($field, $instance, $view
     );
   }
 
-  // Add a select form element for view_mode if viewing the rendered field_collection.
+  // Add a select form element for view_mode if viewing the rendered
+  // field_collection.
   if ($display['type'] !== 'field_collection_list') {
 
     $entity_type = entity_get_info('field_collection_item');
@@ -933,12 +963,17 @@ function field_collection_entity_preload($entities, $langcode, &$items, $fields)
   static $local_entity_cache = array();
 
   $fc_ids = array();
-
+  $new_items = array();
   // Collect every possible term attached to any of the fieldable entities.
   foreach ($entities as $id => $entity) {
     foreach ($items[$id] as $delta => $item) {
 
-      // Check if this item is in our local entity cache
+      // Check if the entity already exists.
+      if (isset($item['entity'])) {
+        continue;
+      }
+
+      // Check if this item is in our local entity cache.
       if (isset($local_entity_cache[$item['value']])) {
         $items[$id][$delta]['field_collection'] = $local_entity_cache[$item['value']];
         continue;
@@ -952,6 +987,7 @@ function field_collection_entity_preload($entities, $langcode, &$items, $fields)
   if ($fc_ids) {
     $new_entities = array();
     $terms = field_collection_item_load_multiple($fc_ids);
+    $new_items == $items;
 
     // Iterate through the fieldable entities again to attach the loaded
     // field collection data.
@@ -959,37 +995,38 @@ function field_collection_entity_preload($entities, $langcode, &$items, $fields)
       $rekey = FALSE;
 
       foreach ($items[$id] as $delta => $item) {
-        // Check whether the field collection field instance value could be loaded.
+        // Check whether the field collection field instance value could be
+        // loaded.
         if (isset($terms[$item['value']])) {
           // Replace the instance value with the term data.
           $e = $terms[$item['value']];
           $local_entity_cache[$item['value']] = $e;
           $items[$id][$delta]['field_collection'] = $e;
 
-	  foreach ($fields as $field_name => $field) {
+          foreach ($fields as $field_name => $field) {
             if (isset($e->$field_name)) {
               $field_data = $e->$field_name;
               if (isset($field_data[$langcode])) {
                 $new_entities[$e->item_id] = $e->item_id;
-                $items[$e->item_id] = $field_data[$langcode];
+                $new_items[$e->item_id] = $field_data[$langcode];
               }
             }
           }
         }
-        // Otherwise, unset the instance value, since the field colletion entity does not exist.
+        // Otherwise, unset the instance value, since the field colletion entity
+        // does not exist.
         else {
-          unset($items[$id][$delta]);
+          unset($new_items[$id][$delta]);
           $rekey = TRUE;
         }
       }
 
       if ($rekey) {
         // Rekey the items array.
-        $items[$id] = array_values($items[$id]);
+        $new_items[$id] = array_values($new_items[$id]);
       }
     }
-
-    field_collection_entity_preload($new_entities, $langcode, $items, $fields);
+    field_collection_entity_preload($new_entities, $langcode, $new_items, $fields);
   }
 }
 
@@ -1013,7 +1050,7 @@ function field_collection_field_formatter_view($entity_type, $entity, $field, $i
           $output = l($field_collection->label(), $field_collection->path());
           $links = array();
           foreach (field_collection_get_operations($settings) as $op => $label) {
-            if ($settings[$op] && entity_access($op == 'edit' ? 'update' : $op, 'field_collection_item', $field_collection)) {
+            if ($settings[$op] && entity_access($op === 'edit' ? 'update' : $op, 'field_collection_item', $field_collection)) {
               $title = entity_i18n_string("field:{$field['field_name']}:{$instance['bundle']}:setting_$op", $settings[$op]);
               $links[] = l($title, $field_collection->path() . '/' . $op, array('query' => drupal_get_destination()));
             }
@@ -1053,7 +1090,7 @@ function field_collection_field_formatter_view($entity_type, $entity, $field, $i
           );
           $links['#attributes']['class'][] = 'field-collection-view-links';
           foreach (field_collection_get_operations($settings) as $op => $label) {
-            if ($settings[$op] && entity_access($op == 'edit' ? 'update' : $op, 'field_collection_item', $field_collection)) {
+            if ($settings[$op] && entity_access($op === 'edit' ? 'update' : $op, 'field_collection_item', $field_collection)) {
               $links['#links'][$op] = array(
                 'title' => entity_i18n_string("field:{$field['field_name']}:{$instance['bundle']}:setting_$op", $settings[$op]),
                 'href' => $field_collection->path() . '/' . $op,
@@ -1124,14 +1161,15 @@ function field_collection_field_formatter_links(&$element, $entity_type, $entity
       $path = field_collection_field_get_path($field);
       list($id) = entity_extract_ids($entity_type, $entity);
       $element['#suffix'] = '';
-      if ($entity_type != 'node' && !empty($settings['description'])) {
+      if ($entity_type !== 'node' && !empty($settings['description'])) {
         $element['#suffix'] .= '<div class="description field-collection-description">' . field_filter_xss($instance['description']) . '</div>';
       }
       $title = entity_i18n_string("field:{$field['field_name']}:{$instance['bundle']}:setting_add", $settings['add']);
       $add_path = $path . '/add/' . $entity_type . '/' . $id;
-      $element['#suffix'] .= '<ul class="action-links action-links-field-collection-add"><li>';
-      $element['#suffix'] .= l($title, $add_path, array('query' => drupal_get_destination()));
-      $element['#suffix'] .= '</li></ul>';
+      $element['#suffix'] .=
+        '<ul class="action-links action-links-field-collection-add"><li>' .
+        l($title, $add_path, array('query' => drupal_get_destination())) .
+        '</li></ul>';
     }
   }
   // If there is no add link, add a special class to the last item.
@@ -1268,7 +1306,7 @@ function field_collection_field_widget_form(&$form, &$form_state, $field, $insta
         if (!isset($field_collection_item->entity_translation_handler_id)) {
           list($id, $revision_id) = entity_extract_ids('field_collection_item', $field_collection_item);
           $revision_id = isset($revision_id) ? $revision_id : 0;
-          $field_collection_item->entity_translation_handler_id = 'field_collection_item' . '-' . (!empty($id) ? 'eid-' . $id . '-' . $revision_id : 'new-' . rand());
+          $field_collection_item->entity_translation_handler_id = 'field_collection_item' . '-' . (!empty($id) ? 'eid-' . $id . '-' . $revision_id : 'new-' . mt_rand());
         }
         $element['#field_collection_item'] = $field_collection_item;
         field_collection_add_child_translation_handler($element);
@@ -1283,7 +1321,7 @@ function field_collection_field_widget_form(&$form, &$form_state, $field, $insta
         }
       }
 
-      // Add the subform
+      // Add the subform.
       field_form_set_state($field_parents, $field_name, $language, $form_state, $field_state);
       // Set the language to to parent entity language, because
       // field_content_languages() will always set $language to LANGUAGE_NONE.
@@ -1339,15 +1377,15 @@ function field_collection_field_widget_form(&$form, &$form_state, $field, $insta
         $item_id = isset($items[$delta]['value']) ? $items[$delta]['value'] : NULL;
         $revision_id = isset($items[$delta]['revision_id']) ? $items[$delta]['revision_id'] : NULL;
 
-        // add a label component to visually identify this field collection item
+        // Add a label component to visually identify this field collection item.
         $element['label'] = array();
         if ($item_id) {
           $item = field_collection_item_load($item_id);
           $element['label']['#markup'] = $item ? $item->label() : $item_id;
         }
 
-        // the field stored value (item_id) and revision_id values
-        // so we need hidden fields to represent them
+        // The field stored value (item_id) and revision_id values so we need
+        // hidden fields to represent them.
         $element['value'] = array(
           '#type' => 'hidden',
           '#default_value' => $item_id,
@@ -1381,7 +1419,7 @@ function field_collection_field_widget_form(&$form, &$form_state, $field, $insta
           '#title' => check_plain($instance['label']),
           '#required' => FALSE,
           '#description' => field_filter_xss($instance['description']),
-          '#max_delta' => $count-1,
+          '#max_delta' => $count - 1,
         );
       }
 
@@ -1390,7 +1428,7 @@ function field_collection_field_widget_form(&$form, &$form_state, $field, $insta
 }
 
 /**
- * Implements hook_entity_translation_source_field_state_alter()
+ * Implements hook_entity_translation_source_field_state_alter().
  */
 function field_collection_entity_translation_source_field_state_alter(&$field_state) {
   if (isset($field_state['entity'])) {
@@ -1429,19 +1467,22 @@ function field_collection_field_attach_form($entity_type, $entity, &$form, &$for
         && field_access('edit', $field, $entity_type)) {
 
       $element_langcode = $form[$field_name]['#language'];
-      if ($form[$field_name][$element_langcode]['#max_delta'] > 0) {
+      if (!empty($form[$field_name][$element_langcode]['#max_delta']) && $form[$field_name][$element_langcode]['#max_delta'] > 0) {
         $form[$field_name][$element_langcode]['#max_delta']--;
       }
       // Remove blank form elements and force user to explicitly add a field
       // collection if both 'hide_initial_item' and 'hide_blank_items' are TRUE.
       if ($field['settings']['hide_initial_item']
         && $field['settings']['hide_blank_items']
+        && !empty($form[$field_name][$element_langcode][0]['#entity'])
         && $form[$field_name][$element_langcode][0]['#entity'] instanceof FieldCollectionItemEntity
         && field_collection_item_is_empty($form[$field_name][$element_langcode][0]['#entity'])) {
 
         _field_collection_process_children_attached($form[$field_name][$element_langcode][0]);
-        unset($form[$field_name][$element_langcode][0]);
-        unset($form_state['field']['#parents'][$field_name][$element_langcode][0]);
+        unset(
+          $form[$field_name][$element_langcode][0],
+          $form_state['field']['#parents'][$field_name][$element_langcode][0]
+        );
       }
     }
 
@@ -1580,7 +1621,7 @@ function field_collection_remove_submit($form, &$form_state) {
   }
 
   // Replace the deleted entity with an empty one. This helps to ensure that
-  // trying to add a new entity won't ressurect a deleted entity from the
+  // trying to add a new entity won't resurrect a deleted entity from the
   // trash bin.
   $count = count($field_state['entity']);
   $field_state['entity'][$count] = entity_create('field_collection_item', array('field_name' => $field_name));
@@ -1600,7 +1641,7 @@ function field_collection_remove_submit($form, &$form_state) {
   // the 3, the order of the two 3s now is undefined and may not match what
   // the user had selected.
   $input = drupal_array_get_nested_value($form_state['input'], $values_address);
-  // Sort by weight
+  // Sort by weight.
   uasort($input, '_field_sort_items_helper');
 
   // Reweight everything in the correct order.
@@ -1740,7 +1781,7 @@ function field_collection_field_widget_embed_validate($element, &$form_state, $c
         $is_empty_multiple = $is_countable && (!count($elements['#value']));
         $is_empty_string = (is_string($elements['#value']) && drupal_strlen(trim($elements['#value'])) == 0);
         $is_empty_value = ($elements['#value'] === 0);
-        $is_empty_option = (isset($elements['#options']['_none']) && $elements['#value'] == '_none');
+        $is_empty_option = (isset($elements['#options']['_none']) && $elements['#value'] === '_none');
 
         // Validate fields with hook_field_is_empty. This will handle cases when
         // file entity passes validation when it shouldn't.
@@ -1808,7 +1849,7 @@ function field_collection_field_widget_embed_validate($element, &$form_state, $c
  * Implements hook_field_create_field().
  */
 function field_collection_field_create_field($field) {
-  if ($field['type'] == 'field_collection') {
+  if ($field['type'] === 'field_collection') {
     field_attach_create_bundle('field_collection_item', $field['field_name']);
 
     // Clear caches.
@@ -1824,7 +1865,7 @@ function field_collection_field_create_field($field) {
  * Implements hook_field_delete_field().
  */
 function field_collection_field_delete_field($field) {
-  if ($field['type'] == 'field_collection') {
+  if ($field['type'] === 'field_collection') {
     // Notify field.module that field collection was deleted.
     field_attach_delete_bundle('field_collection_item', $field['field_name']);
 
@@ -1841,14 +1882,19 @@ function field_collection_field_delete_field($field) {
  * Implements hook_i18n_string_list_{textgroup}_alter().
  */
 function field_collection_i18n_string_list_field_alter(&$properties, $type, $instance) {
-  if ($type == 'field_instance') {
+  if ($type === 'field_instance') {
     $field = field_info_field($instance['field_name']);
 
-    if ($field['type'] == 'field_collection' && !empty($instance['display'])) {
+    if ($field['type'] === 'field_collection' && !empty($instance['display'])) {
 
       foreach ($instance['display'] as $view_mode => $display) {
-        if ($display['type'] != 'field_collection_fields') {
-          $display['settings'] += array('edit' => 'edit', 'translate' => 'translate', 'delete' => 'delete', 'add' => 'add');
+        if ($display['type'] !== 'field_collection_fields') {
+          $display['settings'] += array(
+            'edit' => 'edit',
+            'translate' => 'translate',
+            'delete' => 'delete',
+            'add' => 'add',
+          );
 
           $properties['field'][$instance['field_name']][$instance['bundle']]['setting_edit'] = array(
             'title' => t('Edit link title'),
@@ -1896,7 +1942,7 @@ function field_collection_features_pipe_field_alter(&$pipe, $data, $export) {
   if (!function_exists('field_instance_features_export_options')) {
     // Add the fields of the field collection entity to the pipe.
     foreach ($data as $identifier) {
-      if (($field = features_field_load($identifier)) && $field['field_config']['type'] == 'field_collection') {
+      if (($field = features_field_load($identifier)) && $field['field_config']['type'] === 'field_collection') {
         $fields = field_info_instances('field_collection_item', $field['field_config']['field_name']);
         foreach ($fields as $name => $field) {
           $pipe['field'][] = "{$field['entity_type']}-{$field['bundle']}-{$field['field_name']}";
@@ -1914,7 +1960,7 @@ function field_collection_features_pipe_field_alter(&$pipe, $data, $export) {
 function field_collection_features_pipe_field_instance_alter(&$pipe, $data, $export) {
   // Add the fields of the field collection entity to the pipe.
   foreach ($data as $identifier) {
-    if (($field = features_field_load($identifier)) && $field['field_config']['type'] == 'field_collection') {
+    if (($field = features_field_load($identifier)) && $field['field_config']['type'] === 'field_collection') {
       $fields = field_info_instances('field_collection_item', $field['field_config']['field_name']);
       foreach ($fields as $name => $field) {
         $pipe['field_instance'][] = "{$field['entity_type']}-{$field['bundle']}-{$field['field_name']}";
@@ -1968,7 +2014,7 @@ function field_collection_item_get_host_entity($item) {
  */
 function field_collection_item_get_specific_type_host_entity($item, array $options, $name) {
   // These properties' machine names have the form "host_entity_TYPE".
-  if (substr($name, 0, 12) !== 'host_entity_') {
+  if (strpos($name, 'host_entity_') !== 0) {
     return NULL;
   }
   return $item->hostEntityType() === substr($name, 12) ? $item->hostEntity() : NULL;
@@ -2085,7 +2131,7 @@ function field_collection_entity_translation_delete($entity_type, $entity, $lang
       $field_name = $instance['field_name'];
       $field = field_info_field($field_name);
 
-      if ($field['type'] == 'field_collection') {
+      if ($field['type'] === 'field_collection') {
         $field_langcode = field_is_translatable($entity_type, $field) ? $langcode : LANGUAGE_NONE;
 
         if (!empty($entity->{$field_name}[$field_langcode])) {
@@ -2134,33 +2180,34 @@ function field_collection_admin_menu_map() {
 }
 
 /**
- * implements hook_entity_translation_insert
+ * Implements hook_entity_translation_insert().
  */
 function field_collection_entity_translation_insert($entity_type, $entity, $translation, $values = array()) {
-  // Check if some of the values inserted are of a field_collection field
+  // Check if some of the values inserted are of a field_collection field.
   if (!empty($values)) {
     foreach ($values as $field_name => $value) {
       $field = field_info_field($field_name);
 
-      if ($field['type'] == 'field_collection') {
-        // We have found a field collection
+      if ($field['type'] === 'field_collection') {
+        // We have found a field collection.
         $language = $translation['language'];
         $source_language = $translation['source'];
 
         if (!empty($value[$language])) {
           $source_items = !empty($entity->{$field_name}[$source_language]) ? field_collection_field_item_to_ids($entity->{$field_name}[$source_language]) : array();
           foreach ($value[$language] as $delta => $field_value) {
-            // Check if this field collection item belongs to the source language
+            // Check if this field collection item belongs to the source language.
             if (!isset($field_value['entity'])
               && ($fc_entity = field_collection_field_get_entity($field_value))
-              && in_array($fc_entity->item_id, $source_items)) {
-              // Clone the field collection item
+              && in_array($fc_entity->item_id, $source_items)
+            ) {
+              // Clone the field collection item.
               $new_fc_entity = clone $fc_entity;
               $new_fc_entity->item_id = NULL;
               $new_fc_entity->revision_id = NULL;
               $new_fc_entity->is_new = TRUE;
 
-              // Set the new entity for saving it later
+              // Set the new entity for saving it later.
               $entity->{$field_name}[$language][$delta]['entity'] = $new_fc_entity;
             }
           }
@@ -2172,7 +2219,7 @@ function field_collection_entity_translation_insert($entity_type, $entity, $tran
 
 
 /**
- * Implements hook_feeds_processor_targets_alter()
+ * Implements hook_feeds_processor_targets_alter().
  */
 function field_collection_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
 
@@ -2192,7 +2239,7 @@ function field_collection_feeds_processor_targets_alter(&$targets, $entity_type,
 
   foreach (field_info_instances($entity_type, $bundle_name) as $name => $instance) {
     $info = field_info_field($name);
-    if ($info['type'] == 'field_collection') {
+    if ($info['type'] === 'field_collection') {
 
       $sub_type = 'field_collection_item';
       $new_targets = module_invoke_all('feeds_processor_targets', $sub_type, $info['field_name']);
@@ -2255,7 +2302,7 @@ function field_collection_feeds_set_target($source, $entity, $target, $value, $m
     while (isset($value[$delta])) {
 
       // Zero out.
-      $field_collection_item = null;
+      $field_collection_item = NULL;
 
       // FC is already set on host entity.
       if (isset($field[LANGUAGE_NONE][$delta]['entity'])) {
@@ -2266,7 +2313,7 @@ function field_collection_feeds_set_target($source, $entity, $target, $value, $m
         $field_collection_item = field_collection_item_load($field[LANGUAGE_NONE][$delta]['value']);
 
         // Zero out field so that we don't just keep accumulating values.
-        unset($field_collection_item->{$sub_target}[LANGUAGE_NONE] );
+        unset($field_collection_item->{$sub_target}[LANGUAGE_NONE]);
       }
 
       // Host entity does not have any attached FCs yet.
@@ -2279,7 +2326,7 @@ function field_collection_feeds_set_target($source, $entity, $target, $value, $m
       $config = $source->importer()->getConfig();
       if (!empty($config['processor']['config']['mappings'])) {
         foreach ($config['processor']['config']['mappings'] as $mapping) {
-          if ($mapping['target'] == $target . ':' . $sub_target) {
+          if ($mapping['target'] === $target . ':' . $sub_target) {
             $sub_mapping = $mapping;
             $sub_mapping['target'] = $sub_target;
             // Needs language or feeds mappers shout php notices.
@@ -2292,7 +2339,7 @@ function field_collection_feeds_set_target($source, $entity, $target, $value, $m
       if (isset($_sub_targets[$sub_target]['callback']) && function_exists($_sub_targets[$sub_target]['callback'])) {
         $callback = $_sub_targets[$sub_target]['callback'];
 
-        // Normalize
+        // Normalize.
         if (!is_array($value[$delta])) {
           $value[$delta] = array($value[$delta]);
         }
@@ -2303,7 +2350,7 @@ function field_collection_feeds_set_target($source, $entity, $target, $value, $m
         }
 
         // HiJack the file callback so we can make it work.
-        if ($callback == 'file_feeds_set_target') {
+        if ($callback === 'file_feeds_set_target') {
           $callback = 'field_collection_file_feeds_set_target';
         }
 
@@ -2393,8 +2440,9 @@ function field_collection_file_feeds_set_target($source, $entity, $target, $valu
       watchdog('feeds', check_plain($e->getMessage()));
     }
     if ($file) {
-      $field[LANGUAGE_NONE][$i] = (array)$file;
-      $field[LANGUAGE_NONE][$i]['display'] = 1; // @todo: Figure out how to properly populate this field.
+      $field[LANGUAGE_NONE][$i] = (array) $file;
+      // @todo: Figure out how to properly populate this field.
+      $field[LANGUAGE_NONE][$i]['display'] = 1;
       if ($info['cardinality'] == 1) {
         break;
       }
@@ -2405,9 +2453,9 @@ function field_collection_file_feeds_set_target($source, $entity, $target, $valu
 
 }
 
-
 /**
  * Implementation of hook_feeds_presave().
+ *
  * Invoked before a feed item is saved.
  *
  * @param FeedsSource $source
@@ -2436,7 +2484,7 @@ function field_collection_feeds_presave(FeedsSource $source, $entity, $item, $en
         $info = field_info_field($fc_name);
 
         // If the field is not a field collection, skip it.
-        if ($info['type'] != 'field_collection') {
+        if ($info['type'] !== 'field_collection') {
           continue;
         }
 
@@ -2454,4 +2502,3 @@ function field_collection_feeds_presave(FeedsSource $source, $entity, $item, $en
     }
   }
 }
-
