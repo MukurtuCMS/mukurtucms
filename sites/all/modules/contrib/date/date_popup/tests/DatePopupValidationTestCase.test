@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * @file
+ * Data validation tests for the Date Popup module.
+ */
+
+/**
+ * Data validation tests for the Date Popup module.
+ */
+class DatePopupValidationTestCase extends DateValidationTestCase {
+
+  /**
+   * @todo.
+   */
+  // public static function getInfo() {
+  //   return array(
+  //     'name' => 'Date Popup Validation',
+  //     'description' => 'Data validation tests for the Date Popup module.',
+  //     'group' => 'Date',
+  //   );
+  // }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    $modules[] = 'date_popup';
+    parent::setUp($modules);
+  }
+
+  /**
+   * Validate the Date Popup fields.
+   */
+  public function testValidation() {
+    // Attempts to create text date field stored as a date with default settings
+    // (from input which is not valid).
+    foreach (array('date', 'datestamp', 'datetime') as $field_type) {
+      $this->checkDateField($field_type, 'date_popup', TRUE);
+      return;
+    }
+  }
+
+}

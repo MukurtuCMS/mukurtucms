@@ -2,10 +2,13 @@
 
 /**
  * @file
- * Tests date popup in Views
+ * Tests Date Popup in the Views interface.
  */
 
-class DateViewsPopupTestCase extends DateFieldBasic {
+/**
+ * Tests Date Popup in the Views interface.
+ */
+class DatePopupWithViewsTestCase extends DateFieldTestBase {
   /**
    * Test info.
    */
@@ -14,18 +17,20 @@ class DateViewsPopupTestCase extends DateFieldBasic {
       'name' => 'Date Views - Popup Test',
       'description' => 'Tests date popup in Views',
       'group' => 'Date',
+      'dependencies' => array('ctools', 'views'),
     );
   }
 
   /**
-   * Test setup actions.
+   * {@inheritdoc}
    */
-  public function setUp() {
-    parent::setUp();
-    // Load the 'date_popup', 'date_views', 'views', 'views_ui', 'ctools' modules.
-    $modules = array('date_popup', 'date_views', 'views', 'views_ui', 'ctools');
-    $success = module_enable($modules, TRUE);
-    $this->assertTrue($success, t('Enabled modules: %modules', array('%modules' => implode(', ', $modules))));
+  public function setUp(array $modules = array()) {
+    $modules[] = 'date_popup';
+    $modules[] = 'date_views';
+    $modules[] = 'ctools';
+    $modules[] = 'views';
+    $modules[] = 'views_ui';
+    parent::setUp($modules);
 
     // Reset/rebuild all data structures after enabling the modules.
     $this->resetAll();
@@ -57,7 +62,7 @@ class DateViewsPopupTestCase extends DateFieldBasic {
     $view->human_name = 'Test date_popup';
     $view->core = 7;
     $view->api_version = '3.0';
-    $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+    $view->disabled = FALSE; /* Edit this to TRUE to make a default view disabled initially */
 
     /* Display: Master */
     $handler = $view->new_display('default', 'Master', 'default');
@@ -103,4 +108,5 @@ class DateViewsPopupTestCase extends DateFieldBasic {
     // Go to view page.
     $this->drupalGet('test-date-popup');
   }
+
 }

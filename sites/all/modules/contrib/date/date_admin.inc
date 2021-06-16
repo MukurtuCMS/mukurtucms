@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Date administration code.
+ * Date administration functionality.
  */
 
 /**
@@ -196,7 +196,7 @@ function date_default_formatter_settings_summary($field, $instance, $view_mode) 
 /**
  * Settings summary for the interval formatter.
  *
- * @TODO Add settings later.
+ * @todo Add settings later.
  */
 function date_interval_formatter_settings_summary($field, $instance, $view_mode) {
   $summary = array();
@@ -205,7 +205,7 @@ function date_interval_formatter_settings_summary($field, $instance, $view_mode)
   $formatter = $display['type'];
   $field = ($settings['use_end_date'] == 1) ? 'End' : 'Start';
   $summary[] = t('Display time ago, showing @interval units. Using @field Date',
-      array('@interval' => $settings['interval'], '@field' => $field));
+    array('@interval' => $settings['interval'], '@field' => $field));
 
   return $summary;
 }
@@ -378,14 +378,16 @@ function _date_field_widget_settings_form($field, $instance) {
       '#weight' => 6,
     );
     $form['increment'] = array(
-      '#type' => 'select', '#title' => t('Time increments'),
+      '#type' => 'select',
+      '#title' => t('Time increments'),
       '#default_value' => $settings['increment'],
       '#options' => array(
         1 => t('1 minute'),
         5 => t('5 minute'),
         10 => t('10 minute'),
         15 => t('15 minute'),
-        30 => t('30 minute')),
+        30 => t('30 minute'),
+      ),
       '#weight' => 7,
       '#fieldset' => 'date_format',
     );
@@ -440,7 +442,7 @@ function _date_field_widget_settings_form($field, $instance) {
     '#description' => $description,
   );
   $form['advanced']['text_parts'] = array(
-    '#theme' => $widget['type'] == 'date_select' ? 'date_text_parts' : '',
+    '#theme' => $widget['type'] == 'date_select' ? 'date_text_parts' : NULL,
   );
   $text_parts = (array) $settings['text_parts'];
   foreach (date_granularity_names() as $key => $value) {

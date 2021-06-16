@@ -1,0 +1,151 @@
+<?php
+
+/**
+ * @file
+ * Test updates for the Date All Day module.
+ */
+
+/**
+ * Test updates for the Date All Day module.
+ */
+class DateAllDayUpdatesTest extends DrupalWebTestCase {
+
+  /**
+   * Define this test class.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => t('Update updates'),
+      'description' => t('Confirm update Date All Day updates works as intended.'),
+      'group' => t('Date'),
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    $modules[] = 'date_all_day_test_feature';
+    parent::setUp($modules);
+
+    // Error logging.
+    variable_set('error_level', 2);
+
+    // Log in as user 1, so that permissions are irrelevant.
+    $this->loginUser1();
+
+    // Clear the caches so that the field specs are properly loaded.
+    cache_clear_all();
+  }
+
+  /**
+   * Log in as user 1.
+   *
+   * The benefit of doing this is that it ignores permissions entirely, so the
+   * raw functionality can be tested.
+   */
+  protected function loginUser1() {
+    // Load user 1.
+    $account = user_load(1, TRUE);
+
+    // Reset the password.
+    $password = user_password();
+    $edit = array(
+      'pass' => $password,
+    );
+    user_save($account, $edit);
+    $account->pass_raw = $password;
+
+    // Login.
+    $this->drupalLogin($account);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function verbose($message, $title = NULL) {
+    // Handle arrays, objects, etc.
+    if (!is_string($message)) {
+      $message = "<pre>\n" . print_r($message, TRUE) . "\n</pre>\n";
+    }
+
+    // Optional title to go before the output.
+    if (!empty($title)) {
+      $title = '<h2>' . check_plain($title) . "</h2>\n";
+    }
+
+    parent::verbose($title . $message);
+  }
+
+  /**
+   * Test update 7200.
+   */
+  public function testUpdate7200() {
+    // Load the install file, so that the update script is available.
+    module_load_include('install', 'date_all_day');
+    $this->assertEqual(function_exists('date_all_day_update_7200'), TRUE, 'Update 7200 exists.');
+
+    // Create a sample node.
+    $this->drupalGet('node/add/date-all-day-test');
+    $this->assertResponse(200);
+    $this->assertText('Create Date Test');
+
+    $edit = array(
+      'title' => 'Test All Day option',
+      // This field is required.
+      // 'field_datetime_range[und][0][value2][date]' => '2020-09-07 08:00:00',
+      // The All-Day field.
+      'field_date_all_day[und][0][all_day]' => TRUE,
+      'field_date_all_day[und][0][value][year]' => 2020,
+      'field_date_all_day[und][0][value][month]' => 8,
+      'field_date_all_day[und][0][value][day]' => 30,
+    );
+    $this->drupalPost(NULL, $edit, 'Save');
+    $this->assertResponse(200);
+    // Make sure the form submitted.
+    $this->assertNoText('Create Date Test');
+
+    // Load the node.
+    // @todo get the node ID from the URL.
+    $node = node_load(1, NULL, TRUE);
+    $this->verbose($node);
+
+    // Update the field so it's stored the old way.
+    $node->field_date_all_day[LANGUAGE_NONE][0]['value'] = '2020-08-30 00:00:00';
+    node_save($node);
+
+    // Reload the node and confirm that it has the old value stored.
+    $node = node_load($node->nid, NULL, TRUE);
+    $this->verbose($node);
+    $this->assertEqual($node->field_date_all_day[LANGUAGE_NONE][0]['value'], '2020-08-30 00:00:00');
+
+    // Load the code, confirm the data is invalid.
+    $this->drupalGet('node/' . $node->nid);
+    $this->assertResponse(200);
+    $this->assertText($edit['title']);
+    $this->assertText('Date All Day');
+    $this->assertNoText('Sunday, August 30, 2020 (All day)');
+
+    // Load the node's edit form to confirm the values are incorrect.
+    $this->drupalGet('node/' . $node->nid . '/edit');
+    $this->assertResponse(200);
+
+    // Execute the update function.
+    $results = date_all_day_update_7200();
+    $this->assertTrue($results);
+    $this->verbose($results);
+
+    // Reload the node and confirm that it has the old value stored.
+    $node = node_load($node->nid, NULL, TRUE);
+    $this->verbose($node);
+    // The expected timestamp is relative to the increment value, which is set
+    // to 15 minutes for this field.
+    $this->assertEqual($node->field_date_all_day[LANGUAGE_NONE][0]['value'], '2020-08-30 23:45:59');
+
+    // Load the node again, confirm the data is now valid.
+    $this->drupalGet('node/' . $node->nid);
+    $this->assertText('Date All Day:');
+    $this->assertText('Sunday, August 30, 2020 (All day)');
+  }
+
+}

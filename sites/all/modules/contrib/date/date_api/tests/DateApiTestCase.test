@@ -2,10 +2,14 @@
 
 /**
  * @file
- * Test Date API functions
+ * Test Date API functions.
  */
 
-class DateAPITestCase extends DrupalWebTestCase {
+/**
+ * Test Date API functions.
+ */
+class DateApiTestCase extends DrupalWebTestCase {
+
   /**
    * @todo.
    */
@@ -18,11 +22,12 @@ class DateAPITestCase extends DrupalWebTestCase {
   }
 
   /**
-   * @todo.
+   * {@inheritdoc}
    */
-  public function setUp() {
-    // Load the date_api module.
-    parent::setUp('date_api');
+  public function setUp(array $modules = array()) {
+    $modules[] = 'date_api';
+    parent::setUp($modules);
+
     variable_set('date_api_use_iso8601', FALSE);
     variable_set('date_first_day', 1);
   }
@@ -270,7 +275,7 @@ class DateAPITestCase extends DrupalWebTestCase {
     $value = $date->getOffset();
     $this->assertEqual($expected, $value, "The current offset should be $expected, found $value.");
 
-     // Create date object from datetime string and convert it to a local date.
+    // Create date object from datetime string and convert it to a local date.
     $input = '1970-01-01 00:00:00';
     $timezone = 'UTC';
     $date = new dateObject($input, $timezone);
@@ -327,7 +332,7 @@ class DateAPITestCase extends DrupalWebTestCase {
     $value = $date->getOffset();
     $this->assertEqual($expected, $value, "The current offset should be $expected, found $value.");
 
-     // Create year-only date.
+    // Create year-only date.
     $input = '2009';
     $timezone = NULL;
     $format = 'Y';
@@ -336,7 +341,7 @@ class DateAPITestCase extends DrupalWebTestCase {
     $expected = '2009';
     $this->assertEqual($expected, $value, "Test new dateObject($input, $timezone, $format): should be $expected, found $value.");
 
-     // Create month and year-only date.
+    // Create month and year-only date.
     $input = '2009-10';
     $timezone = NULL;
     $format = 'Y-m';
@@ -345,7 +350,7 @@ class DateAPITestCase extends DrupalWebTestCase {
     $expected = '2009-10';
     $this->assertEqual($expected, $value, "Test new dateObject($input, $timezone, $format): should be $expected, found $value.");
 
-     // Create time-only date.
+    // Create time-only date.
     $input = '0000-00-00T10:30:00';
     $timezone = NULL;
     $format = 'Y-m-d\TH:i:s';
@@ -354,7 +359,7 @@ class DateAPITestCase extends DrupalWebTestCase {
     $expected = '10:30:00';
     $this->assertEqual($expected, $value, "Test new dateObject($input, $timezone, $format): should be $expected, found $value.");
 
-     // Create time-only date.
+    // Create time-only date.
     $input = '10:30:00';
     $timezone = NULL;
     $format = 'H:i:s';
@@ -389,7 +394,8 @@ class DateAPITestCase extends DrupalWebTestCase {
       $this->assertFalse(date_range_valid($range), "$range recognized as an invalid date range.");
     }
 
-    // Test for invalid month names when we are using a short version of the month
+    // Test for invalid month names when we are using a short version of the
+    // month.
     $input = '23 abc 2012';
     $timezone = NULL;
     $format = 'd M Y';
@@ -428,4 +434,5 @@ class DateAPITestCase extends DrupalWebTestCase {
     variable_del('date_api_use_iso8601');
     parent::tearDown();
   }
+
 }

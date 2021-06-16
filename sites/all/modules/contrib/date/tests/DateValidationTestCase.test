@@ -1,9 +1,14 @@
 <?php
+
 /**
  * @file
- * Date validation tests.
+ * Validate date field values.
  */
-class DateValidationTestCase extends DateFieldBasic {
+
+/**
+ * Validate date field values.
+ */
+class DateValidationTestCase extends DateFieldTestBase {
 
   /**
    * @todo.
@@ -23,27 +28,38 @@ class DateValidationTestCase extends DateFieldBasic {
     // Attempts to create text date field stored as a date with default settings
     // (from input which is not valid).
     foreach (array('date', 'datestamp', 'datetime') as $field_type) {
-      foreach (array('date_select', 'date_popup', 'date_text') as $widget_type) {
-        $field_name = 'field_test';
-        $label = 'Test';
-        $options = array(
-          'label' => $label,
-          'field_name' => $field_name,
-          'field_type' => $field_type,
-          'widget_type' => $widget_type,
-          'input_format' => 'm/d/Y - H:i',
-        );
-        $this->createDateField($options);
-
-        // Malformed date test won't work on date_select, which won't allow
-        // invalid input.
-        if ($widget_type != 'date_select') {
-          $this->malFormedDate($field_name, $field_type, $widget_type);
-        }
-
-        $this->wrongGranularity($field_name, $field_type, $widget_type);
-        $this->deleteDateField($label);
+      foreach (array('date_select', 'date_text') as $widget_type) {
+        $this->checkDateField($field_type, $widget_type, TRUE);
+        return;
       }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function checkDateField($field_type, $widget_type, $delete_when_done = TRUE) {
+    $field_name = 'field_test';
+    $label = 'Test';
+    $options = array(
+      'label' => $label,
+      'field_name' => $field_name,
+      'field_type' => $field_type,
+      'widget_type' => $widget_type,
+      'input_format' => 'm/d/Y - H:i',
+    );
+    $this->createDateField($options);
+
+    // Malformed date test won't work on date_select, which won't allow
+    // invalid input.
+    if ($widget_type != 'date_select') {
+      $this->malFormedDate($field_name, $field_type, $widget_type);
+    }
+
+    $this->wrongGranularity($field_name, $field_type, $widget_type);
+
+    if ($delete_when_done) {
+      $this->deleteDateField($label);
     }
   }
 
@@ -118,7 +134,6 @@ class DateValidationTestCase extends DateFieldBasic {
     $this->assertText($should_be, "Correctly blocked invalid hour for a $field_type field using the $widget_type widget.");
     $should_be = 'The minute is invalid.';
     $this->assertText($should_be, "Correctly blocked invalid minute for a $field_type field using the $widget_type widget.");
-
   }
 
   /**
@@ -148,4 +163,5 @@ class DateValidationTestCase extends DateFieldBasic {
     $this->assertNoText($should_not_be, "Correctly blocked creation of node with missing time for a $field_type field using the $widget_type widget.");
     $this->assertText('invalid', "Marked form with missing time as invalid for a $field_type field using the $widget_type widget.");
   }
+
 }

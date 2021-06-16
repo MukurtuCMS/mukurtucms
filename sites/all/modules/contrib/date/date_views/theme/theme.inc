@@ -20,9 +20,6 @@ function date_views_preprocess_views_view(&$vars) {
       case 'both':
         $vars['header'] .= $vars['pager'];
         break;
-
-      default:
-        // Already on the bottom.
     }
   }
 }
@@ -60,8 +57,8 @@ function template_preprocess_date_views_pager(&$vars) {
   $min_date = $date_info->min_date;
   $max_date = $date_info->max_date;
 
-  // Set up the pager link format. Setting the block identifier
-  // will force pager style links.
+  // Set up the pager link format. Setting the block identifier will force
+  // pager style links.
   if ((isset($date_info->date_pager_format) && $date_info->date_pager_format != 'clean') || !empty($date_info->mini)) {
     if (empty($date_info->block_identifier)) {
       $date_info->block_identifier = $date_info->pager_id;
@@ -79,6 +76,7 @@ function template_preprocess_date_views_pager(&$vars) {
           $prev_week = date_week(date_format($prev_date, 'Y-m-d'));
           $prev_arg = date_format($prev_date, 'o-\W') . date_pad($prev_week);
           break;
+
         default:
           $prev_arg = date_format($prev_date, $format[$granularity]);
       }
@@ -92,6 +90,7 @@ function template_preprocess_date_views_pager(&$vars) {
           $next_week = date_week(date_format($next_date, 'Y-m-d'));
           $next_arg = date_format($next_date, 'o-\W') . date_pad($next_week);
           break;
+
         default:
           $next_arg = date_format($next_date, $format[$granularity]);
       }
@@ -110,8 +109,8 @@ function template_preprocess_date_views_pager(&$vars) {
     $vars['next_options'] = $vars['prev_options'] = array();
   }
 
-  // Check whether navigation links would point to
-  // a date outside the allowed range.
+  // Check whether navigation links would point to a date outside the allowed
+  // range.
   if (!empty($next_date) && !empty($vars['next_url']) && date_format($next_date, 'Y') > $date_info->limit[1]) {
     $vars['next_url'] = '';
   }
@@ -145,6 +144,7 @@ function template_preprocess_date_views_pager(&$vars) {
       $next_title = t('Navigate to next day');
       break;
   }
+
   $vars['prev_options']['attributes'] += array('title' => $prev_title);
   $vars['next_options']['attributes'] += array('title' => $next_title);
 
@@ -183,6 +183,7 @@ function theme_date_nav_title($params) {
   $format = !empty($params['format']) ? $params['format'] : NULL;
   $format_with_year = variable_get('date_views_' . $granularity . '_format_with_year', 'l, F j, Y');
   $format_without_year = variable_get('date_views_' . $granularity . '_format_without_year', 'l, F j');
+
   switch ($granularity) {
     case 'year':
       $title = $date_info->year;
@@ -213,6 +214,7 @@ function theme_date_nav_title($params) {
       $date_arg = $date_info->year . '-W' . date_pad($date_info->week);
       break;
   }
+
   if (!empty($date_info->mini) || $link) {
     // Month navigation titles are used as links in the mini view.
     $attributes = array('title' => t('View full page month'));
@@ -236,4 +238,5 @@ function template_preprocess_date_views_filter_form(&$vars) {
   $vars['minadjustment'] = drupal_render($form['minadjustment']);
   $vars['maxadjustment'] = drupal_render($form['maxadjustment']);
   $vars['description'] = drupal_render($form['description']) . drupal_render($form);
+  drupal_add_css(drupal_get_path('module', 'date_api') . '/date.css');
 }

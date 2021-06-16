@@ -5,6 +5,9 @@
  * Tests for Date Tools.
  */
 
+/**
+ * Tests for Date Tools.
+ */
 class DateToolsTestCase extends DrupalWebTestCase {
   protected $privileged_user;
 
@@ -20,16 +23,26 @@ class DateToolsTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * @todo.
+   * {@inheritdoc}
    */
-  public function setUp() {
-    // Load the date_api module.
-    parent::setUp('field', 'field_ui', 'date_api', 'date', 'date_popup', 'date_tools');
+  public function setUp(array $modules = array()) {
+    $modules[] = 'field';
+    $modules[] = 'field_ui';
+    $modules[] = 'date_api';
+    $modules[] = 'date';
+    $modules[] = 'date_popup';
+    $modules[] = 'date_tools';
+    parent::setUp($modules);
 
     // Create and log in our privileged user.
-    $this->privileged_user = $this->drupalCreateUser(
-      array('administer content types', 'administer nodes', 'bypass node access', 'administer date tools', 'administer fields')
+    $perms = array(
+      'administer content types',
+      'administer nodes',
+      'bypass node access',
+      'administer date tools',
+      'administer fields',
     );
+    $this->privileged_user = $this->drupalCreateUser($perms);
     $this->drupalLogin($this->privileged_user);
 
     variable_set('date_format_long', 'D, m/d/Y - H:i');
@@ -39,7 +52,12 @@ class DateToolsTestCase extends DrupalWebTestCase {
    * Creates a date field using the Date Wizard.
    */
   public function testTools() {
-    $form_values = array('label' => 'Test', 'field_type' => 'datetime', 'widget_type' => 'date_select', 'todate' => '');
+    $form_values = array(
+      'label' => 'Test',
+      'field_type' => 'datetime',
+      'widget_type' => 'date_select',
+      'todate' => '',
+    );
     $this->createDateWizard($form_values);
     $this->dateForm($options = 'select');
     $this->assertText('Thu, 10/07/2010 - 10:30', 'Found the correct date for the Date Wizard datetime field using the date_select widget.');
@@ -72,7 +90,7 @@ class DateToolsTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * @todo.
+   * @todo
    */
   function deleteDateField() {
     $this->drupalGet('admin/structure/types/manage/story/fields');
@@ -97,6 +115,7 @@ class DateToolsTestCase extends DrupalWebTestCase {
       'granularity[]' => array('year', 'month', 'day', 'hour', 'minute'),
       'tz_handling' => 'site',
       'year_range' => '2010:+2',
+      'weight' => -100,
     );
     $this->drupalPost('admin/config/date/tools/date_wizard', $edit, t('Save'));
     $this->assertText('Your date field Test has been created.', 'Create a date field using the Date Wizard.');
