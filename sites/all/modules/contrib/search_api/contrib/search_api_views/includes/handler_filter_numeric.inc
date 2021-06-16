@@ -214,7 +214,7 @@ class SearchApiViewsHandlerFilterNumeric extends SearchApiViewsHandlerFilter {
       }
       elseif ($max !== '') {
         $operator = $this->operator === 'between' ? '<=' : '>';
-        $this->query->condition($this->real_field, $min, $operator, $this->options['group']);
+        $this->query->condition($this->real_field, $max, $operator, $this->options['group']);
       }
     }
     else {

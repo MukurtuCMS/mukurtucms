@@ -197,6 +197,10 @@ class SearchApiViewsQuery extends views_plugin_query {
       'parse_mode' => array(
         'default' => 'terms',
       ),
+      'preserve_facet_query_args' => array(
+        'default' => FALSE,
+        'bool' => TRUE,
+      ),
     );
   }
 
@@ -242,6 +246,14 @@ class SearchApiViewsQuery extends views_plugin_query {
           '#states' => $states,
         );
       }
+    }
+    if (module_exists('facetapi')) {
+      $form['preserve_facet_query_args'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Preserve facets while using filters'),
+        '#description' => t('By default, changing an exposed filter would reset all selected facets. This option allows you to prevent this behavior.'),
+        '#default_value' => $this->options['preserve_facet_query_args'],
+      );
     }
   }
 

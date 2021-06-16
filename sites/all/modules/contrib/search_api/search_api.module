@@ -947,7 +947,12 @@ function search_api_entity_delete($entity, $type) {
  * "Comment access" data alteration.
  */
 function search_api_node_access_records_alter(&$grants, $node) {
-  foreach (search_api_index_load_multiple(FALSE) as $index) {
+  $conditions = array(
+    'enabled' => 1,
+    'read_only' => 0,
+  );
+  $indexes = search_api_index_load_multiple(FALSE, $conditions);
+  foreach ($indexes as $index) {
     $item_ids = array();
     if (!empty($index->options['data_alter_callbacks']['search_api_alter_node_access']['status'])) {
       $item_id = $index->datasource()->getItemId($node);
@@ -965,8 +970,11 @@ function search_api_node_access_records_alter(&$grants, $node) {
     }
 
     if ($item_ids) {
-      $indexes = array($index->machine_name => $index);
-      search_api_track_item_change_for_indexes($index->item_type, $item_ids, $indexes);
+      search_api_track_item_change_for_indexes(
+        $index->item_type,
+        $item_ids,
+        array($index->machine_name => $index)
+      );
     }
   }
 }
@@ -1120,6 +1128,11 @@ function search_api_search_api_alter_callback_info() {
     'name' => t('Index hierarchy'),
     'description' => t('Allows to index hierarchical fields along with all their ancestors.'),
     'class' => 'SearchApiAlterAddHierarchy',
+  );
+  $callbacks['search_api_alter_file_entity_public'] = array(
+    'name' => t('Exclude private files'),
+    'description' => t('Exclude file entities in the private files folder from being indexed. <strong>Caution:</strong> This only affects the indexed file entities themselves. If an indexed entity has references to file entities in the private folder, those will still be indexed (or displayed) normally.'),
+    'class' => 'SearchApiAlterFileEntityPublic',
   );
   $callbacks['search_api_alter_language_control'] = array(
     'name' => t('Language control'),
@@ -3188,7 +3201,9 @@ function _search_api_index_queued_items() {
     if ($queue) {
       $indexes = search_api_index_load_multiple(array_keys($queue));
       foreach ($indexes as $index_id => $index) {
-        search_api_index_specific_items($index, $queue[$index_id]);
+        if ($index->enabled && !$index->read_only) {
+          search_api_index_specific_items($index, $queue[$index_id]);
+        }
       }
     }
 
