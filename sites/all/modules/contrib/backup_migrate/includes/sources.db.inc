@@ -15,7 +15,9 @@ class backup_migrate_source_db extends backup_migrate_source_remote {
   public $db_target = 'default';
   public $connection = NULL;
 
-
+  /**
+   *
+   */
   public function type_name() {
     return t("Database");
   }
@@ -24,10 +26,10 @@ class backup_migrate_source_db extends backup_migrate_source_remote {
    * Save the info by importing it into the database.
    */
   public function save_file($file, $settings) {
-    backup_migrate_include('files');
+    require_once dirname(__FILE__) . '/files.inc';
 
-    // Set the source_id to the destination_id in the settings since for a restore, the source_id is the
-    // database that gets restored to.
+    // Set the source_id to the destination_id in the settings since for a
+    // restore, the source_id is the database that gets restored to.
     $settings->set_source($this->get_id());
 
     // Restore the file to the source database.
@@ -117,7 +119,7 @@ class backup_migrate_source_db extends backup_migrate_source_remote {
    * Get the form for the backup settings for this destination.
    */
   public function backup_settings_form($settings) {
-    $objects  = $this->get_object_names();
+    $objects = $this->get_object_names();
     $form['#description'] = t("You may omit specific tables, or specific table data from the backup file. Only omit data that you know you will not need such as cache data, or tables from other applications. Excluding tables can break your Drupal install, so <strong>do not change these settings unless you know what you're doing</strong>.");
     $form['exclude_tables'] = array(
       "#type" => "select",
@@ -202,7 +204,7 @@ class backup_migrate_source_db extends backup_migrate_source_remote {
       else {
         // If the url is specified build it into a connection info array.
         if (!empty($this->dest_url)) {
-          $info = array(
+          $info   = array(
             'driver'    => empty($this->dest_url['scheme']) ? NULL : $this->dest_url['scheme'],
             'host'      => empty($this->dest_url['host']) ? NULL : $this->dest_url['host'],
             'port'      => empty($this->dest_url['port']) ? NULL : $this->dest_url['port'],

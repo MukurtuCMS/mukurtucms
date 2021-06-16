@@ -1,0 +1,121 @@
+<?php
+
+/**
+ * @file
+ * Mock module to help and test hooks.
+ */
+
+/**
+ * A base class for mock exportables.
+ */
+class BmTestItem {
+
+  /**
+   * Edit this to true to make a default item disabled initially.
+   *
+   * @var bool
+   */
+  public $disabled = FALSE;
+
+  /**
+   * Indicates the API version to use.
+   *
+   * @var int
+   */
+  public $api_version = 1;
+
+}
+
+/**
+ * Implements hook_ctools_plugin_api().
+ */
+function bm_test_ctools_plugin_api($module = NULL, $api = NULL) {
+  if ($module == "backup_migrate" && $api == "backup_migrate_exportables") {
+    return array("version" => "1");
+  }
+}
+
+/**
+ * Implements hook_exportables_backup_migrate_schedules().
+ */
+function bm_test_exportables_backup_migrate_schedules() {
+  $export = array();
+  $item = new BmTestItem();
+  $mock_record = _bm_test_get_mock_schedule();
+  foreach ($mock_record as $key => $field) {
+    $item->$key = $field;
+  }
+  $export['mock_db_weekly'] = $item;
+  return $export;
+}
+
+/**
+ * Helper function to create a mock schedule.
+ */
+function _bm_test_get_mock_schedule() {
+  return array(
+    'machine_name' => 'mock_db_weekly',
+    'name' => 'Mock weekly database schedule',
+    'source_id' => 'db',
+    'destination_id' => 'scheduled',
+    'copy_destination_id' => '',
+    'profile_id' => 'default',
+    'keep' => 4,
+    'period' => 604800,
+    'enabled' => TRUE,
+    'cron' => 'builtin',
+    'cron_schedule' => '0 4 * * *',
+  );
+}
+
+/**
+ * Implements hook_exportables_backup_migrate_sources().
+ */
+function bm_test_exportables_backup_migrate_sources() {
+  $export = array();
+  $item = new BmTestItem();
+  $mock_record = _bm_test_get_mock_source();
+  foreach ($mock_record as $key => $field) {
+    $item->$key = $field;
+  }
+  $export['mock_file_directory'] = $item;
+  return $export;
+}
+
+/**
+ * Helper function to create a mock source.
+ */
+function _bm_test_get_mock_source() {
+  return array(
+    'machine_name' => 'mock_file_directory',
+    'name' => 'Mock file directory',
+    'location' => '/dev/null',
+    'subtype' => 'filesource',
+  );
+}
+
+/**
+ * Implements hook_exportables_backup_migrate_destinations().
+ */
+function bm_test_exportables_backup_migrate_destinations() {
+  $export = array();
+  $item = new BmTestItem();
+  $mock_record = _bm_test_get_mock_destination();
+  foreach ($mock_record as $key => $field) {
+    $item->$key = $field;
+  }
+  $export['mock_email'] = $item;
+  return $export;
+}
+
+/**
+ * Helper function to create a mock destination.
+ */
+function _bm_test_get_mock_destination() {
+  return array(
+    'machine_name' => 'mock_email',
+    'name' => 'Mock e-mail destination',
+    'location' => 'test@example.com',
+    'subtype' => 'email',
+  );
+}

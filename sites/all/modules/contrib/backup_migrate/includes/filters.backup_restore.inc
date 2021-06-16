@@ -45,7 +45,8 @@ class backup_migrate_filter_backup_restore extends backup_migrate_filter {
    * Get the default backup settings for this filter.
    */
   public function backup_settings_default() {
-    backup_migrate_include('sources');
+    require_once dirname(__FILE__) . '/sources.inc';
+
     $out = array();
     foreach (backup_migrate_get_sources() as $source) {
       $out['sources'][$source->get_id()] = $source->backup_settings_default();
@@ -86,7 +87,8 @@ class backup_migrate_filter_backup_restore extends backup_migrate_filter {
    * Get the form for the backup settings for this filter.
    */
   public function backup_settings_form($settings) {
-    backup_migrate_include('sources');
+    require_once dirname(__FILE__) . '/sources.inc';
+
     $out = array(
       'sources' => array(
         '#tree' => TRUE,
@@ -214,7 +216,8 @@ class backup_migrate_filter_backup_restore extends backup_migrate_filter {
    *   All of the available destination types.
    */
   public function _get_destination_types() {
-    backup_migrate_include('destinations');
+    require_once dirname(__FILE__) . '/destinations.inc';
+
     $destinations = &drupal_static('backup_migrate_filter_backup_restore::_get_destination_types', NULL);
     if (!is_array($destinations)) {
       $destinations = array();
@@ -238,7 +241,8 @@ class backup_migrate_filter_backup_restore extends backup_migrate_filter {
    *   All of the available source types.
    */
   public function _get_source_types() {
-    backup_migrate_include('sources');
+    require_once dirname(__FILE__) . '/sources.inc';
+
     $sources = &drupal_static('backup_migrate_filter_backup_restore::_get_source_types', NULL);
     if (!is_array($sources)) {
       $sources = array();
