@@ -791,6 +791,7 @@ function views_bulk_operations_execute($vbo, $operation, $selection, $select_all
   // Determine if the operation needs to be executed directly.
   $aggregate = $operation->aggregate();
   $skip_batching = $vbo->get_vbo_option('skip_batching');
+  $save_view = $vbo->get_vbo_option('save_view_object_when_batching');
   $force_single = $vbo->get_vbo_option('force_single');
   $execute_directly = ($aggregate || $skip_batching || $force_single);
   // Try to load all rows without a batch if needed.
@@ -812,6 +813,10 @@ function views_bulk_operations_execute($vbo, $operation, $selection, $select_all
       'exposed_input' => $vbo->view->get_exposed_input(),
     ),
   );
+  // If defined, save the whole view object.
+  if ($save_view) {
+    $options['view_info']['view'] = $vbo->view;
+  }
   // Create an array of rows in the needed format.
   $rows = array();
   $current = 1;
@@ -911,10 +916,18 @@ function views_bulk_operations_adjust_selection($queue_name, $operation, $option
   }
 
   $view_info = $options['view_info'];
-  $view = views_get_view($view_info['name']);
-  $view->set_exposed_input($view_info['exposed_input']);
-  $view->set_arguments($view_info['arguments']);
-  $view->set_display($view_info['display']);
+  if (isset($view_info['view'])) {
+    $view = $view_info['view'];
+    // Because of the offset, we want our view to be re-build and re-executed.
+    $view->built = FALSE;
+    $view->executed = FALSE;
+  }
+  else {
+    $view = views_get_view($view_info['name']);
+    $view->set_exposed_input($view_info['exposed_input']);
+    $view->set_arguments($view_info['arguments']);
+    $view->set_display($view_info['display']);
+  }
   $view->set_offset($context['sandbox']['progress']);
   $view->build();
   $view->execute($view_info['display']);
