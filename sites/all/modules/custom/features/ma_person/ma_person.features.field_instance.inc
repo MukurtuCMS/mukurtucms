@@ -50,9 +50,13 @@ function ma_person_field_default_field_instances() {
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 6,
       ),
       'person_teaser' => array(
         'label' => 'above',
@@ -610,7 +614,7 @@ function ma_person_field_default_field_instances() {
         'weight' => 5,
       ),
       'mukurtu_mobile' => array(
-        'label' => 'hidden',
+        'label' => 'above',
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
@@ -828,7 +832,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 7,
+        'weight' => 33,
       ),
       'person_teaser' => array(
         'label' => 'hidden',
@@ -922,7 +926,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 32,
       ),
       'person_teaser' => array(
         'label' => 'above',
@@ -1100,7 +1104,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 31,
       ),
       'person_teaser' => array(
         'label' => 'above',
@@ -1206,7 +1210,7 @@ function ma_person_field_default_field_instances() {
           'view_mode' => 'mukurtu_mobile',
         ),
         'type' => 'paragraphs_view',
-        'weight' => 5,
+        'weight' => 7,
       ),
       'person_teaser' => array(
         'label' => 'above',
@@ -1315,7 +1319,7 @@ function ma_person_field_default_field_instances() {
           'view_mode' => 'mukurtu_mobile',
         ),
         'type' => 'paragraphs_view',
-        'weight' => 6,
+        'weight' => 5,
       ),
       'person_teaser' => array(
         'label' => 'above',

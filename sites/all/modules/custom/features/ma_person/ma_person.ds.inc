@@ -122,16 +122,6 @@ function ma_person_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'person';
   $ds_fieldsetting->view_mode = 'mukurtu_mobile';
   $ds_fieldsetting->settings = array(
-    'field_related_people' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
-    'field_sections' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
     'title' => array(
       'format' => 'default',
       'label' => 'hidden',
@@ -439,25 +429,25 @@ function ma_person_ds_layout_settings_info() {
     'layout_wrapper' => 'div',
     'regions' => array(
       'bottom' => array(
-        8 => 'field_sections',
-        9 => 'field_node_aggregate',
-        10 => 'field_related_content',
-        11 => 'field_media_aggregate',
+        9 => 'field_sections',
+        10 => 'field_node_aggregate',
+        11 => 'field_related_content',
+        12 => 'field_media_aggregate',
       ),
       'left' => array(
         1 => 'field_media_asset',
       ),
       'right' => array(
-        2 => 'table_of_contents',
-        3 => 'field_date_born',
-        4 => 'field_date_died',
-        5 => 'field_tags',
-        6 => 'field_collection',
-        7 => 'field_related_people',
+        3 => 'table_of_contents',
+        4 => 'field_date_born',
+        5 => 'field_date_died',
+        6 => 'field_tags',
+        7 => 'field_collection',
+        8 => 'field_related_people',
       ),
       'top' => array(
-        0 => 'mukurtu_mobile_sync',
-        1 => 'mukurtu_icon_actions',
+        0 => 'mukurtu_icon_actions',
+        2 => 'mukurtu_mobile_sync',
       ),
     ),
     'wrappers' => array(
@@ -601,6 +591,7 @@ function ma_person_ds_layout_settings_info() {
       ),
     ),
     'fields' => array(
+      'field_collection' => 'ds_content',
       'field_date_born' => 'ds_content',
       'field_date_died' => 'ds_content',
       'field_media_asset' => 'ds_content',
@@ -622,8 +613,9 @@ function ma_person_ds_layout_settings_info() {
         2 => 'field_date_born',
         3 => 'field_date_died',
         4 => 'field_tags',
-        5 => 'field_related_people',
-        6 => 'field_sections',
+        5 => 'field_sections',
+        6 => 'field_collection',
+        7 => 'field_related_people',
       ),
     ),
     'wrappers' => array(

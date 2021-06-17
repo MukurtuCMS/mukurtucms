@@ -132,6 +132,9 @@ function ma_person_strongarm() {
       'map_popup' => array(
         'custom_settings' => FALSE,
       ),
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
+      ),
       'person_teaser' => array(
         'custom_settings' => TRUE,
       ),
