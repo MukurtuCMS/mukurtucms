@@ -21,30 +21,31 @@ function ma_lesson_plan_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
-    'label' => 'Core',
-    'weight' => '12',
     'children' => array(
-      0 => 'field_unit_class_period_length',
-      1 => 'field_unit_grade_level',
-      2 => 'field_unit_subject',
-      3 => 'field_unit_teacher',
-      4 => 'field_unit_unit_length',
-      5 => 'field_unit_week_of',
-      6 => 'og_group_ref',
-      7 => 'field_category',
-      8 => 'field_tags',
-      9 => 'title',
+      0 => 'field_category',
+      1 => 'field_tags',
+      2 => 'field_unit_class_period_length',
+      3 => 'field_unit_grade_level',
+      4 => 'field_unit_subject',
+      5 => 'field_unit_teacher',
+      6 => 'field_unit_unit_length',
+      7 => 'field_unit_week_of',
+      8 => 'og_group_ref',
+      9 => 'field_item_privacy_setting',
+      10 => 'title',
     ),
-    'format_type' => 'htab',
     'format_settings' => array(
-      'label' => 'Core',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'required_fields' => 1,
         'classes' => 'group-base field-group-htab',
         'description' => '',
+        'required_fields' => 1,
       ),
-      'formatter' => 'open',
+      'label' => 'Core',
     ),
+    'format_type' => 'htab',
+    'label' => 'Core',
+    'weight' => '12',
   );
   $field_groups['group_base|node|unit_plan|form'] = $field_group;
 
@@ -58,21 +59,21 @@ function ma_lesson_plan_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
-    'label' => 'Lessons',
-    'weight' => '14',
     'children' => array(
       0 => 'field_unit_lessons',
     ),
-    'format_type' => 'htab',
     'format_settings' => array(
-      'label' => 'Lessons',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'required_fields' => 1,
         'classes' => 'group-lessons field-group-htab',
         'description' => '',
+        'required_fields' => 1,
       ),
-      'formatter' => 'open',
+      'label' => 'Lessons',
     ),
+    'format_type' => 'htab',
+    'label' => 'Lessons',
+    'weight' => '14',
   );
   $field_groups['group_lessons|node|unit_plan|form'] = $field_group;
 
@@ -86,27 +87,27 @@ function ma_lesson_plan_field_group_info() {
   $field_group->mode = 'search_result';
   $field_group->parent_name = '';
   $field_group->data = array(
-    'label' => 'List View Fields',
-    'weight' => '10',
     'children' => array(
       0 => 'body',
       1 => 'featured_content_type',
       2 => 'title',
     ),
-    'format_type' => 'div',
     'format_settings' => array(
-      'label' => 'List View Fields',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'id' => '',
         'classes' => '',
         'description' => '',
-        'show_label' => '0',
-        'label_element' => 'h3',
         'effect' => 'none',
+        'id' => '',
+        'label_element' => 'h3',
+        'show_label' => '0',
         'speed' => 'fast',
       ),
-      'formatter' => 'open',
+      'label' => 'List View Fields',
     ),
+    'format_type' => 'div',
+    'label' => 'List View Fields',
+    'weight' => '10',
   );
   $field_groups['group_list_view_fields|node|lesson|search_result'] = $field_group;
 
@@ -120,8 +121,6 @@ function ma_lesson_plan_field_group_info() {
   $field_group->mode = 'search_result';
   $field_group->parent_name = '';
   $field_group->data = array(
-    'label' => 'List View Fields',
-    'weight' => '1',
     'children' => array(
       0 => 'field_unit_teacher',
       1 => 'field_unit_subject',
@@ -130,20 +129,22 @@ function ma_lesson_plan_field_group_info() {
       4 => 'featured_content_type',
       5 => 'title',
     ),
-    'format_type' => 'div',
     'format_settings' => array(
-      'label' => 'List View Fields',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'id' => '',
         'classes' => '',
         'description' => '',
-        'show_label' => '0',
-        'label_element' => 'h3',
         'effect' => 'none',
+        'id' => '',
+        'label_element' => 'h3',
+        'show_label' => '0',
         'speed' => 'fast',
       ),
-      'formatter' => 'open',
+      'label' => 'List View Fields',
     ),
+    'format_type' => 'div',
+    'label' => 'List View Fields',
+    'weight' => '1',
   );
   $field_groups['group_list_view_fields|node|unit_plan|search_result'] = $field_group;
 
@@ -157,28 +158,28 @@ function ma_lesson_plan_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
-    'label' => 'Learning Outcomes and Assessments',
-    'weight' => '13',
     'children' => array(
-      0 => 'field_unit_assessments',
-      1 => 'field_unit_conceptual',
-      2 => 'field_unit_language_learning',
-      3 => 'field_unit_nature_of_science',
-      4 => 'field_unit_overarching',
-      5 => 'field_unit_technical',
-      6 => 'field_media_asset',
-      7 => 'field_related_content',
+      0 => 'field_media_asset',
+      1 => 'field_related_content',
+      2 => 'field_unit_assessments',
+      3 => 'field_unit_conceptual',
+      4 => 'field_unit_language_learning',
+      5 => 'field_unit_nature_of_science',
+      6 => 'field_unit_overarching',
+      7 => 'field_unit_technical',
     ),
-    'format_type' => 'htab',
     'format_settings' => array(
-      'label' => 'Learning Outcomes and Assessments',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'required_fields' => 1,
         'classes' => 'group-loa field-group-htab',
         'description' => '',
+        'required_fields' => 1,
       ),
-      'formatter' => 'open',
+      'label' => 'Learning Outcomes and Assessments',
     ),
+    'format_type' => 'htab',
+    'label' => 'Learning Outcomes and Assessments',
+    'weight' => '13',
   );
   $field_groups['group_loa|node|unit_plan|form'] = $field_group;
 
@@ -192,14 +193,11 @@ function ma_lesson_plan_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = '';
   $field_group->data = array(
-    'label' => 'Tabs',
-    'weight' => '1',
     'children' => array(
       0 => 'group_base',
       1 => 'group_lessons',
       2 => 'group_loa',
     ),
-    'format_type' => 'htabs',
     'format_settings' => array(
       'formatter' => '',
       'instance_settings' => array(
@@ -207,6 +205,9 @@ function ma_lesson_plan_field_group_info() {
         'id' => '',
       ),
     ),
+    'format_type' => 'htabs',
+    'label' => 'Tabs',
+    'weight' => '1',
   );
   $field_groups['group_tabs|node|unit_plan|form'] = $field_group;
 

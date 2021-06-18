@@ -539,7 +539,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'dropdownAutoWidth' => 0,
           'placeholder' => '',
         ),
-        'use_select2' => 1,
+        'use_select2' => 0,
       ),
       'user_register_form' => FALSE,
     ),
@@ -620,7 +620,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'dropdownAutoWidth' => 0,
           'placeholder' => '',
         ),
-        'use_select2' => 1,
+        'use_select2' => 0,
       ),
       'user_register_form' => FALSE,
     ),
@@ -768,7 +768,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'dropdownAutoWidth' => 0,
           'placeholder' => '',
         ),
-        'use_select2' => 1,
+        'use_select2' => 0,
       ),
       'user_register_form' => FALSE,
     ),
@@ -1358,7 +1358,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'dropdownAutoWidth' => 0,
           'placeholder' => '',
         ),
-        'use_select2' => 1,
+        'use_select2' => 0,
       ),
       'user_register_form' => FALSE,
     ),
@@ -1438,7 +1438,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'dropdownAutoWidth' => 0,
           'placeholder' => '',
         ),
-        'use_select2' => 1,
+        'use_select2' => 0,
       ),
       'user_register_form' => FALSE,
     ),
@@ -1616,7 +1616,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'dropdownAutoWidth' => 0,
           'placeholder' => '',
         ),
-        'use_select2' => 1,
+        'use_select2' => 0,
       ),
       'user_register_form' => FALSE,
     ),
@@ -1759,7 +1759,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'dropdownAutoWidth' => 0,
           'placeholder' => '',
         ),
-        'use_select2' => 1,
+        'use_select2' => 0,
       ),
       'user_register_form' => FALSE,
     ),
@@ -1772,6 +1772,78 @@ function ma_lesson_plan_field_default_field_instances() {
       ),
       'type' => 'options_select',
       'weight' => 18,
+    ),
+  );
+
+  // Exported field_instance: 'node-unit_plan-field_item_privacy_setting'.
+  $field_instances['node-unit_plan-field_item_privacy_setting'] = array(
+    'bundle' => 'unit_plan',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => array(
+      0 => array(
+        'value' => 'all',
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 55,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teacher_view' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_item_privacy_setting',
+    'label' => 'Item Sharing Settings',
+    'required' => 1,
+    'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'treeable' => 0,
+      ),
+      'type' => 'options_buttons',
+      'weight' => 15,
     ),
   );
 
@@ -2019,7 +2091,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'dropdownAutoWidth' => 0,
           'placeholder' => '',
         ),
-        'use_select2' => 1,
+        'use_select2' => 0,
       ),
       'user_register_form' => FALSE,
     ),
@@ -2110,7 +2182,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'dropdownAutoWidth' => 0,
           'placeholder' => '',
         ),
-        'use_select2' => 1,
+        'use_select2' => 0,
       ),
       'user_register_form' => FALSE,
     ),
@@ -2201,7 +2273,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'dropdownAutoWidth' => 0,
           'placeholder' => '',
         ),
-        'use_select2' => 1,
+        'use_select2' => 0,
       ),
       'user_register_form' => FALSE,
     ),
@@ -2317,6 +2389,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // Exported field_instance: 'node-unit_plan-field_unit_assessments'.
   $field_instances['node-unit_plan-field_unit_assessments'] = array(
     'bundle' => 'unit_plan',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -2379,7 +2453,7 @@ function ma_lesson_plan_field_default_field_instances() {
       'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
-      'text_processing' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -2453,7 +2527,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_unit_class_period_length',
     'label' => 'Class Period Length',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
@@ -2464,19 +2538,20 @@ function ma_lesson_plan_field_default_field_instances() {
           'dropdownAutoWidth' => 0,
           'placeholder' => '',
         ),
-        'use_select2' => 1,
+        'use_select2' => 0,
       ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'options',
+      'module' => 'taxonomy',
       'settings' => array(
-        'apply_chosen' => '',
+        'autocomplete_path' => 'taxonomy/autocomplete',
+        'size' => 60,
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
-      'type' => 'options_select',
+      'type' => 'taxonomy_autocomplete',
       'weight' => 11,
     ),
   );
@@ -2484,6 +2559,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // Exported field_instance: 'node-unit_plan-field_unit_conceptual'.
   $field_instances['node-unit_plan-field_unit_conceptual'] = array(
     'bundle' => 'unit_plan',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -2546,7 +2623,7 @@ function ma_lesson_plan_field_default_field_instances() {
       'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
-      'text_processing' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -2621,7 +2698,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_unit_grade_level',
     'label' => 'Grade Level',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
@@ -2632,19 +2709,20 @@ function ma_lesson_plan_field_default_field_instances() {
           'dropdownAutoWidth' => 0,
           'placeholder' => '',
         ),
-        'use_select2' => 1,
+        'use_select2' => 0,
       ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'options',
+      'module' => 'taxonomy',
       'settings' => array(
-        'apply_chosen' => '',
+        'autocomplete_path' => 'taxonomy/autocomplete',
+        'size' => 60,
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
-      'type' => 'options_select',
+      'type' => 'taxonomy_autocomplete',
       'weight' => 8,
     ),
   );
@@ -2652,6 +2730,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // Exported field_instance: 'node-unit_plan-field_unit_language_learning'.
   $field_instances['node-unit_plan-field_unit_language_learning'] = array(
     'bundle' => 'unit_plan',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -2714,7 +2794,7 @@ function ma_lesson_plan_field_default_field_instances() {
       'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
-      'text_processing' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -2848,6 +2928,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // Exported field_instance: 'node-unit_plan-field_unit_nature_of_science'.
   $field_instances['node-unit_plan-field_unit_nature_of_science'] = array(
     'bundle' => 'unit_plan',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -2910,7 +2992,7 @@ function ma_lesson_plan_field_default_field_instances() {
       'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
-      'text_processing' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -2928,6 +3010,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // Exported field_instance: 'node-unit_plan-field_unit_overarching'.
   $field_instances['node-unit_plan-field_unit_overarching'] = array(
     'bundle' => 'unit_plan',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -2990,7 +3074,7 @@ function ma_lesson_plan_field_default_field_instances() {
       'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
-      'text_processing' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -3065,7 +3149,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_unit_subject',
     'label' => 'Subject',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
@@ -3076,19 +3160,20 @@ function ma_lesson_plan_field_default_field_instances() {
           'dropdownAutoWidth' => 0,
           'placeholder' => '',
         ),
-        'use_select2' => 1,
+        'use_select2' => 0,
       ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'options',
+      'module' => 'taxonomy',
       'settings' => array(
-        'apply_chosen' => '',
+        'autocomplete_path' => 'taxonomy/autocomplete',
+        'size' => 60,
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
-      'type' => 'options_select',
+      'type' => 'taxonomy_autocomplete',
       'weight' => 7,
     ),
   );
@@ -3153,7 +3238,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_unit_teacher',
     'label' => 'Teacher',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
@@ -3164,19 +3249,20 @@ function ma_lesson_plan_field_default_field_instances() {
           'dropdownAutoWidth' => 0,
           'placeholder' => '',
         ),
-        'use_select2' => 1,
+        'use_select2' => 0,
       ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'options',
+      'module' => 'taxonomy',
       'settings' => array(
-        'apply_chosen' => '',
+        'autocomplete_path' => 'taxonomy/autocomplete',
+        'size' => 60,
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
-      'type' => 'options_select',
+      'type' => 'taxonomy_autocomplete',
       'weight' => 6,
     ),
   );
@@ -3184,6 +3270,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // Exported field_instance: 'node-unit_plan-field_unit_technical'.
   $field_instances['node-unit_plan-field_unit_technical'] = array(
     'bundle' => 'unit_plan',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -3246,7 +3334,7 @@ function ma_lesson_plan_field_default_field_instances() {
       'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
-      'text_processing' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -3320,7 +3408,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_unit_unit_length',
     'label' => 'Unit Length',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
@@ -3331,19 +3419,20 @@ function ma_lesson_plan_field_default_field_instances() {
           'dropdownAutoWidth' => 0,
           'placeholder' => '',
         ),
-        'use_select2' => 1,
+        'use_select2' => 0,
       ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'options',
+      'module' => 'taxonomy',
       'settings' => array(
-        'apply_chosen' => '',
+        'autocomplete_path' => 'taxonomy/autocomplete',
+        'size' => 60,
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
-      'type' => 'options_select',
+      'type' => 'taxonomy_autocomplete',
       'weight' => 10,
     ),
   );
@@ -3407,7 +3496,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_unit_week_of',
     'label' => 'Week of',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
@@ -3418,19 +3507,20 @@ function ma_lesson_plan_field_default_field_instances() {
           'dropdownAutoWidth' => 0,
           'placeholder' => '',
         ),
-        'use_select2' => 1,
+        'use_select2' => 0,
       ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'options',
+      'module' => 'taxonomy',
       'settings' => array(
-        'apply_chosen' => '',
+        'autocomplete_path' => 'taxonomy/autocomplete',
+        'size' => 60,
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
-      'type' => 'options_select',
+      'type' => 'taxonomy_autocomplete',
       'weight' => 9,
     ),
   );
@@ -3509,7 +3599,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'dropdownAutoWidth' => 0,
           'placeholder' => '',
         ),
-        'use_select2' => 1,
+        'use_select2' => 0,
       ),
       'user_register_form' => FALSE,
     ),
@@ -3677,6 +3767,7 @@ function ma_lesson_plan_field_default_field_instances() {
   t('Explore / Environment');
   t('Gathering Content and Data / Interactive Web-based Activities');
   t('Grade Level');
+  t('Item Sharing Settings');
   t('Key Student Outcomes');
   t('Key Terms, Phrases, Sentences');
   t('Keywords');

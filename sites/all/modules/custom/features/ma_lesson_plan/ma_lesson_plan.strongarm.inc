@@ -156,48 +156,47 @@ function ma_lesson_plan_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'field_bundle_settings_node__lesson';
   $strongarm->value = array(
+    'extra_fields' => array(
+      'display' => array(),
+      'form' => array(
+        'path' => array(
+          'weight' => '12',
+        ),
+        'redirect' => array(
+          'weight' => '11',
+        ),
+        'title' => array(
+          'weight' => '2',
+        ),
+      ),
+    ),
     'view_modes' => array(
-      'teaser' => array(
-        'custom_settings' => TRUE,
-      ),
-      'full' => array(
-        'custom_settings' => TRUE,
-      ),
-      'rss' => array(
-        'custom_settings' => FALSE,
-      ),
-      'search_index' => array(
-        'custom_settings' => FALSE,
-      ),
-      'search_result' => array(
-        'custom_settings' => TRUE,
-      ),
-      'diff_standard' => array(
-        'custom_settings' => FALSE,
-      ),
-      'token' => array(
-        'custom_settings' => FALSE,
-      ),
       'collections_browse' => array(
-        'custom_settings' => FALSE,
-      ),
-      'thumbed' => array(
-        'custom_settings' => FALSE,
-      ),
-      'dictionary_word_summary' => array(
         'custom_settings' => FALSE,
       ),
       'community_record' => array(
         'custom_settings' => FALSE,
       ),
+      'dictionary_word_summary' => array(
+        'custom_settings' => FALSE,
+      ),
+      'diff_standard' => array(
+        'custom_settings' => FALSE,
+      ),
       'featured_content' => array(
+        'custom_settings' => FALSE,
+      ),
+      'full' => array(
+        'custom_settings' => TRUE,
+      ),
+      'ical' => array(
         'custom_settings' => FALSE,
       ),
       'map_popup' => array(
         'custom_settings' => FALSE,
       ),
-      'taxonomy_record_teaser' => array(
-        'custom_settings' => FALSE,
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
       ),
       'person_teaser' => array(
         'custom_settings' => FALSE,
@@ -208,29 +207,30 @@ function ma_lesson_plan_strongarm() {
       'revision' => array(
         'custom_settings' => FALSE,
       ),
+      'rss' => array(
+        'custom_settings' => FALSE,
+      ),
+      'search_index' => array(
+        'custom_settings' => FALSE,
+      ),
+      'search_result' => array(
+        'custom_settings' => TRUE,
+      ),
+      'taxonomy_record_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
       'teacher_view' => array(
         'custom_settings' => TRUE,
       ),
-      'mukurtu_mobile' => array(
+      'teaser' => array(
         'custom_settings' => TRUE,
       ),
-      'ical' => array(
+      'thumbed' => array(
         'custom_settings' => FALSE,
       ),
-    ),
-    'extra_fields' => array(
-      'form' => array(
-        'title' => array(
-          'weight' => '2',
-        ),
-        'path' => array(
-          'weight' => '12',
-        ),
-        'redirect' => array(
-          'weight' => '11',
-        ),
+      'token' => array(
+        'custom_settings' => FALSE,
       ),
-      'display' => array(),
     ),
   );
   $export['field_bundle_settings_node__lesson'] = $strongarm;
@@ -240,48 +240,50 @@ function ma_lesson_plan_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'field_bundle_settings_node__unit_plan';
   $strongarm->value = array(
+    'extra_fields' => array(
+      'display' => array(),
+      'form' => array(
+        'path' => array(
+          'weight' => '6',
+        ),
+        'redirect' => array(
+          'weight' => '7',
+        ),
+        'title' => array(
+          'weight' => '5',
+        ),
+      ),
+    ),
     'view_modes' => array(
-      'teaser' => array(
+      'all_fields' => array(
         'custom_settings' => TRUE,
-      ),
-      'full' => array(
-        'custom_settings' => TRUE,
-      ),
-      'rss' => array(
-        'custom_settings' => FALSE,
-      ),
-      'search_index' => array(
-        'custom_settings' => FALSE,
-      ),
-      'search_result' => array(
-        'custom_settings' => TRUE,
-      ),
-      'diff_standard' => array(
-        'custom_settings' => FALSE,
-      ),
-      'token' => array(
-        'custom_settings' => FALSE,
       ),
       'collections_browse' => array(
-        'custom_settings' => FALSE,
-      ),
-      'thumbed' => array(
-        'custom_settings' => FALSE,
-      ),
-      'dictionary_word_summary' => array(
         'custom_settings' => FALSE,
       ),
       'community_record' => array(
         'custom_settings' => FALSE,
       ),
+      'dictionary_word_summary' => array(
+        'custom_settings' => FALSE,
+      ),
+      'diff_standard' => array(
+        'custom_settings' => FALSE,
+      ),
       'featured_content' => array(
+        'custom_settings' => FALSE,
+      ),
+      'full' => array(
+        'custom_settings' => TRUE,
+      ),
+      'ical' => array(
         'custom_settings' => FALSE,
       ),
       'map_popup' => array(
         'custom_settings' => FALSE,
       ),
-      'taxonomy_record_teaser' => array(
-        'custom_settings' => FALSE,
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
       ),
       'person_teaser' => array(
         'custom_settings' => FALSE,
@@ -292,32 +294,30 @@ function ma_lesson_plan_strongarm() {
       'revision' => array(
         'custom_settings' => FALSE,
       ),
-      'all_fields' => array(
+      'rss' => array(
+        'custom_settings' => FALSE,
+      ),
+      'search_index' => array(
+        'custom_settings' => FALSE,
+      ),
+      'search_result' => array(
         'custom_settings' => TRUE,
+      ),
+      'taxonomy_record_teaser' => array(
+        'custom_settings' => FALSE,
       ),
       'teacher_view' => array(
         'custom_settings' => TRUE,
       ),
-      'mukurtu_mobile' => array(
+      'teaser' => array(
         'custom_settings' => TRUE,
       ),
-      'ical' => array(
+      'thumbed' => array(
         'custom_settings' => FALSE,
       ),
-    ),
-    'extra_fields' => array(
-      'form' => array(
-        'title' => array(
-          'weight' => '5',
-        ),
-        'path' => array(
-          'weight' => '6',
-        ),
-        'redirect' => array(
-          'weight' => '7',
-        ),
+      'token' => array(
+        'custom_settings' => FALSE,
       ),
-      'display' => array(),
     ),
   );
   $export['field_bundle_settings_node__unit_plan'] = $strongarm;
