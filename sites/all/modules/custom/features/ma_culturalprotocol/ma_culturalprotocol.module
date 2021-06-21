@@ -383,6 +383,84 @@ function ma_culturalprotocol_form_cultural_protocol_group_node_form_alter(&$form
  * Implements hook_node_validate().
  */
 function ma_culturalprotocol_node_validate($node, $form, &$form_state) {
+  if (ma_cultural_protocol_node_type_must_have_cp($node->type)) {
+    $missing = FALSE;
+    // Don't allow empty protocol fields for items that require protocols.
+    if (empty($node->og_group_ref[LANGUAGE_NONE])) {
+      form_set_error('og_group_ref', 'You must specify a protocol for this item.');
+      $missing = TRUE;
+    }
+
+    // Don't allow empty privacy setting for items that require protocols.
+    if (empty($node->field_item_privacy_setting[LANGUAGE_NONE])
+    || !isset($node->field_item_privacy_setting[LANGUAGE_NONE][0]['value'])
+    || $node->field_item_privacy_setting[LANGUAGE_NONE][0]['value'] == NULL) {
+      form_set_error('field_item_privacy_setting', 'You must specify an item sharing setting.');
+      $missing = TRUE;
+    }
+
+    // If we have missing field values we don't need to do any more validation.
+    if ($missing) {
+      return;
+    }
+
+    // Validate protocols. This is primarily to handle users with bypass
+    // permissions like administrators. We want to allow them to edit
+    // the item as expected, but prevent altering the original access
+    // scope of the item.
+    $original_node = NULL;
+    if (isset($node->og_group_ref[LANGUAGE_NONE])) {
+      if (isset($node->nid)) {
+        $original_node = node_load($node->nid);
+      }
+
+      $allowed_protocols = ma_cultural_protocol_get_cps_user_can_post_to();
+      // Validate switch from old -> new protocols.
+      if ($original_node && !empty($original_node->og_group_ref[LANGUAGE_NONE])) {
+        $original_privacy_setting = $original_node->field_item_privacy_setting[LANGUAGE_NONE][0]['value'] ?? 'all';
+
+        // For "all" privacy setting, user must have rights to all protocols in
+        // order to modify protocol field values OR the protocols must not have
+        // changed.
+        if ($original_privacy_setting == 'all') {
+          foreach ($original_node->og_group_ref[LANGUAGE_NONE] as $delta => $value) {
+            $new_value = $node->og_group_ref[LANGUAGE_NONE][$delta]['target_id'] ?? NULL;
+            if (!isset($allowed_protocols[$value['target_id']]) && $value['target_id'] != $new_value) {
+              form_set_error('og_group_ref', 'You are not allowed to alter the protocols for this item.');
+            }
+          }
+        }
+
+        // For "any" privacy setting, user must have rights to one protocol in
+        // order to modify protocol field values OR the protocols must not
+        // have changed.
+        if ($original_privacy_setting == 'any') {
+          foreach ($original_node->og_group_ref[LANGUAGE_NONE] as $delta => $value) {
+            $new_value = $node->og_group_ref[LANGUAGE_NONE][$delta]['target_id'] ?? NULL;
+            if (isset($allowed_protocols[$value['target_id']]) || $value['target_id'] == $new_value) {
+              continue;
+            }
+            form_set_error('og_group_ref', 'You are not allowed to alter the protocols for this item.');
+          }
+        }
+      }
+
+      // Confirm that the user has access to the selected protocols
+      // for new items. Revisions have already been tested above.
+      $is_new = is_null($original_node) ?? FALSE;
+      if ($is_new) {
+        foreach ($node->og_group_ref[LANGUAGE_NONE] as $delta => $value) {
+          if (!isset($value['target_id'])) {
+            continue;
+          }
+          if (!isset($allowed_protocols[$value['target_id']])) {
+            form_set_error('og_group_ref', 'Invalid protocol selected.');
+          }
+        }
+      }
+    }
+  }
+
   if ($node->type == 'cultural_protocol_group') {
 
     // Do not allow unsetting Parent Community for Communities that the user is not a Community Manager of

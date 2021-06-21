@@ -24,20 +24,14 @@ function ma_person_user_default_permissions() {
   // Exported permission: 'clear import_people feeds'.
   $permissions['clear import_people feeds'] = array(
     'name' => 'clear import_people feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 
   // Exported permission: 'clear import_people_taxonomy_terms feeds'.
   $permissions['clear import_people_taxonomy_terms feeds'] = array(
     'name' => 'clear import_people_taxonomy_terms feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 
@@ -150,20 +144,14 @@ function ma_person_user_default_permissions() {
   // Exported permission: 'import import_people feeds'.
   $permissions['import import_people feeds'] = array(
     'name' => 'import import_people feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 
   // Exported permission: 'import import_people_taxonomy_terms feeds'.
   $permissions['import import_people_taxonomy_terms feeds'] = array(
     'name' => 'import import_people_taxonomy_terms feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 
@@ -194,18 +182,14 @@ function ma_person_user_default_permissions() {
   // Exported permission: 'unlock import_people feeds'.
   $permissions['unlock import_people feeds'] = array(
     'name' => 'unlock import_people feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 
   // Exported permission: 'unlock import_people_taxonomy_terms feeds'.
   $permissions['unlock import_people_taxonomy_terms feeds'] = array(
     'name' => 'unlock import_people_taxonomy_terms feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 

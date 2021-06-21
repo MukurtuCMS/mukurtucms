@@ -388,13 +388,6 @@ class views_content_plugin_display_panel_pane extends views_plugin_display {
   /**
    * {@inheritdoc}
    */
-  public function has_path() {
-    return TRUE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function validate() {
     // To bypass the validation of the path from Views we temporarily
     // override the path if one doesn't exist because it will be generated

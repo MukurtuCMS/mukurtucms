@@ -20,28 +20,28 @@ function ma_digitalheritage_default_page_manager_pages() {
   $page->access = array(
     'plugins' => array(
       0 => array(
+        'context' => 'logged-in-user',
         'name' => 'perm',
+        'not' => FALSE,
         'settings' => array(
           'perm' => 'access content',
         ),
-        'context' => 'logged-in-user',
-        'not' => FALSE,
       ),
     ),
-    'type' => 'none',
     'settings' => NULL,
+    'type' => 'none',
   );
   $page->menu = array(
-    'type' => 'none',
-    'title' => 'Browse Digital Heritage',
     'name' => 'menu-browse-menu',
-    'weight' => '0',
     'parent' => array(
-      'type' => 'none',
-      'title' => '',
       'name' => 'navigation',
+      'title' => '',
+      'type' => 'none',
       'weight' => '0',
     ),
+    'title' => 'Browse Digital Heritage',
+    'type' => 'none',
+    'weight' => '0',
   );
   $page->arguments = array();
   $page->conf = array(
@@ -57,146 +57,146 @@ function ma_digitalheritage_default_page_manager_pages() {
   $handler->handler = 'panel_context';
   $handler->weight = 0;
   $handler->conf = array(
-    'title' => 'grid-list',
-    'no_blocks' => 0,
-    'pipeline' => 'standard',
-    'body_classes_to_remove' => '',
-    'body_classes_to_add' => '',
-    'css_id' => '',
-    'css' => '',
-    'contexts' => array(),
-    'relationships' => array(),
     'access' => array(
+      'logic' => 'and',
       'plugins' => array(
         0 => array(
           'name' => 'php',
+          'not' => FALSE,
           'settings' => array(
             'description' => '',
             'php' => 'if ($_COOKIE[\'dh_browse_mode\'] <> \'map-view\') return TRUE;',
           ),
-          'not' => FALSE,
         ),
       ),
-      'logic' => 'and',
     ),
+    'body_classes_to_add' => '',
+    'body_classes_to_remove' => '',
+    'contexts' => array(),
+    'css' => '',
+    'css_id' => '',
+    'no_blocks' => 0,
+    'pipeline' => 'standard',
+    'relationships' => array(),
+    'title' => 'grid-list',
   );
   $display = new panels_display();
   $display->layout = 'bootstrap_twocol_stacked';
   $display->layout_settings = array(
     'items' => array(
       'canvas' => array(
-        'type' => 'row',
-        'contains' => 'column',
         'children' => array(
           0 => 'main',
         ),
+        'contains' => 'column',
         'parent' => NULL,
+        'type' => 'row',
+      ),
+      'center' => array(
+        'class' => '',
+        'parent' => 'main-row',
+        'title' => 'Left',
+        'type' => 'region',
+        'width' => '69.9671129903688',
+        'width_type' => '%',
       ),
       'main' => array(
-        'type' => 'column',
-        'width' => 100,
-        'width_type' => '%',
         'children' => array(
           0 => 'main-row',
         ),
         'parent' => 'canvas',
+        'type' => 'column',
+        'width' => 100,
+        'width_type' => '%',
       ),
       'main-row' => array(
-        'type' => 'row',
-        'contains' => 'region',
         'children' => array(
           0 => 'center',
           1 => 'right',
         ),
+        'contains' => 'region',
         'parent' => 'main',
-      ),
-      'center' => array(
-        'type' => 'region',
-        'title' => 'Left',
-        'width' => '69.9671129903688',
-        'width_type' => '%',
-        'parent' => 'main-row',
-        'class' => '',
+        'type' => 'row',
       ),
       'right' => array(
-        'type' => 'region',
+        'class' => '',
+        'parent' => 'main-row',
         'title' => 'Right',
+        'type' => 'region',
         'width' => '30.0328870096312',
         'width_type' => '%',
-        'parent' => 'main-row',
-        'class' => '',
       ),
     ),
   );
   $display->panel_settings = array(
-    'style_settings' => array(
-      'default' => NULL,
-      'center' => NULL,
-      'left' => array(
-        'css_id' => '',
-        'css_class' => '',
-        'column' => array(
-          'xs' => '12',
-          'sm' => '4',
-          'md' => '3',
-          'lg' => '0',
-        ),
-        'offset' => array(
-          'xs' => '0',
-          'sm' => '0',
-          'md' => '0',
-          'lg' => '0',
-        ),
-        'push' => array(
-          'xs' => '0',
-          'sm' => '8',
-          'md' => '9',
-          'lg' => '0',
-        ),
-        'pull' => array(
-          'xs' => '0',
-          'sm' => '0',
-          'md' => '0',
-          'lg' => '0',
-        ),
-      ),
-      'right' => array(
-        'css_id' => '',
-        'css_class' => '',
-        'column' => array(
-          'xs' => '12',
-          'sm' => '8',
-          'md' => '9',
-          'lg' => '0',
-        ),
-        'offset' => array(
-          'xs' => '0',
-          'sm' => '0',
-          'md' => '0',
-          'lg' => '0',
-        ),
-        'push' => array(
-          'xs' => '0',
-          'sm' => '0',
-          'md' => '0',
-          'lg' => '0',
-        ),
-        'pull' => array(
-          'xs' => '0',
-          'sm' => '4',
-          'md' => '3',
-          'lg' => '0',
-        ),
-      ),
-      'center_' => NULL,
-      'top' => NULL,
-      'bottom' => NULL,
-    ),
     'left' => array(
       'style' => 'bootstrap_region',
     ),
     'right' => array(
       'style' => 'bootstrap_region',
+    ),
+    'style_settings' => array(
+      'bottom' => NULL,
+      'center' => NULL,
+      'center_' => NULL,
+      'default' => NULL,
+      'left' => array(
+        'column' => array(
+          'lg' => '0',
+          'md' => '3',
+          'sm' => '4',
+          'xs' => '12',
+        ),
+        'css_class' => '',
+        'css_id' => '',
+        'offset' => array(
+          'lg' => '0',
+          'md' => '0',
+          'sm' => '0',
+          'xs' => '0',
+        ),
+        'pull' => array(
+          'lg' => '0',
+          'md' => '0',
+          'sm' => '0',
+          'xs' => '0',
+        ),
+        'push' => array(
+          'lg' => '0',
+          'md' => '9',
+          'sm' => '8',
+          'xs' => '0',
+        ),
+      ),
+      'right' => array(
+        'column' => array(
+          'lg' => '0',
+          'md' => '9',
+          'sm' => '8',
+          'xs' => '12',
+        ),
+        'css_class' => '',
+        'css_id' => '',
+        'offset' => array(
+          'lg' => '0',
+          'md' => '0',
+          'sm' => '0',
+          'xs' => '0',
+        ),
+        'pull' => array(
+          'lg' => '0',
+          'md' => '3',
+          'sm' => '4',
+          'xs' => '0',
+        ),
+        'push' => array(
+          'lg' => '0',
+          'md' => '0',
+          'sm' => '0',
+          'xs' => '0',
+        ),
+      ),
+      'top' => NULL,
     ),
   );
   $display->cache = array();
@@ -238,8 +238,8 @@ function ma_digitalheritage_default_page_manager_pages() {
   $pane->access = array();
   $pane->configuration = array(
     'override_title' => 0,
-    'override_title_text' => 'Sort by',
     'override_title_heading' => 'h2',
+    'override_title_text' => 'Sort by',
   );
   $pane->cache = array();
   $pane->style = array(
@@ -394,176 +394,176 @@ function ma_digitalheritage_default_page_manager_pages() {
   $handler->handler = 'panel_context';
   $handler->weight = 1;
   $handler->conf = array(
-    'title' => 'map',
-    'no_blocks' => 0,
-    'pipeline' => 'standard',
-    'body_classes_to_remove' => '',
-    'body_classes_to_add' => '',
-    'css_id' => '',
-    'css' => '',
-    'contexts' => array(),
-    'relationships' => array(),
-    'name' => 'map',
     'access' => array(
+      'logic' => 'and',
       'plugins' => array(
         0 => array(
           'name' => 'php',
+          'not' => FALSE,
           'settings' => array(
             'description' => '',
             'php' => 'if ($_COOKIE[\'dh_browse_mode\'] == \'map-view\') return TRUE;',
           ),
-          'not' => FALSE,
         ),
       ),
-      'logic' => 'and',
     ),
+    'body_classes_to_add' => '',
+    'body_classes_to_remove' => '',
+    'contexts' => array(),
+    'css' => '',
+    'css_id' => '',
+    'name' => 'map',
+    'no_blocks' => 0,
+    'pipeline' => 'standard',
+    'relationships' => array(),
+    'title' => 'map',
   );
   $display = new panels_display();
   $display->layout = 'bootstrap_twocol_stacked';
   $display->layout_settings = array(
     'items' => array(
       'canvas' => array(
-        'type' => 'row',
-        'contains' => 'column',
         'children' => array(
           0 => 'main',
         ),
+        'contains' => 'column',
         'parent' => NULL,
+        'type' => 'row',
+      ),
+      'center' => array(
+        'class' => '',
+        'parent' => 'main-row',
+        'title' => 'Left',
+        'type' => 'region',
+        'width' => '69.9671129903688',
+        'width_type' => '%',
       ),
       'main' => array(
-        'type' => 'column',
-        'width' => 100,
-        'width_type' => '%',
         'children' => array(
           0 => 'main-row',
         ),
         'parent' => 'canvas',
+        'type' => 'column',
+        'width' => 100,
+        'width_type' => '%',
       ),
       'main-row' => array(
-        'type' => 'row',
-        'contains' => 'region',
         'children' => array(
           0 => 'center',
           1 => 'right',
         ),
+        'contains' => 'region',
         'parent' => 'main',
-      ),
-      'center' => array(
-        'type' => 'region',
-        'title' => 'Left',
-        'width' => '69.9671129903688',
-        'width_type' => '%',
-        'parent' => 'main-row',
-        'class' => '',
+        'type' => 'row',
       ),
       'right' => array(
-        'type' => 'region',
+        'class' => '',
+        'parent' => 'main-row',
         'title' => 'Right',
+        'type' => 'region',
         'width' => '30.0328870096312',
         'width_type' => '%',
-        'parent' => 'main-row',
-        'class' => '',
       ),
     ),
   );
   $display->panel_settings = array(
-    'style_settings' => array(
-      'default' => NULL,
-      'center' => NULL,
-      'left' => array(
-        'css_id' => '',
-        'css_class' => '',
-        'column' => array(
-          'xs' => '12',
-          'sm' => '4',
-          'md' => '3',
-          'lg' => '0',
-        ),
-        'offset' => array(
-          'xs' => '0',
-          'sm' => '0',
-          'md' => '0',
-          'lg' => '0',
-        ),
-        'push' => array(
-          'xs' => '0',
-          'sm' => '8',
-          'md' => '9',
-          'lg' => '0',
-        ),
-        'pull' => array(
-          'xs' => '0',
-          'sm' => '0',
-          'md' => '0',
-          'lg' => '0',
-        ),
-      ),
-      'right' => array(
-        'css_id' => '',
-        'css_class' => '',
-        'column' => array(
-          'xs' => '12',
-          'sm' => '8',
-          'md' => '9',
-          'lg' => '0',
-        ),
-        'offset' => array(
-          'xs' => '0',
-          'sm' => '0',
-          'md' => '0',
-          'lg' => '0',
-        ),
-        'push' => array(
-          'xs' => '0',
-          'sm' => '0',
-          'md' => '0',
-          'lg' => '0',
-        ),
-        'pull' => array(
-          'xs' => '0',
-          'sm' => '4',
-          'md' => '3',
-          'lg' => '0',
-        ),
-      ),
-      'center_' => NULL,
-      'top' => array(
-        'css_id' => '',
-        'css_class' => '',
-        'column' => array(
-          'xs' => '12',
-          'sm' => '4',
-          'md' => '3',
-          'lg' => '0',
-        ),
-        'offset' => array(
-          'xs' => '0',
-          'sm' => '0',
-          'md' => '0',
-          'lg' => '0',
-        ),
-        'push' => array(
-          'xs' => '0',
-          'sm' => '8',
-          'md' => '9',
-          'lg' => '0',
-        ),
-        'pull' => array(
-          'xs' => '0',
-          'sm' => '0',
-          'md' => '0',
-          'lg' => '0',
-        ),
-      ),
-      'bottom' => NULL,
-    ),
-    'top' => array(
+    'left' => array(
       'style' => 'bootstrap_region',
     ),
     'right' => array(
       'style' => 'bootstrap_region',
     ),
-    'left' => array(
+    'style_settings' => array(
+      'bottom' => NULL,
+      'center' => NULL,
+      'center_' => NULL,
+      'default' => NULL,
+      'left' => array(
+        'column' => array(
+          'lg' => '0',
+          'md' => '3',
+          'sm' => '4',
+          'xs' => '12',
+        ),
+        'css_class' => '',
+        'css_id' => '',
+        'offset' => array(
+          'lg' => '0',
+          'md' => '0',
+          'sm' => '0',
+          'xs' => '0',
+        ),
+        'pull' => array(
+          'lg' => '0',
+          'md' => '0',
+          'sm' => '0',
+          'xs' => '0',
+        ),
+        'push' => array(
+          'lg' => '0',
+          'md' => '9',
+          'sm' => '8',
+          'xs' => '0',
+        ),
+      ),
+      'right' => array(
+        'column' => array(
+          'lg' => '0',
+          'md' => '9',
+          'sm' => '8',
+          'xs' => '12',
+        ),
+        'css_class' => '',
+        'css_id' => '',
+        'offset' => array(
+          'lg' => '0',
+          'md' => '0',
+          'sm' => '0',
+          'xs' => '0',
+        ),
+        'pull' => array(
+          'lg' => '0',
+          'md' => '3',
+          'sm' => '4',
+          'xs' => '0',
+        ),
+        'push' => array(
+          'lg' => '0',
+          'md' => '0',
+          'sm' => '0',
+          'xs' => '0',
+        ),
+      ),
+      'top' => array(
+        'column' => array(
+          'lg' => '0',
+          'md' => '3',
+          'sm' => '4',
+          'xs' => '12',
+        ),
+        'css_class' => '',
+        'css_id' => '',
+        'offset' => array(
+          'lg' => '0',
+          'md' => '0',
+          'sm' => '0',
+          'xs' => '0',
+        ),
+        'pull' => array(
+          'lg' => '0',
+          'md' => '0',
+          'sm' => '0',
+          'xs' => '0',
+        ),
+        'push' => array(
+          'lg' => '0',
+          'md' => '9',
+          'sm' => '8',
+          'xs' => '0',
+        ),
+      ),
+    ),
+    'top' => array(
       'style' => 'bootstrap_region',
     ),
   );

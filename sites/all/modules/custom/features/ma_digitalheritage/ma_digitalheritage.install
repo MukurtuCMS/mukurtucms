@@ -21,6 +21,19 @@ function ma_digitalheritage_update_7101() {
 
 }
 
+/**
+ * Implements hook_update_N().
+ *
+ * Populate the Mukurtu Mobile Community Records field.
+ */
+function ma_digitalheritage_update_7103() {
+
+  features_revert_module ('ma_digitalheritage');
+  include_once('one_time_updates/populate_mm_cr_field.php');
+
+}
+
+
 // Increase field length of an already-populated field.
 // Code from https://drupal.stackexchange.com/a/79832
 function _field_maxlength_fix($field_name, $maxlength = 255) {

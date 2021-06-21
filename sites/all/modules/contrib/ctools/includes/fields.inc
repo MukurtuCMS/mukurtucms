@@ -238,8 +238,6 @@ function ctools_field_label($field_name) {
 function ctools_field_invoke_field($field_name, $op, $entity_type, $entity, &$a = NULL, &$b = NULL, $options = array()) {
   if (is_array($field_name)) {
     $instance = $field_name;
-    $field = empty($field_name['field']) ? field_info_field($instance['field_name']) : $field_name['field'];
-    $field_name = $instance['field_name'];
   }
   else {
     list(, , $bundle) = entity_extract_ids($entity_type, $entity);
@@ -249,6 +247,11 @@ function ctools_field_invoke_field($field_name, $op, $entity_type, $entity, &$a 
   if (empty($instance)) {
     return;
   }
+
+  // Keep the variables consistent regardless if we retrieve the field instance
+  // ourself, or if one is provided to us via the $field_name variable.
+  $field = field_info_field($instance['field_name']);
+  $field_name = $instance['field_name'];
 
   // Merge default options.
   $default_options = array(

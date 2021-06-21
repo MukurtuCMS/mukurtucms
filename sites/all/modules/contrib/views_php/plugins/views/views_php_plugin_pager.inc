@@ -5,7 +5,7 @@
  *
  * @ingroup views_pager_plugins
  */
-class views_php_plugin_pager extends views_php_plugin_wrapper  {
+class views_php_plugin_pager extends views_php_plugin_wrapper {
 
   /**
    * Perform any needed actions just prior to the query executing.
@@ -48,12 +48,12 @@ class views_php_plugin_pager extends views_php_plugin_wrapper  {
     $this->wrapped->post_execute($result);
   }
 
-
   /**
    * Execute the count query, which will be done just prior to the query
    * itself being executed.
    */
-  function execute_count_query(&$count_query) {
+  public function execute_count_query(&$count_query) {
     $this->wrapped->execute_count_query($count_query);
   }
+
 }

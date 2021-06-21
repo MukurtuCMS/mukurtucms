@@ -128,21 +128,78 @@ class RedirectUnitTest extends RedirectTestHelper {
       $this->assertIdentical($output, $test_case['expected']);
     }
   }
+  
+  /**
+   * Test redirect_load_by_source().
+   */
+  public function testLoadRedirectsBySource() {
+    $redirects = array(
+      'source-path?param1=1&param2=2' => 'redirect-path-1',
+      'source-path' => 'redirect-path-2',
+      'source-path?param1=1' => 'redirect-path-3',
+    );
+
+    // Add redirects.
+    foreach ($redirects as $source_path => $redirect_path) {
+      $this->addRedirect($source_path, $redirect_path);
+    }
+
+    // Load redirects by source.
+    foreach ($redirects as $source_path => $redirect_path) {
+      $source_parsed = redirect_parse_url($source_path);
+      if (!isset($source_parsed['query'])) {
+        $source_parsed['query'] = array();
+      }
+      $redirect = redirect_load_by_source($source_parsed['url'], LANGUAGE_NONE, $source_parsed['query']);
+
+      $this->assertEqual($redirect->redirect, $redirect_path, t('The redirect path %redirect equals expected result %result.', array('%redirect' => $redirect->redirect, '%result' => $redirect_path)));
+    }
+  }
 
   /**
    * Test redirect_parse_url().
    */
   function testParseURL() {
-    //$test_cases = array(
-    //  array(
-    //    'input' => array('b' => 'aa', 'c' => array('c2' => 'aa', 'c1' => 'aa'), 'a' => 'aa'),
-    //    'expected' => array('a' => 'aa', 'b' => 'aa', 'c' => array('c1' => 'aa', 'c2' => 'aa')),
-    //  ),
-    //);
-    //foreach ($test_cases as $index => $test_case) {
-    //  $output = redirect_parse_url($test_case['input']);
-    //  $this->assertIdentical($output, $test_case['expected']);
-    //}
+    $clean_url = variable_get('clean_url', 0);
+    $test_case_groups = array(
+      // Tests to be run with Clean URLs on.
+      array(
+        'clean_url' => 1,
+        'test_cases' => array(
+          array(
+            'input' => 'base?param1=1',
+            'expected' => array(
+              'path' => 'base',
+              'query' => array('param1' => '1'),
+              'url' => 'base',
+            ),
+          ),
+        ),
+      ),
+      // Tests to be run with Clean URLs off.
+      array(
+        'clean_url' => 0,
+        'test_cases' => array(
+          array(
+            'input' => 'base&param1=1',
+            'expected' => array(
+              'path' => 'base',
+              'query' => array('param1' => '1'),
+              'url' => 'base',
+            ),
+          ),
+        ),
+      ),
+    );
+    foreach ($test_case_groups as $test_case_group) {
+      variable_set('clean_url', $test_case_group['clean_url']);
+      foreach ($test_case_group['test_cases'] as $index => $test_case) {
+        $output = redirect_parse_url($test_case['input']);
+        $this->assertIdentical($output, $test_case['expected']);
+      }
+    }
+    // Return 'clean_url' to the value it had before testing.
+    variable_set('clean_url', $clean_url);
   }
 }
 
@@ -175,7 +232,7 @@ class RedirectFunctionalTest extends RedirectTestHelper {
     $this->assertNoLink('Add URL redirect from this page to another location');
 
     $this->drupalGet('admin/reports/page-not-found');
-    $this->clickLink('Fix 404 pages with URL redirects');
+    $this->clickLink('Fix file not found (404) errors with URL redirects');
 
     // Check that normal users do not see the add redirect link on 404 pages.
     $this->drupalLogout();

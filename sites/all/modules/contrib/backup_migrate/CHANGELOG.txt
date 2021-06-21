@@ -1,3 +1,73 @@
+Backup and Migrate 7.x-3.9, 2020-07-15
+--------------------------------------
+#3158379 by DamienMcKenna, monnerat: Fixed compatibility with PHP 5.4.
+
+
+Backup and Migrate 7.x-3.8, 2020-07-10
+--------------------------------------
+#3119038 by solideogloria, gisle: Spelling typo in update scripts.
+#3143362 by DamienMcKenna, solideogloria: Undefined variable $machine_name in
+  install file.
+#3143250 by DamienMcKenna: Use utf8mb4 for MySQL files.
+#3154166 by DamienMcKenna: Remove use of backup_migrate_include() entirely.
+#3129399 by solideogloria, DamienMcKenna: Missing ctools_export_form parameter.
+#3158378 by DamienMcKenna, ron_s: Adjust default performance settings.
+#3158379 by DamienMcKenna: Coding standards improvements.
+
+
+Backup and Migrate 7.x-3.7, 2020-02-28
+--------------------------------------
+#3032453 by DamienMcKenna: Ignore Advanced Aggregator CSS & JS directories.
+#3026187 by DamienMcKenna: Configurations don't load correctly when upgrading
+  from 7.x-2.x to 3.x, clear caches.
+#2606586 by Darren Oh, dmargetts, joelpittet, DamienMcKenna, solideogloria: Fix
+  smart delete not saving files for all periods.
+#3026186 by DamienMcKenna: Menus not rebuilt after upgrading from 7.x-2.x.
+#2507495 by brankoc, DamienMcKenna, nicorac, lorisbel, crantok, jakeru,
+  NickWilde, DD 85, rothlive, Oleg Ko, mgstables, szczesuil, Web.Pergamonteam,
+  Lemontonix, Tranko, aotus, knalstaaf, drugan, lesliewagner1165, Pascal.s,
+  HansKuiters, mato, lgough, Frosty29, sdowney2002, dhalbert, toomanypets, ckng,
+  havanablackcu1, myDrupal2014_846824658246, felixmf: Warning: mail(): Multiple
+  or malformed newlines found in additional_header in mime_mail->send().
+#2135813 by RickJ, rlhawk: Support for the Encrypt module.
+#3033583 by BrankoC: Add CTools as a test dependency.
+#2946311 by DamienMcKenna, k.elizabeth, couturier, jackalope, nelslynn,
+  rrirower, bmango, Cyberflyer, sharonknieper: Too many connections in
+  backup_migrate_source_db->_get_db_connection().
+#3023804 by DamienMcKenna, solideogloria, adam1, jazzitup, MaxMendez, jprj,
+  Louis Delacretaz, eloiv, oliverpolden, drupal_jon, mato, VirtualMitra: Error:
+  Call to undefined function _backup_migrate_temp_files_delete().
+#2663066 by BrankoC, DamienMcKenna, bsains, izmeez: Profile Filter field -
+  hitting 64Kb limit.
+#3023414 by BrankoC, DamienMcKenna, wylbur: Provide settings page for the hidden
+  variables.
+#1042672 by fietserwin, BrankoC: hook_help: do not translate texts if not
+  necessary.
+#3060997 by solideogloria, BrankoC: Improve Performance of Schedule Calculation.
+#3064783 by BrankoC, DamienMcKenna: Uninstalling this module leaves variable
+  backup_migrate_schedule_last_run_* intact.
+#3051821 by DamienMcKenna, BrankoC, solideogloria, wylbur: Remove NodeSquirrel
+  integration.
+#3033583 by BrankoC, DamienMcKenna, m.stenta, RickJ, wylbur: CTools exportables
+  code no longer loading.
+#2507495 by BrankoC, DamienMcKenna: Update script to disable destinations
+  affected by the email delivery change.
+#3046235 by joelpittet: Slow query 'show table status' on menu rebuild.
+#3102427 by izmeez: Readme.txt minor typo and formatting fixes.
+#3102506 by DamienMcKenna, BrankoC: Verify destinations work before listing them
+  in the Quick Backup form; save the file system form before beginning backup
+  tests to ensure the private file system is configured correctly.
+#3102218 by DamienMcKenna, BrankoC, jacob.embree, izmeez, devad, joelpittet,
+  fietserwin, wylbur: Update 7310 Disable e-mail destinations. Emits syntax
+  error for MySQL and MariaDB.
+#3027709 by BrankoC, DamienMcKenna, ultrabob: "A non-numeric value encountered"
+  in backup_migrate_to_bytes().
+#3116733 by DamienMcKenna, fietserwin: PDOException: SQLSTATE[42S02]: Base table
+  or view not found: 1146 Table 'variable' doesn't exist.
+#2885094 by pdcarto, avergara, couturier: CLI option dumps the ENTIRE database,
+  ignores 'nodata_tables' setting.
+
+
 Backup and Migrate 7.x-3.6, 2018-12-15
 --------------------------------------
 #2293601 by KimNyholm, fastturtle: Errors shown because directory handles are

@@ -4,7 +4,7 @@
  * @file
  */
 
-backup_migrate_include('sources.db');
+require_once dirname(__FILE__) . '/sources.db.inc';
 
 /**
  * @file
@@ -17,6 +17,31 @@ backup_migrate_include('sources.db');
  * @ingroup backup_migrate_destinations
  */
 class backup_migrate_source_db_mysql extends backup_migrate_source_db {
+
+  /**
+   * The table's data keyed by table name.
+   *
+   * @var array
+   */
+  protected static $tableData = array();
+
+  /**
+   * The tables keyed by name.
+   *
+   * @var array
+   */
+  protected static $tableNames = array();
+
+  /**
+   * The views keyed by name.
+   *
+   * @var array
+   */
+  protected static $viewNames = array();
+
+  /**
+   *
+   */
   public function type_name() {
     return t("MySQL Database");
   }
@@ -166,13 +191,15 @@ class backup_migrate_source_db_mysql extends backup_migrate_source_db {
     );
 
     // Ignore the excluded and no-data tables.
+    $db = $this->dest_url['path'];
     if (!empty($settings->filters['exclude_tables'])) {
-      $db = $this->dest_url['path'];
       foreach ((array) $settings->filters['exclude_tables'] as $table) {
         if (isset($alltables[$table])) {
           $command .= ' --ignore-table=' . $db . '.' . $table;
         }
       }
+    }
+    if (!empty($settings->filters['nodata_tables'])) {
       foreach ((array) $settings->filters['nodata_tables'] as $table) {
         if (isset($alltables[$table])) {
           $nodata_tables[] = $table;
@@ -256,22 +283,24 @@ class backup_migrate_source_db_mysql extends backup_migrate_source_db {
    * Get a list of tables in the database.
    */
   public function _get_table_names() {
-    $out = array();
-    foreach ($this->_get_tables() as $table) {
-      $out[$table['name']] = $table['name'];
+    if (empty(static::$tableNames)) {
+      static::$tableNames = $this->query("SHOW FULL TABLES WHERE Table_Type = 'BASE TABLE'")
+        ->fetchAllKeyed(0, 0);
     }
-    return $out;
+
+    return static::$tableNames;
   }
 
   /**
    * Get a list of views in the database.
    */
   public function _get_view_names() {
-    $out = array();
-    foreach ($this->_get_views() as $view) {
-      $out[$view['name']] = $view['name'];
+    if (empty(static::$viewNames)) {
+      static::$viewNames = $this->query("SHOW FULL TABLES WHERE Table_Type = 'VIEW'")
+        ->fetchAllKeyed(0, 0);
     }
-    return $out;
+
+    return static::$viewNames;
   }
 
   /**
@@ -295,20 +324,35 @@ class backup_migrate_source_db_mysql extends backup_migrate_source_db {
   }
 
   /**
+   * Get a list of table and view data in the db.
+   */
+  protected function get_table_data() {
+    if (empty(static::$tableData)) {
+      $tables = $this->query('SHOW TABLE STATUS')->fetchAll(PDO::FETCH_ASSOC);
+
+      foreach ($tables as $table) {
+        // Lowercase the keys because between Drupal 7.12 and 7.13/14 the
+        // default query behavior was changed.
+        // See: http://drupal.org/node/1171866
+        $table = array_change_key_case($table);
+        static::$tableData[$table['name']] = $table;
+      }
+    }
+
+    return static::$tableData;
+  }
+
+  /**
    * Get a list of tables in the db.
    */
   public function _get_tables() {
     $out = array();
-    // get auto_increment values and names of all tables.
-    $tables = $this->query("show table status", array(), array('fetch' => PDO::FETCH_ASSOC));
-    foreach ($tables as $table) {
-      // Lowercase the keys because between Drupal 7.12 and 7.13/14 the default query behavior was changed.
-      // See: http://drupal.org/node/1171866
-      $table = array_change_key_case($table);
+    foreach ($this->get_table_data() as $table) {
       if (!empty($table['engine'])) {
         $out[$table['name']] = $table;
       }
     }
+
     return $out;
   }
 
@@ -317,12 +361,7 @@ class backup_migrate_source_db_mysql extends backup_migrate_source_db {
    */
   public function _get_views() {
     $out = array();
-    // get auto_increment values and names of all tables.
-    $tables = $this->query("show table status", array(), array('fetch' => PDO::FETCH_ASSOC));
-    foreach ($tables as $table) {
-      // Lowercase the keys because between Drupal 7.12 and 7.13/14 the default query behavior was changed.
-      // See: http://drupal.org/node/1171866
-      $table = array_change_key_case($table);
+    foreach ($this->get_table_data() as $table) {
       if (empty($table['engine'])) {
         $out[$table['name']] = $table;
       }
@@ -352,8 +391,6 @@ class backup_migrate_source_db_mysql extends backup_migrate_source_db {
     return $out;
   }
 
-
-
   /**
    * Get the sql for the structure of the given table.
    */
@@ -379,9 +416,9 @@ class backup_migrate_source_db_mysql extends backup_migrate_source_db {
    * Get the sql to insert the data for a given table.
    */
   public function _dump_table_data_sql_to_file($file, $table) {
-    $rows_per_query = variable_get('backup_migrate_data_rows_per_query', 1000);
-    $rows_per_line = variable_get('backup_migrate_data_rows_per_line', 30);
-    $bytes_per_line = variable_get('backup_migrate_data_bytes_per_line', 2000);
+    $rows_per_query = variable_get('backup_migrate_data_rows_per_query', BACKUP_MIGRATE_DATA_ROWS_PER_QUERY);
+    $rows_per_line = variable_get('backup_migrate_data_rows_per_line', BACKUP_MIGRATE_DATA_ROWS_PER_LINE);
+    $bytes_per_line = variable_get('backup_migrate_data_bytes_per_line', BACKUP_MIGRATE_DATA_BYTES_PER_LINE);
 
     if (variable_get('backup_migrate_verbose')) {
       _backup_migrate_message('Table: %table', array('%table' => $table['name']), 'success');
@@ -522,7 +559,7 @@ class backup_migrate_source_db_mysql extends backup_migrate_source_db {
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE=NO_AUTO_VALUE_ON_ZERO */;
 
 SET SQL_MODE=\"NO_AUTO_VALUE_ON_ZERO\";
-SET NAMES utf8;
+SET NAMES utf8mb4;
 
 ";
   }
@@ -532,7 +569,7 @@ SET NAMES utf8;
    */
   public function _get_sql_file_footer() {
     return "
-  
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

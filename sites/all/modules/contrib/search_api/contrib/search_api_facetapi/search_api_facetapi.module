@@ -508,6 +508,62 @@ function search_api_facetapi_search_api_admin_index_fields_submit($form, &$form_
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter() for views_exposed_form().
+ *
+ * Custom integration for facets. When a Views exposed filter is modified on a
+ * search results page, any facets which have been already selected will be
+ * removed. This (optionally) adds hidden fields for each facet so their values
+ * are retained.
+ */
+function search_api_facetapi_form_views_exposed_form_alter(array &$form, array &$form_state) {
+  if (empty($form_state['view'])) {
+    return;
+  }
+  $view = $form_state['view'];
+
+  // Check if this is a Search API-based view and if the "Preserve facets"
+  // option is enabled. ("search_api_multi" would be the exact base table name,
+  // not just a prefix, but since it's just 16 characters long, we can still use
+  // this check to make the condition less complex.)
+  $base_table_prefix = substr($view->base_table, 0, 17);
+  if (in_array($base_table_prefix, array('search_api_index_', 'search_api_multi'))
+      && _search_api_preserve_views_facets($view)) {
+    // Get query parameters.
+    $query_parameters = drupal_get_query_parameters();
+
+    // Check if any facet query parameters are provided.
+    if (!empty($query_parameters['f'])) {
+      // Iterate through facet query parameters.
+      foreach ($query_parameters['f'] as $key => $value) {
+        // Add hidden form field for facet parameter.
+        $form['f[' . $key . ']'] = array(
+          '#type' => 'hidden',
+          '#value' => $value,
+          '#weight' => -1,
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Checks whether "Preserve facets" option is enabled on the given view.
+ *
+ * If the view display is overridden, use its configuration. Otherwise, use the
+ * default configuration.
+ *
+ * @param view $view
+ *   The search view.
+ *
+* @return bool
+*   TRUE if "Preserve facets" is enabled, FALSE otherwise.
+*/
+function _search_api_preserve_views_facets(view $view) {
+  $query_options = $view->display_handler->get_option('query');
+  return !empty($query_options['options']['preserve_facet_query_args']);
+}
+
+/**
  * Computes the granularity of a date facet filter.
  *
  * @param $filter

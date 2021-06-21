@@ -88,10 +88,8 @@ function field_collection_field_collection_from_field_context($context, $conf) {
     }
 
     if (!empty($items) && isset($items[$delta]['value'])) {
-      $field_collection_item = field_collection_item_load($items[$delta]['value']);
+      return ctools_context_create('entity:field_collection_item', $items[$delta]['value']);
     }
-
-    return ctools_context_create('entity:field_collection_item', $items[$delta]['value']);
   }
 
   return ctools_context_create_empty('entity:field_collection_item', NULL);

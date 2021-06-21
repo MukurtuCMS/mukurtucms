@@ -310,7 +310,7 @@ class ctools_export_ui {
 
     $form['bottom row']['reset'] = array(
       '#type' => 'submit',
-      '#id' => 'ctools-export-ui-list-items-apply',
+      '#id' => 'ctools-export-ui-list-items-reset',
       '#value' => t('Reset'),
       '#attributes' => array('class' => array('use-ajax-submit')),
     );

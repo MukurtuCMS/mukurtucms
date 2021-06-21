@@ -19,9 +19,9 @@ function ma_collection_feeds_tamper_default() {
   $feeds_tamper->source = 'Digital Heritage';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
     'limit' => '',
     'real_separator' => ',',
+    'separator' => ',',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -35,9 +35,9 @@ function ma_collection_feeds_tamper_default() {
   $feeds_tamper->source = 'Digital Heritage Items';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ';',
     'limit' => '',
     'real_separator' => ';',
+    'separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';

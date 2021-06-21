@@ -94,13 +94,20 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 4,
+        'weight' => 5,
       ),
       'map_popup' => array(
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 26,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 7,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'inline',
@@ -131,7 +138,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 36,
+        'weight' => 49,
       ),
     ),
     'display_label' => '',
@@ -167,7 +174,9 @@ function ma_digitalheritage_field_default_field_instances() {
   // Exported field_instance: 'node-digital_heritage-field_book_children'.
   $field_instances['node-digital_heritage-field_book_children'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => NULL,
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => array(),
     'default_value_function' => '',
     'deleted' => 0,
     'description' => 'Book Pages (also identified as Multi-Page Documents) allow multiple media assets to be presented within a single Digital Heritage Item in a paged display where each page can have unique metadata. Book Pages are often used to represent books, publications, scrapbooks or other print resources, but can also can be used with any media assets to create digital scrapbooks, or other unique presentations. Book Pages can be placed in any order by dragging and dropping them into the preferred order.',
@@ -198,13 +207,19 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 61,
+        'weight' => 64,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 12,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 70,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -234,7 +249,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 35,
+        'weight' => 48,
       ),
     ),
     'display_label' => '',
@@ -251,26 +266,34 @@ function ma_digitalheritage_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'entityreference',
+      'module' => 'options',
       'settings' => array(
-        'match_operator' => 'CONTAINS',
-        'path' => '',
-        'size' => 60,
+        'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'entityreference_autocomplete',
-      'weight' => 64,
+      'type' => 'options_select',
+      'weight' => 57,
     ),
   );
 
   // Exported field_instance: 'node-digital_heritage-field_book_parent'.
   $field_instances['node-digital_heritage-field_book_parent'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => NULL,
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => array(),
     'default_value_function' => '',
     'deleted' => 0,
     'description' => '',
@@ -301,13 +324,19 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 60,
+        'weight' => 63,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 19,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 69,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -337,7 +366,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 31,
+        'weight' => 44,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -353,18 +382,25 @@ function ma_digitalheritage_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'entityreference',
+      'module' => 'options',
       'settings' => array(
-        'match_operator' => 'CONTAINS',
-        'path' => '',
-        'size' => 60,
+        'apply_chosen' => '',
+        'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'entityreference_autocomplete',
-      'weight' => 65,
+      'type' => 'options_select',
+      'weight' => 58,
     ),
   );
 
@@ -418,13 +454,20 @@ function ma_digitalheritage_field_default_field_instances() {
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 15,
+        'weight' => 16,
       ),
       'map_popup' => array(
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 3,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 10,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -447,7 +490,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 6,
+        'weight' => 7,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'inline',
@@ -517,7 +560,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 7,
+      'weight' => 8,
     ),
   );
 
@@ -572,13 +615,23 @@ function ma_digitalheritage_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 17,
+        'weight' => 18,
       ),
       'map_popup' => array(
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 21,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 0,
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 19,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -608,7 +661,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 30,
+        'weight' => 43,
       ),
     ),
     'display_label' => '',
@@ -647,11 +700,133 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-digital_heritage-field_comm_records_mm'.
+  $field_instances['node-digital_heritage-field_comm_records_mm'] = array(
+    'bundle' => 'digital_heritage',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'community_record' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'above',
+        'module' => 'link',
+        'settings' => array(
+          'custom_title' => '',
+        ),
+        'type' => 'link_default',
+        'weight' => 50,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 58,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'link',
+        'settings' => array(
+          'custom_title' => '',
+        ),
+        'type' => 'link_default',
+        'weight' => 4,
+      ),
+      'search_index' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'taxonomy_record_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 18,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_comm_records_mm',
+    'label' => 'Community Records',
+    'required' => 0,
+    'settings' => array(
+      'absolute_url' => 0,
+      'attributes' => array(
+        'class' => '',
+        'configurable_class' => 0,
+        'configurable_title' => 0,
+        'rel' => '',
+        'target' => 'default',
+        'title' => '',
+      ),
+      'convert_aliases' => 0,
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'display' => array(
+        'url_cutoff' => 80,
+      ),
+      'enable_tokens' => 1,
+      'rel_remove' => 'default',
+      'title' => 'required',
+      'title_allowed_values' => '',
+      'title_label_use_field_label' => 0,
+      'title_maxlength' => 128,
+      'title_value' => '',
+      'url' => 0,
+      'user_register_form' => FALSE,
+      'validate_url' => 0,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'link',
+      'settings' => array(
+        'treeable' => 0,
+      ),
+      'type' => 'link_field',
+      'weight' => 65,
+    ),
+  );
+
   // Exported field_instance:
   // 'node-digital_heritage-field_community_record_children'.
   $field_instances['node-digital_heritage-field_community_record_children'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => NULL,
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => array(),
     'default_value_function' => '',
     'deleted' => 0,
     'description' => 'Community Records provide multiple layers of information, or contributions from multiple voices. This field displays all existing Community Records attached to the Digital Heritage Item. The display order of the Community Records can be changed by dragging and dropping them into the preferred order.',
@@ -682,13 +857,19 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 62,
+        'weight' => 65,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 15,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 66,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -718,7 +899,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 32,
+        'weight' => 45,
       ),
     ),
     'display_label' => '',
@@ -735,19 +916,25 @@ function ma_digitalheritage_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'entityreference',
+      'module' => 'options',
       'settings' => array(
-        'match_operator' => 'CONTAINS',
-        'path' => '',
-        'size' => 60,
+        'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'entityreference_autocomplete',
-      'weight' => 63,
+      'type' => 'options_select',
+      'weight' => 56,
     ),
   );
 
@@ -786,13 +973,19 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 63,
+        'weight' => 66,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 17,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 65,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -822,7 +1015,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 33,
+        'weight' => 46,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -858,7 +1051,9 @@ function ma_digitalheritage_field_default_field_instances() {
   // Exported field_instance: 'node-digital_heritage-field_community_ref'.
   $field_instances['node-digital_heritage-field_community_ref'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => NULL,
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -915,12 +1110,19 @@ function ma_digitalheritage_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 13,
+        'weight' => 15,
       ),
       'map_popup' => array(
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
+        'weight' => 2,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'node_reference',
+        'settings' => array(),
+        'type' => 'node_reference_default',
         'weight' => 2,
       ),
       'related_items_teaser_map_popup' => array(
@@ -954,7 +1156,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 5,
+        'weight' => 6,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'inline',
@@ -985,6 +1187,8 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 3,
       ),
     ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_community_ref',
     'label' => 'Community',
@@ -992,17 +1196,24 @@ function ma_digitalheritage_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'node_reference',
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_match' => 'contains',
-        'autocomplete_path' => 'node_reference/autocomplete',
-        'size' => 60,
+        'apply_chosen' => '',
+        'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'node_reference_autocomplete',
+      'type' => 'options_select',
       'weight' => 4,
     ),
   );
@@ -1010,7 +1221,9 @@ function ma_digitalheritage_field_default_field_instances() {
   // Exported field_instance: 'node-digital_heritage-field_contributor'.
   $field_instances['node-digital_heritage-field_contributor'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => NULL,
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => array(),
     'deleted' => 0,
     'description' => 'A Contributor can be a person, people, clan, tribal nation, community group or, organization who aided in making the content of a Digital Heritage Item or Media Asset. This could be the person who wrote, compiled, or illustrated a book or recorded a song; the people who edited or produced a film, or collaborated or consulted on a project. Contributors with semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John “Nickname” Smith).',
     'display' => array(
@@ -1080,13 +1293,20 @@ function ma_digitalheritage_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 21,
+        'weight' => 22,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 36,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 21,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -1116,7 +1336,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 40,
+        'weight' => 53,
       ),
     ),
     'display_label' => '',
@@ -1128,17 +1348,26 @@ function ma_digitalheritage_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'allow_add_onfly' => 1,
+        'show_voc_terms_page_link' => 0,
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'active' => 0,
-      'module' => 'taxonomy',
+      'active' => 1,
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_path' => 'taxonomy/autocomplete',
-        'size' => 60,
+        'apply_chosen' => 0,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
+      'type' => 'options_select',
       'weight' => 9,
     ),
   );
@@ -1266,13 +1495,44 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'geofield_map_zoom' => 8,
         ),
         'type' => 'geofield_map_map',
-        'weight' => 8,
+        'weight' => 9,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 37,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'geofield_map',
+        'settings' => array(
+          'geofield_map_baselayers_hybrid' => 1,
+          'geofield_map_baselayers_map' => 1,
+          'geofield_map_baselayers_physical' => 1,
+          'geofield_map_baselayers_satellite' => 1,
+          'geofield_map_center' => array(
+            'lat' => 0,
+            'lon' => 0,
+          ),
+          'geofield_map_controltype' => 'default',
+          'geofield_map_draggable' => 1,
+          'geofield_map_height' => '300px',
+          'geofield_map_maptype' => 'map',
+          'geofield_map_max_zoom' => 0,
+          'geofield_map_min_zoom' => 0,
+          'geofield_map_mtc' => 'standard',
+          'geofield_map_overview' => 0,
+          'geofield_map_overview_opened' => 0,
+          'geofield_map_pancontrol' => 1,
+          'geofield_map_scale' => 1,
+          'geofield_map_scrollwheel' => 0,
+          'geofield_map_streetview_show' => 1,
+          'geofield_map_width' => '100%',
+          'geofield_map_zoom' => 8,
+        ),
+        'type' => 'geofield_map_map',
+        'weight' => 15,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -1302,7 +1562,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 38,
+        'weight' => 51,
       ),
     ),
     'display_label' => '',
@@ -1382,13 +1642,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 9,
+        'weight' => 10,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 30,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 16,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -1418,7 +1685,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 37,
+        'weight' => 50,
       ),
     ),
     'display_label' => '',
@@ -1452,9 +1719,11 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
   // Exported field_instance: 'node-digital_heritage-field_creator'.
   $field_instances['node-digital_heritage-field_creator'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => NULL,
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => array(),
     'deleted' => 0,
-    'description' => 'A Creator can be a person or people; a clan, tribe, or cultural group; or an organization that is primarily responsible for providing the essential knowledge or labor that goes into making a Digital Heritage Item or Media Asset. For example, the Creator field could list who designed or made a basket; the knowledge holders who provided the information for a book or the book’s author or illustrator; the singers, songwriters, dancers, or performers who bring to life cultural materials. Separate multiple Creators with semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John "Nickname" Smith).',
+    'description' => 'A Creator can be a person or people; a clan, tribe, or cultural group; or an organization that is primarily responsible for providing the essential knowledge or labor that goes into making a Digital Heritage Item or Media Asset. For example, the Creator field could list who designed or made a basket; the knowledge holders who provided the information for a book or the book’s author or illustrator; the singers, songwriters, dancers, or performers who bring to life cultural materials. ',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -1522,13 +1791,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 20,
+        'weight' => 21,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 31,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 20,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -1558,7 +1834,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 41,
+        'weight' => 54,
       ),
     ),
     'display_label' => '',
@@ -1570,18 +1846,27 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'allow_add_onfly' => 1,
+        'show_voc_terms_page_link' => 0,
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'active' => 0,
-      'module' => 'taxonomy',
+      'active' => 1,
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_path' => 'taxonomy/autocomplete',
-        'size' => 60,
+        'apply_chosen' => 0,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
-      'weight' => 8,
+      'type' => 'options_select',
+      'weight' => 7,
     ),
   );
 
@@ -1637,6 +1922,13 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'type' => 'hidden',
         'weight' => 32,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 12,
+      ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1665,7 +1957,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 46,
+        'weight' => 59,
       ),
     ),
     'display_label' => '',
@@ -1741,13 +2033,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 4,
       ),
       'map_popup' => array(
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 20,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 6,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'hidden',
@@ -1781,7 +2080,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 36,
       ),
     ),
     'display_label' => '',
@@ -1817,7 +2116,9 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
   // Exported field_instance: 'node-digital_heritage-field_dh_type'.
   $field_instances['node-digital_heritage-field_dh_type'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => NULL,
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => array(),
     'deleted' => 0,
     'description' => 'Type is the nature, genre, or function of the Media Asset or Digital Heritage Item. Examples include Image, Text, Sound, Video. Separate multiple Types with semicolons.',
     'display' => array(
@@ -1852,13 +2153,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 31,
+        'weight' => 32,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 22,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 30,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -1888,7 +2196,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 34,
+        'weight' => 47,
       ),
     ),
     'display_label' => '',
@@ -1900,17 +2208,26 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'allow_add_onfly' => 1,
+        'show_voc_terms_page_link' => 0,
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'active' => 0,
-      'module' => 'taxonomy',
+      'active' => 1,
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_path' => 'taxonomy/autocomplete',
-        'size' => 60,
+        'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
+      'type' => 'options_select',
       'weight' => 26,
     ),
   );
@@ -1964,9 +2281,15 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'textformatter_type' => 'ul',
         ),
         'type' => 'textformatter_list',
-        'weight' => 27,
+        'weight' => 28,
       ),
       'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -1994,7 +2317,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 27,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -2012,6 +2335,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'target' => '_blank',
         'title' => '',
       ),
+      'convert_aliases' => 0,
       'custom_add_another' => '',
       'custom_remove' => '',
       'display' => array(
@@ -2042,7 +2366,9 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
   // Exported field_instance: 'node-digital_heritage-field_format'.
   $field_instances['node-digital_heritage-field_format'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => NULL,
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => array(),
     'deleted' => 0,
     'description' => 'Format is the specific physical or digital manifestation of the Media Asset or Digital Heritage Item. Include physical format (eg: pamphlet, glass slide, open reel), duration or extent (eg: 90 minutes, 20 pages), dimensions (eg: 4x6”, 12x6x8cm), digital filetype (eg: PDF, JPG, MP3, MP4), or other details as needed.',
     'display' => array(
@@ -2094,13 +2420,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 32,
+        'weight' => 33,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 41,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 31,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'hidden',
@@ -2130,7 +2463,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 52,
+        'weight' => 65,
       ),
     ),
     'display_label' => '',
@@ -2142,17 +2475,26 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'allow_add_onfly' => 1,
+        'show_voc_terms_page_link' => 0,
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'active' => 0,
-      'module' => 'taxonomy',
+      'active' => 1,
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_path' => 'taxonomy/autocomplete',
-        'size' => 60,
+        'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
+      'type' => 'options_select',
       'weight' => 25,
     ),
   );
@@ -2201,13 +2543,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 29,
+        'weight' => 30,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 40,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 28,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'inline',
@@ -2237,7 +2586,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 50,
+        'weight' => 63,
       ),
     ),
     'display_label' => '',
@@ -2315,13 +2664,19 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 64,
+        'weight' => 67,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 27,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 68,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -2351,7 +2706,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 27,
+        'weight' => 40,
       ),
     ),
     'display_label' => '',
@@ -2379,7 +2734,9 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
   // Exported field_instance: 'node-digital_heritage-field_language'.
   $field_instances['node-digital_heritage-field_language'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => NULL,
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => array(),
     'deleted' => 0,
     'description' => 'The language or languages used in the Digital Heritage Item or Media Asset. This includes text, audio, video. Separate multiple Languages with semicolons.',
     'display' => array(
@@ -2426,13 +2783,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 22,
+        'weight' => 23,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 38,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 22,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'inline',
@@ -2462,7 +2826,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 47,
+        'weight' => 60,
       ),
     ),
     'display_label' => '',
@@ -2474,17 +2838,26 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'allow_add_onfly' => 1,
+        'show_voc_terms_page_link' => 0,
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'active' => 0,
-      'module' => 'taxonomy',
+      'active' => 1,
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_path' => 'taxonomy/autocomplete',
-        'size' => 60,
+        'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
+      'type' => 'options_select',
       'weight' => 28,
     ),
   );
@@ -2492,6 +2865,8 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
   // Exported field_instance: 'node-digital_heritage-field_licence_std_cc'.
   $field_instances['node-digital_heritage-field_licence_std_cc'] = array(
     'bundle' => 'digital_heritage',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => 'Creative Commons licenses are an extension of Copyright that allow a copyright holder to specify the ways in which their work may be altered, shared, and used. For more information on Creative Commons licensing, visit creativecommons.org',
@@ -2533,13 +2908,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'license',
         'settings' => array(),
         'type' => 'license_formatter',
-        'weight' => 25,
+        'weight' => 26,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 29,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'license',
+        'settings' => array(),
+        'type' => 'license_formatter',
+        'weight' => 25,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'hidden',
@@ -2569,7 +2951,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 45,
+        'weight' => 58,
       ),
     ),
     'display_label' => '',
@@ -2581,13 +2963,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => 0,
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
@@ -2599,6 +2988,8 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
   // Exported field_instance: 'node-digital_heritage-field_licence_trad'.
   $field_instances['node-digital_heritage-field_licence_trad'] = array(
     'bundle' => 'digital_heritage',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => 'Traditional Knowledge (TK) Labels are non-legal, social and educational tags that Indigenous communities can use to add information about access, use, and attribution of public domain and/or third-party owned content. TK labels can be used alongside either traditional copyright or Creative Commons’ licenses. TK Labels can be customized within the site Dashboard. To learn more about TK Labels visit: localcontexts.org',
@@ -2640,13 +3031,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'license',
         'settings' => array(),
         'type' => 'license_formatter',
-        'weight' => 24,
+        'weight' => 25,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 33,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'license',
+        'settings' => array(),
+        'type' => 'license_formatter',
+        'weight' => 24,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'hidden',
@@ -2676,7 +3074,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 43,
+        'weight' => 56,
       ),
     ),
     'display_label' => '',
@@ -2688,13 +3086,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => '',
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
@@ -2760,7 +3165,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'override' => 0,
         ),
         'type' => 'ma_colorbox',
-        'weight' => 1,
+        'weight' => 2,
       ),
       'map_popup' => array(
         'label' => 'hidden',
@@ -2770,6 +3175,16 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'override' => 0,
         ),
         'type' => 'ma_scald_search_results',
+        'weight' => 1,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'ma_colorbox',
         'weight' => 1,
       ),
       'related_items_teaser_map_popup' => array(
@@ -2960,13 +3375,24 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'use_override' => 'none',
         ),
         'type' => 'partial_date_default',
-        'weight' => 18,
+        'weight' => 20,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'partial_date',
+        'settings' => array(
+          'component_settings' => array(),
+          'format' => 'medium',
+          'use_override' => 'none',
+        ),
+        'type' => 'partial_date_default',
+        'weight' => 11,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -2990,7 +3416,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 22,
+        'weight' => 35,
       ),
     ),
     'display_label' => '',
@@ -3078,7 +3504,9 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
   // Exported field_instance: 'node-digital_heritage-field_people'.
   $field_instances['node-digital_heritage-field_people'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => NULL,
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => array(),
     'deleted' => 0,
     'description' => 'The person or people represented or referenced in the Digital Heritage Item or Media Asset. This may be people identifiable in a photograph, people speaking in an audio recording, present in a video, or referenced in a document. The People field is a way to identify people that may have been left out of the record because they were not a Creator or Contributor. Commas are valid (Last name, First name). Separate multiple People with semicolons (John Smith; Jane Doe).',
     'display' => array(
@@ -3113,13 +3541,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 6,
+        'weight' => 8,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 13,
       ),
       'person_teaser' => array(
         'label' => 'above',
@@ -3149,7 +3584,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 29,
+        'weight' => 42,
       ),
     ),
     'display_label' => '',
@@ -3161,18 +3596,29 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'allow_add_onfly' => 1,
+        'show_voc_terms_page_link' => 0,
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'active' => 0,
-      'module' => 'taxonomy',
+      'active' => 1,
+      'module' => 'options',
       'settings' => array(
+        'apply_chosen' => '',
         'autocomplete_path' => 'taxonomy/autocomplete',
         'size' => 60,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
-      'weight' => 31,
+      'type' => 'options_select',
+      'weight' => 32,
     ),
   );
 
@@ -3213,13 +3659,19 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 58,
+        'weight' => 61,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 72,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -3243,7 +3695,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 21,
+        'weight' => 34,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -3272,7 +3724,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 0,
+        'apply_chosen' => '',
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
@@ -3315,13 +3767,19 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 59,
+        'weight' => 62,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 71,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -3345,7 +3803,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 20,
+        'weight' => 33,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -3372,7 +3830,9 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
   // Exported field_instance: 'node-digital_heritage-field_publisher'.
   $field_instances['node-digital_heritage-field_publisher'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => NULL,
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => array(),
     'deleted' => 0,
     'description' => 'A Publisher can be a person, an organization, or a service responsible for publishing the media asset or Digital Heritage Item. Separate multiple Publishers with semicolons.',
     'display' => array(
@@ -3419,13 +3879,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 28,
+        'weight' => 29,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 34,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 27,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -3455,7 +3922,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 39,
+        'weight' => 52,
       ),
     ),
     'display_label' => '',
@@ -3467,17 +3934,26 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'allow_add_onfly' => 1,
+        'show_voc_terms_page_link' => 0,
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'active' => 0,
-      'module' => 'taxonomy',
+      'active' => 1,
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_path' => 'taxonomy/autocomplete',
-        'size' => 60,
+        'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
+      'type' => 'options_select',
       'weight' => 47,
     ),
   );
@@ -3524,13 +4000,19 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'items_per_page' => 5,
         ),
         'type' => 'mukurtu_related_items_formatter',
-        'weight' => 10,
+        'weight' => 11,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 67,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -3554,7 +4036,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 13,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -3626,13 +4108,23 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 57,
+        'weight' => 60,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 23,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 0,
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 17,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -3662,7 +4154,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 28,
+        'weight' => 41,
       ),
     ),
     'display_label' => '',
@@ -3679,13 +4171,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => '',
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
@@ -3698,6 +4197,8 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
   // 'node-digital_heritage-field_related_dictionary_words'.
   $field_instances['node-digital_heritage-field_related_dictionary_words'] = array(
     'bundle' => 'digital_heritage',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -3729,13 +4230,23 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 56,
+        'weight' => 59,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 0,
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 18,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -3759,7 +4270,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 37,
       ),
     ),
     'display_label' => '',
@@ -3776,13 +4287,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => '',
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
@@ -3835,13 +4353,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 23,
+        'weight' => 24,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 42,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 23,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'inline',
@@ -3871,7 +4396,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 51,
+        'weight' => 64,
       ),
     ),
     'display_label' => '',
@@ -3946,13 +4471,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 26,
+        'weight' => 27,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 39,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 26,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'inline',
@@ -3982,7 +4514,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 49,
+        'weight' => 62,
       ),
     ),
     'display_label' => '',
@@ -4016,7 +4548,9 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
   // Exported field_instance: 'node-digital_heritage-field_subject'.
   $field_instances['node-digital_heritage-field_subject'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => NULL,
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => array(),
     'deleted' => 0,
     'description' => 'The main topic or topics presented in the Digital Heritage Item. Subjects may be derived from existing classification systems (for example, Library of Congress Classification Numbers or Dewey Decimal numbers), controlled vocabularies (such as Medical Subject Headings or Art and Architecture Thesaurus descriptors), or can be created as needed within the site. Separate multiple Subjects with semicolons.',
     'display' => array(
@@ -4063,13 +4597,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 30,
+        'weight' => 31,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 35,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 29,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -4099,7 +4640,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 42,
+        'weight' => 55,
       ),
     ),
     'display_label' => '',
@@ -4111,24 +4652,37 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'allow_add_onfly' => 1,
+        'show_voc_terms_page_link' => 0,
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'active' => 0,
-      'module' => 'taxonomy',
+      'active' => 1,
+      'module' => 'options',
       'settings' => array(
+        'apply_chosen' => '',
         'autocomplete_path' => 'taxonomy/autocomplete',
         'size' => 60,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
-      'weight' => 30,
+      'type' => 'options_select',
+      'weight' => 31,
     ),
   );
 
   // Exported field_instance: 'node-digital_heritage-field_summary'.
   $field_instances['node-digital_heritage-field_summary'] = array(
     'bundle' => 'digital_heritage',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => 'A brief description of the Digital Heritage Item, limited to 140 characters. The summary is displayed with the Digital Heritage Item teaser when browsing, and can help distinguish between items with similar or identical titles. Other fields allow for longer, more in depth description.',
@@ -4171,13 +4725,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 2,
+        'weight' => 3,
       ),
       'map_popup' => array(
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 4,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 5,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -4196,7 +4757,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 7,
+        'weight' => 8,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'hidden',
@@ -4244,9 +4805,11 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
   // Exported field_instance: 'node-digital_heritage-field_tags'.
   $field_instances['node-digital_heritage-field_tags'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => NULL,
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => array(),
     'deleted' => 0,
-    'description' => 'Keywords are terms used to describe a Digital Heritage Item to ensure that the item will be discoverable when searching or browsing. Keywords are more flexible and specific than Categories. Contributors can create new Keywords as needed when creating or editing a Digital Heritage Item. Consider adding 3-­5 Keywords that will help users discover the Digital Heritage Item through searching or browsing. Separate multiple Keywords with semicolons (eg: basket; weaving).',
+    'description' => 'Keywords are terms used to describe a Digital Heritage Item to ensure that the item will be discoverable when searching or browsing. Keywords are more flexible and specific than Categories. Contributors can create new Keywords as needed when creating or editing a Digital Heritage Item. Consider adding 3-­5 Keywords that will help users discover the Digital Heritage Item through searching or browsing.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'hidden',
@@ -4291,13 +4854,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 16,
+        'weight' => 17,
       ),
       'map_popup' => array(
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 25,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 9,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -4328,7 +4898,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 48,
+        'weight' => 61,
       ),
     ),
     'display_label' => '',
@@ -4340,17 +4910,26 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'allow_add_onfly' => 1,
+        'show_voc_terms_page_link' => 0,
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'active' => 0,
-      'module' => 'taxonomy',
+      'active' => 1,
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_path' => 'taxonomy/autocomplete',
-        'size' => 60,
+        'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
+      'type' => 'options_select',
       'weight' => 11,
     ),
   );
@@ -4399,13 +4978,20 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 5,
+        'weight' => 6,
       ),
       'map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 28,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 8,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -4435,7 +5021,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 44,
+        'weight' => 57,
       ),
     ),
     'display_label' => '',
@@ -4506,6 +5092,13 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'type' => 'hidden',
         'weight' => 18,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 14,
+      ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
         'settings' => array(),
@@ -4534,7 +5127,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 25,
+        'weight' => 38,
       ),
     ),
     'display_label' => '',
@@ -4646,6 +5239,16 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'type' => 'hidden',
         'weight' => 24,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 0,
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 3,
+      ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
         'settings' => array(),
@@ -4674,7 +5277,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 39,
       ),
     ),
     'display_label' => '',
@@ -4775,7 +5378,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
   // Translatables
   // Included for use with string extractors like potx.
   t('A Contributor can be a person, people, clan, tribal nation, community group or, organization who aided in making the content of a Digital Heritage Item or Media Asset. This could be the person who wrote, compiled, or illustrated a book or recorded a song; the people who edited or produced a film, or collaborated or consulted on a project. Contributors with semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John “Nickname” Smith).');
-  t('A Creator can be a person or people; a clan, tribe, or cultural group; or an organization that is primarily responsible for providing the essential knowledge or labor that goes into making a Digital Heritage Item or Media Asset. For example, the Creator field could list who designed or made a basket; the knowledge holders who provided the information for a book or the book’s author or illustrator; the singers, songwriters, dancers, or performers who bring to life cultural materials. Separate multiple Creators with semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John "Nickname" Smith).');
+  t('A Creator can be a person or people; a clan, tribe, or cultural group; or an organization that is primarily responsible for providing the essential knowledge or labor that goes into making a Digital Heritage Item or Media Asset. For example, the Creator field could list who designed or made a basket; the knowledge holders who provided the information for a book or the book’s author or illustrator; the singers, songwriters, dancers, or performers who bring to life cultural materials. ');
   t('A Publisher can be a person, an organization, or a service responsible for publishing the media asset or Digital Heritage Item. Separate multiple Publishers with semicolons.');
   t('A brief description of the Digital Heritage Item, limited to 140 characters. The summary is displayed with the Digital Heritage Item teaser when browsing, and can help distinguish between items with similar or identical titles. Other fields allow for longer, more in depth description.');
   t('A statement about who holds the legal rights to the Digital Heritage Item, Media Asset, or presented knowledge. Consider adding contact information if the rights holder should be contacted for permission to use, reproduce, circulate, reference, or cite the Digital Heritage Item.');
@@ -4815,7 +5418,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
   t('If a Digital Heritage Item is shared with members of more than one Cultural Protocol, this setting identifies how those protocols interact to provide appropriate access. Selecting All provides more granular access, and will only allow users to access the Digital Heritage Item if they are members of each Cultural Protocol listed. Selecting Any provides more open access, and will allow users to access the Digital Heritage Item if they are enrolled in one or more of the Cultural Protocols listed. If only using one Cultural Protocol, the default setting is All, but either setting can be used.');
   t('Item Sharing Settings');
   t('Keywords');
-  t('Keywords are terms used to describe a Digital Heritage Item to ensure that the item will be discoverable when searching or browsing. Keywords are more flexible and specific than Categories. Contributors can create new Keywords as needed when creating or editing a Digital Heritage Item. Consider adding 3-­5 Keywords that will help users discover the Digital Heritage Item through searching or browsing. Separate multiple Keywords with semicolons (eg: basket; weaving).');
+  t('Keywords are terms used to describe a Digital Heritage Item to ensure that the item will be discoverable when searching or browsing. Keywords are more flexible and specific than Categories. Contributors can create new Keywords as needed when creating or editing a Digital Heritage Item. Consider adding 3-­5 Keywords that will help users discover the Digital Heritage Item through searching or browsing.');
   t('Language');
   t('Licensing Options');
   t('Location');

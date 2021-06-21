@@ -20,28 +20,28 @@ function ma_collection_default_page_manager_pages() {
   $page->access = array(
     'plugins' => array(
       0 => array(
+        'context' => 'logged-in-user',
         'name' => 'perm',
+        'not' => FALSE,
         'settings' => array(
           'perm' => 'access content',
         ),
-        'context' => 'logged-in-user',
-        'not' => FALSE,
       ),
     ),
-    'type' => 'none',
     'settings' => NULL,
+    'type' => 'none',
   );
   $page->menu = array(
-    'type' => 'none',
-    'title' => 'Browse Collections',
     'name' => 'menu-browse-menu',
-    'weight' => '0',
     'parent' => array(
-      'type' => 'none',
-      'title' => '',
       'name' => 'navigation',
+      'title' => '',
+      'type' => 'none',
       'weight' => '0',
     ),
+    'title' => 'Browse Collections',
+    'type' => 'none',
+    'weight' => '0',
   );
   $page->arguments = array();
   $page->conf = array(
@@ -57,73 +57,73 @@ function ma_collection_default_page_manager_pages() {
   $handler->handler = 'panel_context';
   $handler->weight = 0;
   $handler->conf = array(
-    'title' => 'Panel',
+    'body_classes_to_add' => '',
+    'body_classes_to_remove' => '',
+    'contexts' => array(),
+    'css' => '',
+    'css_id' => '',
+    'name' => '',
     'no_blocks' => 0,
     'pipeline' => 'standard',
-    'body_classes_to_remove' => '',
-    'body_classes_to_add' => '',
-    'css_id' => '',
-    'css' => '',
-    'contexts' => array(),
     'relationships' => array(),
-    'name' => '',
+    'title' => 'Panel',
   );
   $display = new panels_display();
   $display->layout = 'onecol';
   $display->layout_settings = array(
     'items' => array(
       'canvas' => array(
-        'type' => 'row',
-        'contains' => 'column',
         'children' => array(
           0 => 'main',
         ),
+        'contains' => 'column',
         'parent' => NULL,
+        'type' => 'row',
+      ),
+      'center' => array(
+        'class' => '',
+        'parent' => 'main-row',
+        'title' => 'Left',
+        'type' => 'region',
+        'width' => '69.9671129903688',
+        'width_type' => '%',
       ),
       'main' => array(
-        'type' => 'column',
-        'width' => 100,
-        'width_type' => '%',
         'children' => array(
           0 => 'main-row',
         ),
         'parent' => 'canvas',
+        'type' => 'column',
+        'width' => 100,
+        'width_type' => '%',
       ),
       'main-row' => array(
-        'type' => 'row',
-        'contains' => 'region',
         'children' => array(
           0 => 'center',
           1 => 'right',
         ),
+        'contains' => 'region',
         'parent' => 'main',
-      ),
-      'center' => array(
-        'type' => 'region',
-        'title' => 'Left',
-        'width' => '69.9671129903688',
-        'width_type' => '%',
-        'parent' => 'main-row',
-        'class' => '',
+        'type' => 'row',
       ),
       'right' => array(
-        'type' => 'region',
+        'class' => '',
+        'parent' => 'main-row',
         'title' => 'Right',
+        'type' => 'region',
         'width' => '30.0328870096312',
         'width_type' => '%',
-        'parent' => 'main-row',
-        'class' => '',
       ),
     ),
   );
   $display->panel_settings = array(
     'style_settings' => array(
-      'default' => NULL,
       'center' => NULL,
-      'left' => NULL,
-      'right' => NULL,
       'center_' => NULL,
+      'default' => NULL,
+      'left' => NULL,
       'middle' => NULL,
+      'right' => NULL,
     ),
   );
   $display->cache = array();
@@ -143,8 +143,8 @@ function ma_collection_default_page_manager_pages() {
   $pane->configuration = array(
     'inherit_path' => 1,
     'override_title' => 0,
-    'override_title_text' => '',
     'override_title_heading' => 'h2',
+    'override_title_text' => '',
   );
   $pane->cache = array();
   $pane->style = array(
@@ -166,8 +166,8 @@ function ma_collection_default_page_manager_pages() {
   $pane->access = array();
   $pane->configuration = array(
     'override_title' => 0,
-    'override_title_text' => '',
     'override_title_heading' => 'h2',
+    'override_title_text' => '',
   );
   $pane->cache = array();
   $pane->style = array(
@@ -216,28 +216,28 @@ function ma_collection_default_page_manager_pages() {
   $page->access = array(
     'plugins' => array(
       0 => array(
+        'context' => 'logged-in-user',
         'name' => 'perm',
+        'not' => FALSE,
         'settings' => array(
           'perm' => 'access content',
         ),
-        'context' => 'logged-in-user',
-        'not' => FALSE,
       ),
     ),
-    'type' => 'none',
     'settings' => NULL,
+    'type' => 'none',
   );
   $page->menu = array(
-    'type' => 'none',
-    'title' => 'Browse Collections',
     'name' => 'menu-browse-menu',
-    'weight' => '0',
     'parent' => array(
-      'type' => 'none',
-      'title' => '',
       'name' => 'navigation',
+      'title' => '',
+      'type' => 'none',
       'weight' => '0',
     ),
+    'title' => 'Browse Collections',
+    'type' => 'none',
+    'weight' => '0',
   );
   $page->arguments = array();
   $page->conf = array(
@@ -253,71 +253,71 @@ function ma_collection_default_page_manager_pages() {
   $handler->handler = 'panel_context';
   $handler->weight = 0;
   $handler->conf = array(
-    'title' => 'Panel',
+    'body_classes_to_add' => '',
+    'body_classes_to_remove' => '',
+    'contexts' => array(),
+    'css' => '',
+    'css_id' => '',
     'no_blocks' => 0,
     'pipeline' => 'standard',
-    'body_classes_to_remove' => '',
-    'body_classes_to_add' => '',
-    'css_id' => '',
-    'css' => '',
-    'contexts' => array(),
     'relationships' => array(),
+    'title' => 'Panel',
   );
   $display = new panels_display();
   $display->layout = 'flexible';
   $display->layout_settings = array(
     'items' => array(
       'canvas' => array(
-        'type' => 'row',
-        'contains' => 'column',
         'children' => array(
           0 => 'main',
         ),
+        'contains' => 'column',
         'parent' => NULL,
+        'type' => 'row',
+      ),
+      'center' => array(
+        'class' => '',
+        'parent' => 'main-row',
+        'title' => 'Left',
+        'type' => 'region',
+        'width' => '69.9671129903688',
+        'width_type' => '%',
       ),
       'main' => array(
-        'type' => 'column',
-        'width' => 100,
-        'width_type' => '%',
         'children' => array(
           0 => 'main-row',
         ),
         'parent' => 'canvas',
+        'type' => 'column',
+        'width' => 100,
+        'width_type' => '%',
       ),
       'main-row' => array(
-        'type' => 'row',
-        'contains' => 'region',
         'children' => array(
           0 => 'center',
           1 => 'right',
         ),
+        'contains' => 'region',
         'parent' => 'main',
-      ),
-      'center' => array(
-        'type' => 'region',
-        'title' => 'Left',
-        'width' => '69.9671129903688',
-        'width_type' => '%',
-        'parent' => 'main-row',
-        'class' => '',
+        'type' => 'row',
       ),
       'right' => array(
-        'type' => 'region',
+        'class' => '',
+        'parent' => 'main-row',
         'title' => 'Right',
+        'type' => 'region',
         'width' => '30.0328870096312',
         'width_type' => '%',
-        'parent' => 'main-row',
-        'class' => '',
       ),
     ),
   );
   $display->panel_settings = array(
     'style_settings' => array(
-      'default' => NULL,
       'center' => NULL,
+      'center_' => NULL,
+      'default' => NULL,
       'left' => NULL,
       'right' => NULL,
-      'center_' => NULL,
     ),
   );
   $display->cache = array();
@@ -378,8 +378,8 @@ function ma_collection_default_page_manager_pages() {
   $pane->access = array();
   $pane->configuration = array(
     'override_title' => 0,
-    'override_title_text' => '',
     'override_title_heading' => 'h2',
+    'override_title_text' => '',
   );
   $pane->cache = array();
   $pane->style = array(

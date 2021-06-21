@@ -86,7 +86,7 @@ function field_collection_item_delete_confirm($form, &$form_state, $field_collec
  */
 function field_collection_item_delete_confirm_submit($form, &$form_state) {
   $field_collection_item = $form_state['field_collection_item'];
-  entity_delete('field_collection_item',$field_collection_item->item_id);
+  entity_delete('field_collection_item', $field_collection_item->item_id);
   drupal_set_message(t('%label has been deleted.', array('%label' => drupal_ucfirst($field_collection_item->label()))));
   $form_state['redirect'] = '<front>';
 }
@@ -118,8 +118,7 @@ function field_collection_item_add($field_name, $entity_type, $entity_id, $revis
   $langcode = !empty($field['translatable']) ? entity_language($entity_type, $entity) : LANGUAGE_NONE;
 
   if (!($field['cardinality'] == FIELD_CARDINALITY_UNLIMITED || !isset($entity->{$field_name}[$langcode]) || count($entity->{$field_name}[$langcode]) < $field['cardinality'])) {
-    drupal_set_message(t('Too many items.'), 'error');
-    return '';
+    return MENU_ACCESS_DENIED;
   }
 
   $field_collection_item = entity_create('field_collection_item', array('field_name' => $field_name));
@@ -130,7 +129,7 @@ function field_collection_item_add($field_name, $entity_type, $entity_id, $revis
   $field_collection_item->setHostEntity($entity_type, $entity, $langcode, FALSE);
 
   $label = $field_collection_item->translatedInstanceLabel();
-  $title = ($field['cardinality'] == 1) ? $label : t('Add new !instance_label', array('!instance_label' => $label));
+  $title = $field['cardinality'] == 1 ? $label : t('Add new !instance_label', array('!instance_label' => $label));
   drupal_set_title($title);
 
   // Make sure the current user has access to create a field collection item.

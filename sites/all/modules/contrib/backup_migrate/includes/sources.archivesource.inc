@@ -4,7 +4,7 @@
  * @file
  */
 
-backup_migrate_include('sources.filesource');
+require_once dirname(__FILE__) . '/sources.filesource.inc';
 
 /**
  * @file
@@ -19,6 +19,9 @@ backup_migrate_include('sources.filesource');
 class backup_migrate_files_destination_archivesource extends backup_migrate_destination_filesource {
   public $supported_ops = array('source');
 
+  /**
+   *
+   */
   public function type_name() {
     return t("Site Archive Source");
   }
@@ -174,7 +177,10 @@ class backup_migrate_files_destination_archivesource extends backup_migrate_dest
    * Gets a database dump to add to the archive.
    */
   public function get_db() {
-    backup_migrate_include('destinations', 'files', 'filters', 'profiles');
+    require_once dirname(__FILE__) . '/destinations.inc';
+    require_once dirname(__FILE__) . '/files.inc';
+    require_once dirname(__FILE__) . '/filters.inc';
+    require_once dirname(__FILE__) . '/profiles.inc';
 
     $file = new backup_file();
     // Clone the default settings so we can make changes without them leaking
@@ -255,7 +261,7 @@ class backup_migrate_files_destination_archivesource extends backup_migrate_dest
    * Restores to this source.
    */
   public function _restore_from_file_cli($file, &$settings) {
-    // @TODO: implement the cli version of the restore.
+    // @todo implement the cli version of the restore.
     return FALSE;
   }
 

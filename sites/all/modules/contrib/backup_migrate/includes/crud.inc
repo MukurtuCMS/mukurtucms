@@ -53,7 +53,7 @@ function backup_migrate_crud_subtypes($type) {
   if ($info = backup_migrate_crud_type_info($type)) {
     // Include the function that contains the type base.
     if (!empty($info['include'])) {
-      backup_migrate_include($info['include']);
+      require_once dirname(__FILE__) . '/' . $info['include'] . '.inc';
     }
 
     // Allow modules (including this one) to declare backup and migrate
@@ -103,14 +103,14 @@ function backup_migrate_crud_type_load($type, $subtype = NULL) {
 
   if (!empty($info)) {
     if (!empty($info['include'])) {
-      backup_migrate_include($info['include']);
+      require_once dirname(__FILE__) . '/' . $info['include'] . '.inc';
     }
     if (!empty($info['file'])) {
-      include_once './' . (isset($info['path']) ? $info['path'] : '') . $info['file'];
+      require_once './' . (isset($info['path']) ? $info['path'] : '') . $info['file'];
     }
 
     if (class_exists($info['class'])) {
-      $out = new $info['class'];
+      $out = new $info['class']();
       $out = $out->create(array('subtype' => $subtype));
     }
   }
@@ -176,7 +176,6 @@ function backup_migrate_crud_ui_list_all() {
   return implode('', $out);
 }
 
-
 /**
  * Page callback to edit an item.
  */
@@ -204,12 +203,12 @@ function backup_migrate_crud_item_exists($machine_name, $element, $form_state) {
 function backup_migrate_crud_edit_form($form, $form_state, $item) {
   $form = $item->edit_form();
 
-  $form['item'] = array(
+  $form['item']        = array(
     '#type' => 'value',
     '#value' => $item,
   );
-  $form['#validate'][]  = 'backup_migrate_crud_edit_form_validate';
-  $form['#submit'][]    = 'backup_migrate_crud_edit_form_submit';
+  $form['#validate'][] = 'backup_migrate_crud_edit_form_validate';
+  $form['#submit'][]   = 'backup_migrate_crud_edit_form_submit';
 
   return $form;
 }
@@ -914,7 +913,7 @@ class backup_migrate_item {
     $items = array();
 
     // Get any items stored as a variable. This allows destinations to be
-    // defined in settings.php
+    // defined in settings.php.
     $defaults = (array) variable_get($this->db_table . '_defaults', array());
     foreach ($defaults as $info) {
       if (is_array($info) && $item = $this->create($info)) {
@@ -935,6 +934,23 @@ class backup_migrate_item {
     // Allow other modules to declare destinations programatically.
     $default_items = module_invoke_all($this->db_table);
 
+    // Get CTools exported versions.
+    if (function_exists('ctools_include')) {
+      ctools_include('export');
+      $defaults = ctools_export_load_object($this->db_table);
+      foreach ($defaults as $info) {
+        $info = (array) $info;
+        if (!empty($info) && $item = $this->create($info)) {
+          // If this item is not already in $default_items,
+          // set flag to indicate it's only there because of ctools export.
+          if (empty($default_items[$item->get_id()])) {
+            $item->settings['ctools_export'] = TRUE;
+          }
+          $default_items[$item->get_id()] = $item;
+        }
+      }
+    }
+
     // Get any items stored as a variable again to correctly mark overrides.
     $defaults = (array) variable_get($this->db_table . '_defaults', array());
     foreach ($defaults as $info) {
@@ -947,7 +963,10 @@ class backup_migrate_item {
     // already been overridden.
     foreach ($default_items as $item) {
       if (isset($items[$item->get_id()])) {
-        $items[$item->get_id()]->storage = BACKUP_MIGRATE_STORAGE_OVERRIDEN;
+        // Items added by ctools export are not overrides.
+        if (empty($item->settings['ctools_export'])) {
+          $items[$item->get_id()]->storage = BACKUP_MIGRATE_STORAGE_OVERRIDEN;
+        }
       }
       else {
         $item->storage = BACKUP_MIGRATE_STORAGE_NONE;

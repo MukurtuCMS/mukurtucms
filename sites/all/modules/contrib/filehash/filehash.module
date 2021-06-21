@@ -11,7 +11,7 @@
 function filehash_menu() {
   $items['admin/config/media/filehash'] = array(
     'title' => 'File hash',
-    'description' => 'Configure file hash settings.',
+    'description' => 'Configure File Hash settings.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('filehash_settings'),
     'access arguments' => array('administer site configuration'),
@@ -127,35 +127,33 @@ function filehash_names() {
 function filehash_node_view($node, $view_mode) {
   static $fields;
   // Add <media:hash> elements for at most one file per RSS item.
-  if ($view_mode == 'rss') {
-    // The <media:hash> element only supports MD5 and SHA-1.
-    $algos = filehash_algos();
-    if (isset($algos['md5']) || isset($algos['sha1'])) {
-      if (!isset($fields)) {
-        // The following field types are currently supported.
-        $fields = field_read_fields(array(
-          'type' => array('file', 'image', 'media'),
-        ));
-      }
-      foreach (field_info_instances('node', $node->type) as $instance) {
-        if (isset($fields[$instance['field_name']])) {
-          foreach ($node->{$instance['field_name']} as $language) {
-            foreach ($language as $file) {
-              // Media fields have a file object rather than a file array.
-              if ($fields[$instance['field_name']]['type'] == 'media') {
-                filehash_rss_elements((array) $file['file'], $node);
-                return;
-              }
-              elseif ($fields[$instance['field_name']]['type'] == 'image') {
-                filehash_rss_elements($file, $node);
-                return;
-              }
-              elseif ($file['display']) {
-                filehash_rss_elements($file, $node);
-                return;
-              }
-            }
-          }
+  if ($view_mode != 'rss') {
+    return;
+  }
+  // The <media:hash> element only supports MD5 and SHA-1.
+  $algos = filehash_algos();
+  if (!isset($algos['md5']) && !isset($algos['sha1'])) {
+    return;
+  }
+  if (!isset($fields[$node->type])) {
+    $fields[$node->type] = field_read_fields(array(
+      'bundle' => $node->type,
+      'entity_type' => 'node',
+      // The following field types are currently supported.
+      'type' => array('file', 'image', 'media'),
+    ));
+  }
+  foreach ($fields[$node->type] as $field) {
+    if ($items = field_get_items('node', $node, $field['field_name'])) {
+      foreach ($items as $file) {
+        // Media fields have a file object rather than a file array.
+        if ($field['type'] == 'media') {
+          filehash_rss_elements((array) $file['file'], $node);
+          return;
+        }
+        elseif ($field['type'] == 'image' || $file['display']) {
+          filehash_rss_elements($file, $node);
+          return;
         }
       }
     }
@@ -277,7 +275,7 @@ function theme_filehash_table(array $variables) {
     t('@algo hash', array('@algo' => $names[$variables['settings']['algo']])),
   );
   $rows = array();
-  foreach ($variables['items'] as $delta => $item) {
+  foreach ($variables['items'] as $item) {
     // Media field items contain a file object.
     if (!isset($item['uri']) && isset($item['file'])) {
       $file = $item['file'];

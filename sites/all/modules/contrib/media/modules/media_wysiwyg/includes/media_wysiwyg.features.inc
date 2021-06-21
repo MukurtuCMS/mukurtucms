@@ -79,7 +79,7 @@ function media_wysiwyg_features_export($data, &$export, $module_name = '') {
 /**
  * Implements hook_features_export_render().
  */
-function media_wysiwyg_features_export_render($module_name = '', $data, $export = NULL) {
+function media_wysiwyg_features_export_render($module_name, $data, $export = NULL) {
   $code = array();
   $code[] = '  $media_wysiwyg = array();';
   $code[] = '';

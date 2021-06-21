@@ -18,6 +18,11 @@ function ma_profile_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'user';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
+    'mm_sync_content_view_field' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'personal_collections' => array(
       'weight' => '1',
       'label' => 'above',
@@ -85,11 +90,13 @@ function ma_profile_ds_layout_settings_info() {
       'central' => array(
         0 => 'og_user_node',
         1 => 'personal_collections',
+        2 => 'mm_sync_content_view_field',
       ),
     ),
     'fields' => array(
       'og_user_node' => 'central',
       'personal_collections' => 'central',
+      'mm_sync_content_view_field' => 'central',
     ),
     'classes' => array(
       'layout_class' => array(

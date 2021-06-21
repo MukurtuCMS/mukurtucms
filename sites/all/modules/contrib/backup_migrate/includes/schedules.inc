@@ -21,10 +21,10 @@ define('BACKUP_MIGRATE_SMART_KEEP_WEEKLY', PHP_INT_MAX);
 
 define('BACKUP_MIGRATE_KEEP_DEFAULT', 100);
 
-backup_migrate_include('crud');
+require_once dirname(__FILE__) . '/crud.inc';
 
 /**
- * Implementation of hook_backup_migrate_destination_types().
+ * Implements hook_backup_migrate_destination_types().
  *
  * Get the built in Backup and Migrate destination types.
  */
@@ -44,7 +44,8 @@ function backup_migrate_backup_migrate_schedule_types() {
  * Run the preconfigured schedules. Called on cron.
  */
 function backup_migrate_schedules_cron() {
-  backup_migrate_include('profiles');
+  require_once dirname(__FILE__) . '/profiles.inc';
+
   foreach (backup_migrate_get_schedules() as $schedule) {
     $schedule->cron();
   }
@@ -55,7 +56,8 @@ function backup_migrate_schedules_cron() {
  * Run the preconfigured schedules regardless of scheduled time settings.
  */
 function backup_migrate_schedules_run() {
-  backup_migrate_include('profiles');
+  require_once dirname(__FILE__) . '/profiles.inc';
+
   foreach (backup_migrate_get_schedules() as $schedule) {
     $schedule->run();
   }
@@ -66,7 +68,8 @@ function backup_migrate_schedules_run() {
  * Run the preconfigured schedules. Called on cron.
  */
 function backup_migrate_schedule_run($schedule_id) {
-  backup_migrate_include('profiles');
+  require_once dirname(__FILE__) . '/profiles.inc';
+
   if (($schedule = backup_migrate_get_schedule($schedule_id)) && $schedule->is_enabled()) {
     $schedule->run();
   }
@@ -231,7 +234,8 @@ class backup_migrate_schedule extends backup_migrate_item {
    * Get the destination object of the schedule.
    */
   public function get_destinations() {
-    backup_migrate_include('destinations');
+    require_once dirname(__FILE__) . '/destinations.inc';
+
     $out = array();
     foreach ($this->get_destination_ids() as $id) {
       if ($dest = backup_migrate_get_destination($id)) {
@@ -245,14 +249,17 @@ class backup_migrate_schedule extends backup_migrate_item {
    * Get the destination object of the schedule.
    */
   public function get_destination_remote() {
-    backup_migrate_include('destinations');
+    require_once dirname(__FILE__) . '/destinations.inc';
+
     return backup_migrate_get_destination($this->get('destination_remote_id'));
   }
+
   /**
    * Get the destination object of the schedule.
    */
   public function get_destination_local() {
-    backup_migrate_include('destinations');
+    require_once dirname(__FILE__) . '/destinations.inc';
+
     return backup_migrate_get_destination($this->get('destination_local_id'));
   }
 
@@ -274,7 +281,8 @@ class backup_migrate_schedule extends backup_migrate_item {
    * Get the destination of the schedule.
    */
   public function get_profile() {
-    backup_migrate_include('profiles');
+    require_once dirname(__FILE__) . '/profiles.inc';
+
     if ($settings = backup_migrate_get_profile($this->get('profile_id'))) {
       $settings->file_info = empty($settings->file_info) ? array() : $settings->file_info;
       $settings->file_info += array(
@@ -387,8 +395,11 @@ class backup_migrate_schedule extends backup_migrate_item {
    * Get the edit form.
    */
   public function edit_form() {
+    require_once dirname(__FILE__) . '/destinations.inc';
+    require_once dirname(__FILE__) . '/sources.inc';
+    require_once dirname(__FILE__) . '/profiles.inc';
+
     $form = parent::edit_form();
-    backup_migrate_include('destinations', 'sources', 'profiles');
 
     $form['name'] = array(
       "#type" => "textfield",
@@ -515,7 +526,7 @@ class backup_migrate_schedule extends backup_migrate_item {
     );
 
     $keep_hourly = variable_get('backup_migrate_smart_keep_hourly', BACKUP_MIGRATE_SMART_KEEP_HOURLY);
-    $keep_daily  = variable_get('backup_migrate_smart_keep_daily', BACKUP_MIGRATE_SMART_KEEP_DAILY);
+    $keep_daily = variable_get('backup_migrate_smart_keep_daily', BACKUP_MIGRATE_SMART_KEEP_DAILY);
     $keep_weekly = variable_get('backup_migrate_smart_keep_weekly', BACKUP_MIGRATE_SMART_KEEP_WEEKLY);
     $form['delete_settings']['smartdelete'] = array(
       "#type" => "radio",
@@ -621,7 +632,7 @@ class backup_migrate_schedule extends backup_migrate_item {
     $now = time();
 
     // Add a small negative buffer (1% of the entire period) to the time to account for slight difference in cron run length.
-    $wait_time = $this->period - ($this->period * variable_get('backup_migrate_schedule_buffer', 0.01));
+    $wait_time = $this->period - ($this->period * variable_get('backup_migrate_schedule_buffer', BACKUP_MIGRATE_SCHEDULE_BUFFER));
 
     $cron = $this->get('cron');
     if ($cron == BACKUP_MIGRATE_CRON_BUILTIN && $this->is_enabled() && ($now - $this->get('last_run')) >= $wait_time) {
@@ -633,8 +644,8 @@ class backup_migrate_schedule extends backup_migrate_item {
    * Run the actual schedule.
    */
   public function run() {
-    // Clear cached profile data which could have been altered by previous
-    // schedule run; see #2672478
+    // Clear cached profile data as it could have been altered by a previous
+    // schedule run.
     drupal_static_reset('backup_migrate_get_profiles');
 
     if ($settings = $this->get_profile()) {
@@ -671,7 +682,7 @@ class backup_migrate_schedule extends backup_migrate_item {
    * Remove older backups keeping only the number specified by the aministrator.
    */
   public function remove_expired_backups() {
-    backup_migrate_include('destinations');
+    require_once dirname(__FILE__) . '/destinations.inc';
 
     $num_to_keep = $this->keep;
     // If num to keep is not 0 (0 is infinity).
@@ -698,7 +709,7 @@ class backup_migrate_schedule extends backup_migrate_item {
    * Remove older backups keeping only the number specified by the aministrator.
    */
   public function delete_backups($destination, $files, $num_to_keep) {
-    backup_migrate_include('destinations');
+    require_once dirname(__FILE__) . '/destinations.inc';
 
     $num_to_keep = $this->keep;
 
@@ -731,6 +742,7 @@ class backup_migrate_schedule extends backup_migrate_item {
    * Delete files keeping the specified number of hourly, daily, weekly and monthly backups.
    */
   public function smart_delete_backups($destination, $files, $keep_subhourly = 3600, $keep_hourly = 24, $keep_daily = 14, $keep_weekly = PHP_INT_MAX, $keep_monthly = PHP_INT_MAX) {
+    // Each period must be an exact multiple of the next smallest period.
     $now = time();
     $periods = array(
       'subhourly' => array(
@@ -774,23 +786,37 @@ class backup_migrate_schedule extends backup_migrate_item {
         $sorted[$id] = $time;
       }
     }
-    arsort($sorted);
+    // Sort files, oldest first.
+    asort($sorted);
 
-    $now = time();
+    // Reset internal pointer and get the oldest file time.
+    $oldest_file_time = reset($sorted);
+    // Save the oldest file.
+    $keep_files[key($sorted)] = key($sorted);
+
     foreach ($periods as $i => $period) {
-      foreach ($sorted as $id => $time) {
-        if ($time < ($now - ($period['delta'] * $period['keep']))) {
-          break;
-        }
-        if ($period['last_time'] == 0 || $time <= ($period['last_time'] - $period['delta'])) {
-          $period['last_time'] = $time;
-          $keep_files[$id] = $id;
-        }
+      $period_keep_files = array();
+      $time = $oldest_file_time;
+
+      // Set time from which we start saving files.
+      $period_start_time = $now - (($period['keep'] + 1) * $period['delta']);
+
+      // Increase time to within one period time span of the period start
+      // time. This keeps all the different period starts aligned.
+      if ($time < $period_start_time) {
+        $time += ((int) ceil(($period_start_time - $time) / $period['delta'])) * $period['delta'];
       }
-      // Keep oldest backup or it will get deleted if it doesn't fall on an exact multiple of the period.
-      if ($id) {
-        $keep_files[$id] = $id;
-      }
+
+      $file_id = $this->find_nearest_file($sorted, $time);
+
+      do {
+        $period_keep_files[$file_id] = $file_id;
+        $last_file_id = $file_id;
+        $time += $period['delta'];
+        $file_id = $this->find_nearest_file($sorted, $time);
+      } while ($time < $now);
+
+      $keep_files = array_merge($keep_files, $period_keep_files);
     }
 
     // Do the delete.
@@ -798,6 +824,38 @@ class backup_migrate_schedule extends backup_migrate_item {
       if (!isset($keep_files[$id])) {
         $destination->delete_file($file->file_id());
       }
+    }
+  }
+
+  /**
+   *
+   */
+  protected function find_nearest_file($files, $time) {
+    $last_file_id = NULL;
+    $last_file_time = NULL;
+
+    foreach ($files as $id => $file_time) {
+      if ($file_time >= $time) {
+        if ($last_file_time == NULL) {
+          return $id;
+        }
+        if ($file_time == $time) {
+          return $id;
+        }
+        $time_to_prev = $time - $last_file_time;
+        $time_to_next = $file_time - $time;
+        if ($time_to_prev >= $time_to_next) {
+          return $id;
+        }
+        else {
+          return $last_file_id;
+        }
+
+        // Shouldn't hit this but you never know.
+        break;
+      }
+      $last_file_id = $id;
+      $last_file_time = $file_time;
     }
   }
 

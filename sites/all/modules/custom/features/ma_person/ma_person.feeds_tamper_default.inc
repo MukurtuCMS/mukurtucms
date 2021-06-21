@@ -33,13 +33,13 @@ function ma_person_feeds_tamper_default() {
   $feeds_tamper->source = 'Deceased';
   $feeds_tamper->plugin_id = 'find_replace';
   $feeds_tamper->settings = array(
-    'find' => 'yes',
-    'replace' => '1',
     'case_sensitive' => 0,
-    'word_boundaries' => 0,
-    'whole' => 0,
-    'regex' => FALSE,
+    'find' => 'yes',
     'func' => 'str_ireplace',
+    'regex' => FALSE,
+    'replace' => '1',
+    'whole' => 0,
+    'word_boundaries' => 0,
   );
   $feeds_tamper->weight = 2;
   $feeds_tamper->description = 'Find replace \'yes\' -> 1';
@@ -53,13 +53,13 @@ function ma_person_feeds_tamper_default() {
   $feeds_tamper->source = 'Deceased';
   $feeds_tamper->plugin_id = 'find_replace';
   $feeds_tamper->settings = array(
-    'find' => 'n',
-    'replace' => '0',
     'case_sensitive' => 0,
-    'word_boundaries' => 0,
-    'whole' => 0,
-    'regex' => FALSE,
+    'find' => 'n',
     'func' => 'str_ireplace',
+    'regex' => FALSE,
+    'replace' => '0',
+    'whole' => 0,
+    'word_boundaries' => 0,
   );
   $feeds_tamper->weight = 5;
   $feeds_tamper->description = 'Find replace \'n\' -> 0';
@@ -73,13 +73,13 @@ function ma_person_feeds_tamper_default() {
   $feeds_tamper->source = 'Deceased';
   $feeds_tamper->plugin_id = 'find_replace';
   $feeds_tamper->settings = array(
-    'find' => 'no',
-    'replace' => '0',
     'case_sensitive' => 0,
-    'word_boundaries' => 0,
-    'whole' => 0,
-    'regex' => FALSE,
+    'find' => 'no',
     'func' => 'str_ireplace',
+    'regex' => FALSE,
+    'replace' => '0',
+    'whole' => 0,
+    'word_boundaries' => 0,
   );
   $feeds_tamper->weight = 3;
   $feeds_tamper->description = 'Find replace \'no\' -> 0';
@@ -93,13 +93,13 @@ function ma_person_feeds_tamper_default() {
   $feeds_tamper->source = 'Deceased';
   $feeds_tamper->plugin_id = 'find_replace';
   $feeds_tamper->settings = array(
-    'find' => 'y',
-    'replace' => '1',
     'case_sensitive' => 0,
-    'word_boundaries' => 0,
-    'whole' => 0,
-    'regex' => FALSE,
+    'find' => 'y',
     'func' => 'str_ireplace',
+    'regex' => FALSE,
+    'replace' => '1',
+    'whole' => 0,
+    'word_boundaries' => 0,
   );
   $feeds_tamper->weight = 4;
   $feeds_tamper->description = 'Find replace \'y\' -> 1';
@@ -128,9 +128,9 @@ function ma_person_feeds_tamper_default() {
   $feeds_tamper->source = 'Media Assets';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ';',
     'limit' => '',
     'real_separator' => ';',
+    'separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -159,9 +159,9 @@ function ma_person_feeds_tamper_default() {
   $feeds_tamper->source = 'Term Attachments';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ';',
     'limit' => '',
     'real_separator' => ';',
+    'separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';

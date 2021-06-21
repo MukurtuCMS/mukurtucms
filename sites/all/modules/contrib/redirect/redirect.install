@@ -39,24 +39,24 @@ function redirect_schema() {
       ),
       'source' => array(
         'type' => 'varchar',
-        'length' => 255,
+        'length' => 900,
         'not null' => TRUE,
         'description' => 'The source path to redirect from.',
       ),
       'source_options' => array(
-        'type' => 'text',
+        'type' => 'blob',
         'not null' => TRUE,
         'serialize' => TRUE,
         'description' => 'A serialized array of source options.',
       ),
       'redirect' => array(
         'type' => 'varchar',
-        'length' => 255,
+        'length' => 900,
         'not null' => TRUE,
         'description' => 'The destination path to redirect to.',
       ),
       'redirect_options' => array(
-        'type' => 'text',
+        'type' => 'blob',
         'not null' => TRUE,
         'serialize' => TRUE,
         'description' => 'A serialized array of redirect options.',
@@ -104,8 +104,15 @@ function redirect_schema() {
       'expires' => array('type', 'access'),
       'status_source_language' => array(
         'status',
-        'source',
+        // Limit the number of characters used by the index.
+        // That allows avoiding the risk to have a PDOException
+        // caused the DB index limitations of some databases.
+        // see https://www.drupal.org/project/redirect/issues/2057615.
+        array('source', 255),
         'language',
+      ),
+      'redirect' => array(
+        array('redirect', 255),
       ),
     ),
   );
@@ -117,10 +124,18 @@ function redirect_schema() {
  * Implements hook_install().
  */
 function redirect_install() {
-  // If the path redirect table exists, then set the schema to run the
-  // migration update function.
+  // If the path redirect table exists then run the migration.
   if (db_table_exists('path_redirect')) {
-    drupal_set_installed_schema_version('redirect', 6999);
+    $file = drupal_get_path('module', 'redirect') .  '/redirect.install';
+    $batch = array(
+      'title' => t('Migrating redirects'),
+      'operations' => array(
+        array('_redirect_migrate_path_redirect_redirects', array()),
+      ),
+      'finished' => '_redirect_migrate_finished_callback',
+      'file' => $file,
+    );
+    batch_set($batch);
   }
 }
 
@@ -214,67 +229,6 @@ function redirect_update_6() {
 }
 
 /**
- * Migrate data and variables from the Drupal 6 path_redirect module.
- */
-function redirect_update_7000(&$sandbox) {
-  if (!isset($sandbox['progress']) && db_table_exists('path_redirect')) {
-    $sandbox['progress'] = 0;
-    $sandbox['current_rid'] = 0;
-    $sandbox['max'] = db_query('SELECT COUNT(rid) FROM {path_redirect}')->fetchField();
-    $sandbox['skipped'] = array();
-  }
-
-  if (empty($sandbox['max'])) {
-    $sandbox['#finished'] = 1;
-    return t('No redirects to migrate.');
-  }
-
-  // Ensure the redirect module is loaded since we need to use its functions.
-  drupal_load('module', 'redirect');
-
-  $query = db_query_range("SELECT * FROM {path_redirect} WHERE rid > :rid ORDER BY rid", 0, 25, array(':rid' => $sandbox['current_rid']));
-  foreach ($query as $old_redirect) {
-    $redirect = _redirect_migrate_path_redirect_redirect($old_redirect);
-
-    if (empty($redirect->success)) {
-      $sandbox['skipped'][$old_redirect->rid] = t('RID @rid: @from to @to', array(
-        '@rid' => $old_redirect->rid,
-        '@from' => redirect_url($redirect->source, $redirect->source_options),
-        '@to' => redirect_url($redirect->redirect, $redirect->redirect_options),
-      ));
-    }
-    $sandbox['progress']++;
-    $sandbox['current_rid'] = $old_redirect->rid;
-  }
-
-  $sandbox['#finished'] = $sandbox['progress'] / $sandbox['max'];
-
-  if ($sandbox['#finished'] >= 1) {
-    // Once finished, drop the old table.
-    db_drop_table('path_redirect');
-
-    // Migrate variables.
-    _redirect_migrate_path_redirect_variables();
-
-    // Remove the path_redirect entry from the system table.
-    db_delete('system')
-      ->condition('name', 'path_redirect')
-      ->execute();
-
-    // Show a message about how many redirects were migrated, and how many
-    // were skipped.
-    $skipped = count($sandbox['skipped']);
-    $migrated = $sandbox['progress'] - $skipped;
-    // @todo The following strings should be using t().
-    $return = "Migrated $migrated redirects.";
-    if (!empty($sandbox['skipped'])) {
-      $return .= " The following $skipped redirects were not migrated since there were already existing redirects for the path and language combination:" . theme('item_list', array('items' => $sandbox['skipped']));
-    }
-    return $return;
-  }
-}
-
-/**
  * Rebuild the registry and clear the entity info cache.
  */
 function redirect_update_7100() {
@@ -288,19 +242,35 @@ function redirect_update_7100() {
  * Add status field.
  */
 function redirect_update_7101() {
-  db_add_field('redirect', 'status', array(
+  $status_schema = array(
     'type' => 'int',
     'size' => 'small',
     'not null' => TRUE,
     'default' => 1,
     'description' => 'Boolean indicating whether the redirect is enabled (visible to non-administrators).',
-  ));
-  db_drop_index('redirect', 'source_language');
-  db_add_index('redirect', 'status_source_language', array(
-    'status',
-    'source',
-    'language',
-  ));
+  );
+  if (!db_field_exists('redirect', 'status')) {
+    db_add_field('redirect', 'status', $status_schema);
+  }
+  else {
+    db_change_field('redirect', 'status', 'status', $status_schema);
+  }
+
+  if (db_index_exists('redirect', 'source_language')) {
+    db_drop_index('redirect', 'source_language');
+  }
+
+  if (!db_index_exists('redirect', 'status_source_language')) {
+    db_add_index('redirect', 'status_source_language', array(
+      'status',
+      // Limit the number of characters used by the index.
+      // That allows avoiding the risk to have a PDOException
+      // caused the DB index limitations of some databases.
+      // see https://www.drupal.org/project/redirect/issues/2057615.
+      array('source', 255),
+      'language',
+    ));
+  }
 }
 
 /**
@@ -392,6 +362,81 @@ function _redirect_migrate_path_redirect_redirect($old_redirect) {
 }
 
 /**
+ * Migrate data and variables from the Drupal 6 path_redirect module.
+ */
+function _redirect_migrate_path_redirect_redirects(&$context) {
+  if (!isset($context['sandbox']['progress']) && db_table_exists('path_redirect')) {
+    $context['sandbox']['progress'] = 0;
+    $context['sandbox']['current_rid'] = 0;
+    $context['sandbox']['max'] = db_query('SELECT COUNT(rid) FROM {path_redirect}')->fetchField();
+    $context['results']['skipped'] = array();
+  }
+
+  if (empty($context['sandbox']['max'])) {
+    $context['finished'] = 1;
+    return t('No redirects to migrate.');
+  }
+
+  // Ensure the redirect module is loaded since we need to use its functions.
+  drupal_load('module', 'redirect');
+
+  $query = db_query_range("SELECT * FROM {path_redirect} WHERE rid > :rid ORDER BY rid", 0, 25, array(':rid' => $context['sandbox']['current_rid']));
+  foreach ($query as $old_redirect) {
+    $redirect = _redirect_migrate_path_redirect_redirect($old_redirect);
+
+    if (empty($redirect->success)) {
+      $context['results']['skipped'][$old_redirect->rid] = t('RID @rid: @from to @to', array(
+        '@rid' => $old_redirect->rid,
+        '@from' => redirect_url($redirect->source, $redirect->source_options),
+        '@to' => redirect_url($redirect->redirect, $redirect->redirect_options),
+      ));
+    }
+    $context['sandbox']['progress']++;
+    $context['sandbox']['current_rid'] = $old_redirect->rid;
+  }
+
+  $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
+
+  if ($context['finished'] >= 1) {
+    // Once finished, drop the old table.
+    db_drop_table('path_redirect');
+
+    // Migrate variables.
+    _redirect_migrate_path_redirect_variables();
+
+    // Remove the path_redirect entry from the system table.
+    db_delete('system')
+      ->condition('name', 'path_redirect')
+      ->execute();
+
+    // Record how many redirects were migrated, and how many were skipped.
+    $context['results']['skipped_count'] = count($context['results']['skipped']);
+    $context['results']['migrated'] = $context['sandbox']['progress'] - $context['results']['skipped_count'];
+
+  }
+}
+
+/**
+ * Set an appropriate message when the batch migration is complete.
+ */
+function _redirect_migrate_finished_callback($success, $results, $operations) {
+  if ($success) {
+    // Show a message about how many redirects were migrated, and how many
+    // were skipped.
+    $message = t('Migrated !migrated redirects.', array('!migrated' => $results['migrated']));
+    if (!empty($results['skipped'])) {
+      $message .= ' ' . t('The following !skipped redirects were not migrated since there were already existing redirects for the path and language combination:', array('!skipped' => $results['skipped_count']));
+      $message .= theme('item_list', array('items' => $results['skipped']));
+    }
+  }
+  else {
+    $message = t('There was a problem with the migration from path_redirect.');
+  }
+
+  drupal_set_message($message);
+}
+
+/**
  * Migrate path redirect variables to redirect variables.
  */
 function _redirect_migrate_path_redirect_variables() {
@@ -418,5 +463,22 @@ function _redirect_migrate_path_redirect_variables() {
 
     // Delete the old path redirect variable.
     variable_del($old_variable);
+  }
+}
+
+/**
+ * Change fields 'redirect_options', 'source_options' to blob type.
+ */
+function redirect_update_7103() {
+  db_change_field('redirect', 'redirect_options', 'redirect_options', array('type' => 'blob'));
+  db_change_field('redirect', 'source_options', 'source_options', array('type' => 'blob'));
+}
+
+ /**
+ * Add an index on the redirect column in the redirect table.
+ */
+function redirect_update_7104() {
+  if (!db_index_exists('redirect', 'redirect')) {
+    db_add_index('redirect', 'redirect', array('redirect'));
   }
 }

@@ -425,8 +425,7 @@ function field_collection_update_7009(&$sandbox) {
     ->fields('t', array("{$sandbox['field_name']}_revision_id"))
     ->range($sandbox['current_field_collection_item'], $items_per_pass)
     ->groupBy("t.{$sandbox['field_name']}_revision_id");
-  $query->addExpression("COUNT(t.{$sandbox['field_name']}_revision_id)", 'vidcount');
-  $query->havingCondition('vidcount', 2, '>=');
+  $query->having("COUNT(t.{$sandbox['field_name']}_revision_id) >= 2");
   $vids = $query->execute()->fetchCol();
 
   // Each revision ID that occurs more than once.
@@ -488,18 +487,20 @@ function field_collection_update_7009(&$sandbox) {
         ->condition('delta', $row_to_replace->delta)
         ->condition('language', $row_to_replace->language)
         ->execute();
+
+      if ($field_collection_item_current_revision == $field_collection_duplicated_revision_id) {
+        _field_collection_update_7009_update_data($new_revision_id, $field_collection_duplicated_revision_id);
+
+        // Update the current field collection item data in its host.
+        db_update("field_data_{$sandbox['field_name']}")
+          ->fields(array('revision_id' => $new_revision_id))
+          ->condition('revision_id', $field_collection_duplicated_revision_id)
+          ->condition('entity_type', $row_to_replace->entity_type)
+          ->execute();
+      }
     }
 
-    if ($field_collection_item_current_revision == $field_collection_duplicated_revision_id) {
-      _field_collection_update_7009_update_data($new_revision_id, $field_collection_duplicated_revision_id);
 
-      // Update the current field collection item data in its host.
-      db_update("field_data_{$sandbox['field_name']}")
-        ->fields(array('revision_id' => $new_revision))
-        ->condition('revision_id', $old_revision)
-        ->condition('entity_type', $row_to_replace->entity_type)
-        ->execute();
-    }
 
     foreach ($modern_revisions as $each_modern_revision) {
       $new_revision_id = _field_collection_update_7009_new_revision($field_collection_item_id, $each_modern_revision, $sandbox['inner_fields'], $sandbox['field_name']);
@@ -523,12 +524,12 @@ function field_collection_update_7009(&$sandbox) {
         ->execute();
 
       if ($field_collection_item_current_revision == $each_modern_revision->{"{$sandbox['field_name']}_revision_id"}) {
-        _field_collection_update_7009_update_data($new_revision_id, $each_modern_revision->{"{$sandbox['field_name']}_revision_id"});
+        _field_collection_update_7009_update_data($new_revision_id, $field_collection_item_current_revision);
 
         // Update the current field collection item data in its host.
         db_update("field_data_{$sandbox['field_name']}")
-          ->fields(array('revision_id' => $new_revision))
-          ->condition('revision_id', $old_revision)
+          ->fields(array('revision_id' => $new_revision_id))
+          ->condition('revision_id', $field_collection_item_current_revision)
           ->condition('entity_type', $each_modern_revision->entity_type)
           ->execute();
       }

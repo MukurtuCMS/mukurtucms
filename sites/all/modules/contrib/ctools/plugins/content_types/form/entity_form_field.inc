@@ -152,6 +152,12 @@ function ctools_entity_form_field_content_type_render($subtype, $conf, $panel_ar
  * Returns the administrative title for a type.
  */
 function ctools_entity_form_field_content_type_admin_title($subtype, $conf, $context) {
+  // Return early because we don't have context to build this field from.
+  if (!$context || !isset($context->identifier)) {
+    watchdog('ctools_entity_form_field_content_type_admin_title', 'Context is missing for field: @name', array('@name' => $subtype), WATCHDOG_NOTICE);
+    return t('Deleted/missing field @name', array('@name' => $subtype));
+  }
+
   list($entity_type, $field_name) = explode(':', $subtype, 2);
 
   if (!empty($context->restrictions)) {

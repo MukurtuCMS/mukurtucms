@@ -36,6 +36,7 @@ function link_update_7002() {
  */
 function link_uninstall() {
   variable_del('link_allowed_domains');
+  variable_del('link_default_protocol');
 }
 
 /**

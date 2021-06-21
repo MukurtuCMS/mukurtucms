@@ -479,6 +479,7 @@ function _user_resource_update($uid, $account) {
     return services_error(t('You are not allowed to change your username.'), 406);
   }
 
+  $account_loaded = (object) array_merge((array) $account_loaded, (array) $account);
   $form_state['values']['op'] = variable_get('services_user_save_button_resource_update', t('Save'));
   $form_state['programmed_bypass_access_check'] = FALSE;
   $ret = drupal_form_submit('user_profile_form', $form_state, $account_loaded, $category);

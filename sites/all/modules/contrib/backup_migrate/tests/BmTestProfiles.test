@@ -15,7 +15,7 @@ class BmTestProfiles extends BmTestBase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'Destination tests',
+      'name' => 'Profiles tests',
       'description' => 'Run through basic scenarios and functionality.',
       'group' => 'backup_migrate',
     );
@@ -49,11 +49,13 @@ class BmTestProfiles extends BmTestBase {
    * Confirm adding a new backup process works.
    */
   public function testAddDefaultProfile() {
+    require_once dirname(__FILE__) . '/../includes/files.inc';
+    require_once dirname(__FILE__) . '/../includes/profiles.inc';
+
     // Load the main B&M page.
     $this->drupalGet(BACKUP_MIGRATE_MENU_PATH . '/settings/profile/add');
     $this->assertResponse(200);
 
-    backup_migrate_include('files', 'profiles');
     $filename = _backup_migrate_default_filename();
     $defaults = _backup_migrate_profile_default_profile();
 

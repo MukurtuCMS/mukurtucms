@@ -114,6 +114,22 @@ function hook_field_collection_item_delete(FieldCollectionItemEntity $field_coll
 }
 
 /**
+ * Responds to field collection item archiving.
+ *
+ * This hook is invoked after the field collection item has been archived while
+ * removing it from its host entity.
+ *
+ * @param FieldCollectionItemEntity $field_collection_item
+ *   The field collection item that is being archived.
+ */
+function hook_field_collection_item_archive(FieldCollectionItemEntity $field_collection_item) {
+  db_update('mytable')
+    ->fields(array('archived' => 1))
+    ->condition('id', entity_id('field_collection_item', $field_collection_item))
+    ->execute();
+}
+
+/**
  * Act on a field collection item that is being assembled before rendering.
  *
  * @param $field_collection_item

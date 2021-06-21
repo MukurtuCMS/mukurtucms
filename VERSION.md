@@ -1,3 +1,14 @@
+## Mukurtu 3.0.0
+- Added support for the new version of Mukurtu Mobile
+- Updated to Drupal 7.81
+- Many contrib module updates
+
+#### Manual Upgrade Steps
+This version requires both database and feature updates.
+It is strongly recommended to have a current backup of your site before updating.
+- database update: `drush updb`
+- revert all features: `drush fra`
+
 ## Mukurtu 2.1.8
 - Updated to Drupal 7.80
 - Updated handling of Soundcloud API
