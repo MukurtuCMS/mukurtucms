@@ -83,19 +83,19 @@ function ma_digitalheritage_strongarm() {
       'is_enabled' => 1,
       'types' => array(
         'article' => array(
-          'is_valid' => TRUE,
           'display_handler' => 'links',
+          'is_valid' => TRUE,
           'opmode' => 1,
         ),
-        'digital_heritage' => array(
-          'is_valid' => TRUE,
-          'display_handler' => 'links',
-          'opmode' => 2,
-        ),
         'dictionary_word' => array(
-          'is_valid' => TRUE,
           'display_handler' => 'none',
+          'is_valid' => TRUE,
           'opmode' => 0,
+        ),
+        'digital_heritage' => array(
+          'display_handler' => 'links',
+          'is_valid' => TRUE,
+          'opmode' => 2,
         ),
       ),
     ),
@@ -135,12 +135,65 @@ function ma_digitalheritage_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'field_bundle_settings_node__digital_heritage';
   $strongarm->value = array(
+    'extra_fields' => array(
+      'display' => array(),
+      'form' => array(
+        'path' => array(
+          'weight' => '3',
+        ),
+        'redirect' => array(
+          'weight' => '5',
+        ),
+        'title' => array(
+          'weight' => '2',
+        ),
+      ),
+    ),
     'view_modes' => array(
-      'teaser' => array(
+      'browse_teaser' => array(
+        'custom_settings' => TRUE,
+      ),
+      'collections_browse' => array(
+        'custom_settings' => FALSE,
+      ),
+      'community_record' => array(
+        'custom_settings' => TRUE,
+      ),
+      'dictionary_word_summary' => array(
+        'custom_settings' => FALSE,
+      ),
+      'diff_standard' => array(
+        'custom_settings' => FALSE,
+      ),
+      'featured' => array(
+        'custom_settings' => TRUE,
+      ),
+      'featured_content' => array(
         'custom_settings' => TRUE,
       ),
       'full' => array(
         'custom_settings' => TRUE,
+      ),
+      'ical' => array(
+        'custom_settings' => FALSE,
+      ),
+      'map_popup' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
+      ),
+      'person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'custom_settings' => TRUE,
+      ),
+      'related_person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'revision' => array(
+        'custom_settings' => FALSE,
       ),
       'rss' => array(
         'custom_settings' => FALSE,
@@ -151,56 +204,21 @@ function ma_digitalheritage_strongarm() {
       'search_result' => array(
         'custom_settings' => TRUE,
       ),
-      'browse_teaser' => array(
+      'taxonomy_record_teaser' => array(
         'custom_settings' => TRUE,
       ),
-      'featured' => array(
+      'teacher_view' => array(
+        'custom_settings' => FALSE,
+      ),
+      'teaser' => array(
         'custom_settings' => TRUE,
-      ),
-      'token' => array(
-        'custom_settings' => FALSE,
-      ),
-      'revision' => array(
-        'custom_settings' => FALSE,
-      ),
-      'community_record' => array(
-        'custom_settings' => TRUE,
-      ),
-      'diff_standard' => array(
-        'custom_settings' => FALSE,
       ),
       'thumbed' => array(
         'custom_settings' => FALSE,
       ),
-      'related_items_teaser_map_popup' => array(
-        'custom_settings' => TRUE,
-      ),
-      'map_popup' => array(
-        'custom_settings' => TRUE,
-      ),
-      'person_teaser' => array(
+      'token' => array(
         'custom_settings' => FALSE,
       ),
-      'taxonomy_record_teaser' => array(
-        'custom_settings' => TRUE,
-      ),
-      'featured_content' => array(
-        'custom_settings' => TRUE,
-      ),
-    ),
-    'extra_fields' => array(
-      'form' => array(
-        'title' => array(
-          'weight' => '2',
-        ),
-        'path' => array(
-          'weight' => '3',
-        ),
-        'redirect' => array(
-          'weight' => '5',
-        ),
-      ),
-      'display' => array(),
     ),
   );
   $export['field_bundle_settings_node__digital_heritage'] = $strongarm;

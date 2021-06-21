@@ -74,8 +74,8 @@ function ma_base_theme_field_default_field_bases() {
     'settings' => array(
       'allowed_values' => array(
         0 => array(
-          'vocabulary' => 'category',
           'parent' => 0,
+          'vocabulary' => 'category',
         ),
       ),
       'treeable' => FALSE,
@@ -101,8 +101,8 @@ function ma_base_theme_field_default_field_bases() {
     'settings' => array(
       'allowed_values' => array(
         0 => array(
-          'vocabulary' => 'contributor',
           'parent' => 0,
+          'vocabulary' => 'contributor',
         ),
       ),
       'treeable' => FALSE,
@@ -177,7 +177,7 @@ function ma_base_theme_field_default_field_bases() {
     'locked' => 0,
     'module' => 'text',
     'settings' => array(
-      'treeable' => 0,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'text_long',
@@ -200,8 +200,8 @@ function ma_base_theme_field_default_field_bases() {
     'settings' => array(
       'allowed_values' => array(
         0 => array(
-          'vocabulary' => 'creator',
           'parent' => 0,
+          'vocabulary' => 'creator',
         ),
       ),
       'treeable' => FALSE,
@@ -314,8 +314,8 @@ function ma_base_theme_field_default_field_bases() {
     'settings' => array(
       'allowed_values' => array(
         0 => array(
-          'vocabulary' => 'format',
           'parent' => 0,
+          'vocabulary' => 'format',
         ),
       ),
       'treeable' => FALSE,
@@ -455,11 +455,11 @@ function ma_base_theme_field_default_field_bases() {
     'settings' => array(
       'allowed_values' => array(
         0 => array(
-          'vocabulary' => 'language',
           'parent' => 0,
+          'vocabulary' => 'language',
         ),
       ),
-      'treeable' => 0,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
@@ -489,7 +489,7 @@ function ma_base_theme_field_default_field_bases() {
         'http://creativecommons.org/licenses/by-nc-nd/4.0' => 'Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)',
       ),
       'allowed_values_function' => '',
-      'treeable' => 0,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'list_text',
@@ -552,7 +552,7 @@ function ma_base_theme_field_default_field_bases() {
     'locked' => 0,
     'module' => 'atom_reference',
     'settings' => array(
-      'treeable' => 0,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'atom_reference',
@@ -578,7 +578,7 @@ function ma_base_theme_field_default_field_bases() {
         1 => '',
       ),
       'allowed_values_function' => '',
-      'treeable' => 0,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'list_boolean',
@@ -601,8 +601,8 @@ function ma_base_theme_field_default_field_bases() {
     'settings' => array(
       'allowed_values' => array(
         0 => array(
-          'vocabulary' => 'publisher',
           'parent' => 0,
+          'vocabulary' => 'publisher',
         ),
       ),
       'treeable' => FALSE,
@@ -672,7 +672,7 @@ function ma_base_theme_field_default_field_bases() {
     'locked' => 0,
     'module' => 'text',
     'settings' => array(
-      'treeable' => 0,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'text_long',
@@ -717,11 +717,11 @@ function ma_base_theme_field_default_field_bases() {
     'settings' => array(
       'allowed_values' => array(
         0 => array(
-          'vocabulary' => 'subject',
           'parent' => 0,
+          'vocabulary' => 'subject',
         ),
       ),
-      'treeable' => 0,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
@@ -744,8 +744,8 @@ function ma_base_theme_field_default_field_bases() {
     'settings' => array(
       'allowed_values' => array(
         0 => array(
-          'vocabulary' => 'tags',
           'parent' => 0,
+          'vocabulary' => 'tags',
         ),
       ),
       'treeable' => FALSE,

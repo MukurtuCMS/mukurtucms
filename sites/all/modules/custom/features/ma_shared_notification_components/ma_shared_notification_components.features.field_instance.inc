@@ -15,7 +15,9 @@ function ma_shared_notification_components_field_default_field_instances() {
   // 'field_collection_item-field_notification_email-field_notification_action'.
   $field_instances['field_collection_item-field_notification_email-field_notification_action'] = array(
     'bundle' => 'field_notification_email',
-    'default_value' => array(),
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -42,7 +44,7 @@ function ma_shared_notification_components_field_default_field_instances() {
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => '',
         'treeable' => 0,
       ),
       'type' => 'options_buttons',
@@ -54,6 +56,8 @@ function ma_shared_notification_components_field_default_field_instances() {
   // 'field_collection_item-field_notification_email-field_notification_author'.
   $field_instances['field_collection_item-field_notification_email-field_notification_author'] = array(
     'bundle' => 'field_notification_email',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -94,13 +98,20 @@ function ma_shared_notification_components_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => '',
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
@@ -164,6 +175,8 @@ function ma_shared_notification_components_field_default_field_instances() {
   // 'field_collection_item-field_notification_email-field_notification_comment'.
   $field_instances['field_collection_item-field_notification_email-field_notification_comment'] = array(
     'bundle' => 'field_notification_email',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -204,13 +217,20 @@ function ma_shared_notification_components_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => '',
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
