@@ -1,11 +1,11 @@
 ## Mukurtu 3.0.0
-- Added support for the new version of Mukurtu Mobile
+- Added support for the new version of [Mukurtu Mobile](https://mukurtu.org/mobile/)
 - Updated to Drupal 7.81
 - Many contrib module updates
 
 #### Manual Upgrade Steps
 This version requires both database and feature updates.
-It is strongly recommended to have a current backup of your site before updating.
+Many features have been changed. It is strongly recommended to have a current backup of your site before updating.
 - database update: `drush updb`
 - revert all features: `drush fra`
 
