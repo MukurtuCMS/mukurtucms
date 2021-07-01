@@ -1,0 +1,141 @@
+<?php
+
+/**
+ * @file
+ * Test module updates.
+ */
+
+/**
+ * Test module update 7310.
+ */
+class BmTestUpdate7310 extends BmTestBase {
+
+  /**
+   * Define this test class.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Update 7310',
+      'description' => 'Confirm update 7310 works as intended.',
+      'group' => 'backup_migrate',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    parent::setUp($modules);
+
+    // Log in as user 1, so that permissions are irrelevant.
+    $this->loginUser1();
+  }
+
+  /**
+   * Test update 7310.
+   */
+  public function testUpdate7310() {
+    require_once dirname(__FILE__) . '/../includes/destinations.inc';
+    require_once dirname(__FILE__) . '/../includes/schedules.inc';
+
+    $this->assertEqual(function_exists('backup_migrate_update_7310'), TRUE, 'Update 7310 exists.');
+
+    // First test what happens when there are no e-mail destinations.
+    // Execute the update function.
+    $result = backup_migrate_update_7310();
+
+    // We should be getting a notice as a result.
+    $message = "The following notice was displayed: &quot;$result&quot;";
+    $expected = 'No destinations were affected by this change.';
+    $this->assertEqual($expected, $result, $message);
+
+    // Next, add e-mail destinations and see what happens then.
+    // Create two mock e-mail destinations.
+    $address = strtolower($this->randomName(10)) . '@example.com';
+    $email_destination_id = strtolower($this->randomName(16));
+    $this->submitDestinationEmail('Mock e-mail destination', $email_destination_id, $address);
+    $address = strtolower($this->randomName(10)) . '@example.com';
+    $email_destination_id = strtolower($this->randomName(16));
+    $this->submitDestinationEmail('Mock e-mail destination', $email_destination_id, $address);
+    $this->assertText(t('Your destination was saved'));
+
+    // Create mock schedules with different types of destinations.
+    $mock_schedule_1 = $this->randomName(10);
+    $mock_schedule_2 = $this->randomName(10);
+    $mock_schedule_3 = $this->randomName(10);
+    $this->submitSchedule($mock_schedule_1, 'test_1', 'scheduled', '');
+    $this->assertText(t('Your schedule was saved'));
+    $this->submitSchedule($mock_schedule_2, 'test_2', $email_destination_id, '');
+    $this->assertText(t('Your schedule was saved'));
+    $this->submitSchedule($mock_schedule_3, 'test_3', 'scheduled', $email_destination_id);
+    $this->assertText(t('Your schedule was saved'));
+
+    $destinations = db_select('backup_migrate_destinations', 'bmd')->fields('bmd', array('machine_name'))->condition('subtype', 'email', '=')->execute()->fetchAllAssoc('machine_name', PDO::FETCH_ASSOC);
+    $destinations = array_keys($destinations);
+
+    // Execute the update function.
+    $result = backup_migrate_update_7310();
+
+    // We should be getting a notice as a result.
+    $expected = htmlspecialchars("Schedules that back up to e-mail destinations have been disabled. Check that you are using the correct e-mail addresses, then re-enable manually. The following schedules have been disabled: <ul><li>{$mock_schedule_2}</li><li>{$mock_schedule_3}</li></ul>");
+    $message = "The following notice was displayed: &quot;$result&quot;.";
+    $this->assertEqual($expected, $result, $message);
+
+    $schedules_query = db_select('backup_migrate_schedules', 'bms')->fields('bms', array('machine_name', 'enabled'));
+    $schedules = $schedules_query->execute()->fetchAllAssoc('machine_name', PDO::FETCH_ASSOC);
+
+    // Check that the correct values have changed.
+    $this->assertEqual($schedules['test_1']['enabled'], 1, 'The file back-up schedule remained enabled.');
+    $this->assertEqual($schedules['test_2']['enabled'], 0, 'The e-mail back-up schedule was disabled.');
+    $this->assertEqual($schedules['test_2']['enabled'], 0, 'The file back-up schedule with an e-mail copy was disabled.');
+  }
+
+  /**
+   * Submits the destination form for E-mails.
+   *
+   * @param string $name
+   *   The name of the destination.
+   * @param string $machine_name
+   *   The machine name of the destination.
+   * @param string $mail
+   *   The e-mail address of the destination.
+   */
+  public function submitDestinationEmail($name, $machine_name, $mail) {
+    $this->drupalGet('admin/config/system/backup_migrate/settings/destination/add/email');
+    $this->assertResponse(200);
+    $edit = array();
+    $edit['name'] = $name;
+    $edit['machine_name'] = $machine_name;
+    $edit['location'] = $mail;
+    $this->drupalPost(NULL, $edit, t('Save destination'));
+    $this->assertResponse(200);
+  }
+
+  /**
+   * Submits the schedule form.
+   *
+   * @param string $name
+   *   The name of the destination.
+   * @param string $machine_name
+   *   The machine name of the destination.
+   * @param string $destination_id
+   *   The destination ID to use.
+   * @param string $copy_destination_id
+   *   The destination ID to use for an optional copy.
+   */
+  public function submitSchedule($name, $machine_name, $destination_id, $copy_destination_id = NULL) {
+    $this->drupalGet('admin/config/system/backup_migrate/schedule/add');
+    $this->assertResponse(200);
+    $edit = array();
+    $edit['name'] = $name;
+    $edit['machine_name'] = $machine_name;
+    $edit['destination_id'] = $destination_id;
+    if (!empty($copy_destination_id)) {
+      $edit['copy'] = TRUE;
+      $edit['copy_destination_id'] = $copy_destination_id;
+    }
+    $this->drupalPost(NULL, $edit, t('Save schedule'));
+    $this->assertResponse(200);
+  }
+
+}

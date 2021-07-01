@@ -2,22 +2,21 @@
 
 /**
  * @file
- *
  * This is the task handler plugin to handle attaching a panel to any
  * task that advertises itself as a 'context' type, which all of the
  * basic page tasks provided by page_manager.module do by default.
  */
 
-// Plugin definition
+// Plugin definition.
 $plugin = array(
-  // is a 'context' handler type, meaning it supports the API of the
+  // Is a 'context' handler type, meaning it supports the API of the
   // context handlers provided by ctools context plugins.
   'handler type' => 'context',
   'visible' => TRUE, // may be added up front.
 
   // Administrative fields.
   'title' => t('Panel'),
-  'admin summary' =>'panels_panel_context_admin_summary',
+  'admin summary' => 'panels_panel_context_admin_summary',
   'admin title' => 'panels_panel_context_title',
   'operations' => array(
     'settings' => array(
@@ -115,7 +114,7 @@ $plugin = array(
 
   // Callback to render the data.
   'render' => 'panels_panel_context_render',
-  // Callback to return addressable data
+  // Callback to return addressable data.
   'addressable callback' => 'panels_panel_context_get_addressable',
 
   // Various callbacks for operations performed on the handler to ensure
@@ -184,7 +183,7 @@ $plugin = array(
   'default conf' => array(
     'title' => t('Panel'),
     'no_blocks' => FALSE,
-    'pipeline' => 'standard',
+    'pipeline' => variable_get('panels_renderer_default', 'standard'),
     'body_classes_to_remove' => '',
     'body_classes_to_add' => '',
     'css_id' => '',
@@ -216,26 +215,48 @@ function panels_panel_context_tab_operation($handler, $contexts, $args) {
  *   simply means that the display has been modified and is awaiting
  *   save. The modified one should always be used for editing purposes.
  * - If none of the above is true, then a new display needs to be created
- *   for the handler and pla
+ *   for the handler and pla.
  */
 function &panels_panel_context_get_display(&$handler) {
-  if (isset($handler->conf['display'])) {
-    return $handler->conf['display'];
-  }
+  if (!isset($handler->conf['display'])) {
+    if (isset($handler->conf['did'])) {
+      $handler->conf['display'] = panels_load_display($handler->conf['did']);
+    }
 
-  if (isset($handler->conf['did'])) {
-    $handler->conf['display'] = panels_load_display($handler->conf['did']);
-
-    // Check for a valid display. If no valid display can be loaded, something
-    // is wrong and we'll create a new one.
-    if (!empty($handler->conf['display'])) {
-      return $handler->conf['display'];
+    // Check for again for a valid display. If no valid display could be loaded,
+    // something is wrong and we'll create a new one.
+    if (empty($handler->conf['display'])) {
+      $handler->conf['display'] = panels_new_display();
     }
   }
 
-  $handler->conf['display'] = panels_new_display();
+  $display =& $handler->conf['display'];
+  $display->storage_type = 'page_manager';
+  $display->storage_id = !empty($handler->name) ? $handler->name : 'new';
 
-  return $handler->conf['display'];
+  return $display;
+}
+
+/**
+ * Build the cache key so that the editor and IPE can properly find
+ * everything needed for this display.
+ */
+function panels_panel_context_cache_key($task_name, $handler_id, $args) {
+  $arguments = array();
+  foreach ($args as $arg) {
+    // Sadly things like panels everywhere actually use non-string arguments
+    // and they basically can't be represented here. Luckily, PE also does
+    // not use a system where this matters, so replace its args with a 0
+    // for a placeholder.
+    if (is_string($arg)) {
+      $arguments[] = $arg;
+    }
+    else {
+      $arguments[] = '0';
+    }
+  }
+  $cache_key = 'panel_context:' . $task_name . '::' . $handler_id . '::' . implode('\\', $arguments) . '::';
+  return $cache_key;
 }
 
 /**
@@ -247,7 +268,7 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
   ctools_include('context-task-handler');
   ctools_include('plugins', 'panels');
 
-  // Add my contexts
+  // Add my contexts.
   $contexts = ctools_context_handler_get_handler_contexts($base_contexts, $handler);
 
   // Test.
@@ -259,15 +280,16 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
     ctools_context_handler_pre_render($handler, $contexts, $args);
   }
 
-  // Load the display
+  // Load the display.
   $display = panels_panel_context_get_display($handler);
 
   $display->context = $contexts;
   $display->args = $args;
-  $display->css_id = $handler->conf['css_id'];
+  $page_css_id = ctools_context_keyword_substitute($handler->conf['css_id'], array(), $contexts);
+  $display->css_id = check_plain($page_css_id);
   $task_name = page_manager_make_task_name($handler->task, $handler->subtask);
 
-  $display->cache_key = 'panel_context:' . $task_name . ':' . $handler->name;
+  $display->cache_key = panels_panel_context_cache_key($task_name, $handler->name, $args);
 
   // Check to see if there is any CSS.
   if (!empty($handler->conf['css'])) {
@@ -275,7 +297,9 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
     $css_id = 'panel_context:' . $handler->name;
     $filename = ctools_css_retrieve($css_id);
     if (!$filename) {
-      $filename = ctools_css_store($css_id, $handler->conf['css']);
+      // Add keywords from context.
+      $css = ctools_context_keyword_substitute($handler->conf['css'], array(), $contexts, array('css safe' => TRUE));
+      $filename = ctools_css_store($css_id, $css);
     }
     drupal_add_css($filename);
   }
@@ -284,15 +308,33 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
   panels_get_current_page_display($display);
 
   $renderer = panels_get_renderer($handler->conf['pipeline'], $display);
+  // If the IPE is enabled, but the user does not have access to edit
+  // load the standard renderer instead.
+  $parents = class_parents($renderer);
+  if (!empty($parents['panels_renderer_editor']) && !user_access('user page manager') && !user_access('use ipe with page manager')) {
+    $renderer = panels_get_renderer_handler('standard', $display);
+  }
 
-  // Remove and add body element classes
+  // Remove and add body element classes.
   $panel_body_css = &drupal_static('panel_body_css');
 
-  if (isset($handler->conf['body_classes_to_remove']) && !isset($panel_body_css['body_classes_to_remove'])) {
-    $panel_body_css['body_classes_to_remove'] = $handler->conf['body_classes_to_remove'];
+  if (isset($handler->conf['body_classes_to_remove'])) {
+    $classes = ctools_context_keyword_substitute($handler->conf['body_classes_to_remove'], array(), $contexts, array('css safe' => TRUE));
+    if (!isset($panel_body_css['body_classes_to_remove'])) {
+      $panel_body_css['body_classes_to_remove'] = check_plain($classes);
+    }
+    else {
+      $panel_body_css['body_classes_to_remove'] .= ' ' . check_plain($classes);
+    }
   }
-  if (isset($handler->conf['body_classes_to_add']) && !isset($panel_body_css['body_classes_to_add'])) {
-    $panel_body_css['body_classes_to_add'] = $handler->conf['body_classes_to_add'];
+  if (isset($handler->conf['body_classes_to_add'])) {
+    $classes = ctools_context_keyword_substitute($handler->conf['body_classes_to_add'], array(), $contexts, array('css safe' => TRUE));
+    if (!isset($panel_body_css['body_classes_to_add'])) {
+      $panel_body_css['body_classes_to_add'] = check_plain($classes);
+    }
+    else {
+      $panel_body_css['body_classes_to_add'] .= ' ' . check_plain($classes);
+    }
   }
 
   $info = array(
@@ -327,8 +369,8 @@ function panels_panel_context_save(&$handler, $update) {
   ctools_include('css');
   ctools_css_clear('panel_context:' . $handler->name);
 
-  if (isset($page->conf['temp_layout'])) {
-    unset($page->conf['temp_layout']);
+  if (isset($handler->conf['temp_layout'])) {
+    unset($handler->conf['temp_layout']);
   }
 }
 
@@ -355,7 +397,7 @@ function panels_panel_context_export(&$handler, $indent) {
 /**
  * When a handler is cloned, we have to clone the display.
  */
-  function panels_panel_context_clone(&$handler) {
+function panels_panel_context_clone(&$handler) {
   $old_display = panels_panel_context_get_display($handler);
   $code = panels_export_display($old_display);
   eval($code);
@@ -364,7 +406,10 @@ function panels_panel_context_export(&$handler, $indent) {
       unset($handler->conf[$item]);
     }
   }
-  $display->did = 'new';
+  $display = (object) array(
+    'did' => 'new',
+    'uuid' => ctools_uuid_generate(),
+  );
   $handler->conf['display'] = $display;
 }
 
@@ -407,7 +452,7 @@ function panels_panel_context_admin_summary($handler, $task, $subtask, $page, $s
   ctools_include('context');
   ctools_include('context-task-handler');
 
-  // Get the operations
+  // Get the operations.
   $operations = page_manager_get_operations($page);
 
   // Get operations for just this handler.
@@ -482,7 +527,7 @@ function panels_panel_context_admin_summary($handler, $task, $subtask, $page, $s
 
   $output .= '<div class="clearfix">';
   if ($show_title) {
-  $output .= '<div class="handler-title clearfix">';
+    $output .= '<div class="handler-title clearfix">';
     $output .= '<div class="actions handler-actions">' . $rendered_operations['actions'] . '</div>';
     $output .= '<span class="title-label">' . $title . '</span>';
   }
@@ -490,24 +535,23 @@ function panels_panel_context_admin_summary($handler, $task, $subtask, $page, $s
   $output .= '</div>';
   $output .= $info;
   $output .= '</div>';
-/*
+  /*
   $output .= '<div class="right-container">';
   $output .= '<h3 class="context-title">' . t('Contexts') . $context_link . '</h3>';
   $output .= $contexts;
   $output .= '</div>';
 
   $output .= '<div class="left-container">';
-//  $output .= $icon;
+  //  $output .= $icon;
   $output .= '<h3 class="handler-title">' . t('Content') . $content_link . '</h3>';
   $output .= $content;
   $output .= '</div>';
-*/
+   */
   return $output;
 }
 
 // --------------------------------------------------------------------------
-// Forms
-
+// Forms.
 /**
  * General notes about forms: The handler is automatically cached by the form
  * wizard, so anything we store on $form_state['handler'] anywhere will get
@@ -629,7 +673,7 @@ function panels_panel_context_edit_move($form, &$form_state) {
   $form_state['display'] = &panels_panel_context_get_display($form_state['handler']);
   $form_state['layout'] = $form_state['handler']->conf['temp_layout'];
 
-  $form_state['cache_key'] = 'panel_context:' . $form_state['task_name'] . ':' . $form_state['handler_id'];
+  $form_state['cache_key'] = panels_panel_context_cache_key($form_state['task_name'], $form_state['handler_id'], array());
 
   ctools_include('common', 'panels');
   ctools_include('display-layout', 'panels');
@@ -642,10 +686,9 @@ function panels_panel_context_edit_move($form, &$form_state) {
   $form = panels_change_layout($form, $form_state);
 
   // Change the 'back' button to just go directly to the previous form
-//  $task_id = $form_state['task']['name'];
-//  $handler_id = $form_state['handler']->handler;
-//  $name = $form_state['handler']->name;
-
+  //  $task_id = $form_state['task']['name'];
+  //  $handler_id = $form_state['handler']->handler;
+  //  $name = $form_state['handler']->name;
   // This form is outside the normal wizard list, so we need to specify the
   // previous/next forms.
   $form['buttons']['previous']['#next'] = 'layout';
@@ -666,7 +709,7 @@ function panels_panel_context_edit_content($form, &$form_state) {
   ctools_include('context');
   ctools_include('context-task-handler');
 
-  $cache = panels_edit_cache_get('panel_context:' . $form_state['task_name'] . ':' . $form_state['handler_id']);
+  $cache = panels_edit_cache_get(panels_panel_context_cache_key($form_state['task_name'], $form_state['handler_id'], array()));
 
   $form_state['renderer'] = panels_get_renderer_handler('editor', $cache->display);
   $form_state['renderer']->cache = &$cache;
@@ -696,10 +739,14 @@ function panels_panel_context_edit_content_validate(&$form, &$form_state) {
 }
 
 function panels_panel_context_edit_content_submit(&$form, &$form_state) {
+  // Update the storage_id if this is a new variant before saving.
+  if ($form_state['display']->storage_id == 'new') {
+    $form_state['display']->storage_id = $form_state['handler_id'];
+  }
   panels_edit_display_form_submit($form, $form_state);
   $handler = &$form_state['handler'];
 
-  // update the cached display:
+  // Update the cached display:
   $display = $form_state['page']->display_cache[$form_state['handler_id']]->display;
   $handler->conf['display'] = $display;
   unset($form_state['page']->display_cache[$form_state['handler_id']]);
@@ -710,7 +757,7 @@ function panels_panel_context_edit_content_submit(&$form, &$form_state) {
 }
 
 /**
- * General settings for the panel
+ * General settings for the panel.
  */
 function panels_panel_context_edit_settings($form, &$form_state) {
   $conf = $form_state['handler']->conf;
@@ -731,17 +778,17 @@ function panels_panel_context_edit_settings($form, &$form_state) {
   $form['conf']['body_classes_to_remove'] = array(
     '#type' => 'textfield',
     '#size' => 128,
-    '#default_value' => $conf['body_classes_to_remove'],
+    '#default_value' => empty($conf['body_classes_to_remove']) ? '' : $conf['body_classes_to_remove'],
     '#title' => t('Remove body CSS classes'),
-    '#description' => t('The CSS classes to remove from the body element of this page. Separated by a space. For example: no-sidebars one-sidebar sidebar-first sidebar-second two-sidebars.'),
+    '#description' => t('The CSS classes to remove from the body element of this page. Separated by a space. For example: no-sidebars one-sidebar sidebar-first sidebar-second two-sidebars. Keywords from context are allowed.'),
   );
 
   $form['conf']['body_classes_to_add'] = array(
     '#type' => 'textfield',
     '#size' => 128,
-    '#default_value' => $conf['body_classes_to_add'],
+    '#default_value' => empty($conf['body_classes_to_add']) ? '' : $conf['body_classes_to_add'],
     '#title' => t('Add body CSS classes'),
-    '#description' => t('The CSS classes to add to the body element of this page. Separated by a space. For example: no-sidebars one-sidebar sidebar-first sidebar-second two-sidebars.'),
+    '#description' => t('The CSS classes to add to the body element of this page. Separated by a space. For example: no-sidebars one-sidebar sidebar-first sidebar-second two-sidebars. Keywords from context are allowed.'),
   );
 
   ctools_include('plugins', 'panels');
@@ -781,13 +828,13 @@ function panels_panel_context_edit_settings($form, &$form_state) {
     '#size' => 35,
     '#default_value' => $conf['css_id'],
     '#title' => t('CSS ID'),
-    '#description' => t('The CSS ID to apply to this page'),
+    '#description' => t('The CSS ID to apply to this page. Keywords from context are allowed.'),
   );
 
   $form['conf']['css'] = array(
     '#type' => 'textarea',
     '#title' => t('CSS code'),
-    '#description' => t('Enter well-formed CSS code here; this code will be embedded into the page, and should only be used for minor adjustments; it is usually better to try to put CSS for the page into the theme if possible. This CSS will be filtered for safety so some CSS may not work.'),
+    '#description' => t('Enter well-formed CSS code here; this code will be embedded into the page, and should only be used for minor adjustments; it is usually better to try to put CSS for the page into the theme if possible. This CSS will be filtered for safety so some CSS may not work. Keywords from context are allowed.'),
     '#default_value' => $conf['css'],
   );
 
@@ -823,7 +870,7 @@ function panels_panel_context_edit_preview($form, &$form_state) {
   $form['preview'] = array();
   ctools_context_replace_form($form['preview'], $contexts);
 
-  // automatically preview if there are no argument placeholders.
+  // Automatically preview if there are no argument placeholders.
   if (empty($form['preview'])) {
     $display = panels_panel_context_get_display($form_state['handler']);
     $display->context = $contexts;
@@ -862,21 +909,34 @@ function panels_panel_context_edit_preview_submit(&$form, &$form_state) {
 }
 
 function panels_panel_context_get_addressable($task, $subtask_name, $handler, $address, $contexts, $arguments, $type) {
-  // Load the display
+  // Load the display.
   $display = panels_panel_context_get_display($handler);
 
   $display->context = $contexts;
   $display->args = $arguments;
   $display->css_id = $handler->conf['css_id'];
-  $display->cache_key = 'panel_context:' . $task->name . ':' . $handler->name;
+  $display->cache_key = panels_panel_context_cache_key($task->name, $handler->name, $arguments);
 
   $renderer = panels_get_renderer($handler->conf['pipeline'], $display);
-  if ($type == 'content') {
-    $renderer->prepare();
+  $renderer->prepare();
 
+  if ($address) {
     $pid = array_shift($address);
     if (!empty($renderer->prepared['panes'][$pid])) {
-      return $renderer->render_pane($renderer->prepared['panes'][$pid]);
+      if ($type == 'content') {
+        return $renderer->render_pane($renderer->prepared['panes'][$pid]);
+      }
+      elseif ($type == 'pane') {
+        return $renderer->prepared['panes'][$pid];
+      }
+    }
+  }
+  else {
+    if ($type == 'content') {
+      return $renderer->render();
+    }
+    elseif ($type == 'renderer') {
+      return $renderer;
     }
   }
 }

@@ -1,0 +1,275 @@
+<?php
+/**
+ * @file
+ * Code for the Mukurtu Shared Notification Components feature.
+ */
+
+include_once 'ma_shared_notification_components.features.inc';
+
+/**
+ * Implements hook_field_collection_item_insert()
+ *
+ * After creating a new notification email FC, send out notifications for the "immediately" users and update the notification's users notified field.
+ */
+function ma_shared_notification_components_field_collection_item_insert($fc_item){
+  if ($fc_item->field_name == 'field_notification_email') {
+    $notification_w = entity_metadata_wrapper('node', $fc_item->hostEntity());
+    $notify_users = array_diff($notification_w->field_notify_immediately->raw(), $notification_w->field_users_notified->raw());
+
+    // Send notifications.
+    $notification_author = $fc_item->field_notification_author[LANGUAGE_NONE][0]['target_id'];;
+    if (count($notify_users)) {
+      foreach ($notify_users as $uid) {
+        // Do not notify users of their *own* node creations / node edits / or comments.
+        if ($uid == $notification_author) {
+          $successful_sends[] = $uid;
+          continue;
+        }
+        $body = $fc_item->field_notification_body[LANGUAGE_NONE][0]['value'];
+        // Digital Heritage Admin Notifiations
+        if ($notification_w->getBundle() == 'dhan') {
+          $body .= "\n\nView your Digital Heritage notifications: " . $GLOBALS['base_url'] . "/user/" . $uid . "/digital-heritage-notifications";
+        }
+        // Collab pages notifications
+        else {
+          $body .= "\n\nManage your notifications: " . $GLOBALS['base_url'] . "/user/" . $uid . "/following";
+        }
+        $params = [
+          'subject' => $fc_item->field_notification_subject[LANGUAGE_NONE][0]['value'],
+          'body' => $body ,
+        ];
+        if (isset($fc_item->field_notification_comment[LANGUAGE_NONE][0]['target_id'])) {
+          $params['comment_id'] = $fc_item->field_notification_comment[LANGUAGE_NONE][0]['target_id'];
+          $params['uid'] = $uid;
+        }
+        $user = user_load($uid);
+        $result = drupal_mail('ma_shared_notification_components', 'mukurtu_notification', $user->mail, language_default(), $params);
+        if ($result['result']) { // This doesn't guarantee much but it's better than nothing.
+          $successful_sends[] = $uid;
+        }
+      }
+
+      // Update the notified users field.
+      if (count($successful_sends)) {
+        $notification_w->field_users_notified->set($successful_sends); // This saves automatically, because the FC already exists. Saving the wrapper separately creates a duplicate error.
+      }
+
+    }
+  }
+}
+
+/**
+ * Implements hook_mail().
+ */
+function ma_shared_notification_components_mail($key, &$message, $params) {
+
+  if ($key == 'mukurtu_notification') {
+
+    // For comments on immediate-send notications
+    // Currently these are only on collab pages.
+    if (isset($message['params']['comment_id'])) {
+      $comment = comment_load($message['params']['comment_id']);
+
+      // Embed the comment in the email body. This requires rebuilding the email body from its
+      // standard format (that of how non-comment notifications, and comment notifications in digests appear).
+      $body_prefix = variable_get('mailcomment_reply_text');
+      $split_body = preg_split("/.\n\nView the comment: /", $params['body']);
+      $comment_body = '| ' . drupal_html_to_text(wordwrap($comment->subject, 75, "\n| ", true)); // limit each line to 77 chars, including a "| " at the start of each line to denote quoted text.
+      $body_suffix = 'You may reply directly to this comment via email, or go to the comment at: ';
+      $params['body'] = $body_prefix . "\n\n" . $split_body[0] . ":\n\n" . $comment_body . "\n" . $body_suffix . $split_body[1];
+      //      $messageid_params['uid'] = $params['uid'];
+      //      $message['body'][0] .= 'View original post: ' . url('mailcomment/redirect/' . mailcomment_build_messageid($messageid_params), ['absolute' => TRUE]);
+
+      // Add ability to reply to the comment via email, using an auth code in the Message-ID header.
+      // This is taken from mailcomment_message_notify_mail_alter().
+      $messageid_params = [];
+      $messageid_params['uid'] = $comment->uid;
+      $messageid_params['cid'] = $comment->cid;
+      $messageid_params['nid'] = $comment->nid;
+      $messageid_params['time'] = $comment->created;
+      $reply = variable_get('mailcomment_mailbox', variable_get('site_mail', ''));
+      $message['headers']['Reply-To'] = $reply;
+      $message['headers']['Message-ID'] = mailcomment_build_messageid($messageid_params);
+      $ancestor_msg_id = mailcomment_mail_comment_ancestor_message_id($messageid_params['nid'], $messageid_params['cid']);
+      if (isset($ancestor_msg_id)) { // TODO: test if this is necessary
+        $message['headers']['In-Reply-To'] = $ancestor_msg_id;
+      }
+
+    };
+
+    // All notifications (not just comments) need the body and subject set here.
+    $message['subject'] = $params['subject'];
+    $message['body'][] = $params['body'];
+
+  }
+}
+
+
+/**
+ * Implementation of hook_cronapi.
+ *
+ * This hook is provided by Elysia Cron, which allows for scheduled cron jobs.
+ */
+function ma_shared_notification_components_cronapi($op, $job = NULL) {
+  $items['ma_shared_notification_components_daily_notifications'] = array(
+    'description' => 'Send daily mukurtu notifications.',
+    'rule' => '0 8 * * *', // every day at 8am
+  );
+  $items['ma_shared_notification_components_weekly_notifications'] = array(
+    'description' => 'Send weekly mukurtu notifications.',
+    'rule' => '0 8 * * 1', // every Monday at 8am
+  );
+  return $items;
+}
+
+// Elysia cron notification callacks.
+function ma_shared_notification_components_daily_notifications() {
+  ma_shared_notification_components_send_scheduled_notifications('daily');
+}
+function ma_shared_notification_components_weekly_notifications() {
+  ma_shared_notification_components_send_scheduled_notifications('weekly');
+}
+
+// Send scheduled notifications, as called by the different schedule Elysia cron callbacks.
+function ma_shared_notification_components_send_scheduled_notifications($schedule) {
+  switch ($schedule) {
+    case 'daily':
+      $notification_field = 'field_notify_day';
+      break;
+    case 'weekly':
+      $notification_field = 'field_notify_week';
+      break;
+  }
+
+  // Run a separate loop for the two types of notifications, so that their digest emails are separate and not combined.
+  foreach (['following_notification', 'dhan'] as $notification_type) {
+
+    // Get the notification nodes that still have users to notify.
+    $query = new EntityFieldQuery();
+    $result = $query
+      ->addMetaData('account', user_load(1))
+      ->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', $notification_type)
+      ->propertyCondition('status', NODE_PUBLISHED)
+      ->fieldCondition('field_all_users_notified', 'value', 0)
+      ->propertyOrderBy('changed', 'DESC')
+      ->execute();
+    if (isset($result['node']) && count($result['node'])) {
+      $successful_sends = [];
+      $aggregated_fcs_all_users = [];
+      foreach (array_keys($result['node']) as $nid) {
+        $notification_w = entity_metadata_wrapper('node', $nid);
+
+        // Get users to send to.
+        $users_to_send_to = $notification_w->field_notify_immediately->raw() ? $notification_w->field_notify_immediately->raw() : [];  // We start with all immediate notifications that have not yet gone out. This happens if a user was set to receive notifications of a node on a schedule, the node was then updated before the schedule was fired, and then user changed their schedule to immediate (either on the node or by switching to default wherein their default is immediate). This ensures those notifications still get sent, during the next scheduled send (ie. no later than daily).
+        $users_to_send_to = array_merge($users_to_send_to, $notification_w->{$notification_field}->raw() ? $notification_w->{$notification_field}->raw() : []);
+        $users_to_send_to = array_diff($users_to_send_to, $notification_w->field_users_notified->raw() ? $notification_w->field_users_notified->raw() : []); // Do not send to users already notified.
+        $users_to_send_to = array_unique($users_to_send_to); // There never should be duplicates, but just in case.
+
+        if (count($users_to_send_to)) {
+          // Get the FC
+          $latest_fc = $notification_w->field_notification_email->count();
+          if ($latest_fc) { // This can be 0 from development debugging. Ultimately this should be able to be removed.
+            $fc = $notification_w->field_notification_email[$latest_fc - 1]->value();
+            // Add the FC for each user to send to.
+            foreach ($users_to_send_to as $user_to_send_to) {
+              $aggregated_fcs_all_users[$user_to_send_to][$nid] = $fc;
+            }
+          }
+        }
+
+      }
+
+      // Send the aggregate email(s), one per user.
+      foreach ($aggregated_fcs_all_users as $uid => $fc_items) {
+        if ($notification_type == 'dhan') { // DHAN
+          $bodies = ["This is your " . $schedule . " digest of Digital Heritage notifications for " . variable_get('site_name') . ". You may view your Digital Heritage notifications at: " . $GLOBALS['base_url'] . "/user/" . $uid . "/digital-heritage-notifications"];
+          $subject = 'Your ' . $schedule . ' Digital Heritage notifications digest for ' . variable_get('site_name') . '.';
+        }
+        else { // Collab notification
+          $bodies = ["This is your " . $schedule . " digest of notifications for " . variable_get('site_name') . ". You may manage these notifications at: " . $GLOBALS['base_url'] . "/user/" . $uid . "/following"];
+          $subject = 'Your ' . $schedule . ' notifications digest for ' . variable_get('site_name') . '.';
+        }
+
+        $notification_nids = [];
+        foreach ($fc_items as $notification_nid => $fc_item) {
+          $notification_nids[] = $notification_nid;
+          $bodies[] = $fc_item->field_notification_body[LANGUAGE_NONE][0]['value'];
+        }
+        $body = implode("\n_____________________________________________________________________________\n\n", $bodies); // 77 chars wide
+        $params = [
+          'subject' => $subject,
+          'body' => $body,
+        ];
+        $user = user_load($uid);
+        $result = drupal_mail('ma_shared_notification_components', 'mukurtu_notification', $user->mail, language_default(), $params);
+        if ($result['result']) { // This doesn't guarantee much but it's better than nothing.
+          $successful_sends[$uid] = $notification_nids;
+        }
+      }
+
+      // Update the notification node's field_users_notified and then field_all_users_notified
+      $nids_to_update = [];
+      foreach ($successful_sends as $uid => $notification_nids) {
+        foreach ($notification_nids as $notification_nid) {
+          $nids_to_update[$notification_nid][] = $uid;
+        }
+      }
+      foreach ($nids_to_update as $nid_to_update => $users_emailed) {
+        $notification_w = entity_metadata_wrapper('node', $nid_to_update);
+        $users_notified = array_unique(array_merge($notification_w->field_users_notified->raw(), $users_emailed));
+        $notification_w->field_users_notified->set($users_notified);
+        $notification_w->save();
+        ma_shared_notification_components_update_field_all_users_notified($notification_w);
+      }
+
+    }
+  }
+}
+
+/**
+ * Update field_all_users_notified.
+ */
+function ma_shared_notification_components_update_field_all_users_notified($notification_w) {
+  $all_users_to_notify = $notification_w->field_notify_all->raw();
+  $already_notified = $notification_w->field_users_notified->raw();
+  $all_users_notified = 1;
+  if (count(array_diff($all_users_to_notify, $already_notified))) {
+    $all_users_notified = 0;
+  }
+  if ($all_users_notified <>  $notification_w->field_all_users_notified->value()) {
+    $notification_w->field_all_users_notified->set($all_users_notified);
+    $notification_w->save();
+  }
+}
+
+/**
+ * Helper function to compare two fields and return if there is a difference.
+ *
+ * This diff'ing code is based on https://drupal.stackexchange.com/a/175186/83739.
+ */
+function ma_shared_notification_components_check_for_field_value_change($old_value, $new_value, $properties_within_fields_to_ignore = []) {
+  // If both are empty - ignore
+  if(empty($old_value) && empty($new_value)) {
+    return FALSE;
+  }
+  // If one of the value is not empty compared to the other
+  if( (empty($old_value) && !empty($new_value) ) || (empty($new_value) && !empty($old_value))){
+    return TRUE;
+  }
+  if(!is_array($new_value) && $new_value != $old_value) {
+    return TRUE;
+  }
+  // Both values exist. Check for a difference.
+  if(is_array($new_value) && is_array($old_value)) {
+    foreach ($properties_within_fields_to_ignore as $property_to_ignore) {
+      recursive_unset($new_value, $property_to_ignore);
+      recursive_unset($old_value, $property_to_ignore);
+    }
+    $diff1 = array_diff_assoc_recursive($new_value, $old_value);
+    $diff2 = array_diff_assoc_recursive($old_value, $new_value);
+    if ($diff1 or $diff2) {
+      return TRUE;
+    }
+  }
+}

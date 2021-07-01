@@ -1,0 +1,12 @@
+<?php
+/**
+ * @file
+ * Integrates Multiple Email and Mailhandler.
+ */
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function mailhandler_multiple_email_ctools_plugin_directory($owner, $plugin_type) {
+  return 'plugins/' . $owner . '/' . $plugin_type;
+}

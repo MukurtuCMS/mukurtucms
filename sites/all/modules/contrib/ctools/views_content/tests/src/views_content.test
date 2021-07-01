@@ -1,0 +1,79 @@
+<?php
+
+/**
+ * @file
+ * Contains ViewsContentPanesTest.
+ */
+
+/**
+ * Tests rendering views content pane displays.
+ */
+class ViewsContentPanesTest extends ViewsSqlTest {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Views content panes tests',
+      'description' => 'Tests rendering views content pane displays.',
+      'group' => 'ctools',
+      'dependencies' => array('ctools', 'views'),
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    $modules[] = 'ctools';
+    $modules[] = 'views_content';
+    $modules[] = 'views_content_test';
+    parent::setUp($modules);
+  }
+
+  /**
+   * Tests rendering a content pane with a more link.
+   */
+  public function testViewMoreLink() {
+    // The view "views_content_more_link" has two displays: a content pane
+    // display and a page display. The content pane display displays 3 nodes,
+    // the page display displays all items.
+    // On the content pane display a "more" link is configured that should link
+    // to the page.
+    $view = views_get_view('views_content_more_link');
+
+    // Create four nodes that the view will display. The first three
+    // will get displayed on the content pane display and the remaining
+    // on the page display.
+    for ($i = 0; $i < 4; $i++) {
+      $this->drupalCreateNode();
+    }
+
+    // Render the content pane display and assert that a more link is shown.
+    $view->set_display('panel_pane_1');
+    $rendered_output = $view->preview();
+    $this->verbose($rendered_output);
+    $this->storeViewPreview($rendered_output);
+
+    $this->assertLink('more');
+    $this->assertLinkByHref('views-content-more-link');
+  }
+
+  /**
+   * Stores a view output in the elements.
+   *
+   * @param string $output
+   *   The Views HTML output.
+   */
+  protected function storeViewPreview($output) {
+    $html_dom = new DOMDocument();
+    @$html_dom->loadHTML($output);
+    if ($html_dom) {
+      // It's much easier to work with simplexml than DOM, luckily enough
+      // we can just simply import our DOM tree.
+      $this->elements = simplexml_import_dom($html_dom);
+    }
+  }
+
+}

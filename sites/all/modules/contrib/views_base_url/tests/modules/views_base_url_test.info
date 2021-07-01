@@ -1,0 +1,12 @@
+name = Views base url test
+description = Test cases for views base url module
+core = 7.x
+dependencies[] = views_base_url
+hidden = true
+
+; Information added by Drupal.org packaging script on 2015-08-08
+version = "7.x-1.2"
+core = "7.x"
+project = "views_base_url"
+datestamp = "1439063940"
+

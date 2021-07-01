@@ -9,6 +9,10 @@
  * Tests for the http library.
  */
 class FeedsHTTPRequestTestCase extends FeedsUnitTestHelper {
+
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'HTTP library',
@@ -17,6 +21,9 @@ class FeedsHTTPRequestTestCase extends FeedsUnitTestHelper {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
     feeds_include_library('http_request.inc', 'http_request');
@@ -49,6 +56,45 @@ EOF;
     $links = http_request_find_feeds(str_replace('"', "'", $html));
     $this->assertEqual(count($links), 1);
     $this->assertEqual($links[0], 'http://example.com/rss.xml');
+  }
+
+  /**
+   * Tests fetching data from a protected directory.
+   */
+  public function testProtectedPages() {
+    // Create a directory and put a file in it.
+    $dir = 'public://feeds-protected';
+    file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
+    file_put_contents($dir . '/content.txt', 'A protected document');
+
+    // Create .htpasswd and .htaccess files.
+    file_put_contents($dir . '/.htpasswd', 'Morticia:$apr1$s3SZUBCe$loi5XqSMHJ9CRfsY9GzLW/');
+    $htaccess = "AuthType Basic\nAuthName \"Restricted area\"\nAuthUserFile !path\nrequire valid-user";
+    $htaccess = strtr($htaccess, array(
+      '!path' => drupal_realpath($dir . '/.htpasswd'),
+    ));
+    file_put_contents($dir . '/.htaccess', $htaccess);
+
+    // Create url to file.
+    $url = file_create_url($dir . '/content.txt');
+
+    // Try to access the file without username/password.
+    $result = feeds_http_request($url, array(
+      'cache_http_result' => FALSE,
+    ));
+    // Assert that it was forbidden.
+    $this->assertEqual(401, $result->code);
+    $this->assertNotEqual('A protected document', $result->data);
+
+    // Now access the same with username/password.
+    $result = feeds_http_request($url, array(
+      'username' => 'Morticia',
+      'password' => 'mort',
+      'cache_http_result' => FALSE,
+    ));
+    // And assert that this time the request was successful.
+    $this->assertEqual(200, $result->code);
+    $this->assertEqual('A protected document', $result->data);
   }
 
   /**

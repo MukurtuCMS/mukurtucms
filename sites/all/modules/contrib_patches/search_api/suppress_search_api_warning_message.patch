@@ -1,0 +1,12 @@
+diff --git a/sites/all/modules/contrib/search_api/contrib/search_api_views/search_api_views.module b/sites/all/modules/contrib/search_api/contrib/search_api_views/search_api_views.module
+index 8a131c2..7d6c9b1 100644
+--- a/sites/all/modules/contrib/search_api/contrib/search_api_views/search_api_views.module
++++ b/sites/all/modules/contrib/search_api/contrib/search_api_views/search_api_views.module
+@@ -62,6 +62,6 @@ function _search_api_views_index_unavailable(SearchApiIndex $index) {
+   }
+   if ($names) {
+     views_invalidate_cache();
+-    drupal_set_message(t('The following views were using the index %name: @views. You should disable or delete them.', array('%name' => $index->name, '@views' => implode(', ', $names))), 'warning');
++    # drupal_set_message(t('The following views were using the index %name: @views. You should disable or delete them.', array('%name' => $index->name, '@views' => implode(', ', $names))), 'warning'); // suppressing this warning because it shows up during profile installation even with our suppression of profile messages (not sure why)
+   }
+ }

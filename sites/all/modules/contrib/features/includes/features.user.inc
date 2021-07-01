@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Features integration for 'user' module.
+ */
+
+/**
  * Implements hook_features_api().
  */
 function user_features_api() {
@@ -8,12 +13,16 @@ function user_features_api() {
     'user_role' => array(
       'name' => t('Roles'),
       'feature_source' => TRUE,
+      /* @see \hook_user_default_roles() */
+      /* @see \hook_user_default_roles_alter() */
       'default_hook' => 'user_default_roles',
       'default_file' => FEATURES_DEFAULTS_INCLUDED,
     ),
     'user_permission' => array(
       'name' => t('Permissions'),
       'feature_source' => TRUE,
+      /* @see \hook_user_default_permissions() */
+      /* @see \hook_user_default_permissions_alter() */
       'default_hook' => 'user_default_permissions',
       'default_file' => FEATURES_DEFAULTS_INCLUDED,
     ),
@@ -26,7 +35,8 @@ function user_features_api() {
 function user_permission_features_export($data, &$export, $module_name = '') {
   $export['dependencies']['features'] = 'features';
 
-  // Ensure the modules that provide the given permissions are included as dependencies.
+  // Ensure the modules that provide the given permissions are included as
+  // dependencies.
   $map = user_permission_get_modules();
   foreach ($data as $perm) {
     $perm_name = $perm;
@@ -140,7 +150,7 @@ function user_permission_features_rebuild($module) {
       $perm = $permission['name'];
       _user_features_change_term_permission($perm, 'machine_name');
       if (empty($modules[$perm])) {
-        $args = array('!name' => $perm, '!module' => $module,);
+        $args = array('!name' => $perm, '!module' => $module);
         $msg = t('Warning in features rebuild of !module. No module defines permission "!name".', $args);
         drupal_set_message($msg, 'warning');
         continue;
@@ -177,7 +187,7 @@ function user_role_features_export($data, &$export, $module_name = '') {
       $export['dependencies'][$map[$role]] = $map[$role];
     }
     // Export.
-    elseif(user_role_load_by_name($role)) {
+    elseif (user_role_load_by_name($role)) {
       $export['features']['user_role'][$role] = $role;
     }
   }
@@ -203,7 +213,7 @@ function user_role_features_export_render($module, $data) {
     if ($role = user_role_load_by_name($name)) {
       unset($role->rid);
       $role_identifier = features_var_export($name);
-      $role_export = features_var_export($role , '  ');
+      $role_export = features_var_export($role, '  ');
       $code[] = "  // Exported role: {$name}.";
       $code[] = "  \$roles[{$role_identifier}] = {$role_export};";
       $code[] = "";
@@ -239,6 +249,13 @@ function user_role_features_rebuild($module) {
 
 /**
  * Generate $rid => $role with role names untranslated.
+ *
+ * @param bool $builtin
+ *   If TRUE, built-in roles like 'anonymous user' and 'authenticated user' will
+ *   be included.
+ *
+ * @return string[]
+ *   Format: $[$rid] = $role_name
  */
 function _user_features_get_roles($builtin = TRUE) {
   $roles = array();
@@ -249,11 +266,13 @@ function _user_features_get_roles($builtin = TRUE) {
           $roles[$rid] = 'anonymous user';
         }
         break;
+
       case DRUPAL_AUTHENTICATED_RID:
         if ($builtin) {
           $roles[$rid] = 'authenticated user';
         }
         break;
+
       default:
         $roles[$rid] = $name;
         break;
@@ -264,6 +283,16 @@ function _user_features_get_roles($builtin = TRUE) {
 
 /**
  * Represent the current state of permissions as a perm to role name array map.
+ *
+ * @param bool $by_role
+ *   Parameter to control the return value. See below.
+ *
+ * @return string[][]|bool[][]
+ *   Format:
+ *   - If $by_role is TRUE: $[$permission_name][] = $role_name
+ *   - Otherwise: $[$role_name][$permission_name] = $status
+ *
+ * @todo The $by_role parameter name is misleading. See #3077296.
  */
 function _user_features_get_permissions($by_role = TRUE) {
   $map = user_permission_get_modules();

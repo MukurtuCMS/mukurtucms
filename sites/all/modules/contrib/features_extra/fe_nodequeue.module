@@ -127,6 +127,9 @@ function fe_nodequeue_features_export_render($module_name = '', $data) {
  */
 function fe_nodequeue_features_revert($module) {
   $defaults = features_get_default('fe_nodequeue', $module);
+  if (empty($defaults)) {
+    return;
+  }
 
   // Revert.
   foreach ($defaults as $object) {
@@ -180,7 +183,13 @@ function _fe_nodequeue_save_queue(array $settings) {
     if (is_int($role)) {
       continue;
     }
-    $settings['roles'][$index] = $roles[$role];
+    if (isset($roles[$role])) {
+      $settings['roles'][$index] = $roles[$role];
+    }
+    else {
+      // Do not attempt to assign a role which does not exist.
+      unset($settings['roles'][$index]);
+    }
   }
 
   // Simulate checkboxes.

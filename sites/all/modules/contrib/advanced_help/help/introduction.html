@@ -1,0 +1,76 @@
+<p>The <strong>Advanced Help</strong> module provides a framework that
+allows help texts to be viewed as integrated into a Drupal
+website.</p>
+
+<p>These help texts are stored in ordinary <code>.html</code>-files
+that lives in the file system (as opposed to the database).  These
+files are distributed from the project Drupal.org repo in the same
+package as the module or theme, and placed in a subdirectory named
+<code>help</code> in the project or theme directory.</p>
+  
+<p>The help texts can be placed in an hierarchical book, allowing for
+top-down navigation, or programmatically placed in popups that can be
+added to a page with plain text links or themed icon links.</p>
+
+<p>If there is a <code>README.md</code> or <code>README.txt</code> in
+the package, the content of that file may be shown as well.</p>
+  
+<p>Cross-linking book-sections,using fragment identifiers, works as
+one would expect.</p>
+
+<p>The help texts may be made searchable, but are not so by default (see
+“<a href="&topic:advanced_help/using-advanced-help#search&">Using advanced help</a>”
+for details).  If search is enabled, all help texts are fully
+indexed. This means that the entire contents of the advanced help set
+of pages can be searched for keywords.</p>
+
+<p>Modules and themes can even insert help texts into another
+project's hierarchy.</p>
+
+<p>May be integrated into <code>hook_help()</code> using companion
+module
+<a href="https://www.drupal.org/project/advanced_help_hint"><strong>Advanced Help Hint</strong></a>.</p>
+
+<h2 id="demo">Demonstration</h2>
+
+<p>The project comes with a small demo module named
+<strong>Advanced Help Example</strong> to demonstrate how it works.
+This example also shows how to make use of some of the css classes
+provided.</p>
+
+<p>For an example of a project that makes extensive use of the
+advanced help features, see the <strong>Views</strong> project.</p>
+
+<p>For an example of translation of help text, see the
+directory <code>translations/help/nb</code> in the <strong>Advanced
+Help Example</strong> submodule. For translation instructions, see the
+section named “<a href="&topic:advanced_help/translation&">Translating
+advanced help</a>”.</p>
+
+<h2 id="theme">Theme</h2>
+
+<p>The <strong>Advanced Help</strong> and
+<strong>Advanced Help Example</strong> modules implements
+<code>hook_admin_paths_alter()</code> to render the help
+texts rendered using the site's administrative theme.
+The <code>help.css</code> provided is created with the
+theme <strong>Seven</strong> in mind.  Using a different
+administrative theme may require you to create custom css for the
+site.</p>
+
+<p>The contributed module
+<a href="https://www.drupal.org/project/admin_path"><strong>Administrative pages</strong></a>
+seems to override <code>hook_admin_paths_alter()</code>.  If you use this module,
+you also need to navigate to
+<span class="nav">Configuration » User interface » Administrative pages</span>
+and declare these paths as administrative pages:</p>
+
+<pre>
+help/advanced_help/*
+help/help_example/*
+</pre>
+
+<p>You may attach your own custom css to any project that
+uses <strong>Advanced Help</strong> to provide help.</p>
+
+

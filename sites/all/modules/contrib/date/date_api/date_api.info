@@ -4,14 +4,15 @@ package = Date/Time
 core = 7.x
 php = 5.2
 
-stylesheets[all][] = date.css
-
 files[] = date_api.module
 files[] = date_api_sql.inc
 
-; Information added by Drupal.org packaging script on 2014-07-29
-version = "7.x-2.8"
+; Test coverage.
+files[] = tests/DateApiTestCase.test
+files[] = tests/DateApiUnitTestCase.test
+
+; Information added by Drupal.org packaging script on 2021-03-05
+version = "7.x-2.11"
 core = "7.x"
 project = "date"
-datestamp = "1406653438"
-
+datestamp = "1614952728"

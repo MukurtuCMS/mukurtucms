@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * @file
+ */
+
+/**
  * Fetch metadata on a specific page_wizard plugin.
  *
  * @param $page_wizard
@@ -53,7 +57,7 @@ function page_manager_get_wizard_cache($plugin) {
 }
 
 function page_manager_make_wizard_cache($plugin) {
-  $cache = new stdClass;
+  $cache = new stdClass();
   $cache->plugin = $plugin;
   if ($function = ctools_plugin_get_function($plugin, 'default cache')) {
     $function($cache);
@@ -93,7 +97,7 @@ function page_manager_page_wizard($name, $step = NULL) {
   }
 
   // Check for possibly more complex access callback on plugin.
-  if ($function = ctools_plugin_get_function($plugin, 'access callback') && !$function($plugin)) {
+  if (($function = ctools_plugin_get_function($plugin, 'access callback')) && !$function($plugin)) {
     return MENU_ACCESS_DENIED;
   }
 

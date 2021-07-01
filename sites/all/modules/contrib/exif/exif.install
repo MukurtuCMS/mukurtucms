@@ -64,6 +64,11 @@ function exif_requirements($phase) {
         'value' => $t('SXMP library is not available'),        
         'severity' => REQUIREMENT_WARNING,
       );
+      // Do not show the warning during install.
+      // It leads to an unnecessary click in the install process.
+      if ($phase == 'install') {
+        $requirements['SXMPFiles']['severity'] = REQUIREMENT_INFO;
+      }
     }
   }
   return $requirements;

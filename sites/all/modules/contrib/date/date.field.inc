@@ -15,10 +15,12 @@ function date_field_formatter_info() {
       'field types' => array('date', 'datestamp', 'datetime'),
       'settings' => array(
         'format_type' => 'long',
+        'custom_date_format' => '',
+        'fromto' => 'both',
         'multiple_number' => '',
         'multiple_from' => '',
         'multiple_to' => '',
-        'fromto' => 'both',
+        'show_remaining_days' => FALSE,
       ),
     ),
     'format_interval' => array(
@@ -27,6 +29,7 @@ function date_field_formatter_info() {
       'settings' => array(
         'interval' => 2,
         'interval_display' => 'time ago',
+        'use_end_date' => FALSE,
       ),
     ),
     'date_plain' => array(
@@ -48,9 +51,9 @@ function date_field_formatter_settings_form($field, $instance, $view_mode, $form
     case 'format_interval':
       $form = date_interval_formatter_settings_form($field, $instance, $view_mode, $form, $form_state);
       break;
+
     default:
       $form = date_default_formatter_settings_form($field, $instance, $view_mode, $form, $form_state);
-      break;
   }
   $context = array(
     'field' => $field,
@@ -72,9 +75,9 @@ function date_field_formatter_settings_summary($field, $instance, $view_mode) {
     case 'format_interval':
       $summary = date_interval_formatter_settings_summary($field, $instance, $view_mode);
       break;
+
     default:
       $summary = date_default_formatter_settings_summary($field, $instance, $view_mode);
-      break;
   }
   $context = array(
     'field' => $field,
@@ -88,28 +91,24 @@ function date_field_formatter_settings_summary($field, $instance, $view_mode) {
 
 /**
  * Implements hook_field_formatter_view().
- *
- * Useful values:
- *
- *   $entity->date_id
- *     If set, this will show only an individual date on a field with
- *     multiple dates. The value should be a string that contains
- *     the following values, separated with periods:
- *     - module name of the module adding the item
- *     - node nid
- *     - field name
- *     - delta value of the field to be displayed
- *     - other information the module's custom theme might need
- *
- *     Used by the calendar module and available for other uses.
- *     example: 'date:217:field_date:3:test'
- *
- *   $entity->date_repeat_show
- *     If true, tells the theme to show all the computed values
- *     of a repeating date. If not true or not set, only the
- *     start date and the repeat rule will be displayed.
  */
 function date_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  // Useful values:
+  // - $entity->date_id
+  //   If set, this will show only an individual date on a field with
+  //   multiple dates. The value should be a string that contains
+  //   the following values, separated with periods:
+  //   - module name of the module adding the item
+  //   - node nid
+  //   - field name
+  //   - delta value of the field to be displayed
+  //   - other information the module's custom theme might need
+  //   Used by the calendar module and available for other uses.
+  //   example: 'date:217:field_date:3:test'
+  // - $entity->date_repeat_show
+  //   If TRUE, tells the theme to show all the computed values
+  //   of a repeating date. If not TRUE or not set, only the
+  //   start date and the repeat rule will be displayed.
   $element = array();
   $settings = $display['settings'];
   $formatter = $display['type'];
@@ -169,11 +168,17 @@ function date_field_formatter_view($entity_type, $entity, $field, $instance, $la
             $element[$delta] = array('#markup' => $item['value']);
           }
           else {
-            $element[$delta] = array('#markup' => t('!start-date to !end-date', array('!start-date' => $item['value'], '!end-date' => $item['value2'])));
+            $element[$delta] = array(
+              '#markup' => t('!start-date to !end-date', array(
+                '!start-date' => $item['value'],
+                '!end-date' => $item['value2'],
+              )),
+            );
           }
         }
       }
       break;
+
     case 'format_interval':
       foreach ($items as $delta => $item) {
         if (!empty($entity->date_id) && !in_array($delta, $selected_deltas)) {
@@ -188,6 +193,7 @@ function date_field_formatter_view($entity_type, $entity, $field, $instance, $la
         }
       }
       break;
+
     default:
       foreach ($items as $delta => $item) {
         if (!empty($entity->date_id) && !in_array($delta, $selected_deltas)) {
@@ -198,14 +204,20 @@ function date_field_formatter_view($entity_type, $entity, $field, $instance, $la
           $variables['item'] = $item;
           $variables['dates'] = date_formatter_process($formatter, $entity_type, $entity, $field, $instance, $langcode, $item, $display);
           $variables['attributes'] = !empty($rdf_mapping) ? rdf_rdfa_attributes($rdf_mapping, $item['value']) : array();
+          $variables['show_remaining_days'] = isset($display['settings']['show_remaining_days']) ? $display['settings']['show_remaining_days'] : FALSE;
           $output = theme('date_display_combination', $variables);
           if (!empty($output)) {
             $element[$delta] = array('#markup' => $output);
           }
         }
       }
-      break;
   }
+
+  // Add the CSS stylesheet only if we have something to display.
+  if (!empty($element)) {
+    $element['#attached']['css'][] = drupal_get_path('module', 'date_api') . '/date.css';
+  }
+
   return $element;
 }
 
@@ -213,8 +225,7 @@ function date_field_formatter_view($entity_type, $entity, $field, $instance, $la
  * Implements hook_field_is_empty().
  */
 function date_field_is_empty($item, $field) {
-  // Sometimes a $item is a date object.
-  // Coming from repeating dates. Why??
+  // Sometimes a $item is a date object. Coming from repeating dates. Why??
   if (!is_array($item)) {
     return FALSE;
   }
@@ -231,10 +242,11 @@ function date_field_is_empty($item, $field) {
  * Implements hook_field_info().
  */
 function date_field_info() {
+  $granularity = array('year', 'month', 'day', 'hour', 'minute');
   $settings = array(
     'settings' => array(
       'todate' => '',
-      'granularity' => drupal_map_assoc(array('year', 'month', 'day', 'hour', 'minute')),
+      'granularity' => drupal_map_assoc($granularity),
       'tz_handling' => 'site',
       'timezone_db' => 'UTC',
     ),
@@ -250,26 +262,26 @@ function date_field_info() {
   );
   return array(
     'datetime' => array(
-      'label' => 'Date',
+      'label' => t('Date'),
       'description' => t('Store a date in the database as a datetime field, recommended for complete dates and times that may need timezone conversion.'),
       'default_widget' => 'date_select',
       'default_formatter' => 'date_default',
       'default_token_formatter' => 'date_plain',
-      ) + $settings,
+    ) + $settings,
     'date' => array(
-      'label' => 'Date (ISO format)',
+      'label' => t('Date (ISO format)'),
       'description' => t('Store a date in the database as an ISO date, recommended for historical or partial dates.'),
       'default_widget' => 'date_select',
       'default_formatter' => 'date_default',
       'default_token_formatter' => 'date_plain',
-      ) + $settings,
+    ) + $settings,
     'datestamp' => array(
-      'label' => 'Date (Unix timestamp)',
+      'label' => t('Date (Unix timestamp)'),
       'description' => t('Store a date in the database as a timestamp, deprecated format to support legacy data.'),
       'default_widget' => 'date_select',
       'default_formatter' => 'date_default',
       'default_token_formatter' => 'date_plain',
-      ) + $settings,
+    ) + $settings,
   );
 }
 
@@ -294,24 +306,24 @@ function date_field_widget_info() {
 
   $info = array(
     'date_select' => array(
-      'label' =>  t('Select list'),
+      'label' => t('Select list'),
       'field types' => array('date', 'datestamp', 'datetime'),
     ) + $settings,
     'date_text' => array(
-      'label' =>  t('Text field'),
+      'label' => t('Text field'),
       'field types' => array('date', 'datestamp', 'datetime'),
-     ) + $settings,
+    ) + $settings,
   );
 
   if (module_exists('date_popup')) {
     $info['date_popup'] = array(
-      'label' =>  t('Pop-up calendar'),
+      'label' => t('Pop-up calendar'),
       'field types' => array('date', 'datestamp', 'datetime'),
     ) + $settings;
   }
 
   // The date text widget should use an increment of 1.
-  $info['date_text']['increment'] = 1;
+  $info['date_text']['settings']['increment'] = 1;
 
   return $info;
 }
@@ -361,12 +373,13 @@ function date_field_validate($entity_type, $entity, $field, $instance, $langcode
     foreach ($items as $delta => $item) {
       if (is_array($item) && isset($item['value'])) {
         $process = date_process_values($field, $instance);
-        $date1 = new DateObject($item['value'], $item['timezone'], date_type_format($field['type']));
-        if (count($process) == 1 || (empty($item['value2']) && $item['value2'] !== 0)) {
-          $date2 = clone($date1);
+        $timezone = date_get_timezone($field['settings']['tz_handling'], isset($item['timezone']) ? $item['timezone'] : '');
+        $date1 = new DateObject($item['value'], $timezone, date_type_format($field['type']));
+        if (count($process) === 1 || (empty($item['value2']) && $item['value2'] !== 0)) {
+          $date2 = clone $date1;
         }
         else {
-          $date2 = new DateObject($item['value2'], $item['timezone'], date_type_format($field['type']));
+          $date2 = new DateObject($item['value2'], $timezone, date_type_format($field['type']));
         }
         $valid1 = $date1->validGranularity($field['settings']['granularity'], $flexible);
         $valid2 = $date2->validGranularity($field['settings']['granularity'], $flexible);
@@ -399,6 +412,7 @@ function date_field_presave($entity_type, $entity, $field, $instance, $langcode,
   if (empty($items)) {
     return;
   }
+
   // Add some information needed to interpret token values.
   $values = $items;
   foreach ($values as $delta => $item) {
@@ -442,13 +456,20 @@ function date_field_update($entity_type, $entity, $field, $instance, $langcode, 
 
 /**
  * Implements hook_field_instance_settings_form().
- *
- * Wrapper functions for date administration, included only when processing
- * field settings.
  */
 function date_field_instance_settings_form($field, $instance) {
+  // Wrapper functions for date administration, included only when processing
+  // field settings.
   module_load_include('inc', 'date', 'date_admin');
   return _date_field_instance_settings_form($field, $instance);
+}
+
+/**
+ * Form validation handler for _date_field_instance_settings_form().
+ */
+function date_field_instance_settings_form_validate(&$form, &$form_state) {
+  module_load_include('inc', 'date', 'date_admin');
+  return _date_field_instance_settings_form_validate($form, $form_state);
 }
 
 /**
@@ -460,6 +481,14 @@ function date_field_widget_settings_form($field, $instance) {
 }
 
 /**
+ * Form validation handler for _date_field_widget_settings_form().
+ */
+function date_field_widget_settings_form_validate(&$form, &$form_state) {
+  module_load_include('inc', 'date', 'date_admin');
+  return _date_field_widget_settings_form_validate($form, $form_state);
+}
+
+/**
  * Implements hook_field_settings_form().
  */
 function date_field_settings_form($field, $instance, $has_data) {
@@ -468,16 +497,23 @@ function date_field_settings_form($field, $instance, $has_data) {
 }
 
 /**
+ * Form validation handler for _date_field_settings_form().
+ */
+function date_field_settings_validate(&$form, &$form_state) {
+  module_load_include('inc', 'date', 'date_admin');
+  return _date_field_settings_validate($form, $form_state);
+}
+
+/**
  * Implements hook_content_migrate_field_alter().
- *
- * Use this to tweak the conversion of field settings from the D6 style to the
- * D7 style for specific situations not handled by basic conversion, as when
- * field types or settings are changed.
- *
- * $field_value['widget_type'] is available to see what widget type was
- * originally used.
  */
 function date_content_migrate_field_alter(&$field_value, $instance_value) {
+  // Use this to tweak the conversion of field settings from the D6 style to the
+  // D7 style for specific situations not handled by basic conversion, as when
+  // field types or settings are changed.
+  //
+  // $field_value['widget_type'] is available to see what widget type was
+  // originally used.
   switch ($field_value['module']) {
     case 'date':
       // Those settings do not exist anymore, or have been moved to the instance
@@ -490,15 +526,13 @@ function date_content_migrate_field_alter(&$field_value, $instance_value) {
 
 /**
  * Implements hook_content_migrate_instance_alter().
- *
- * Use this to tweak the conversion of instance or widget settings from the D6
- * style to the D7 style for specific situations not handled by basic
- * conversion, as when formatter or widget names or settings are changed.
  */
 function date_content_migrate_instance_alter(&$instance_value, $field_value) {
+  // Use this to tweak the conversion of instance or widget settings from the D6
+  // style to the D7 style for specific situations not handled by basic
+  // conversion, as when formatter or widget names or settings are changed.
   switch ($instance_value['widget']['module']) {
     case 'date':
-
       // Some settings have been moved from field to instance.
       $instance_value['widget']['settings']['repeat_collapsed'] = $field_value['settings']['repeat_collapsed'];
 

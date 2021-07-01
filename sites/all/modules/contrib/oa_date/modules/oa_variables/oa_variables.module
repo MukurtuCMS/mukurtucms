@@ -1,0 +1,67 @@
+<?php
+/**
+ * @file
+ * Code for the OA variables feature.
+ */
+
+include_once 'oa_variables.features.inc';
+
+/* Helper Functions to manipulate space-specific variables */
+
+/**
+ * Return the value of a variable in the current (or specified) space
+ * @param $key
+ * @param null $default
+ * @return mixed
+ */
+function oa_variable_get($key, $default = NULL, $gid = NULL) {
+  list($realm_name, $realm_key) = _oa_variable_realm($gid);
+  return variable_realm_get($realm_name, $realm_key, $key, $default);
+}
+
+/**
+ * Set a variable in the current (or specified) space
+ * @param $key
+ * @param $value
+ */
+function oa_variable_set($key, $value, $gid = NULL) {
+  list($realm_name, $realm_key) = _oa_variable_realm($gid);
+  variable_realm_set($realm_name, $realm_key, $key, $value);
+}
+
+/**
+ * Helper function to return variable realm data
+ * @param null $gid
+ * @return array
+ */
+function _oa_variable_realm($gid = NULL) {
+  $gid = isset($gid) ? $gid : oa_core_get_space_context();
+  return array('og', 'node_' . $gid);
+}
+
+/**
+ * Implements hook_entity_insert().
+ */
+function oa_variables_entity_insert($entity, $type) {
+  if ($type == 'taxonomy_vocabulary') {
+    variable_cache_clear();
+  }
+}
+
+/**
+ * Implements hook_entity_delete().
+ */
+function oa_variables_entity_delete($entity, $type) {
+  if ($type == 'taxonomy_vocabulary') {
+    variable_cache_clear();
+  }
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function oa_variables_entity_update($entity, $type) {
+  if ($type == 'taxonomy_vocabulary') {
+    variable_cache_clear();
+  }
+}

@@ -14,14 +14,35 @@ class views_plugin_style_rdf extends views_plugin_style {
   function option_definition() {
     $options = parent::option_definition();
     $author_default = isset($GLOBALS['user']->name) ? $GLOBALS['user']->name : variable_get('anonymous', t('Anonymous'));
-    $options['vocabulary'] = array('default' => 'foaf', 'translatable' => FALSE);
-    $options['field_output'] = array('default' => 'normal', 'translatable' => FALSE);
-    $options['plaintext_output'] = array('default' => TRUE, 'translatable' => FALSE);
-    $options['escape_as_CDATA'] = array('default' => 'no', 'translatable' => FALSE);
-    $options['content_type'] = array('default' => 'text/xml', 'translatable' => FALSE);
+    $options['vocabulary'] = array(
+      'default' => 'foaf',
+      'translatable' => FALSE
+    );
+    $options['field_output'] = array(
+      'default' => 'normal',
+      'translatable' => FALSE
+    );
+    $options['plaintext_output'] = array(
+      'default' => TRUE,
+      'translatable' => FALSE
+    );
+    $options['escape_as_CDATA'] = array(
+      'default' => 'no',
+      'translatable' => FALSE
+    );
+    $options['content_type'] = array(
+      'default' => 'text/xml',
+      'translatable' => FALSE
+    );
     $options['header'] = array('default' => NULL, 'translatable' => FALSE);
-    $options['author'] = array('default' => $author_default, 'translatable' => FALSE);
-    $options['using_views_api_mode'] = array('default' => FALSE, 'translatable' => FALSE);
+    $options['author'] = array(
+      'default' => $author_default,
+      'translatable' => FALSE
+    );
+    $options['using_views_api_mode'] = array(
+      'default' => FALSE,
+      'translatable' => FALSE
+    );
     //$options['action_on_missing_field'] = array('default' => 'none', 'translatable' => FALSE);
     return $options;
   }
@@ -37,7 +58,7 @@ class views_plugin_style_rdf extends views_plugin_style {
       '#options' => views_rdf_views_formats(),
       '#default_value' => $this->options['vocabulary'],
     );
-    $form['field_output']  = array(
+    $form['field_output'] = array(
       '#type' => 'radios',
       '#title' => t('Field output'),
       '#description' => t('For each row in the view, fields can be output as either the field rendered by Views, or by the raw content of the field.'),
@@ -50,7 +71,7 @@ class views_plugin_style_rdf extends views_plugin_style {
       '#default_value' => $this->options['plaintext_output'],
       '#description' => t('For each row in the view, strip all markup from the field output.'),
     );
-    $form['escape_as_CDATA']  = array(
+    $form['escape_as_CDATA'] = array(
       '#type' => 'radios',
       '#title' => t('Escape row content as CDATA'),
       '#description' => t('For each row in the view, escape the row field content as XML CDATA sections.'),
@@ -67,8 +88,8 @@ class views_plugin_style_rdf extends views_plugin_style {
       '#type' => 'radios',
       '#title' => t('Content-Type'),
       '#options' => array(
-         'default' => t('Default: application/rdf+xml for FOAF and SIOC documents.'),
-         'text/xml' => t('text/xml'),
+        'default' => t('Default: application/rdf+xml for FOAF and SIOC documents.'),
+        'text/xml' => t('text/xml'),
       ),
       '#default_value' => $this->options['content_type'],
       '#description' => t('The Content-Type header that will be sent with the XML output.'),
@@ -121,6 +142,10 @@ class views_plugin_style_rdf extends views_plugin_style {
     }
     unset($view->row_index);
 
-    return theme($this->theme_functions(), array('view' => $view, 'options' => $options, 'rows' => $rows));
+    return theme($this->theme_functions(), array(
+        'view' => $view,
+        'options' => $options,
+        'rows' => $rows
+      ));
   }
 }

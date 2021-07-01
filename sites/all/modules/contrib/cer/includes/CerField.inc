@@ -144,14 +144,12 @@ abstract class CerField extends FieldInstance {
     $instances = &drupal_static(__METHOD__);
     
     if (! isset($instances[$identifier])) {
-      list ($entity_type, $bundle, $field) = explode(':', $identifier);
-
       $info = self::getPluginInfo($identifier);
       if ($info) {
         $instances[$identifier] = new $info['class']($info);
       }
       else {
-        throw new Exception(t('Cannot get instance of invalid plugin %identifier.', array('%identifier' => $identifier)));
+        throw new Exception("Cannot get instance of invalid plugin $identifier.");
       }
     }
 

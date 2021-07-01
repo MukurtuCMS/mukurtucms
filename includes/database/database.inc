@@ -184,7 +184,7 @@
  *
  * @see http://php.net/manual/book.pdo.php
  */
-abstract class DatabaseConnection extends PDO {
+abstract class DatabaseConnection {
 
   /**
    * The database target this connection is for.
@@ -262,6 +262,13 @@ abstract class DatabaseConnection extends PDO {
   protected $temporaryNameIndex = 0;
 
   /**
+   * The actual PDO connection.
+   *
+   * @var \PDO
+   */
+  protected $connection;
+
+  /**
    * The connection information for this connection object.
    *
    * @var array
@@ -296,6 +303,27 @@ abstract class DatabaseConnection extends PDO {
    */
   protected $prefixReplace = array();
 
+  /**
+   * List of escaped database, table, and field names, keyed by unescaped names.
+   *
+   * @var array
+   */
+  protected $escapedNames = array();
+
+  /**
+   * List of escaped aliases names, keyed by unescaped aliases.
+   *
+   * @var array
+   */
+  protected $escapedAliases = array();
+
+  /**
+   * List of un-prefixed table names, keyed by prefixed table names.
+   *
+   * @var array
+   */
+  protected $unprefixedTablesMap = array();
+
   function __construct($dsn, $username, $password, $driver_options = array()) {
     // Initialize and prepare the connection prefix.
     $this->setPrefix(isset($this->connectionOptions['prefix']) ? $this->connectionOptions['prefix'] : '');
@@ -304,12 +332,25 @@ abstract class DatabaseConnection extends PDO {
     $driver_options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
 
     // Call PDO::__construct and PDO::setAttribute.
-    parent::__construct($dsn, $username, $password, $driver_options);
+    $this->connection = new PDO($dsn, $username, $password, $driver_options);
 
     // Set a Statement class, unless the driver opted out.
     if (!empty($this->statementClass)) {
-      $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array($this->statementClass, array($this)));
+      $this->connection->setAttribute(PDO::ATTR_STATEMENT_CLASS, array($this->statementClass, array($this)));
     }
+  }
+
+  /**
+   * Proxy possible direct calls to the \PDO methods.
+   *
+   * Since PHP8.0 the signature of the the \PDO::query() method has changed,
+   * and this class can't extending \PDO any more.
+   *
+   * However, for the BC, proxy any calls to the \PDO methods to the actual
+   * PDO connection object.
+   */
+  public function __call($name, $arguments) {
+    return call_user_func_array(array($this->connection, $name), $arguments);
   }
 
   /**
@@ -324,7 +365,9 @@ abstract class DatabaseConnection extends PDO {
     // Destroy all references to this connection by setting them to NULL.
     // The Statement class attribute only accepts a new value that presents a
     // proper callable, so we reset it to PDOStatement.
-    $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('PDOStatement', array()));
+    if (!empty($this->statementClass)) {
+      $this->connection->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('PDOStatement', array()));
+    }
     $this->schema = NULL;
   }
 
@@ -428,6 +471,13 @@ abstract class DatabaseConnection extends PDO {
     $this->prefixReplace[] = $this->prefixes['default'];
     $this->prefixSearch[] = '}';
     $this->prefixReplace[] = '';
+
+    // Set up a map of prefixed => un-prefixed tables.
+    foreach ($this->prefixes as $table_name => $prefix) {
+      if ($table_name !== 'default') {
+        $this->unprefixedTablesMap[$prefix . $table_name] = $table_name;
+      }
+    }
   }
 
   /**
@@ -464,6 +514,17 @@ abstract class DatabaseConnection extends PDO {
   }
 
   /**
+   * Gets a list of individually prefixed table names.
+   *
+   * @return array
+   *   An array of un-prefixed table names, keyed by their fully qualified table
+   *   names (i.e. prefix + table_name).
+   */
+  public function getUnprefixedTablesMap() {
+    return $this->unprefixedTablesMap;
+  }
+
+  /**
    * Prepares a query string and returns the prepared statement.
    *
    * This method caches prepared statements, reusing them when
@@ -480,7 +541,7 @@ abstract class DatabaseConnection extends PDO {
     $query = $this->prefixTables($query);
 
     // Call PDO::prepare.
-    return parent::prepare($query);
+    return $this->connection->prepare($query);
   }
 
   /**
@@ -692,7 +753,7 @@ abstract class DatabaseConnection extends PDO {
         case Database::RETURN_AFFECTED:
           return $stmt->rowCount();
         case Database::RETURN_INSERT_ID:
-          return $this->lastInsertId();
+          return $this->connection->lastInsertId();
         case Database::RETURN_NULL:
           return;
         default:
@@ -919,11 +980,14 @@ abstract class DatabaseConnection extends PDO {
    * For some database drivers, it may also wrap the table name in
    * database-specific escape characters.
    *
-   * @return
+   * @return string
    *   The sanitized table name string.
    */
   public function escapeTable($table) {
-    return preg_replace('/[^A-Za-z0-9_.]+/', '', $table);
+    if (!isset($this->escapedNames[$table])) {
+      $this->escapedNames[$table] = preg_replace('/[^A-Za-z0-9_.]+/', '', $table);
+    }
+    return $this->escapedNames[$table];
   }
 
   /**
@@ -933,11 +997,14 @@ abstract class DatabaseConnection extends PDO {
    * For some database drivers, it may also wrap the field name in
    * database-specific escape characters.
    *
-   * @return
+   * @return string
    *   The sanitized field name string.
    */
   public function escapeField($field) {
-    return preg_replace('/[^A-Za-z0-9_.]+/', '', $field);
+    if (!isset($this->escapedNames[$field])) {
+      $this->escapedNames[$field] = preg_replace('/[^A-Za-z0-9_.]+/', '', $field);
+    }
+    return $this->escapedNames[$field];
   }
 
   /**
@@ -948,11 +1015,14 @@ abstract class DatabaseConnection extends PDO {
    * DatabaseConnection::escapeTable(), this doesn't allow the period (".")
    * because that is not allowed in aliases.
    *
-   * @return
+   * @return string
    *   The sanitized field name string.
    */
   public function escapeAlias($field) {
-    return preg_replace('/[^A-Za-z0-9_]+/', '', $field);
+    if (!isset($this->escapedAliases[$field])) {
+      $this->escapedAliases[$field] = preg_replace('/[^A-Za-z0-9_]+/', '', $field);
+    }
+    return $this->escapedAliases[$field];
   }
 
   /**
@@ -1066,7 +1136,7 @@ abstract class DatabaseConnection extends PDO {
         $rolled_back_other_active_savepoints = TRUE;
       }
     }
-    parent::rollBack();
+    $this->connection->rollBack();
     if ($rolled_back_other_active_savepoints) {
       throw new DatabaseTransactionOutOfOrderException();
     }
@@ -1094,7 +1164,7 @@ abstract class DatabaseConnection extends PDO {
       $this->query('SAVEPOINT ' . $name);
     }
     else {
-      parent::beginTransaction();
+      $this->connection->beginTransaction();
     }
     $this->transactionLayers[$name] = $name;
   }
@@ -1145,7 +1215,7 @@ abstract class DatabaseConnection extends PDO {
       // If there are no more layers left then we should commit.
       unset($this->transactionLayers[$name]);
       if (empty($this->transactionLayers)) {
-        if (!parent::commit()) {
+        if (!$this->connection->commit()) {
           throw new DatabaseTransactionCommitFailedException();
         }
       }
@@ -1229,7 +1299,7 @@ abstract class DatabaseConnection extends PDO {
    * Returns the version of the database server.
    */
   public function version() {
-    return $this->getAttribute(PDO::ATTR_SERVER_VERSION);
+    return $this->connection->getAttribute(PDO::ATTR_SERVER_VERSION);
   }
 
   /**
@@ -1313,6 +1383,39 @@ abstract class DatabaseConnection extends PDO {
    *   also larger than the $existing_id if one was passed in.
    */
   abstract public function nextId($existing_id = 0);
+
+  /**
+   * Checks whether utf8mb4 support is configurable in settings.php.
+   *
+   * @return bool
+   */
+  public function utf8mb4IsConfigurable() {
+    // Since 4 byte UTF-8 is not supported by default, there is nothing to
+    // configure.
+    return FALSE;
+  }
+
+  /**
+   * Checks whether utf8mb4 support is currently active.
+   *
+   * @return bool
+   */
+  public function utf8mb4IsActive() {
+    // Since 4 byte UTF-8 is not supported by default, there is nothing to
+    // activate.
+    return FALSE;
+  }
+
+  /**
+   * Checks whether utf8mb4 support is available on the current database system.
+   *
+   * @return bool
+   */
+  public function utf8mb4IsSupported() {
+    // By default we assume that the database backend may not support 4 byte
+    // UTF-8.
+    return FALSE;
+  }
 }
 
 /**
@@ -1641,12 +1744,16 @@ abstract class Database {
    *
    * @param $key
    *   The connection key.
+   * @param $close
+   *   Whether to close the connection.
    * @return
    *   TRUE in case of success, FALSE otherwise.
    */
-  final public static function removeConnection($key) {
+  final public static function removeConnection($key, $close = TRUE) {
     if (isset(self::$databaseInfo[$key])) {
-      self::closeConnection(NULL, $key);
+      if ($close) {
+        self::closeConnection(NULL, $key);
+      }
       unset(self::$databaseInfo[$key]);
       return TRUE;
     }
@@ -2784,13 +2891,29 @@ function db_field_exists($table, $field) {
  *
  * @param $table_expression
  *   An SQL expression, for example "simpletest%" (without the quotes).
- *   BEWARE: this is not prefixed, the caller should take care of that.
  *
  * @return
  *   Array, both the keys and the values are the matching tables.
  */
 function db_find_tables($table_expression) {
   return Database::getConnection()->schema()->findTables($table_expression);
+}
+
+/**
+ * Finds all tables that are like the specified base table name. This is a
+ * backport of the change made to db_find_tables in Drupal 8 to work with
+ * virtual, un-prefixed table names. The original function is retained for
+ * Backwards Compatibility.
+ * @see https://www.drupal.org/node/2552435
+ *
+ * @param $table_expression
+ *   An SQL expression, for example "simpletest%" (without the quotes).
+ *
+ * @return
+ *   Array, both the keys and the values are the matching tables.
+ */
+function db_find_tables_d8($table_expression) {
+  return Database::getConnection()->schema()->findTablesD8($table_expression);
 }
 
 function _db_create_keys_sql($spec) {

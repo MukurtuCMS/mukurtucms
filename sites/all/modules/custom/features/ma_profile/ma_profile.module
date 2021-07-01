@@ -22,9 +22,53 @@ function ma_profile_form_user_register_form_alter(&$form, &$form_state, $form_id
   }
 
   // Only show communities for the group ref field
-  $communities_only = $form['og_user_node'][LANGUAGE_NONE]['#options']['Community'];
-  $form['og_user_node'][LANGUAGE_NONE]['#options'] = $communities_only;
 
+  //  $communities_only = $form['og_user_node'][LANGUAGE_NONE]['#options']['Community'];
+  //  dpm($communities_only);
+  //  $form['og_user_node'][LANGUAGE_NONE]['#options'] = $communities_only;
+
+}
+
+/**
+ * Implements hook_query_og_alter().
+ */
+function ma_profile_query_og_alter(QueryAlterableInterface $query) {
+    // For some reason the 'Do not show on registration page' functionality isn't filtering our values
+    // Here we stick in the condition that makes it happen. This should be removed once we identify the actual cause
+    // of the problem.
+
+    // These conditions are taken straight from og_register_query_og_alter
+    global $user;
+    if ($user->uid) {
+        // User is authenticated.
+        return;
+    }
+
+    if (!field_info_field(OG_REGISTER_FIELD)) {
+        // No register field exists.
+        return;
+    }
+
+    $handler = $query->alterMetaData['entityreference_selection_handler'];
+    $field = $handler->field;
+    $instance = $handler->instance;
+
+    if ($instance['entity_type'] != 'user') {
+        // Field is not attached to the user entity.
+        return;
+    }
+
+    // Loop through conditions, add if necessary
+    $conditions = &$query->conditions();
+    foreach ($conditions as $key => $condition) {
+        if(isset($condition['field']) && isset($condition['value'])) {
+            if($condition['field'] == 'node.nid' && $condition['value'] == -1 && $condition['operator'] == '=') {
+                return;
+            }
+        }
+    }
+
+    $conditions[] = array("field" => 'node.nid', "value" => -1, "operator" => '=');
 }
 
 /**
@@ -44,36 +88,24 @@ function ma_profile_form_user_profile_form_alter(&$form, &$form_state, $form_id)
   // Only show communities for the group ref field, and add a submit handler to add the user's protocols back after the form is submitted
   $communities_only = $form['og_user_node'][LANGUAGE_NONE]['#options']['Community'];
   $form['og_user_node'][LANGUAGE_NONE]['#options'] = $communities_only;
-  $form['#submit'][] = 'ma_profile_add_protocols_back_in';
-}
-
-
-/**
- * Custom submit handler
- */
-function ma_profile_add_protocols_back_in(&$form, &$form_state) {
-  $non_community_groups = array();
-  foreach ($form['og_user_node'][LANGUAGE_NONE]['#default_value'] as $gid) {
-    $group = node_load($gid);
-    if ($group->type <> 'community') {
-      $non_community_groups[] = array('target_id' => $gid);
-    }
-  }
-  if (isset($non_community_groups)) {
-    // Unable to get to get form_set_value to work here or in a validation hook, so save the non-community groups to a $session var and add them back in on the user_presave
-    $_SESSION['non-community_groups_to_add_back'] = $non_community_groups;
-  }
 }
 
 /**
  * Implements hook_user_presave().
  */
 function ma_profile_user_presave(&$edit, $account, $category) {
-
-  // Add back in any non-community groups from ma_profile_add_protocols_back_in
-  if (isset ($_SESSION['non-community_groups_to_add_back'])) {
-    $edit['og_user_node'][LANGUAGE_NONE] = array_merge($edit['og_user_node'][LANGUAGE_NONE], $_SESSION['non-community_groups_to_add_back']);
-    unset ($_SESSION['non-community_groups_to_add_back']);
+  // Preserve og group memberships in our user field.
+  // Don't do this for new accounts (uid == 0).
+  // og_get_groups_by_user returns *all* groups for uid 0.
+  if (isset($account->uid) && $account->uid > 0) {
+    $og_user_node = array();
+    $user_groups = og_get_groups_by_user($account);
+    if (!empty($user_groups['node'])) {
+      foreach ($user_groups['node'] as $gid) {
+        $og_user_node[] = array('target_id' => $gid);
+      }
+    }
+    $edit['og_user_node'][LANGUAGE_NONE] = $og_user_node;
   }
 }
 
@@ -82,16 +114,19 @@ function ma_profile_user_presave(&$edit, $account, $category) {
  */
 function ma_profile_user_view($account, $view_mode, $langcode) {
   if ($view_mode == 'full') {
-
+    $empty = TRUE;
     // Only show Community nodes (not CPs) when viewing a user profile page under the "Communities" field (which is actually a field that contains all the users groups)
-    foreach ($account->og_user_node[LANGUAGE_NONE] as $group) {
-      $group_node = node_load ($group['target_id']);
-      if ($group_node->type <> 'community') {
-        unset ($account->content['og_user_node'][0]['#items'][$group['target_id']]);
+    foreach ($account->og_user_node[LANGUAGE_NONE] as $delta => $group) {
+      if ($group['entity']->type <> 'community') {
+        unset($account->og_user_node[LANGUAGE_NONE][$delta]);
+        unset($account->content['og_user_node']['#items'][$delta]);
+      } else {
+        $empty = FALSE;
       }
     }
+
     // If no groups are left, then hide the whole field
-    if (count($account->content['og_user_node'][0]['#items']) == 0) {
+    if ($empty) {
       unset ($account->content['og_user_node']);
     }
   }

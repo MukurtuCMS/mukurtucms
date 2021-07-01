@@ -1,4 +1,3 @@
-
 div.panel-pane div.admin-links {
   font-size: xx-small;
   margin-right: 1em;
@@ -38,11 +37,6 @@ div.panel-pane:hover div.panel-hide {
   position: absolute;
   z-index: 200;
   margin-top: -1.5em;
-}
-
-div.panel-pane div.node {
-  margin: 0;
-  padding: 0;
 }
 
 div.panel-pane div.feed a {

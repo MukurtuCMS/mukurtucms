@@ -12,19 +12,21 @@ class views_php_handler_filter extends views_handler_filter {
   /**
    * Implements views_handler#can_expose().
    */
-  function can_expose() { return FALSE; }
+  public function can_expose() {
+    return FALSE;
+  }
 
   /**
    * Implements views_object#admin_summary().
    */
-  function admin_summary() {
+  public function admin_summary() {
     return t('PHP');
   }
 
   /**
    * Implements views_object#option_definition().
    */
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $options['use_php_setup'] = array('default' => FALSE);
     $options['php_setup'] = array('default' => '');
@@ -35,7 +37,7 @@ class views_php_handler_filter extends views_handler_filter {
   /**
    * Implements views_handler#option_definition().
    */
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
 
     $form += views_php_form_element($this,
@@ -53,7 +55,7 @@ class views_php_handler_filter extends views_handler_filter {
   /**
    * Implements views_handler_filter#query().
    */
-  function query() {
+  public function query() {
     // Inform views_php_views_pre_execute() to seize control over the query.
     $this->view->views_php = TRUE;
   }
@@ -62,10 +64,13 @@ class views_php_handler_filter extends views_handler_filter {
    *
    * @see views_php_views_pre_execute()
    */
-  function php_pre_execute() {
-    // Ecexute static PHP code.
+  public function php_pre_execute() {
+    // Execute static PHP code.
     if (!empty($this->options['php_setup'])) {
-      $function = create_function('$view, $handler, &$static', $this->options['php_setup'] . ';');
+      $code = $this->options['php_setup'] . ';';
+      $function = function ($view, $handler, &$static) use ($code) {
+        eval($code);
+      };
       ob_start();
       $function($this->view, $this, $this->php_static_variable);
       ob_end_clean();
@@ -76,13 +81,16 @@ class views_php_handler_filter extends views_handler_filter {
    *
    * @see views_php_views_post_execute()
    */
-  function php_post_execute() {
+  public function php_post_execute() {
     // Evaluate the PHP code.
     if (!empty($this->options['php_filter'])) {
-      $function = create_function('$view, $handler, &$static, $row, $data', $this->options['php_filter'] . ';');
+      $code = $this->options['php_filter'] . ';';
+      $function = function ($view, $handler, &$static, $row, $data) use ($code) {
+        return eval($code);
+      };
       ob_start();
       foreach ($this->view->result as $i => $row) {
-        $normalized_row = new stdClass;
+        $normalized_row = new stdClass();
         foreach ($this->view->display_handler->get_handlers('field') as $field => $handler) {
           $normalized_row->$field = isset($row->{$handler->field_alias}) ? $row->{$handler->field_alias} : NULL;
         }
@@ -93,4 +101,5 @@ class views_php_handler_filter extends views_handler_filter {
       ob_end_clean();
     }
   }
+
 }

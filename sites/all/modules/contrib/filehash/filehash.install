@@ -1,0 +1,62 @@
+<?php
+
+/**
+ * @file
+ * Install and uninstall functions for the filehash module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function filehash_schema() {
+  $schema['filehash'] = array(
+    'description' => 'Store hashes for each uploaded file.',
+    'fields' => array(
+      'fid' => array(
+        'description' => 'Primary key: {file_managed}.fid.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'md5' => array(
+        'description' => 'MD5 hash for this file.',
+        'type' => 'char',
+        'length' => 32,
+        'not null' => FALSE,
+      ),
+      'sha1' => array(
+        'description' => 'SHA-1 hash for this file.',
+        'type' => 'char',
+        'length' => 40,
+        'not null' => FALSE,
+      ),
+      'sha256' => array(
+        'description' => 'SHA-256 hash for this file.',
+        'type' => 'char',
+        'length' => 64,
+        'not null' => FALSE,
+      ),
+    ),
+    'primary key' => array('fid'),
+    'indexes' => array(
+      'md5_idx' => array('md5'),
+      'sha1_idx' => array('sha1'),
+      'sha256_idx' => array('sha256'),
+    ),
+    'foreign keys' => array(
+      'fid' => array(
+        'table' => 'file_managed',
+        'columns' => array('fid' => 'fid'),
+      ),
+    ),
+  );
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function filehash_uninstall() {
+  variable_del('filehash_algos');
+  variable_del('filehash_dedupe');
+}

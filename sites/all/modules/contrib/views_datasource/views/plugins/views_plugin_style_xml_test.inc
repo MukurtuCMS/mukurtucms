@@ -13,10 +13,22 @@ class views_plugin_style_xml_test extends views_plugin_style {
   function option_definition() {
     $options = parent::option_definition();
     $options['schema'] = array('default' => 'raw', 'translatable' => TRUE);
-    $options['root_element'] = array('default' => 'node', 'translatable' => TRUE);
-    $options['field_output'] = array('default' => 'normal', 'translatable' => TRUE);
-    $options['element_output'] = array('default' => 'nested', 'translatable' => TRUE);
-    $options['escape_as_CDATA'] = array('default' => 'yes', 'translatable' => TRUE);
+    $options['root_element'] = array(
+      'default' => 'node',
+      'translatable' => TRUE
+    );
+    $options['field_output'] = array(
+      'default' => 'normal',
+      'translatable' => TRUE
+    );
+    $options['element_output'] = array(
+      'default' => 'nested',
+      'translatable' => TRUE
+    );
+    $options['escape_as_CDATA'] = array(
+      'default' => 'yes',
+      'translatable' => TRUE
+    );
     return $options;
   }
 
@@ -29,7 +41,11 @@ class views_plugin_style_xml_test extends views_plugin_style {
       '#type' => 'radios',
       '#title' => t('XML schema'),
       '#description' => t('The schema or format of the XML data document.'),
-      '#options' => array('raw' => t('Raw XML'), 'opml' => t('OPML'), 'atom' => t('Atom')),
+      '#options' => array(
+        'raw' => t('Raw XML'),
+        'opml' => t('OPML'),
+        'atom' => t('Atom')
+      ),
       '#default_value' => $this->options['schema'],
     );
     $form['root_element'] = array(
@@ -41,21 +57,24 @@ class views_plugin_style_xml_test extends views_plugin_style {
       //'#dependency' => array('radios:schema' => array('raw')),
 
     );
-    $form['field_output']  = array(
+    $form['field_output'] = array(
       '#type' => 'radios',
       '#title' => t('Field output'),
       '#description' => t('For each row in the view, fields can be output as either the field rendered by Views, or by the raw content of the field.'),
       '#options' => array('normal' => t('Normal'), 'raw' => t('Raw')),
       '#default_value' => $this->options['field_output'],
     );
-    $form['element_output']  = array(
+    $form['element_output'] = array(
       '#type' => 'radios',
       '#title' => t('Element output'),
       '#description' => t('For each row in the view, fields can be output as either nested XML child elements, or attributes of the XML element.'),
-      '#options' => array('nested' => t('Nested'), 'attributes' => t('Attributes')),
+      '#options' => array(
+        'nested' => t('Nested'),
+        'attributes' => t('Attributes')
+      ),
       '#default_value' => $this->options['element_output'],
     );
-    $form['escape_as_CDATA']  = array(
+    $form['escape_as_CDATA'] = array(
       '#type' => 'radios',
       '#title' => t('Escape row content as CDATA'),
       '#description' => t('For each row in the view, escape the row field content as XML CDATA sections.'),
@@ -90,10 +109,14 @@ class views_plugin_style_xml_test extends views_plugin_style {
     $rows = array();
 
     foreach ($view->result as $row) {
-    //views_xml_test_debug_stop($row);
+      //views_xml_test_debug_stop($row);
       $rows[] = _views_xml_test_render_fields($view, $row);
     }
     //views_xml_test_debug_stop($rows);
-    return theme($this->theme_functions(), array('view' => $this->view, 'options' => $this->options, 'rows' => $rows));
+    return theme($this->theme_functions(), array(
+        'view' => $this->view,
+        'options' => $this->options,
+        'rows' => $rows
+      ));
   }
 }

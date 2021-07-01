@@ -84,11 +84,9 @@ function homebox_features_revert($module = NULL) {
   // Get homebox pages from feature
   if (module_hook($module, 'homebox')) {
     $pages = module_invoke($module, 'homebox');
-    foreach($pages as $page) {
-      $pageToSave = new stdClass();
-      $pageToSave->name = $page['title'];
-      $pageToSave->settings = $page;
-      $saved = homebox_save_page($pageToSave);
+
+    foreach ($pages as $name => $settings) {
+      homebox_delete_page($name);
     }
   }
 }

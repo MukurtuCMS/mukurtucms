@@ -2,13 +2,14 @@ name = Rules UI
 description = Administrative interface for managing rules.
 package = Rules
 core = 7.x
-files[] = rules_admin.module
-files[] = rules_admin.inc
 dependencies[] = rules
+configure = admin/config/workflow/rules
 
-; Information added by Drupal.org packaging script on 2015-01-08
-version = "7.x-2.8"
+; Test cases
+files[] = tests/rules_admin.test
+
+; Information added by Drupal.org packaging script on 2019-01-24
+version = "7.x-2.12"
 core = "7.x"
 project = "rules"
-datestamp = "1420734780"
-
+datestamp = "1548305586"

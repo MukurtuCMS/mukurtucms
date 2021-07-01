@@ -1,0 +1,215 @@
+<?php
+
+/**
+ * @file
+ * Contains FeedsEntityProcessorDateTest.
+ */
+
+/**
+ * Tests importing entities with properties of various data types.
+ */
+class FeedsEntityProcessorDateTest extends FeedsWebTestCase {
+
+  /**
+   * The created feeds_entity_processor_test_type bundle.
+   *
+   * @var string
+   */
+  private $bundle;
+
+  /**
+   * The created node.
+   *
+   * @var object
+   */
+  private $node;
+
+  /**
+   * Describes this test.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Entity date property test',
+      'description' => 'Tests importing dates.',
+      'group' => 'Feeds entity processor',
+      'dependencies' => array('date_api'),
+    );
+  }
+
+  /**
+   * Set up test.
+   */
+  public function setUp() {
+    parent::setUp(array(
+      'feeds_entity_processor',
+      'feeds_entity_processor_test',
+      'date_api',
+    ));
+
+    // Create an importer configuration.
+    $this->createImporterConfiguration('Syndication', 'syndication');
+    $this->setPlugin('syndication', 'FeedsCSVParser');
+    $this->setPlugin('syndication', 'FeedsEntityProcessorFeeds_entity_processor_test');
+
+    // Create bundle entity.
+    $this->bundle = drupal_strtolower($this->randomName());
+    entity_create('feeds_entity_processor_test_type', array(
+      'id' => drupal_strtolower($this->randomName()),
+      'name' => $this->bundle,
+    ))->save();
+
+    // Create a node.
+    $this->node = $this->drupalCreateNode();
+
+    // Set bundle and set default values for required properties.
+    $this->setSettings('syndication', 'FeedsEntityProcessorFeeds_entity_processor_test', array(
+      'bundle' => $this->bundle,
+      'values[entity][entity_type]' => 'node',
+      'values[entity][entity_id]' => $this->node->nid,
+      'values[user]' => 1,
+    ));
+
+    $this->addMappings('syndication', array(
+      0 => array(
+        'source' => 'guid',
+        'target' => 'guid',
+        'unique' => TRUE,
+      ),
+      1 => array(
+        'source' => 'title',
+        'target' => 'title',
+      ),
+    ));
+  }
+
+  /**
+   * Basic test.
+   */
+  public function test() {
+    $this->addMappings('syndication', array(
+      2 => array(
+        'source' => 'created',
+        'target' => 'created',
+      ),
+    ));
+
+    // Run import.
+    $this->importURL('syndication', $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'feeds_entity_processor') . '/tests/resources/content_date.csv');
+    $this->assertText('Created 7 test entities');
+
+    foreach ($this->getExpectedTimestamps() as $entity_id => $expected_value) {
+      $entity = entity_load_single('feeds_entity_processor_test', $entity_id);
+      $this->assertEqual($expected_value, $entity->created);
+    }
+  }
+
+  /**
+   * Tests importing dates using the timezone mapping option.
+   */
+  public function testTimezoneMappingOption() {
+    // Los Angeles == UTC-08:00.
+    $this->addMappings('syndication', array(
+      2 => array(
+        'source' => 'created',
+        'target' => 'created',
+        'timezone' => 'America/Los_Angeles',
+      ),
+    ));
+
+    // Run import.
+    $this->importURL('syndication', $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'feeds_entity_processor') . '/tests/resources/content_date.csv');
+    $this->assertText('Created 7 test entities');
+
+    $expected_values = $this->getExpectedTimestamps();
+    // Increase each timestamp with 8 hours (28800 seconds), except for:
+    // - date 1, which is a timestamp by itself;
+    // - date 2, 3 and 7, which are summertime dates;
+    // - date 4, which has a timezone of its own.
+    foreach ($expected_values as $key => &$value) {
+      switch ($key) {
+        case 1:
+        case 4:
+          break;
+
+        case 2:
+        case 3:
+        case 7:
+          // Summertime: UTC-07:00.
+          $value += 25200;
+          break;
+
+        default:
+          // Winter time: UTC-08:00.
+          $value += 28800;
+      }
+    }
+
+    foreach ($expected_values as $entity_id => $expected_value) {
+      $entity = entity_load_single('feeds_entity_processor_test', $entity_id);
+      $this->assertEqual($expected_value, $entity->created);
+    }
+  }
+
+  /**
+   * Tests if the user is advised to enable the Date API module.
+   */
+  public function testEnableDateApiModuleAdvise() {
+    // Disable the Date API module first.
+    module_disable(array('date_api'));
+
+    // Go to the settings page.
+    $this->drupalGet('admin/structure/feeds/syndication/settings/FeedsEntityProcessorFeeds_entity_processor_test');
+
+    // Assert advise about enabling the Date API module.
+    $this->assertText('Enter a timestamp or enable the Date API module');
+
+    // Go to the mapping page.
+    $this->drupalGet('admin/structure/feeds/syndication/mapping');
+
+    // Since there hasn't been mapped to a date target yet, assert that no
+    // warning is yet shown about enabling the Date API module.
+    $this->assertNoText('Enable the Date API module');
+
+    // Now map to a date target.
+    $this->addMappings('syndication', array(
+      2 => array(
+        'source' => 'created',
+        'target' => 'created',
+      ),
+    ));
+
+    // Assert that a warning now is shown.
+    $this->assertText('Enable the Date API module');
+
+    // Now enable the Date API module again.
+    module_enable(array('date_api'));
+
+    // Assert that the advise about enabling the Date API module is now gone on
+    // the settings page.
+    $this->drupalGet('admin/structure/feeds/syndication/settings/FeedsEntityProcessorFeeds_entity_processor_test');
+    $this->assertNoText('Enter a timestamp or enable the Date API module');
+
+    // Assert that the warning on the mapping page is gone as well.
+    $this->drupalGet('admin/structure/feeds/syndication/mapping');
+    $this->assertNoText('Enable the Date API module');
+  }
+
+  /**
+   * Returns expected timestamps from dates defined in content_date.csv.
+   *
+   * @return array
+   *   An array of expected timestamps.
+   */
+  protected function getExpectedTimestamps() {
+    return array(
+      1 => 1411606273,
+      2 => 959644800,
+      3 => 1498899210,
+      4 => 1498892010,
+      5 => 1612051200,
+      6 => 1612084140,
+      7 => 1445470151,
+    );
+  }
+
+}

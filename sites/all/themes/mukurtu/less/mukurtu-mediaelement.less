@@ -1,0 +1,247 @@
+.mejs__container {
+    background: @mukurtu-mejs-background-color;
+
+    .mejs__inner {
+        .mejs__mediaelement {
+            video {
+                background: #000;
+            }
+        }
+    }
+
+    &.mejs__container-fullscreen {
+        .mejs__controls {
+            position: absolute;
+            bottom: 0;
+        }
+    }
+
+    &.mejs__video {
+        .mejs__controls {
+            position: absolute;
+            bottom: -35px;
+        }
+    }
+
+    .mejs__controls {
+        background: @mukurtu-mejs-background-color;
+        //left: 50%;
+
+/*        // Shrink controls on mobile
+        width: 240px;
+
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            width: 350px;
+        }
+
+        // Desktop
+        @media (min-width: @screen-md-min) {
+            width: 330px;
+        }
+
+        // Large Desktop
+        @media (min-width: @screen-lg-min) {
+            width: 100%;
+        }
+*/
+        .mejs__time {
+            color: @mukurtu-mejs-text-color;
+        }
+
+        .mejs__time-rail {
+            .mejs__time-total {
+                background: @mukurtu-mejs-time-rail-loaded-color;
+            }
+            .mejs__time-loaded {
+                background: @mukurtu-mejs-time-rail-loaded-color;
+            }
+            .mejs__time-current {
+                background: @mukurtu-mejs-time-rail-current-color;
+            }
+        }
+
+        // Hide volume controls when screen is small
+        .mejs__horizontal-volume-button,
+        .mejs__mute,
+        .mejs__horizontal-volume-slider {
+            display: none;
+
+            // Tablet
+            @media (min-width: @screen-sm-min) {
+                display: block;
+            }
+        }
+
+        .mejs__horizontal-volume-slider {
+            .mejs__horizontal-volume-total {
+                background: @mukurtu-mejs-time-rail-loaded-color;
+            }
+            .mejs__horizontal-volume-current {
+                background: @mukurtu-mejs-time-rail-current-color;
+            }
+        }
+
+        .mejs__button {
+            button {
+                background: transparent url(@mukurtu-mejs-controls-icon-path) no-repeat;
+            }
+        }
+
+        .mejs__play,
+        .mejs__replay {
+            height: 50px;
+            width: 40px;
+
+            button {
+                background: transparent url(@mukurtu-mejs-play-icon-path) no-repeat;
+                background-size: 20px;
+                height: 100%;
+                width: 100%;
+            }
+        }
+
+        .mejs__pause {
+            height: 50px;
+            width: 40px;
+
+            button {
+                background-position: -20px 0;
+            }
+        }
+
+        .mejs__unmute button {
+            background-position: -40px 0;
+        }
+
+        .mejs__mute button {
+            background-position: -60px 0;
+        }
+
+        //mejs__button mejs__fullscreen-button mejs__unfullscreen
+        .mejs__fullscreen-button {
+            button {
+                background-position: -80px 0px;
+            }
+            &.mejs__unfullscreen button {
+                background-position: -100px 0;
+            }
+        }
+    }
+}
+
+.view-mode-ma_scald_search_results {
+    .mejs__container {
+        &.scald_video {
+            margin-bottom: 30px;
+        }
+    }
+}
+
+///// Old
+
+.mejs-container-old {
+    background: transparent;
+
+    .mejs-inner {
+        .mejs-mediaelement {
+            video {
+                background: #000;
+            }
+        }
+    }
+
+    .mejs-controls {
+        background: transparent;
+
+        // Shrink controls on mobile
+        width: 240px;
+
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            width: 350px;
+        }
+
+        // Desktop
+        @media (min-width: @screen-md-min) {
+            width: 330px;
+        }
+
+        // Large Desktop
+        @media (min-width: @screen-lg-min) {
+            width: 100%;
+        }
+
+        .mejs-time {
+            color: @mukurtu-mejs-text-color;
+        }
+
+        .mejs-time-rail {
+            .mejs-time-loaded {
+                background: @mukurtu-mejs-time-rail-loaded-color;
+            }
+            .mejs-time-current {
+                background: @mukurtu-mejs-time-rail-current-color;
+            }
+        }
+
+        .mejs-horizontal-volume-slider {
+            .mejs-horizontal-volume-total {
+                background: @mukurtu-mejs-time-rail-loaded-color;
+            }
+            .mejs-horizontal-volume-current {
+                background: @mukurtu-mejs-time-rail-current-color;
+            }
+        }
+
+        .mejs-button {
+            button {
+                background: transparent url(@mukurtu-mejs-controls-icon-path) no-repeat;
+            }
+        }
+
+        .mejs-play {
+            height: 50px;
+            width: 40px;
+
+            button {
+                background: transparent url(@mukurtu-mejs-play-icon-path) no-repeat;
+                background-size: 20px;
+                height: 100%;
+                width: 100%;
+            }
+        }
+        .mejs-pause {
+            height: 50px;
+            width: 40px;
+
+            button {
+                background-position: 0px -16px;
+            }
+        }
+
+        .mejs-unmute button {
+            background-position: -16px 0px;
+        }
+
+        .mejs-mute button {
+            background-position: -16px -16px;
+        }
+
+        .mejs-fullscreen-button button {
+            background-position: -32px 0px;
+        }
+    }
+}
+
+// Remove volume controls in list/grid views.
+.list-view,
+.grid-view {
+  .mejs__container {
+    .mejs__horizontal-volume-button,
+    .mejs__mute,
+    .mejs__horizontal-volume-slider {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,11 @@
+name = Views content panes Test
+description = Test module for Views content panes.
+package = Views
+core = 7.x
+dependencies[] = views_content
+hidden = TRUE
+; Information added by Drupal.org packaging script on 2021-01-30
+version = "7.x-1.19"
+core = "7.x"
+project = "ctools"
+datestamp = "1611988843"

@@ -17,9 +17,12 @@ function oembed_default_oembed_provider() {
   $provider->name = 'flickr';
   $provider->title = 'Flickr';
   $provider->endpoint = 'http://www.flickr.com/services/oembed/';
-  $provider->scheme = 'http://*.flickr.com/*
+  $provider->scheme = 'http://flic.kr/*
+https://flic.kr/*
 http://flickr.com/*
-http://flic.kr/*';
+https://flickr.com/*
+http://*.flickr.com/*
+https://*.flickr.com/*';
   $providers['flickr'] = $provider;
 
   $provider = new stdClass();
@@ -71,9 +74,12 @@ http://www.scribd.com/mobile/documents/*';
   $provider->name = 'slideshare';
   $provider->title = 'SlideShare';
   $provider->endpoint = 'http://www.slideshare.net/api/oembed/2';
-  $provider->scheme = 'http://www.slideshare.net/*/*
+  $provider->scheme = 'http://slidesha.re/*
+https://slidesha.re/*
+http://www.slideshare.net/*/*
+https://www.slideshare.net/*/*
 http://www.slideshare.net/mobile/*/*
-http://slidesha.re/*';
+https://www.slideshare.net/mobile/*/*';
   $providers['slideshare'] = $provider;
 
   $provider = new stdClass();
@@ -134,13 +140,16 @@ https://mobile.twitter.com/*/statuses/*';
   $provider->name = 'vimeo';
   $provider->title = 'Vimeo';
   $provider->endpoint = 'http://vimeo.com/api/oembed.json';
-  $provider->scheme = 'http://www.vimeo.com/groups/*/videos/*
+  $provider->scheme = 'http://vimeo.com/*
+https://vimeo.com/*
+http://vimeo.com/groups/*/videos/*
+https://vimeo.com/groups/*/videos/*
+http://vimeo.com/m/#/*
+https://vimeo.com/m/#/*
 http://www.vimeo.com/*
 https://www.vimeo.com/*
-http://vimeo.com/groups/*/videos/*
-http://vimeo.com/*
-https://vimeo.com/*
-http://vimeo.com/m/#/*';
+http://www.vimeo.com/groups/*/videos/*
+https://www.vimeo.com/groups/*/videos/*';
   $providers['vimeo'] = $provider;
 
   $provider = new stdClass();
@@ -149,18 +158,26 @@ http://vimeo.com/m/#/*';
   $provider->name = 'youtube';
   $provider->title = 'YouTube';
   $provider->endpoint = 'http://www.youtube.com/oembed';
-  $provider->scheme = 'http://*youtube.com/watch*
-http://*.youtube.com/v/*
-https://*youtube.com/watch*
-https://*.youtube.com/v/*
-http://youtu.be/*
-http://*.youtube.com/user/*
-http://*.youtube.com/*#*/*
-http://m.youtube.com/watch*
-http://m.youtube.com/index*
+  $provider->scheme = 'http://youtu.be/*
+https://youtu.be/*
+http://*.youtube.com/playlist*
+https://*.youtube.com/playlist*
 http://*.youtube.com/profile*
+https://*.youtube.com/profile*
+http://*.youtube.com/user/*
+https://*.youtube.com/user/*
+http://*.youtube.com/v/*
+https://*.youtube.com/v/*
 http://*.youtube.com/view_play_list*
-http://*.youtube.com/playlist*';
+https://*.youtube.com/view_play_list*
+http://*youtube.com/watch*
+https://*youtube.com/watch*
+http://*.youtube.com/*#*/*
+https://*.youtube.com/*#*/*
+http://m.youtube.com/index*
+https://m.youtube.com/index*
+http://m.youtube.com/watch*
+https://m.youtube.com/watch*';
   $providers['youtube'] = $provider;
 
   return $providers;

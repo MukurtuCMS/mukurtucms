@@ -110,7 +110,11 @@ function services_controller_execute($controller, $args = array(), $options = ar
     throw $exception;
   }
 
-  _services_controller_execute_restore_user();
+  // Restore user only if callback is not logout.
+  $restore_user = !is_string($controller['callback']) || strpos($controller['callback'], 'logout') === FALSE;
+  if ($restore_user) {
+    _services_controller_execute_restore_user();
+  }
 
   if (!empty($server_info->debug)) {
     watchdog('services', 'results: <pre>@results</pre>', array('@results' => print_r($result, TRUE)), WATCHDOG_DEBUG);
@@ -127,7 +131,7 @@ function _services_controller_execute_preserve_user_switch_anonymous($controller
   global $user;
   services_set_server_info('original_user', $user);
 
-  $preserve_session = !is_string($controller['callback']) || (strpos($controller['callback'], 'login') === FALSE && strpos($controller['callback'], 'logout') === FALSE);
+  $preserve_session = !user_is_anonymous();
   services_set_server_info('preserve_session', $preserve_session);
   if ($preserve_session) {
     $original_session_state = drupal_save_session();
@@ -245,6 +249,8 @@ function services_authentication_info($module) {
  *
  */
 function services_auth_invoke($module, $method, &$arg1 = NULL, &$arg2 = NULL, &$arg3 = NULL) {
+  $args = func_get_args();
+
   // Get information about the auth module
   $info = services_authentication_info($module);
   drupal_alter('services_authentication_info', $info, $module);
@@ -258,7 +264,6 @@ function services_auth_invoke($module, $method, &$arg1 = NULL, &$arg2 = NULL, &$
   }
 
   if (is_callable($func)) {
-    $args = func_get_args();
     // Replace module and method name and arg1 with reference to $arg1 and $arg2.
     array_splice($args, 0, 5, array(&$arg1, &$arg2, &$arg3));
     return call_user_func_array($func, $args);

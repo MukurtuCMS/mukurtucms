@@ -11,6 +11,7 @@ files[] = geofield.widgets.inc
 files[] = geofield.formatters.inc
 files[] = geofield.openlayers.inc
 files[] = geofield.feeds.inc
+files[] = geofield.migrate.inc
 files[] = tests/geofield.test
 files[] = views/geofield.views.inc
 files[] = views/handlers/geofield_handler_sort.inc
@@ -25,9 +26,9 @@ files[] = views/proximity_plugins/geofieldProximityOtherGeofield.inc
 files[] = views/proximity_plugins/geofieldProximityCurrentUser.inc
 files[] = views/proximity_plugins/geofieldProximityExposedFilter.inc
 files[] = views/proximity_plugins/geofieldProximityContextualFilter.inc
-; Information added by Drupal.org packaging script on 2014-09-21
-version = "7.x-2.3"
+
+; Information added by Drupal.org packaging script on 2018-10-24
+version = "7.x-2.4"
 core = "7.x"
 project = "geofield"
-datestamp = "1411337638"
-
+datestamp = "1540417984"

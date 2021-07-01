@@ -66,22 +66,23 @@ Scald used its own terminology for concepts that came in Drupal 7.
 - Scald Unified Type (or atom type): is Entity Bundle. Each atom type thus can
   have different attached fields, different view modes and different display
   settings. Why "Unified Type"? Because one type (e.g. video) can have many
-  providers (e.g. local files, YouTube, Dailymotion etc.) and are all treated the
-  same way (e.g. share the same player).
+  providers (e.g. local files, YouTube, Dailymotion etc.)
+  and are all treated the same way (e.g. share the same player).
 
 - Scald Display Context: is similar to Entity View mode. What make it
   different is while view modes are about field display settings, in Scald the
   atom itself (an "extra fields") could also have display settings. In each
-  context (read: view mode), an atom can have a different transcoder (read: image
-  style) and a different player (read: display plugin). It is similar to the
-  possibility of having different displays of node title in different view modes
-  - but an atom is much more complex than a node title.
+  context (read: view mode), an atom can have a different
+  transcoder (read: image style) and a different player (read: display plugin).
+  It is similar to the possibility of having different displays of node title
+  in different view modes
+- but an atom is much more complex than a node title.
 
 - Scald Action: is also designed to be extensible. Common actions defined in
   Scald core are: fetch (read: load), view, edit, delete. Modules can defined
   more actions. Each atom can be configured to open to certain actions. Scald
-  supports a permission system per action so that access control works out of the
-  box with great level of granularity.
+  supports a permission system per action so that access
+  control works out of the box with great level of granularity.
 
 - Transcoder: is similar to image style, but designed to work with all kinds of
   content. For example, a video or an audio transcoded to different bit rates
@@ -133,4 +134,3 @@ Because Scald is modular, you need at least one module in each category to work:
 
 More detail on how to install/configure Scald is available at
 http://drupal.org/node/1775718.
-

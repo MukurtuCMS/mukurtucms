@@ -28,7 +28,7 @@ class ModuleTestCase extends DrupalWebTestCase {
    *   specified base table. Defaults to TRUE.
    */
   function assertTableCount($base_table, $count = TRUE) {
-    $tables = db_find_tables(Database::getConnection()->prefixTables('{' . $base_table . '}') . '%');
+    $tables = db_find_tables_d8($base_table . '%');
 
     if ($count) {
       return $this->assertTrue($tables, format_string('Tables matching "@base_table" found.', array('@base_table' => $base_table)));
@@ -726,7 +726,7 @@ class IPAddressBlockingTestCase extends DrupalWebTestCase {
 
     // Block a valid IP address.
     $edit = array();
-    $edit['ip'] = '192.168.1.1';
+    $edit['ip'] = '1.2.3.3';
     $this->drupalPost('admin/config/people/ip-blocking', $edit, t('Add'));
     $ip = db_query("SELECT iid from {blocked_ips} WHERE ip = :ip", array(':ip' => $edit['ip']))->fetchField();
     $this->assertTrue($ip, t('IP address found in database.'));
@@ -734,7 +734,7 @@ class IPAddressBlockingTestCase extends DrupalWebTestCase {
 
     // Try to block an IP address that's already blocked.
     $edit = array();
-    $edit['ip'] = '192.168.1.1';
+    $edit['ip'] = '1.2.3.3';
     $this->drupalPost('admin/config/people/ip-blocking', $edit, t('Add'));
     $this->assertText(t('This IP address is already blocked.'));
 
@@ -769,6 +769,25 @@ class IPAddressBlockingTestCase extends DrupalWebTestCase {
      // $edit['ip'] = ip_address();
      // $this->drupalPost('admin/config/people/ip-blocking', $edit, t('Save'));
      // $this->assertText(t('You may not block your own IP address.'));
+  }
+
+  /**
+   * Test duplicate IP addresses are not present in the 'blocked_ips' table.
+   */
+  function testDuplicateIpAddress() {
+    drupal_static_reset('ip_address');
+    $submit_ip = $_SERVER['REMOTE_ADDR'] = '192.168.1.1';
+    system_block_ip_action();
+    system_block_ip_action();
+    $ip_count = db_query("SELECT COUNT(*) from {blocked_ips} WHERE ip = :ip", array(':ip' => $submit_ip))->fetchColumn();
+    $this->assertEqual('1', $ip_count);
+    drupal_static_reset('ip_address');
+    $submit_ip = $_SERVER['REMOTE_ADDR'] = ' ';
+    system_block_ip_action();
+    system_block_ip_action();
+    system_block_ip_action();
+    $ip_count = db_query("SELECT COUNT(*) from {blocked_ips} WHERE ip = :ip", array(':ip' => $submit_ip))->fetchColumn();
+    $this->assertEqual('1', $ip_count);
   }
 }
 
@@ -905,6 +924,29 @@ class CronRunTestCase extends DrupalWebTestCase {
     $result = variable_get('common_test_cron');
     $this->assertEqual($result, 'success', 'Cron correctly handles exceptions thrown during hook_cron() invocations.');
   }
+
+  /**
+   * Tests that hook_flush_caches() is not invoked on every single cron run.
+   *
+   * @see system_cron()
+   */
+  public function testCronCacheExpiration() {
+    module_enable(array('system_cron_test'));
+    variable_del('system_cron_test_flush_caches');
+
+    // Invoke cron the first time: hook_flush_caches() should be called and then
+    // get cached.
+    drupal_cron_run();
+    $this->assertEqual(variable_get('system_cron_test_flush_caches'), 1, 'hook_flush_caches() was invoked the first time.');
+    $cache = cache_get('system_cache_tables');
+    $this->assertEqual(empty($cache), FALSE, 'Cache is filled with cache table data.');
+
+    // Run cron again and ensure that hook_flush_caches() is not called.
+    variable_del('system_cron_test_flush_caches');
+    drupal_cron_run();
+    $this->assertNull(variable_get('system_cron_test_flush_caches'), 'hook_flush_caches() was not invoked the second time.');
+  }
+
 }
 
 /**
@@ -1327,7 +1369,23 @@ class DateTimeFunctionalTest extends DrupalWebTestCase {
     $this->assertEqual($this->getUrl(), url('admin/config/regional/date-time/formats', array('absolute' => TRUE)), 'Correct page redirection.');
     $this->assertText(t('Custom date format updated.'), 'Custom date format successfully updated.');
 
+    // Check that ajax callback is protected by CSRF token.
+    $this->drupalGet('admin/config/regional/date-time/formats/lookup', array('query' => array('format' => 'Y m d')));
+    $this->assertResponse(403, 'Access denied with no token');
+    $this->drupalGet('admin/config/regional/date-time/formats/lookup', array('query' => array('token' => 'invalid', 'format' => 'Y m d')));
+    $this->assertResponse(403, 'Access denied with invalid token');
+    $this->drupalGet('admin/config/regional/date-time/formats');
+    $this->clickLink(t('edit'));
+    $settings = $this->drupalGetSettings();
+    $lookup_url = $settings['dateTime']['date-format']['lookup'];
+    preg_match('/token=([^&]+)/', $lookup_url, $matches);
+    $this->assertFalse(empty($matches[1]), 'Found token value');
+    $this->drupalGet('admin/config/regional/date-time/formats/lookup', array('query' => array('token' => $matches[1], 'format' => 'Y m d')));
+    $this->assertResponse(200, 'Access allowed with valid token');
+    $this->assertText(format_date(time(), 'custom', 'Y m d'));
+
     // Delete custom date format.
+    $this->drupalGet('admin/config/regional/date-time/formats');
     $this->clickLink(t('delete'));
     $this->drupalPost($this->getUrl(), array(), t('Remove'));
     $this->assertEqual($this->getUrl(), url('admin/config/regional/date-time/formats', array('absolute' => TRUE)), 'Correct page redirection.');
@@ -1400,6 +1458,60 @@ class DateTimeFunctionalTest extends DrupalWebTestCase {
       ->execute()
       ->fetchColumn();
     $this->assertFalse($format, 'Localized date format for disabled language is ignored.');
+  }
+}
+
+/**
+ * Tests date format configuration.
+ */
+class DateFormatTestCase extends DrupalWebTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Date format',
+      'description' => 'Test date format configuration and defaults.',
+      'group' => 'System',
+    );
+  }
+
+  function setUp() {
+    parent::setUp();
+
+    // Create admin user and log in admin user.
+    $this->admin_user = $this->drupalCreateUser(array('administer site configuration'));
+    $this->drupalLogin($this->admin_user);
+  }
+
+  /**
+   * Test the default date type formats are consistent.
+   */
+  function testDefaultDateFormats() {
+    // These are the default format values from format_date().
+    $default_formats = array(
+      'short' => 'm/d/Y - H:i',
+      'medium' => 'D, m/d/Y - H:i',
+      'long' => 'l, F j, Y - H:i',
+    );
+
+    // Clear the date format variables.
+    variable_del('date_format_short');
+    variable_del('date_format_medium');
+    variable_del('date_format_long');
+
+    $this->drupalGet('admin/config/regional/date-time');
+
+    foreach ($default_formats as $format_name => $format_value) {
+      $id = 'edit-date-format-' . $format_name;
+      // Check that the configuration fields match the default format.
+      $this->assertOptionSelected(
+        $id,
+        $format_value,
+        format_string('The @type format type matches the expected format @format.',
+        array(
+          '@type' => $format_name,
+          '@format' => $format_value,
+        )
+      ));
+    }
   }
 }
 
@@ -1830,6 +1942,30 @@ class SystemThemeFunctionalTest extends DrupalWebTestCase {
     $this->drupalGet('');
     $elements = $this->xpath('//*[@id=:id]/img', array(':id' => 'logo'));
     $this->assertEqual($elements[0]['src'], file_create_url($uploaded_filename));
+  }
+
+
+  /**
+   * Test the individual per-theme settings form.
+   */
+  function testPerThemeSettings() {
+    // Enable the test theme and the module that controls it. Clear caches in
+    // between so that the module's hook_system_theme_info() implementation is
+    // correctly registered.
+    module_enable(array('theme_test'));
+    drupal_flush_all_caches();
+    theme_enable(array('test_theme'));
+
+    // Test that the theme-specific settings form can be saved and that the
+    // theme-specific checkbox is checked and unchecked as appropriate.
+    $this->drupalGet('admin/appearance/settings/test_theme');
+    $this->assertNoFieldChecked('edit-test-theme-checkbox', 'The test_theme_checkbox setting is unchecked.');
+    $this->drupalPost(NULL, array('test_theme_checkbox' => TRUE), t('Save configuration'));
+    $this->assertText('The test theme setting was saved.');
+    $this->assertFieldChecked('edit-test-theme-checkbox', 'The test_theme_checkbox setting is checked.');
+    $this->drupalPost(NULL, array('test_theme_checkbox' => FALSE), t('Save configuration'));
+    $this->assertText('The test theme setting was saved.');
+    $this->assertNoFieldChecked('edit-test-theme-checkbox', 'The test_theme_checkbox setting is unchecked.');
   }
 
   /**
@@ -2316,6 +2452,20 @@ class UpdateScriptFunctionalTest extends DrupalWebTestCase {
   }
 
   /**
+   * Tests that there are no pending updates for the first test method.
+   */
+  function testNoPendingUpdates() {
+    // Ensure that for the first test method in a class, there are no pending
+    // updates. This tests a drupal_get_schema_versions() bug that previously
+    // led to the wrong schema version being recorded for the initial install
+    // of a child site during automated testing.
+    $this->drupalLogin($this->update_user);
+    $this->drupalGet($this->update_url, array('external' => TRUE));
+    $this->drupalPost(NULL, array(), t('Continue'));
+    $this->assertText(t('No pending updates.'), 'End of update process was reached.');
+  }
+
+  /**
    * Tests access to the update script.
    */
   function testUpdateAccess() {
@@ -2396,6 +2546,12 @@ class UpdateScriptFunctionalTest extends DrupalWebTestCase {
     $this->assertText('This is a requirements error provided by the update_script_test module.');
     $this->clickLink('try again');
     $this->assertText('This is a requirements error provided by the update_script_test module.');
+
+    // Check if the optional 'value' key displays without a notice.
+    variable_set('update_script_test_requirement_type', REQUIREMENT_INFO);
+    $this->drupalGet($this->update_url, array('external' => TRUE));
+    $this->assertText('This is a requirements info provided by the update_script_test module.');
+    $this->assertNoText('Notice: Undefined index: value in theme_status_report()');
   }
 
   /**
@@ -2839,7 +2995,16 @@ class SystemValidTokenTest extends DrupalUnitTestCase {
     // The following checks will throw PHP notices, so we disable error
     // assertions.
     $this->assertErrors = FALSE;
-    $this->assertFalse(drupal_valid_token(NULL, new stdClass()), 'Token NULL, value object returns FALSE.');
+
+    try {
+      $this->assertFalse(drupal_valid_token(NULL, new stdClass()), 'Token NULL, value object returns FALSE.');
+    }
+    // PHP 7.4 compatibility: the stdClass string conversion throws an exception
+    // which is also an acceptable outcome of this test.
+    catch (Error $e) {
+      $this->pass('Token NULL, value object throws error exception which is ok.');
+    }
+
     $this->assertFalse(drupal_valid_token(0, array()), 'Token 0, value array returns FALSE.');
     $this->assertFalse(drupal_valid_token('', array()), "Token '', value array returns FALSE.");
     $this->assertFalse('' === drupal_get_token(array()), 'Token generation does not return an empty string on invalid parameters.');

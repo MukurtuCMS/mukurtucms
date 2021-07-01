@@ -1,0 +1,241 @@
+<?php
+/**
+ * @file
+ * Code for the oa_update module
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function oa_update_menu() {
+  $items = array();
+  $items['admin/reports/update_distro'] = array(
+    'title' => 'Available updates',
+    'description' => 'Get update information for your distribution.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('oa_update_admin_form'),
+    'access arguments' => array('administer site configuration'),
+    'weight' => -50,
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+function oa_update_menu_alter(&$items) {
+  // swap out normal update links with our own pages
+  if (!empty($items['admin/reports/updates'])) {
+    $items['admin/reports/oa_updates'] = $items['admin/reports/updates'];
+    $items['admin/reports/oa_updates']['type'] = MENU_CALLBACK;
+    $items['admin/reports/updates'] = $items['admin/reports/update_distro'];
+  }
+  if (!empty($items['admin/reports/updates/update'])) {
+    $items['admin/reports/oa_updates/update'] = $items['admin/reports/updates/update'];
+    $items['admin/reports/oa_updates/update']['type'] = MENU_CALLBACK;
+    $items['admin/reports/updates/update'] = $items['admin/reports/update_distro'];
+    $items['admin/reports/updates/update']['type'] = MENU_CALLBACK;
+  }
+  unset($items['admin/reports/update_distro']);
+}
+
+/**
+ * Update distro help page..
+ */
+function oa_update_admin_form() {
+  $form = array();
+
+  $form['header'] = array(
+    '#theme' => 'html_tag',
+    '#tag' => 'h3',
+    '#value' => t('Do not manually update modules within distributions!'),
+  );
+
+  $form['help'] = array(
+    '#markup' => '<p>' .
+      t('Drupal Distributions contain a carefully selected set of module
+      versions along with specific patches.  You should never update individual modules
+      within a distribution unless you are an experienced developer.')
+      . '</p><p>' .
+      t('If you REALLY know what you are doing, you can find the links to the normal Drupal
+        update pages in the collapsed section below.')
+      . '</p>',
+  );
+
+  // display the update status for just our profile
+  $profile_name = drupal_get_profile();
+  if (!empty($profile_name)) {
+    $available = update_get_available(TRUE);
+    if (empty($available[$profile_name])) {
+      // if we haven't fetched the update info for the profile yet
+      // then do it now
+      module_load_include('inc', 'update', 'update.fetch');
+      $project = oa_update_get_profile($profile_name);
+      _update_process_fetch_task($project);
+      $available = update_get_available(TRUE);
+    }
+    if (!empty($available[$profile_name])) {
+      module_load_include('inc', 'update', 'update.compare');
+      module_load_include('inc', 'update', 'update.report');
+      $data = update_calculate_project_data($available);
+      $profile[$profile_name] = $data[$profile_name];
+      $markup = theme('update_report', array('data' => $profile));
+      $markup = str_replace(
+        '<h3>' . t('Modules') . '</h3>',
+        '<h3>' . t('Distribution') . '</h3>', $markup);
+      $form['profile'] = array(
+        '#markup' => $markup,
+      );
+    }
+  }
+
+  $form['update'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Update Links',
+    '#collapsible' => TRUE,
+    '#collapsed' => !variable_get('oa_update_enable', FALSE),
+  );
+  $form['update']['oa_update_enable'] = array(
+    '#type' => 'checkbox',
+    '#title' => 'Enable module update status',
+    '#description' => t('Enable this option (and Save) to access the normal update links'),
+    '#default_value' => variable_get('oa_update_enable', FALSE),
+  );
+
+  if (variable_get('oa_update_enable', FALSE)) {
+    $links[] = array(
+      'title' => 'Available updates',
+      'href' => 'admin/reports/oa_updates',
+    );
+    $links[] = array(
+      'title' => 'Check for available updates',
+      'href' => 'admin/reports/oa_updates/update',
+    );
+    $form['update']['links'] = array(
+      '#theme' => 'links',
+      '#links' => $links,
+    );
+  }
+  $form['#submit'][] = 'oa_update_admin_form_submit';
+  return system_settings_form($form);
+}
+
+/**
+ * Submit handler for oa_update_admin_form
+ */
+function oa_update_admin_form_submit($form, &$form_state) {
+  if ($form_state['values']['oa_update_enable'] !== $form_state['input']['oa_update_enable']) {
+    variable_set('oa_update_enable', $form_state['values']['oa_update_enable']);
+    module_load_install('update');
+    $status = update_requirements('runtime');
+  }
+}
+
+/**
+ * Build the Project array needed by Update module for profile_name
+ */
+function oa_update_get_profile($profile_name) {
+  // add the profile back into the module list to fetch update status for
+  $uri = 'profiles/' . $profile_name . '/' . $profile_name . '.profile';
+  $filename = dirname($uri) . '/' . $profile_name . '.info';
+  $info = drupal_parse_info_file($filename);
+  $info['project'] = $profile_name;
+  $info['hidden'] = FALSE;
+  if (!isset($info['_info_file_ctime'])) {
+    $info['_info_file_ctime'] = filectime($filename);
+  }
+  if (!isset($info['datestamp'])) {
+    $info['datestamp'] = 0;
+  }
+  $profile = array(
+    'name' => $profile_name,
+    'info' => $info,
+    'project_type' => 'module',
+    'project_status' => TRUE,
+    'includes' => array($profile_name => $info['name']),
+  );
+
+  return $profile;
+}
+
+/**
+ * Implements hook_update_projects_alter().
+ */
+function oa_update_update_projects_alter(&$projects) {
+  $profile_name = drupal_get_profile();
+  if (!empty($profile_name)) {
+    $profile = oa_update_get_profile($profile_name);
+    $projects[$profile_name] = $profile;
+  }
+
+  // If using ver versions, pretend to be latest tag.
+  foreach (array('oa_core', 'oa_discussion', 'oa_subspaces', 'panopoly_magic') as $module) {
+    if (!empty($projects[$module]) && empty($projects[$module]['info']['version']) && ($tag = _oa_update_get_tag($module))) {
+      $projects[$module]['info']['version'] = $tag;
+    }
+  }
+}
+
+/**
+ * For a module in -dev, get the latest tag if on -dev branch.
+ */
+function _oa_update_get_tag($module) {
+  $file = drupal_get_path('module', $module) . '/.git/HEAD';
+  if (file_exists($file) && ($contents = file_get_contents($file))) {
+    for ($i = 2; $i > 0; $i--) {
+      $tagprefix = '7.x-' . $i . '.';
+      if (strpos($contents, $tagprefix . 'x')) {
+        $tagsfile = drupal_get_path('module', $module) . '/.git/packed-refs';
+        if (is_file($tagsfile) && ($tags = file_get_contents($tagsfile))) {
+          $tags = array_filter(explode("\n", $tags));
+          foreach ($tags as $key => $tag) {
+            $pos = strpos($tag, $tagprefix);
+            if (strpos($tag, $tagprefix) === FALSE || strpos($tag, $tagprefix . 'x') !== FALSE) {
+              unset($tags[$key]);
+            }
+            else {
+              $tags[$key] = substr($tag, $pos + strlen($tagprefix));
+            }
+          }
+        }
+        // Add in tagsdir files.
+        $tagsdir = drupal_get_path('module', $module) . '/.git/refs/tags';
+        if (is_dir($tagsdir) && ($tagsdirtags = scandir($tagsdir))) {
+          foreach ($tagsdirtags as $tag) {
+            if (strpos($tag, $tagprefix) === 0) {
+              $tags[] = substr($tag, strlen($tagprefix));
+            }
+          }
+        }
+        sort($tags);
+        if ($tags) {
+          return $tagprefix . array_pop($tags);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_update_status_alter().
+ */
+function oa_update_update_status_alter(&$projects) {
+  $profile_name = drupal_get_profile();
+  foreach ($projects as $key => $project) {
+    // -dev versions with patches are marked as NOT_SUPPORTED
+    // but for a Distribution, these modules are Current
+    if ($project['status'] == UPDATE_NOT_SUPPORTED) {
+      $projects[$key]['status'] = UPDATE_CURRENT;
+    }
+  }
+  if (!variable_get('oa_update_enable', FALSE)) {
+    // we want to supress the update messages for non-security updates
+    foreach ($projects as $key => $project) {
+      // mark anything that isn't a security update as ok
+      // don't change status of distribution version
+      if (($key != $profile_name) && ($project['status'] !== UPDATE_NOT_SECURE)) {
+        $projects[$key]['status'] = UPDATE_CURRENT;
+      }
+    }
+  }
+}

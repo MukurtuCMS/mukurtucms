@@ -1,0 +1,207 @@
+<?php
+
+/**
+ * @file
+ * Test email delivery.
+ */
+
+/**
+ * Test email delivery.
+ */
+class BmTestEmail extends BmTestBase {
+
+  /**
+   * Define this test class.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Email handling',
+      'description' => 'Confirm email handling works as intended.',
+      'group' => 'backup_migrate',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    parent::setUp($modules);
+
+    // Log in as user 1, so that permissions are irrelevant.
+    $this->loginUser1();
+  }
+
+  /**
+   * Confirm the whole email process.
+   */
+  public function testAddEmailDestination() {
+    // See if we can add a destination.
+    // Load the email destination Add page.
+    $this->drupalGet(BACKUP_MIGRATE_MENU_PATH . '/settings/destination/add/email');
+    $this->assertResponse(200);
+
+    // Verify all of the expected fields exist.
+    $this->assertFieldByName('name');
+    $this->assertFieldByName('name', 'Untitled Destination');
+    $this->assertFieldByName('machine_name');
+    $this->assertFieldByName('location');
+
+    // Set up test values.
+    $test_source = strtolower($this->randomName(16));
+    $address = strtolower($this->randomName(10)) . '@example.com';
+    $test_destination = strtolower($this->randomName(16));
+
+    // Submit e-mail destination form with invalid values.
+    $this->submitDestinationEmail('', $test_destination, $address);
+    $this->assertText(t('Destination name field is required.'), 'Name required.');
+
+    $this->submitDestinationEmail($this->randomString(16), '', $address);
+    $this->assertText(t('Machine-readable name field is required.'), 'Machine name required.');
+
+    $this->submitDestinationEmail($this->randomString(16), $test_destination, '');
+    $this->assertText(t('Email Address field is required.'), 'E-mail required.');
+
+    // Step 1, set-up.
+    // Create a test destination.
+    $this->submitDestinationEmail($this->randomString(16), $test_destination, $address);
+    $this->assertText(t('Your destination was saved'));
+
+    // Create a test source.
+    // @todo Test the source add form.
+    // @todo Maybe add a note somewhere about how we are using a small
+    // source on purpose, so as to not break the testing system.
+    $this->submitSourceFiles($this->randomString(16), $test_source, drupal_get_path('module', 'backup_migrate') . '/tests/files/');
+    $this->assertText(t('Your source was saved'));
+
+    // Run a manual back-up so we have a file to compare against.
+    $this->runBackup('manual', $test_source);
+
+    $files = $this->listBackupFiles();
+    $key = key($files);
+
+    // Confirm the back-up file exists.
+    $this->assertNotEqual($key, NULL, 'A backup file was found.');
+
+    $file = $files[$key];
+
+    // Copied from destinations.email.inc to build a compatible parameter.
+    $attachment = new stdClass();
+    $attachment->filename = $file->name;
+    $attachment->path = $file->path;
+
+    // Step 2, e-mail generated through the Quick Backup form.
+    // Run a backup per e-mail.
+    $this->runBackup($test_destination, $test_source);
+
+    // Confirm that an e-mail was sent.
+    $captured_emails = $this->drupalGetMails(array('id' => 'backup_migrate_destination_mail', 'to' => $address));
+    $this->verboseEmail();
+    $this->assertEqual(count($captured_emails), 1, 'A back-up was mailed.');
+
+    // Does the attachment occur in the captured e-mail?
+    // Note that the e-mail from Step 2 is tested against the back-up file from
+    // Step 1.
+    $file_data = fread(fopen($attachment->path, "r"), filesize($attachment->path));
+    $encoded_file_data = chunk_split(base64_encode($file_data), 70, "\r\n");
+    $this->assertMailString('body', $encoded_file_data, 1);
+
+    // Step 3, e-mail generated through the main helper function.
+    // Make sure the new $address is never the same as the old one.
+    $address = strtolower($this->randomName(1 + strlen($address))) . '@example.com';
+
+    _backup_migrate_destination_email_mail_backup($attachment, $address);
+
+    // Confirm that an e-mail is sent.
+    $captured_emails = $this->drupalGetMails(array('id' => 'backup_migrate_destination_mail', 'to' => $address));
+    $this->verboseEmail();
+    $this->assertEqual(count($captured_emails), 1, 'A back-up was mailed.');
+
+    // Check if the Subject field contains the filename.
+    $this->assertMailString('subject', $attachment->filename, 1);
+
+    // Check if the body contains the filename.
+    $this->assertMailString('body', $attachment->filename, 1);
+
+    // Step 4, (partial) e-mail generated through a mime_mail() object.
+    // Build an e-mail.
+    $test_mail = new mime_mail();
+    $boundary = "b" . md5(uniqid(time()));
+
+    // Make sure the new $address is never the same as the old one.
+    $address = strtolower($this->randomName(1 + strlen($address))) . '@example.com';
+
+    $attach = fread(fopen($attachment->path, "r"), filesize($attachment->path));
+    $test_mail->add_attachment($attach, $attachment->filename, "application/octet-stream");
+
+    $message = $test_mail->build_multipart($boundary);
+
+    $params = array(
+      'body' => $message,
+      'subject' => 'test',
+      'headers' => array(
+        'MIME-Version' => "1.0",
+        'Content-Type' => "multipart/mixed; boundary=\"$boundary\"",
+      ),
+    );
+
+    drupal_mail('backup_migrate', 'destination_mail', $address, '', $params);
+    $captured_emails = $this->drupalGetMails(array('id' => 'backup_migrate_destination_mail', 'to' => $address));
+    $this->verboseEmail();
+
+    // Confirm that an e-mail was sent.
+    $this->assertEqual(count($captured_emails), 1, 'A back-up was mailed.');
+
+    // Does the boundary occur in the captured e-mail?
+    $this->assertMailString('body', '--' . $boundary, 1);
+
+    // How many boundaries?
+    $expected = count($test_mail->parts) + 1;
+    $this->assertMailStringCount('body', '--' . $boundary, $expected, 1);
+
+    // Cleanup - purge all backups.
+    $this->deleteBackups();
+  }
+
+  /**
+   * Submits the destination form for E-mails.
+   *
+   * @param string $name
+   *   The name of the destination.
+   * @param string $machine_name
+   *   The machine name of the destination.
+   * @param string $mail
+   *   The e-mail address of the destination.
+   */
+  public function submitDestinationEmail($name, $machine_name, $mail) {
+    $this->drupalGet('admin/config/system/backup_migrate/settings/destination/add/email');
+    $this->assertResponse(200);
+    $edit = array();
+    $edit['name'] = $name;
+    $edit['machine_name'] = $machine_name;
+    $edit['location'] = $mail;
+    $this->drupalPost(NULL, $edit, t('Save destination'));
+    $this->assertResponse(200);
+  }
+
+  /**
+   * Submits the source form for Files.
+   *
+   * @param string $name
+   *   The name of the source.
+   * @param string $machine_name
+   *   The machine name of the source.
+   * @param string $path
+   *   The path of the source.
+   */
+  public function submitSourceFiles($name, $machine_name, $path) {
+    $this->drupalGet('admin/config/system/backup_migrate/settings/source/add/filesource');
+    $this->assertResponse(200);
+    $edit = array();
+    $edit['name'] = $name;
+    $edit['machine_name'] = $machine_name;
+    $edit['location'] = $path;
+    $this->drupalPost(NULL, $edit, t('Save source'));
+    $this->assertResponse(200);
+  }
+
+}

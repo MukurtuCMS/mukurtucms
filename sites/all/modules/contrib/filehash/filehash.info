@@ -1,0 +1,11 @@
+name = File Hash
+description = Generate hashes for each uploaded file.
+core = 7.x
+configure = admin/config/media/filehash
+files[] = filehash.test
+
+; Information added by Drupal.org packaging script on 2020-01-10
+version = "7.x-1.7"
+core = "7.x"
+project = "filehash"
+datestamp = "1578638891"

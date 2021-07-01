@@ -2,7 +2,6 @@
 
 /**
  * @file
- *
  * Handle the forms for changing a display's layout.
  */
 
@@ -33,7 +32,7 @@ function _panels_edit_layout($display, $finish, $destination, $allowed_layouts) 
   if (empty($_POST) || empty($_POST['form_id']) || $_POST['form_id'] != 'panels_change_layout') {
     $output = drupal_build_form('panels_choose_layout', $form_state);
     if (!empty($form_state['executed'])) {
-      // upon submission go to next form.
+      // Upon submission go to next form.
       $change_form_state['layout'] = $_SESSION['layout'][$display->did] = $form_state['layout'];
       $change_form = TRUE;
     }
@@ -94,6 +93,7 @@ function panels_choose_layout($form, &$form_state) {
     }
   }
 
+  ctools_add_js('panels-base', 'panels');
   ctools_add_js('layout', 'panels');
 
   $form['categories'] = array(
@@ -145,7 +145,6 @@ function panels_choose_layout($form, &$form_state) {
   ctools_add_js('dependent');
   $js['CTools']['dependent'] = $dependencies;
   drupal_add_js($js, 'setting');
-
 
   if (empty($form_state['no buttons'])) {
     $form['submit'] = array(
@@ -292,7 +291,7 @@ function panels_change_layout_submit($form, &$form_state) {
     foreach ($form_state['values']['panel']['pane'] as $region_id => $panes) {
       if ($panes) {
         $pids = explode(',', $panes);
-        // need to filter the array, b/c passing it in a hidden field can generate trash
+        // Need to filter the array, b/c passing it in a hidden field can generate trash.
         foreach (array_filter($pids) as $pid) {
           $switch[$pid] = $region_id;
         }
@@ -320,6 +319,8 @@ function panels_change_layout_submit($form, &$form_state) {
   $display->panels = $content;
 
   $display->layout = $form_state['layout'];
+
+  panels_edit_display_settings_form_submit($form, $form_state);
 }
 
 /**

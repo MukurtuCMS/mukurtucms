@@ -1,0 +1,14 @@
+name = ECK Services
+description = Service resources for ECK
+core = 7.x
+package = ECK
+
+dependencies[] = eck
+dependencies[] = services
+
+
+; Information added by Drupal.org packaging script on 2018-10-15
+version = "7.x-2.0-rc10"
+core = "7.x"
+project = "eck"
+datestamp = "1539631684"

@@ -49,6 +49,9 @@ class CerFieldHandler implements Countable, SeekableIterator {
 
   /**
    * Adds a reference to $entity, validating it first.
+   *
+   * @param EntityDrupalWrapper $entity
+   *  The wrapped entity to reference.
    */
   public function add(EntityDrupalWrapper $entity) {
     if ($this->validate($entity)) {
@@ -58,6 +61,9 @@ class CerFieldHandler implements Countable, SeekableIterator {
 
   /**
    * Deletes all references to $entity.
+   *
+   * @param EntityDrupalWrapper $entity
+   *  The wrapped entity to dereference.
    */
   public function delete(EntityDrupalWrapper $entity) {
     $entityID = $entity->getIdentifier();
@@ -77,10 +83,13 @@ class CerFieldHandler implements Countable, SeekableIterator {
   }
 
   /**
-   * Validates a possible reference to $entity. After doing a cardinality check,
-   * the reference is validated through the Field Attach API, allowing the module
-   * which owns the field to do its normal validation logic. If validation fails,
-   * the error(s) are logged.
+   * Validates a potential reference. After doing a cardinality check, the
+   * reference is validated through the Field Attach API, allowing the module
+   * which owns the field to do its normal validation logic. If validation
+   * fails, the error(s) are logged.
+   *
+   * @param EntityDrupalWrapper $entity
+   *  The wrapped entity to validate.
    *
    * @return boolean
    */
@@ -147,12 +156,8 @@ class CerFieldHandler implements Countable, SeekableIterator {
     $entityID = $this->entity->getIdentifier();
     $entity = $this->entity->value();
 
-    // Don't call $entity->save(), or we'll cause an infinite loop.
-    field_attach_presave($entity_type, $entity);
-    field_attach_update($entity_type, $entity);
-
-    // Issue #2225071
-    entity_get_controller($entity_type)->resetCache((array) $entityID);
+    $entity->cer_processed = TRUE;
+    entity_save($entity_type, $entity);
 
     // Reload the entity we just saved and cleared from the static cache.
     $entities = entity_load($entity_type, (array) $entityID);

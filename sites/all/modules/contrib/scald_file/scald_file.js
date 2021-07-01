@@ -1,3 +1,8 @@
+/**
+ * @file
+ * File: scald_file.js.
+ */
+
 (function ($) {
   Drupal.behaviors.scaldFile = {
     attach: function (context, settings) {

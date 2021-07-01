@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ * Install and update functionality..
+ */
+
+/**
+* Implements hook_install().
+*/
+function oa_teams_install() {
+  // disable comments on Teams by default
+  variable_set('comment_oa_team', 0);
+}
+

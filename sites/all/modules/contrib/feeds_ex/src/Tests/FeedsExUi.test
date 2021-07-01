@@ -1,0 +1,106 @@
+<?php
+
+/**
+ * @file
+ * Contains FeedsExUi.
+ */
+
+/**
+ * User interface tests.
+ */
+class FeedsExUi extends FeedsWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'UI tests',
+      'description' => 'Integration tests for the user interface.',
+      'group' => 'Feeds EX',
+    );
+  }
+
+  public function setUp() {
+    parent::setUp('feeds_ex', 'feeds_ex_test');
+    $this->createImporterConfiguration();
+    $this->setSettings('syndication', '', array('content_type' => ''));
+    $this->setPlugin('syndication', 'FeedsExTestUi');
+  }
+
+  /**
+   * Tests basic UI functionality.
+   */
+  public function test() {
+    $path = 'admin/structure/feeds/syndication/settings/FeedsExTestUi';
+
+    // Set context.
+    $edit = array(
+      'context[value]' => 'context value',
+    );
+    $this->drupalPost($path, $edit, t('Save'));
+    $this->assertFieldByName(key($edit), reset($edit), 'Context value set.');
+
+    // Add a value.
+    $edit = array(
+      'add[name]' => 'new name',
+      'add[machine_name]' => 'new_value',
+      'add[value]' => 'new value',
+      'add[debug]' => 1,
+    );
+    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->assertFieldByName('sources[new_value][name]', 'new name', 'New expression name');
+    $this->assertFieldByName('sources[new_value][value]', 'new value', 'New expression value');
+    $this->assertFieldByName('sources[new_value][debug]', 1, 'Debug value set');
+
+    // Remove the row.
+    $edit = array(
+      'sources[new_value][remove]' => 1,
+    );
+    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->assertNoFieldByName('sources[new_value][name]');
+  }
+
+  /**
+   * Tests debug mode.
+   */
+  public function testDebugMode() {
+    $path = 'admin/structure/feeds/syndication/settings/FeedsExTestUi';
+
+    // Set context.
+    $edit = array(
+      'context[value]' => 'context value',
+      'debug_mode' => 1,
+    );
+    $this->drupalPost($path, $edit, t('Save'));
+    $this->assertFieldByName('context[value]', 'context value', 'Context value set.');
+    $this->assertFieldByName('debug_mode', 1, 'Debug mode set.');
+
+    $path = 'import/syndication';
+
+    // Set context.
+    $edit = array(
+      'feeds[FeedsHTTPFetcher][source]' => 'http://example.com',
+      'feeds[FeedsExTestUi][context][value]' => 'new context value',
+    );
+    $this->drupalPost($path, $edit, t('Import'));
+    $this->assertFieldByName(key($edit), reset($edit), 'Context value set.');
+
+    // Add a value.
+    $edit = array(
+      'feeds[FeedsExTestUi][add][name]' => 'new name',
+      'feeds[FeedsExTestUi][add][machine_name]' => 'new_value',
+      'feeds[FeedsExTestUi][add][value]' => 'new value',
+      'feeds[FeedsExTestUi][add][debug]' => 1,
+    );
+    $this->drupalPost(NULL, $edit, t('Import'));
+    $this->assertFieldByName('feeds[FeedsExTestUi][sources][new_value][name]', 'new name', 'New expression name');
+    $this->assertFieldByName('feeds[FeedsExTestUi][sources][new_value][value]', 'new value', 'New expression value');
+    $this->assertFieldByName('feeds[FeedsExTestUi][sources][new_value][debug]', 1, 'Debug value set');
+
+    // Remove the row.
+    $edit = array(
+      'feeds[FeedsExTestUi][sources][new_value][remove]' => 1,
+    );
+    $this->drupalPost(NULL, $edit, t('Import'));
+    $this->assertNoFieldByName('feeds[FeedsExTestUi][sources][new_value][name]');
+  }
+
+}

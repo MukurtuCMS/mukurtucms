@@ -20,10 +20,10 @@ class viewsHandlerArgumentCommentUserUidTest extends ViewsSqlTest {
   /**
    * Post comment.
    *
-   * @param $node
+   * @param object $node
    *   Node to post comment on.
-   * @param $comment
-   *   Comment to save
+   * @param array $comment
+   *   Comment to save.
    */
   function postComment($node, $comment = array()) {
     $comment += array(
@@ -35,11 +35,14 @@ class viewsHandlerArgumentCommentUserUidTest extends ViewsSqlTest {
     return comment_save((object) $comment);
   }
 
-  function setUp() {
-    parent::setUp();
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    parent::setUp($modules);
 
-    // Add two users, create a node with the user1 as author and another node with user2 as author.
-    // For the second node add a comment from user1.
+    // Add two users, create a node with the user1 as author and another node
+    // with user2 as author. For the second node add a comment from user1.
     $this->account = $this->drupalCreateUser();
     $this->account2 = $this->drupalCreateUser();
     $this->drupalLogin($this->account);
@@ -50,7 +53,6 @@ class viewsHandlerArgumentCommentUserUidTest extends ViewsSqlTest {
 
   function testCommentUserUidTest() {
     $view = $this->view_comment_user_uid();
-
 
     $this->executeView($view, array($this->account->uid));
     $resultset = array(
@@ -67,7 +69,7 @@ class viewsHandlerArgumentCommentUserUidTest extends ViewsSqlTest {
   }
 
   function view_comment_user_uid() {
-    $view = new view;
+    $view = new view();
     $view->name = 'test_comment_user_uid';
     $view->description = '';
     $view->tag = 'default';
@@ -103,4 +105,5 @@ class viewsHandlerArgumentCommentUserUidTest extends ViewsSqlTest {
 
     return $view;
   }
+
 }

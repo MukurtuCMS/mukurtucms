@@ -19,11 +19,12 @@ require_once 'scald.constants.inc';
  */
 function scald_admin_dashboard() {
   $types = scald_types();
+  $content = '';
 
   $message = '<p>' . t('This is the Scald administration dashboard. It allows to manage <em>Atom Types</em> (entity bundles) and <em>Representation Contexts</em> (entity view modes). In each context, it is possible to choose which <em>transcoder</em> (for Image atoms, it is image style) is used and how atom is rendered using different <em>players</em>. The context settings is for the atom itself, while "manage display" is to controlled how are fields displayed. If you are strange to the terminology, please read the short <a href="@readme">README.txt</a> or the long <a href="@doc">documentation pages</a>.', array('@readme' => 'http://drupalcode.org/project/scald.git/blob/refs/heads/7.x-1.x:/README.txt', '@doc' => 'https://drupal.org/node/1652740')) . '</p>';
   drupal_set_message($message);
 
-  $content = '<h3>' . t('Scald Unified Atom Types') . '</h3>';
+  $content .= '<h3>' . t('Scald Unified Atom Types') . '</h3>';
   $content .= '<p>' . t('List of Scald Unified Atom Types. Each type is an entity bundle and has different fields, displays and contexts. Multiple providers (e.g. local image provider, Flickr provider) can provide atoms of the same type and share the same transcoders, players.') . '</p>';
 
   $list = array('type' => 'ul', 'items' => array());
@@ -55,9 +56,16 @@ function scald_admin_dashboard() {
 
   $content .= theme('table', $table);
 
+  // Tell the user, he can switch to a new export with Features.
+  if (!variable_get('scald_switch_feature_export', FALSE) && module_exists('features')) {
+    $content .= '<h3>' . t('Scald Context Features Export') . '</h3>';
+    $switch_form = drupal_get_form('scald_switch_to_feature_form');
+    $content .= drupal_render($switch_form);
+  }
+
   // Display a context listing.
   $content .= '<h3>' . t('Scald Contexts') . '</h3>';
-  $content .= '<p>' . t('List of all Scald Contexts, thoses created through the UI and even those hidden or defined by other modules.') . '</p>';
+  $content .= '<p>' . t('List of all Scald Contexts, those created through the UI and even those hidden or defined by other modules.') . '</p>';
   $content .= '<ul class="action-links"><li>' . l(t('Add context'), 'admin/structure/scald/context/add') . '</li></ul>';
 
   $list = array('type' => 'ul', 'items' => array());
@@ -95,7 +103,6 @@ function scald_admin_dashboard() {
 
   return $content;
 }
-
 
 /**
  * Form for admin settings for Scald Types.
@@ -360,6 +367,8 @@ function scald_admin_context_form_submit($form, &$form_state) {
 
   scald_context_save($context);
   cache_clear_all('*', 'cache_scald', TRUE);
+  cache_clear_all('field_info_types', 'cache_field', TRUE);
+  field_info_cache_clear();
 
   $form_state['redirect'] = 'admin/structure/scald';
 }
@@ -720,4 +729,36 @@ function scald_player_settings_form_submit($form, &$form_state) {
 
     drupal_set_message(t('Your player settings has been updated.'));
   }
+}
+
+/**
+ * Switch to feature form.
+ */
+function scald_switch_to_feature_form() {
+  $form = array();
+
+  $form['text'] = array(
+    '#markup' => '<p>' . t('You can now export your contexts with Features. This will break existing exports and you will have to review your existing features containing scald contexts.') . '</p>',
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Switch to Features Export')
+  );
+
+  return $form;
+}
+
+
+/**
+ * Switch to feature form submission.
+ */
+function scald_switch_to_feature_form_submit($form, &$form_state) {
+  variable_set('scald_switch_feature_export', TRUE);
+  cache_clear_all();
+
+  $message = '<p>' . t('You are now using the new Features export. Please make sure you have checked and recreated the features involved. Cache clear is necessary.') . '</p>';
+  drupal_set_message($message, 'warning');
+
+  $form_state['redirect'] = 'admin/structure/scald';
 }

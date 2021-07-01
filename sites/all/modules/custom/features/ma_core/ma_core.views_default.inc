@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_core.views_default.inc

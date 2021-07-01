@@ -1,0 +1,42 @@
+name = Mailhandler quick-start
+description = An example importer, source content type, and mailbox to get you started.
+core = 7.x
+package = Mailhandler
+version = 7.x-2.0
+project = mailhandler_default
+dependencies[] = ctools
+dependencies[] = features
+dependencies[] = feeds
+dependencies[] = feeds_ui
+dependencies[] = mailhandler
+dependencies[] = mailhandler_php_imap
+dependencies[] = strongarm
+datestamp = 1383755944
+features[ctools][] = feeds:feeds_importer_default:1
+features[ctools][] = mailhandler:mailhandler_mailbox:2
+features[ctools][] = strongarm:strongarm:1
+features[features_api][] = api:2
+features[feeds_importer][] = mailhandler_nodes
+features[mailhandler_mailbox][] = test_mailbox
+features[node][] = mailhandler_source
+features[variable][] = comment_anonymous_mailhandler_source
+features[variable][] = comment_controls_mailhandler_source
+features[variable][] = comment_default_mode_mailhandler_source
+features[variable][] = comment_default_order_mailhandler_source
+features[variable][] = comment_default_per_page_mailhandler_source
+features[variable][] = comment_form_location_mailhandler_source
+features[variable][] = comment_mailhandler_source
+features[variable][] = comment_preview_mailhandler_source
+features[variable][] = comment_subject_field_mailhandler_source
+features[variable][] = menu_options_mailhandler_source
+features[variable][] = menu_parent_mailhandler_source
+features[variable][] = node_options_mailhandler_source
+features[variable][] = node_preview_mailhandler_source
+features[variable][] = node_submitted_mailhandler_source
+
+; Information added by Drupal.org packaging script on 2017-12-05
+version = "7.x-2.11"
+core = "7.x"
+project = "mailhandler"
+datestamp = "1512494003"
+

@@ -1,0 +1,75 @@
+.pager-text {
+    .mukurtu-standard-link;
+    border: none;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: @mukurtu-expanded-letter-spacing;
+
+    padding: 6px 6px;
+    font-size: 13px;
+    // Tablet
+    @media (min-width: @screen-sm-min) {
+        padding: 6px 6px;
+        font-size: 16px;
+    }
+
+    &:hover,
+    &:focus {
+        background: transparent;
+        border: none;
+    }
+}
+
+ul.pagination {
+    li {
+        // Current page
+        &.active {
+            .pager-text;
+
+            span {
+                .pager-text;
+                color: @text-color;
+                background: transparent;
+
+                &:hover,
+                &:focus {
+                    color: @text-color;
+                }
+
+                // Underline current page
+                &::after {
+                    content : "";
+                    display: inline-block;
+                    position: absolute;
+                    left: 20%;
+                    bottom: 0;
+                    height: 6px;
+                    width: 15px;
+                    border-bottom: 6px solid @brand-secondary;
+                }
+            }
+        }
+
+        // Other pages
+        a {
+            .pager-text;
+        }
+
+        // On small screens, hide First/Last shortcuts
+        &.pager-first,
+        &.pager-last {
+            display: none;
+
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                display: inline;
+            }
+        }
+
+        &.pager-ellipsis {
+            span {
+                border: none;
+            }
+        }
+    }
+}

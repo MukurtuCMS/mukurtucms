@@ -1,8 +1,13 @@
+/**
+ * @file
+ * Colorbox module init js.
+ */
+
 (function ($) {
 
 Drupal.behaviors.initColorbox = {
   attach: function (context, settings) {
-    if (!$.isFunction($.colorbox) || typeof settings.colorbox === 'undefined') {
+    if (!$.isFunction($('a, area, input', context).colorbox) || typeof settings.colorbox === 'undefined') {
       return;
     }
 
@@ -14,13 +19,31 @@ Drupal.behaviors.initColorbox = {
       }
     }
 
+    // Use "data-colorbox-gallery" if set otherwise use "rel".
+    settings.colorbox.rel = function () {
+
+      if ($(this).data('colorbox-gallery')) {
+        return $(this).data('colorbox-gallery');
+      }
+      else {
+        return $(this).attr('rel');
+      }
+    };
+
     $('.colorbox', context)
-      .once('init-colorbox')
-      .colorbox(settings.colorbox);
+      .once('init-colorbox').each(function(){
+        $(this).colorbox(settings.colorbox);
+      });
 
     $(context).bind('cbox_complete', function () {
       Drupal.attachBehaviors('#cboxLoadedContent');
     });
+
+    // Zoom colorbox images
+    $(window).bind('cbox_complete', function () {
+      $('#cboxLoadedContent').zoom({on:'mouseover', magnify: 2});
+    });
+
   }
 };
 

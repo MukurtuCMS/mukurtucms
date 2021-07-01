@@ -2,7 +2,6 @@
 
 /**
  * @file
- *
  * Contains helper code for plugins and contexts.
  */
 
@@ -41,7 +40,7 @@ function panels_get_regions($layout, $display) {
  *   The cached content, or FALSE to indicate no cached content exists.
  */
 function panels_get_cached_content($display, $args, $context, $pane = NULL) {
-  // Never use cache on a POST
+  // Never use cache on a POST.
   if (!empty($_POST)) {
     return FALSE;
   }
@@ -59,7 +58,7 @@ function panels_get_cached_content($display, $args, $context, $pane = NULL) {
     return FALSE;
   }
 
-  // restore it.
+  // Restore it.
   $cache->restore();
   return $cache;
 }
@@ -68,7 +67,7 @@ function panels_get_cached_content($display, $args, $context, $pane = NULL) {
  * Store cached content for a given display and possibly pane.
  */
 function panels_set_cached_content($cache, $display, $args, $context, $pane = NULL) {
-  // Never use cache on a POST
+  // Never use cache on a POST.
   if (!empty($_POST)) {
     return FALSE;
   }
@@ -82,7 +81,7 @@ function panels_set_cached_content($cache, $display, $args, $context, $pane = NU
 
   $conf = $pane ? $pane->cache['settings'] : $display->cache['settings'];
 
-  // snapshot it.
+  // Snapshot it.
   $cache->cache();
   return $function($conf, $cache, $display, $args, $context, $pane);
 }
@@ -125,7 +124,7 @@ class panels_cache_object {
   /**
    * When constructed, take a snapshot of our existing out of band data.
    */
-  function panels_cache_object() {
+  function __construct() {
     $this->head = drupal_add_html_head();
     $this->css = drupal_add_css();
     $this->tokens = ctools_set_page_token();
@@ -154,7 +153,7 @@ class panels_cache_object {
 
     $this->ready = TRUE;
 
-    // Simple replacement for head
+    // Simple replacement for head.
     $this->head = str_replace($this->head, '', drupal_add_html_head());
 
     // Slightly less simple for CSS:
@@ -173,15 +172,36 @@ class panels_cache_object {
     $start = $this->js;
     $this->js = array();
 
+    // Use the advanced mapping function from Drupal >= 7.23 if available.
+    $array_mapping_func = function_exists('drupal_array_diff_assoc_recursive') ? 'drupal_array_diff_assoc_recursive' : 'array_diff_assoc';
+
     // If there are any differences between the old and the new javascript then
     // store them to be added later.
-    if ($diff = array_diff_assoc($js, $start)) {
-      $this->js = $diff;
-    }
-
-    // Special case the settings key and get the difference of the data.
-    if ($settings_diff = array_diff_assoc($js['settings']['data'], $start['settings']['data'])) {
-      $this->js['settings'] = $settings_diff;
+    if ($diff = $array_mapping_func($js, $start)) {
+      // Iterate over the diff to ensure we keep the keys on merge and don't add
+      // unnecessary items.
+      foreach ($diff as $key => $diff_data) {
+        // Special case the settings key and get the difference of the data.
+        if ($key === 'settings') {
+          // Iterate over the diff to ensure we keep the keys on merge and don't
+          // add unnecessary items.
+          if (isset($diff[$key]['data'])) {
+            foreach ($diff[$key]['data'] as $settings_key => $settings_data) {
+              // Merge the changes with the base to get a complete settings
+              // array.
+              $this->js[$key]['data'][] = drupal_array_merge_deep($settings_data, $diff[$key]['data'][$settings_key]);
+            }
+          }
+        }
+        else {
+          $this->js[$key] = $diff_data;
+          // Check if the key was present already and if so merge the changes
+          // with the original data to get the full settings array.
+          if (isset($start[$key])) {
+            $this->js[$key] = drupal_array_merge_deep($start[$key], $this->js[$key]);
+          }
+        }
+      }
     }
 
     // And for tokens:
@@ -213,7 +233,7 @@ class panels_cache_object {
           drupal_add_js($args['data'], $args);
         }
         else {
-          foreach ($args as $setting) {
+          foreach ($args['data'] as $setting) {
             drupal_add_js($setting, 'setting');
           }
         }
@@ -227,6 +247,7 @@ class panels_cache_object {
       }
     }
   }
+
 }
 
 /**
@@ -391,7 +412,7 @@ function panels_get_renderer_handler($plugin, &$display) {
  * Choose a renderer for a display based on a render pipeline setting.
  */
 function panels_get_renderer($pipeline_name, &$display) {
-  // Load the pipeline
+  // Load the pipeline.
   ctools_include('export');
   $pipeline = ctools_export_crud_load('panels_renderer_pipeline', $pipeline_name);
 
@@ -422,7 +443,7 @@ function panels_get_renderer($pipeline_name, &$display) {
     return $renderer;
   }
 
-  // Fall through. If no renderer is selected, use the standard renderer
+  // Fall through. If no renderer is selected, use the standard renderer.
   return panels_get_renderer_handler('standard', $display);
 }
 
@@ -433,9 +454,9 @@ function panels_get_renderer($pipeline_name, &$display) {
  */
 function _panels_renderer_pipeline_sort($a, $b) {
   if ($a->weight == $b->weight) {
-      if ($a->admin_title == $b->admin_title) {
-        return 0;
-      }
+    if ($a->admin_title == $b->admin_title) {
+      return 0;
+    }
     return ($a->admin_title < $b->admin_title) ? -1 : 1;
   }
   return ($a->weight < $b->weight) ? -1 : 1;
@@ -455,6 +476,31 @@ function panels_get_renderer_pipelines($sort = TRUE) {
   }
 
   return $pipelines;
+}
+
+/**
+ * Fetch metadata on a specific panels_storage plugin.
+ *
+ * @param $storage
+ *   Name of a panel_storage plugin.
+ *
+ * @return
+ *   An array with information about the requested panels_storage plugin
+ */
+function panels_get_panels_storage_plugin($storage) {
+  ctools_include('plugins');
+  return ctools_get_plugins('panels', 'panels_storage', $storage);
+}
+
+/**
+ * Fetch metadata for all panels_storage plugins.
+ *
+ * @return
+ *   An array of arrays with information about all available panels_storage plugins.
+ */
+function panels_get_panels_storage_plugins() {
+  ctools_include('plugins');
+  return ctools_get_plugins('panels', 'panels_storage');
 }
 
 /**

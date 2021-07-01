@@ -5,7 +5,7 @@
  */
 
 /**
- * The basic 'fields' row plugin
+ * The basic 'fields' row plugin.
  *
  * This displays fields one after another, giving options for inline
  * or not.
@@ -89,7 +89,8 @@ class panels_views_plugin_row_fields extends views_plugin_row_fields {
     if (!$layout) {
       // Fall back to normal behavior if the layout is somehow invalid. This
       // can happen if the layout was removed, for example.
-      return theme($this->theme_functions(), array('view' => view, 'options' => $this->options, 'row' => $row, 'field_alias' => $this->field_alias));
+      return theme($this->theme_functions(), array('view' => $this->view, 'options' => $this->options, 'row' => $row));
+
     }
 
     // Store a backup copy of the array because we're going to be screwing
@@ -137,8 +138,8 @@ class panels_views_plugin_row_fields extends views_plugin_row_fields {
 
     // Now that we have distributed our fields, go through the regions and
     // render them into the content array.
-    foreach ($this->region_fields as $region_id => $fields) {
-      $this->view->field = $fields;
+    foreach ($this->region_fields as $region_id => $fields_list) {
+      $this->view->field = $fields_list;
       $content[$region_id] = theme($this->theme_functions(), array('view' => $this->view, 'options' => $this->options, 'row' => $row));
     }
 
@@ -148,10 +149,11 @@ class panels_views_plugin_row_fields extends views_plugin_row_fields {
     // Now that we have a rendered content array, render it.
     return panels_print_layout($layout, $content, $meta);
   }
+
 }
 
 /**
- * Override handler for views_ui_edit_display_form
+ * Override handler for views_ui_edit_display_form.
  */
 function panels_change_layout_button($form, &$form_state) {
   $display = &$form_state['view']->display[$form_state['display_id']];

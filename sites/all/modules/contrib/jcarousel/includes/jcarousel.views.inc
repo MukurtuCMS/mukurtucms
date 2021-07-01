@@ -156,6 +156,11 @@ function jcarousel_views_add($view, $display_id = NULL) {
     $options['auto'] = 0;
   }
 
+  // Calculate proper value for start if a negative value was chosen
+  if ($options['start'] < 0) {
+    $options['start'] += $count + 1;
+  }
+
   // Determine AJAX functionality in a backwards-compatible way. Versions prior
   // to jCarousel 2.6 used the view-level "Use AJAX" option instead of a style
   // setting. We check $view->style_options here intentionally instead of

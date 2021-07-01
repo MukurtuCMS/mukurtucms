@@ -1,0 +1,230 @@
+<?php
+
+/**
+ * @file
+ * Adds a legend of event types.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function fullcalendar_legend_theme($existing, $type, $theme, $path) {
+  return array(
+    'fullcalendar_legend' => array(
+      'variables' => array('types' => NULL),
+      'path' => $path . '/theme',
+      'file' => 'theme.inc',
+    ),
+  );
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function fullcalendar_legend_block_info() {
+  $blocks = array();
+
+  $blocks['fullcalendar_legend'] = array(
+    'info' => t('FullCalendar Legend'),
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function fullcalendar_legend_block_configure($delta = '') {
+  $form = array();
+
+  if ($delta == 'fullcalendar_legend') {
+    $form['fullcalendar_legend_type'] = array(
+      '#type' => 'select',
+      '#title' => t('Legend type'),
+      '#options' => array(
+        'bundle' => t('Bundle'),
+        'taxonomy' => t('Taxonomy'),
+      ),
+      '#default_value' => variable_get('fullcalendar_legend_type', 'bundle'),
+      '#description' => t('Select the type of legend to display.'),
+    );
+  }
+
+  return $form;
+}
+
+/**
+ * Implements hook_block_save().
+ */
+function fullcalendar_legend_block_save($delta = '', $edit = array()) {
+  if ($delta == 'fullcalendar_legend') {
+    variable_set('fullcalendar_legend_type', $edit['fullcalendar_legend_type']);
+  }
+}
+
+/**
+ * Implements hook_block_view().
+ *
+ * Displays a block with a representative item for each available bundle.
+ */
+function fullcalendar_legend_block_view($delta = '') {
+  $block = array();
+
+  if ($delta == 'fullcalendar_legend') {
+    // Ensure that this page is a FullCalendar view with the legend option set.
+    $view = views_get_page_view();
+    if (empty($view) || $view->display_handler->get_option('style_plugin') != 'fullcalendar') {
+      return;
+    }
+
+    // Build the block structure.
+    $block['content'] = fullcalendar_legend_build_legend($view, variable_get('fullcalendar_legend_type', 'bundle'));
+  }
+
+  return $block;
+}
+
+/**
+ * Builds the legend as a render array.
+ *
+ * @param object $view
+ *   The View object.
+ * @param string $type
+ *   The type of legend to build, either 'bundle' or 'taxonomy'.
+ *
+ * @return array
+ *   The render array representing the legend.
+ */
+function fullcalendar_legend_build_legend($view, $type) {
+  // Restrict the fields to only date fields used by the view.
+  $fields = array();
+  foreach ($view->display_handler->get_handlers('field') as $field) {
+    if (fullcalendar_field_is_date($field)) {
+      $fields[$field->field_info['field_name']] = $field->field_info;
+    }
+  }
+
+  $function = "fullcalendar_legend_get_type_$type";
+  $element = array(
+    '#theme' => 'fullcalendar_legend',
+    '#types' => $function($fields),
+  );
+  return $element;
+}
+
+/**
+ * Finds the bundle of a given date field.
+ *
+ * @param array $fields
+ *   An array of results from field_info_field(), keyed by field name.
+ *
+ * @return array
+ *   Array of bundles.
+ */
+function fullcalendar_legend_get_type_taxonomy($fields) {
+  $types = array();
+  $use_i18n = module_exists('i18n_taxonomy');
+  $field_info = field_info_fields();
+  foreach ($fields as $field_name => $field) {
+    // Then by entity type.
+    foreach ($field['bundles'] as $entity_type => $bundles) {
+      foreach ($bundles as $bundle) {
+        foreach (field_info_instances($entity_type, $bundle) as $taxonomy_field_name => $taxonomy_field) {
+          if ($field_info[$taxonomy_field_name]['type'] != 'taxonomy_term_reference') {
+            continue;
+          }
+          foreach ($field_info[$taxonomy_field_name]['settings']['allowed_values'] as $vocab) {
+            $vocabulary = taxonomy_vocabulary_machine_name_load($vocab['vocabulary']);
+            foreach (taxonomy_get_tree($vocabulary->vid) as $term) {
+              $term->vocabulary_machine_name = $vocabulary->machine_name;
+              $types[$term->tid]['entity_type'] = $entity_type;
+              $types[$term->tid]['field_name'] = $field_name;
+              $types[$term->tid]['bundle'] = $bundle;
+              $types[$term->tid]['label'] = ($use_i18n) ? i18n_taxonomy_term_name($term) : $term->name;
+              $types[$term->tid]['taxonomy_field'] = $taxonomy_field_name;
+              $types[$term->tid]['tid'] = $term->tid;
+              $types[$term->tid]['uri'] = entity_uri('taxonomy_term', $term);
+            }
+          }
+        }
+      }
+    }
+  }
+  return $types;
+}
+
+/**
+ * Finds the bundle of a given date field.
+ *
+ * @param array $fields
+ *   An array of results from field_info_field(), keyed by field name.
+ *
+ * @return array
+ *   Array of bundles.
+ */
+function fullcalendar_legend_get_type_bundle($fields) {
+  $types = array();
+  // Recurse through each field, finding out its bundle and entity type.
+  // Array is keyed first by field name.
+  foreach ($fields as $field_name => $field) {
+    // Then by entity type.
+    foreach ($field['bundles'] as $entity_type => $bundles) {
+      $entity_info = entity_get_info($entity_type);
+      // And finally by bundle name.
+      foreach ($bundles as $bundle) {
+        if (!isset($types[$bundle])) {
+          // @todo Find a generic way to process all entity types.
+          switch ($entity_type) {
+            case 'node':
+            case 'taxonomy_term':
+            case 'user':
+              $types[$bundle]['entity_type'] = $entity_type;
+              $types[$bundle]['field_name'] = $field_name;
+              $types[$bundle]['bundle'] = $bundle;
+              $types[$bundle]['label'] = $entity_info['bundles'][$bundle]['label'];
+              break;
+          }
+        }
+      }
+    }
+  }
+  return $types;
+}
+
+/**
+ * Implements hook_fullcalendar_classes().
+ */
+function fullcalendar_legend_fullcalendar_classes($entity) {
+  $classes = array();
+  if (!isset($entity->eid)) {
+    $classes[] = 'fc-event';
+  }
+  return $classes;
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function fullcalendar_legend_ctools_plugin_directory($module, $plugin_type) {
+  if ($module == 'ctools') {
+    return "plugins/$plugin_type";
+  }
+}
+
+/**
+ * Implements hook_preprocess_panels_pane().
+ */
+function fullcalendar_legend_preprocess_panels_pane(&$variables) {
+  if ($variables['pane']->type == 'fullcalendar_legend') {
+    $variables['classes_array'][] = 'fullcalendar-legend';
+  }
+}
+
+/**
+ * Implements hook_preprocess_block().
+ */
+function fullcalendar_legend_preprocess_block(&$variables) {
+  if ($variables['block']->module == 'fullcalendar_legend') {
+    $variables['classes_array'][] = 'fullcalendar-legend';
+  }
+}

@@ -1,0 +1,270 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the mail_logger module.
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function mail_logger_schema() {
+  $schema = array();
+  $schema['mail_logger'] = array(
+    'description'           => 'Mail Logger table stores outgoing mails',
+    'fields'      => array(
+      'mlid'          => array(
+        'description'   => 'Mail Logger entry ID',
+        'type'          => 'serial',
+        'not null'      => TRUE,
+        'unsigned'      => TRUE,
+      ),
+      'mailkey'       => array(
+        'description'   => 'a key identifying the mail type',
+        'type'          => 'varchar',
+        'length'        => 255,
+        'not null'      => TRUE,
+      ),
+      'mailto'        => array(
+        'description'   => 'to whom this mail is going',
+        'type'          => 'text',
+        'size'          => 'medium',    /* up to 16MB */
+        'not null'      => TRUE,
+      ),
+      'subject'       => array(
+        'description'   => 'Mail subject',
+        'type'          => 'varchar',
+        'length'        => 2047,
+        'not null'      => TRUE,
+      ),
+      'body'          => array(
+        'description'   => 'Body text of the mail',
+        'type'          => 'text',
+        'not null'      => TRUE,
+        'size'          => 'big',
+      ),
+      'mailfrom'      => array(
+        'description'   => 'the FROM email address',
+        'type'          => 'varchar',
+        'length'        => 2047,
+        'not null'      => TRUE,
+      ),
+      'headers'       => array(
+        'description'   => 'Headers of the outgoing mail',
+        'type'          => 'text',
+        'not null'      => TRUE,
+        'size'          => 'big',
+      ),
+      'date_sent'     => array(
+        'description'   => 'Mail Logger entry ID',
+        'type'          => 'int',
+        'not null'      => TRUE,
+        'unsigned'      => TRUE,
+      ),
+      'language'      => array(
+        'description'   => 'Language code',
+        'type'          => 'varchar',
+        'length'        => 20,
+        'not null'      => TRUE,
+      ),
+      'ipaddr'      => array(
+        'description'   => 'IP Address of User',
+        'type'          => 'varchar',
+        'length'        => 45,              // Long enough for IPv6.
+        'not null'      => TRUE,
+      ),
+      'mail_system'     => array(
+        'description'   => 'Mail System Class',
+        'type'          => 'varchar',
+        'length'        => 128,
+      ),
+    ),
+    'primary key'     => array('mlid'),
+    'indexes'         => array(
+      'mailto'          => array(array('mailto', 200)),
+      'mailfrom'        => array(array('mailfrom', 100)),
+      'mail_system'     => array('mail_system'),
+      'subject'         => array(array('subject', 20)),
+      'date_sent'       => array('date_sent'),
+      'language'        => array('language'),
+      'ipaddr'          => array('ipaddr'),
+    ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function mail_logger_install() {
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function mail_logger_uninstall() {
+  variable_del('mail_logger_log_maximum_age');
+}
+
+/**
+ * Implementation of hook_enable().
+ */
+function mail_logger_enable() {
+  // Because modules can modify the outgoing mail, mail_logger must be executed last in order to capture
+  // the final mail parameters by setting the weight of mail_logger to something large.
+  $max_weight = db_query("SELECT max(weight) FROM {system} WHERE name <> 'mail_logger'")->fetchField();
+  db_query("UPDATE {system} SET weight = :max_weight WHERE name = 'mail_logger'", array(':max_weight' => $max_weight + 100));
+}
+
+/**
+ * Expand 'mailto' column.
+ */
+function mail_logger_update_7000() {
+  if (db_driver() == 'mysql') {
+    // Otherwise the alter table may fail.
+    db_query("set sql_mode = 'NO_ENGINE_SUBSTITUTION'");
+  }
+
+  db_change_field('mail_logger', 'mailto', 'mailto',
+    array(
+      'description' => 'to whom this mail is going',
+      'type' => 'varchar',
+      'length' => 2047,
+      'not null' => TRUE,
+      ),
+    array('mailto' => array(array('mailto', 200)))
+    );
+  return t('The Mail_logger "mailto" column has been expanded.');
+}
+
+/**
+ * Add 'ipaddr' column.
+ */
+function mail_logger_update_7001() {
+  if (db_field_exists('mail_logger', 'ipaddr')) {
+    return t('mail_logger_update_7001 was unneccessary.');
+  }
+  else {
+    db_add_field('mail_logger', 'ipaddr',
+      array(
+          'description' => 'IP Address of User',
+          'type' => 'varchar',
+          'length' => 45,
+          'initial' => '',
+        ),
+      array(
+        'indexes' => array('ipaddr' => array('ipaddr')),
+        )
+      );
+    return t('The Mail_logger "ipaddr" field was added.');
+  }
+}
+
+/**
+ * Verify correct schema for 'ipaddr' column.
+ */
+function mail_logger_update_7002() {
+  // mail_logger_update_7001() initially had an error that could lead to a
+  // corrupt schema and NULL values in the ipaddr column. These problems can
+  // persist even after the user runs the corrected version of update 7001, so
+  // we use this update hook to detect/fix those cases.
+  // @see https://www.drupal.org/node/2668458
+  $current_schema = drupal_get_schema('mail_logger');
+  // First change any NULL ipaddr values to our intended empty value.
+  $updated = db_update('mail_logger')
+    ->fields(array('ipaddr' => ''))
+    ->condition('ipaddr', NULL)
+    ->execute();
+  // If NULL values were found and corrected this in an indicator that the
+  // schema spec for the ipaddr column may also be in a corrupt state, so we
+  // refresh its definition.
+  if ($updated) {
+    db_change_field('mail_logger', 'ipaddr', 'ipaddr', $current_schema['fields']['ipaddr']);
+    return t('The Mail_logger "ipaddr" field has been verified.');
+  }
+  return t('The Mail_logger "ipaddr" field did not require verification.');
+}
+
+/**
+ * Add 'mail system' column.
+ */
+function mail_logger_update_7003() {
+  if (db_field_exists('mail_logger', 'mail_system')) {
+    return t('mail_logger_update_7003 was unneccessary.');
+  }
+  else {
+    db_add_field('mail_logger', 'mail_system',
+      array(
+        'description'   => 'Mail System Class',
+        'type'          => 'varchar',
+        'length'        => 128,
+      ),
+      array(
+        'indexes' => array('mail_system' => array('mail_system')),
+        )
+      );
+    return t('The Mail_logger "mail_system" field was added.');
+  }
+}
+
+/**
+ * Expand 'subject' and 'mailfrom' columns.
+ */
+function mail_logger_update_7004() {
+  db_drop_index('mail_logger', 'mailfrom');
+  db_change_field('mail_logger', 'mailfrom', 'mailfrom',
+    array(
+      'description' => 'the FROM email address',
+      'type' => 'varchar',
+      'length' => 2047,
+      'not null' => TRUE,
+      ),
+    array('mailfrom' => array(array('mailfrom', 100)))
+    );
+
+  db_change_field('mail_logger', 'mailfrom', 'mailfrom',
+    array(
+      'description' => 'Mail subject',
+      'type' => 'varchar',
+      'length' => 2047,
+      'not null' => TRUE,
+      ),
+    array('subject' => array(array('subject', 20)))
+    );
+  db_add_index('mail_logger', 'mailfrom', array(array('mailfrom', 100)));
+
+  return t('The Mail_logger "mailfrom" and "subject" columns have been expanded.');
+}
+
+/**
+ * Update the mail subject field definition.
+ */
+function mail_logger_update_7005() {
+  db_change_field('mail_logger', 'subject', 'subject',
+    array(
+      'description' => 'Mail subject',
+      'type' => 'varchar',
+      'length' => 2047,
+      'not null' => TRUE,
+    ),
+    array('subject' => array(array('subject', 20)))
+  );
+}
+
+/**
+ * Expand 'mailto' column.
+ */
+function mail_logger_update_7006() {
+  db_drop_index('mail_logger', 'mailto');
+  db_change_field('mail_logger', 'mailto', 'mailto',
+    array(
+      'description' => 'to whom this mail is going',
+      'type' => 'text',
+      'size' => 'medium',
+      'not null' => TRUE,
+      ),
+    array('mailto' => array(array('mailto', 200)))
+    );
+
+  return t('The Mail_logger "mailto" column has been expanded.');
+}

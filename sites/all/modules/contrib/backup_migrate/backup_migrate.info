@@ -1,17 +1,52 @@
 name = Backup and Migrate
-description = "Backup or migrate the Drupal Database quickly and without unnecessary data."
+description = "Backup the Drupal database and files or migrate them to another environment."
 core = 7.x
+configure = admin/config/system/backup_migrate
 
-files[] = backup_migrate.module
-files[] = backup_migrate.install
+; Require PHP 5.4 so that some slightly more advanced PHP logic can be used.
+; This is for future usage; removing this will allow the module to continue
+; working fine for now.
+php = 5.4
+
+; All of the class files used within the module.
+files[] = includes/crud.inc
 files[] = includes/destinations.inc
+files[] = includes/destinations.browser.inc
+files[] = includes/destinations.db.inc
+files[] = includes/destinations.db.mysql.inc
+files[] = includes/destinations.email.inc
+files[] = includes/destinations.file.inc
+files[] = includes/destinations.ftp.inc
+files[] = includes/destinations.s3.inc
+files[] = includes/files.inc
+files[] = includes/filters.inc
+files[] = includes/filters.backup_restore.inc
+files[] = includes/filters.compression.inc
+files[] = includes/filters.encryption.inc
+files[] = includes/filters.statusnotify.inc
+files[] = includes/filters.utils.inc
+files[] = includes/locations.inc
 files[] = includes/profiles.inc
 files[] = includes/schedules.inc
+files[] = includes/sources.inc
+files[] = includes/sources.archivesource.inc
+files[] = includes/sources.db.inc
+files[] = includes/sources.db.mysql.inc
+files[] = includes/sources.filesource.inc
 
-configure = admin/config/system/backup_migrate
-; Information added by  packaging script on 2013-11-05
-version = "7.x-2.8"
+; Test dependencies.
+test_dependencies[] = ctools
+
+; Test suite.
+files[] = tests/BmTestBase.test
+files[] = tests/BmTestBasics.test
+files[] = tests/BmTestProfiles.test
+files[] = tests/BmTestEmail.test
+files[] = tests/BmTestCtools.test
+files[] = tests/BmTestUpdate7310.test
+
+; Information added by Drupal.org packaging script on 2020-07-15
+version = "7.x-3.9"
 core = "7.x"
 project = "backup_migrate"
-datestamp = "1383686305"
-
+datestamp = "1594807678"

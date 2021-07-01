@@ -1,0 +1,16 @@
+If you want to define your own custom logic of what terms are to be considered possible duplicates and then to plug this custom logic into all Term Merge machinery, then this page is for you.
+
+Duplicate detection heuristics are implemented through cTools plugins. If you have not worked with cTools plugins before, we highly recommend you to read documentation about them, such as <a href="&topic:ctools/plugins-implementing&">this one</a>.
+
+Term Merge module defines the cTools plugin type of <em>duplicate_suggestion</em>. This plugin type contains the following properties: <ul>
+    <li><b>title</b>: (string) Human readable translated title of your duplicate suggestion logic. The title will be inserted into the UI of duplicate tool whereafter you can enable it for duplicate detection</li>
+    <li><b>description</b>: (string) [optional] Human readable translated description of how your duplicate suggestion functions. Try including here description of the logic.</li>
+    <li><b>hash callback</b>: (string) Name of a function that hashes terms. Terms with the same hash will be considered possible duplicates. The function will receive the following input arguments: <ol>
+        <li>(object) Taxonomy term object whose hash is requested. The term will not include fields attached to it. They are excluded for performance and scaling considerations.</li>
+    </ol>Your hash function is expected to return string: hash of the provided Taxonomy term.</li>
+    <li><b>weight</b>: (int) [optional] Weight of your duplicate suggestion. On the duplicate tool UI the duplicate suggestions are displayed in the order according to their weights.</li>
+</ul>
+
+Having that said, core of your duplicate suggestion plugin should be the hash function. You can look at the examples of hash function inside of Term Merge module, just study the <em>term_merge/plugins/duplicate_suggestion/*.inc</em> files. In fact your hash function does not necessarily have to be complicated to yield reasonable duplicate suggestions.
+
+Good luck coding! And if you feel like you have coded a duplicate suggestion that others might benefit from, please, be kind to open an issue against Term Merge module and share your duplicate suggestion there. I thank you beforehand on behalf of all the community!

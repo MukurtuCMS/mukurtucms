@@ -1,0 +1,209 @@
+.view-mode-full {
+    .field-name-dh-related-items-teasers {
+        text-align: center;
+    }
+}
+
+.view-mode-search_result,
+.view-mode-teaser {
+    .label-inline {
+        letter-spacing: @mukurtu-expanded-letter-spacing;
+        font-size: 10px;
+        font-weight: bold;
+        text-transform: uppercase;
+
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            font-size: 12px;
+            line-height: 2;
+            width: 100px;
+            float: left;
+            clear: both;
+        }
+    }
+
+    .label-above {
+        letter-spacing: @mukurtu-expanded-letter-spacing;
+        font-size: 10px;
+        font-weight: bold;
+        text-transform: uppercase;
+
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            font-size: 12px;
+            line-height: 2;
+        }
+    }
+
+    .field {
+        padding: 5px;
+        font-size: 15px;
+
+        // Desktop
+        @media (min-width: @screen-md-min) {
+            font-size: 16px;
+        }
+    }
+
+    // Title
+    .field-name-title {
+        h2 {
+            .font-light;
+            font-size: 18px;
+            margin-top: 0px;
+
+            // Tablet
+            @media (min-width: @screen-sm-min) {
+                font-size: 24px;
+            }
+
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                font-size: 30px;
+            }
+
+            a {
+                .mukurtu-standard-link;
+            }
+        }
+    }
+
+    // Media
+    .field-name-field-media-asset {
+        img {
+            width: 100%;
+        }
+    }
+
+    // Type
+    .field-name-featured-content-type {
+        font-weight: bold;
+
+        // Desktop
+        @media (min-width: @screen-md-min) {
+            font-size: 13px;
+        }
+    }
+}
+
+.list-view {
+    .view-mode-search_result,
+    .view-mode-teaser {
+        // Type
+        .field-name-featured-content-type {
+            letter-spacing: @mukurtu-expanded-letter-spacing;
+            text-transform: uppercase;
+        }
+    }
+}
+
+// For the search result teaser, do not show the content type if we are in a content-type specific view.
+.view-digital-heritage-grid-list,
+.view-collections-grid-list,
+.view-dictionary-words {
+    .view-mode-search_result,
+    .view-mode-teaser {
+        // Type
+        .field-name-featured-content-type {
+            display: none !important;
+        }
+    }
+}
+
+
+// Teaser specific
+.view-mode-teaser {
+    .view-border;
+    padding: 20px 0px;
+
+    .field {
+        // Media
+        &.field-name-field-media-asset {
+            img {
+                width: 60%;
+                margin: auto;
+            }
+        }
+
+        &.field-name-featured-content-type {
+            font-weight: bold;
+            font-size: 13px;
+            letter-spacing: @mukurtu-expanded-letter-spacing;
+            padding-bottom: 20px;
+            text-transform: uppercase;
+
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                font-size: 15px;
+            }
+        }
+    }
+}
+
+// List View
+.list-view {
+    .mejs__audio,
+    .mejs__video .mejs__controls {
+        display: none;
+
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            display: flex;
+        }
+    }
+}
+
+// Grid View
+.grid-view {
+    padding-top: 60px;
+
+    .view-header {
+        position: absolute;
+        top: 0;
+    }
+
+    .view-content {
+        height: 100%;
+    }
+
+    // Pager
+    .text-center {
+        width: 100%;
+        float: left;
+        margin-top: 10%;
+    }
+
+    .views-row {
+        .mukurtu-standard-grid-sizing;
+    }
+
+    .view-mode-search_result {
+        .item-grid-view;
+    }
+}
+
+
+.grid-view:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+
+.image-grid {
+    .thumbnail-on-link;
+}
+
+.view-mode-mukurtu_scald_related_items {
+    img {
+        margin: auto;
+    }
+}
+
+
+.view-mode-full {
+    .field-name-mukurtu-icon-actions {
+        float: right;
+        margin-top: -25px;
+    }
+}
+

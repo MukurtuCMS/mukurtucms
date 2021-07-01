@@ -18,14 +18,11 @@ class ServicesResourceFileTests extends ServicesWebTestCase {
   protected $testfile;
 
   /**
-   * Implements setUp().
+   * {@inheritdoc}
    */
-  public function setUp() {
-    parent::setUp(
-      'ctools',
-      'services',
-      'rest_server'
-    );
+  public function setUp(array $modules = array()) {
+    parent::setUp($modules);
+
     // Set up endpoint.
     $this->endpoint =  $this->saveNewEndpoint();
     // Create and log in our privileged user.
@@ -50,6 +47,9 @@ class ServicesResourceFileTests extends ServicesWebTestCase {
       'name' => 'Resource File',
       'description' => 'Test the resource File methods.',
       'group' => 'Services',
+      // The libraries module is required by rest_service, which is used by
+      // ServicesEndpointTests.
+      'dependencies' => array('ctools', 'libraries'),
     );
   }
 

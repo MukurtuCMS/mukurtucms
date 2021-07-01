@@ -1,0 +1,9 @@
+name = Entity Field Query Extra Fields
+description = Allow retrieving extra fields from EFQ
+core = 7.x
+; Information added by Drupal.org packaging script on 2014-11-05
+version = "7.x-1.0-alpha1"
+core = "7.x"
+project = "efq_extra_field"
+datestamp = "1415196781"
+

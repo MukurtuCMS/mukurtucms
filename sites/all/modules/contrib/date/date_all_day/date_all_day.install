@@ -1,0 +1,113 @@
+<?php
+
+/**
+ * @file
+ * Update scripts for the Date All Day module.
+ */
+
+/**
+ * Change old "all day" values.
+ *
+ * Old data was stored with values with the time set to "00:00:00" whereas new
+ * data is stored with the time set to "23:59:59" (the minutes value varies
+ * depending upon the field's "increment" value), while keeping the same date.
+ *
+ * @todo Run this through a sandbox.
+ */
+function date_all_day_update_7200() {
+  // Get all fields provided by the Data module. This is used instead of the
+  // usual field_read_fields() because we want to select three different field
+  // types, whereas the API only supports one at a time.
+  $field_names = db_select('field_config', 'f')
+    ->fields('f', array('field_name'))
+    ->condition('f.type', array('datetime', 'date', 'datestamp'), 'IN')
+    ->execute()
+    ->fetchCol();
+
+  // Keep track of the fields that were processed.
+  $fields_processed = array();
+
+  // Loop over each of the fields that was found.
+  foreach ($field_names as $field_name) {
+    // Get the full specs of this base field.
+    $field = field_read_field($field_name);
+
+    // Loop over each instance of this field.
+    $params = array(
+      'field_name' => $field_name,
+    );
+    foreach (field_read_instances($params) as $instance) {
+      if (!empty($instance['widget']['settings']['display_all_day'])) {
+        $fields_processed[] = $field_name;
+
+        // If this field has a "to" date, the column to change is the "value2"
+        // column, otherwise just change the primary column.
+        if (!empty($field['settings']['todate'])) {
+          $field_to_change = $field_name . '_value2';
+        }
+        else {
+          $field_to_change = $field_name . '_value';
+        }
+
+        // Manually fix each record.
+        $records = db_select('field_data_' . $field_name, 'f')
+          ->fields('f')
+          ->condition('f.entity_type', $instance['entity_type'])
+          ->condition('f.bundle', $instance['bundle'])
+          ->condition('f.' . $field_to_change, '%:00:00', 'LIKE')
+          ->execute();
+
+        // The value that the widget is set to increment by. This is stored in
+        // minutes.
+        $increment = 1;
+        if (isset($instance['widget']['settings']['increment'])) {
+          $increment = $instance['widget']['settings']['increment'];
+        }
+
+        foreach ($records as $record) {
+          // Extract the value and convert it to a timestamp.
+          $end_date_value = $record->{$field_to_change};
+          $date = strtotime($end_date_value);
+
+          // The old time was stored with the value of midnight the day before
+          // the date that was intended, e.g. if the date was 2020-10-17 the
+          // time was stored as 0:00:00 thus the saved value "2020-10-17
+          // 00:00:00". This needs to be converted to 1 second before midnight
+          // on *that* day, i.e. "2020-10-17 23:59:59".
+          // @see hook_date_combo_validate_date_end_alter()
+          // @see date_all_day_date_combo_validate_date_start_alter()
+          $date += 23 * 60 * 60; // 23 hours.
+          $date += (60 - $increment) * 60; // 60 minutes - $increment, e.g. 59.
+          $date += 59; // 59 seconds.
+
+          // Reformat the date using an appropriate format for storing in the
+          // database.
+          $date = date(DATE_FORMAT_DATETIME, $date);
+
+          // Update the record.
+          db_update('field_data_' . $field_name)
+            ->fields(array(
+              $field_to_change => $date,
+            ))
+            ->condition('entity_type', $record->entity_type)
+            ->condition('bundle', $record->bundle)
+            ->condition('deleted', $record->deleted)
+            ->condition('revision_id', $record->revision_id)
+            ->condition('language', $record->language)
+            ->condition('delta', $record->delta)
+            ->execute();
+
+          // Clear the caches for this entity.
+          entity_get_controller($record->entity_type)->resetCache(array($record->entity_id));
+        }
+      }
+    }
+  }
+
+  // If any data was converted clear the site's caches.
+  if ($fields_processed) {
+    drupal_flush_all_caches();
+  }
+
+  return t('Processed %fields.', array('%fields' => implode(', ', $fields_processed)));
+}

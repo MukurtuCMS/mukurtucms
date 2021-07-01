@@ -240,14 +240,14 @@ class FormsTestCase extends DrupalWebTestCase {
     $values = drupal_json_decode($this->drupalPost(NULL, array('required_checkbox' => 1), t('Submit')));
     $expected_values = array(
       'disabled_checkbox_on' => 'disabled_checkbox_on',
-      'disabled_checkbox_off' => '',
+      'disabled_checkbox_off' => 0,
       'checkbox_on' => 'checkbox_on',
-      'checkbox_off' => '',
+      'checkbox_off' => 0,
       'zero_checkbox_on' => '0',
-      'zero_checkbox_off' => '',
+      'zero_checkbox_off' => 0,
     );
     foreach ($expected_values as $widget => $expected_value) {
-      $this->assertEqual($values[$widget], $expected_value, format_string('Checkbox %widget returns expected value (expected: %expected, got: %value)', array(
+      $this->assertIdentical($values[$widget], $expected_value, format_string('Checkbox %widget returns expected value (expected: %expected, got: %value)', array(
         '%widget' => var_export($widget, TRUE),
         '%expected' => var_export($expected_value, TRUE),
         '%value' => var_export($values[$widget], TRUE),
@@ -521,6 +521,9 @@ class FormsTestCase extends DrupalWebTestCase {
     $form_state['values'] = array();
     drupal_prepare_form($form_id, $form, $form_state);
 
+    // Set the CSRF token in the user-provided input.
+    $form_state['input']['form_token'] = $form['form_token']['#default_value'];
+
     // This is the main function we want to test: it is responsible for
     // populating user supplied $form_state['input'] to sanitized
     // $form_state['values'].
@@ -587,6 +590,19 @@ class FormElementTestCase extends DrupalWebTestCase {
         '%type' => $type,
       )));
     }
+  }
+
+  /**
+   * Tests Weight form element #default_value behavior.
+   */
+  public function testWeightDefaultValue() {
+    $element = array(
+      '#type' => 'weight',
+      '#delta' => 10,
+      '#default_value' => 15,
+    );
+    $element = form_process_weight($element);
+    $this->assertTrue(isset($element['#options'][$element['#default_value']]), 'Default value exists in #options list');
   }
 }
 
@@ -687,7 +703,15 @@ class FormValidationTestCase extends DrupalWebTestCase {
     $this->drupalPost(NULL, $edit, 'Save');
     $this->assertNoFieldByName('name', '#value changed by #validate', 'Form element #value was not altered.');
     $this->assertNoText('Name value: value changed by form_set_value() in #validate', 'Form element value in $form_state was not altered.');
-    $this->assertText('The form has become outdated. Copy any unsaved work in the form below');
+    $this->assertText('The form has become outdated.');
+  }
+
+  /**
+   * Tests that a form with a disabled CSRF token can be validated.
+   */
+  function testDisabledToken() {
+    $this->drupalPost('form-test/validate-no-token', array(), 'Save');
+    $this->assertText('The form_test_validate_no_token form has been submitted successfully.');
   }
 
   /**
@@ -828,6 +852,12 @@ class FormsElementsLabelsTestCase extends DrupalWebTestCase {
     $this->assertEqual($elements[0]['title'], 'Checkboxes test' . ' (' . t('Required') . ')', 'Title attribute found.');
     $elements = $this->xpath('//div[@id="edit-form-radios-title-attribute"]');
     $this->assertEqual($elements[0]['title'], 'Radios test' . ' (' . t('Required') . ')', 'Title attribute found.');
+
+    // Check that empty name attribute is not printed on buttons.
+    $elements = $this->xpath('//input[@id="edit-form-button-with-name"]');
+    $this->assertTrue($elements[0]['name'] == 'op', 'Name attribute found.');
+    $elements = $this->xpath('//input[@id="edit-form-button-without-name"]');
+    $this->assertFalse(isset($elements[0]['name']), 'No name attribute found.');
   }
 }
 
@@ -994,6 +1024,26 @@ class FormsElementsTableSelectFunctionalTest extends DrupalWebTestCase {
     $this->assertTrue(isset($errors['tableselect']), 'Option checker disallows invalid values for radio buttons.');
   }
 
+  /**
+   * Test presence of ajax functionality
+   */
+  function testAjax() {
+    $rows = array('row1', 'row2', 'row3');
+    // Test checkboxes (#multiple == TRUE).
+    foreach ($rows as $row) {
+      $element = 'tableselect[' . $row . ']';
+      $edit = array($element => TRUE);
+      $result = $this->drupalPostAJAX('form_test/tableselect/multiple-true', $edit, $element);
+      $this->assertFalse(empty($result), t('Ajax triggers on checkbox for @row.', array('@row' => $row)));
+    }
+    // Test radios (#multiple == FALSE).
+    $element = 'tableselect';
+    foreach ($rows as $row) {
+      $edit = array($element => $row);
+      $result = $this->drupalPostAjax('form_test/tableselect/multiple-false', $edit, $element);
+      $this->assertFalse(empty($result), t('Ajax triggers on radio for @row.', array('@row' => $row)));
+    }
+  }
 
   /**
    * Helper function for the option check test to submit a form while collecting errors.
@@ -1389,6 +1439,59 @@ class FormsFormStoragePageCacheTestCase extends DrupalWebTestCase {
     $this->assertText($build_id_first_rebuild, 'First build id as old build id on the page');
     $build_id_second_rebuild = $this->getFormBuildId();
     $this->assertNotEqual($build_id_first_rebuild, $build_id_second_rebuild, 'Build id changes on second rebuild.');
+  }
+}
+
+/**
+ * Test cache_form.
+ */
+class FormsFormCacheTestCase extends DrupalWebTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Form caching',
+      'description' => 'Tests storage and retrieval of forms from cache.',
+      'group' => 'Form API',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('form_test');
+  }
+
+  /**
+   * Tests storing and retrieving the form from cache.
+   */
+  function testCacheForm() {
+    $form = drupal_get_form('form_test_cache_form');
+    $form_state = array('foo' => 'bar', 'build_info' => array('baz'));
+    form_set_cache($form['#build_id'], $form, $form_state);
+
+    $cached_form_state = array();
+    $cached_form = form_get_cache($form['#build_id'], $cached_form_state);
+
+    $this->assertEqual($cached_form['#build_id'], $form['#build_id'], 'Form retrieved from cache_form successfully.');
+    $this->assertEqual($cached_form_state['foo'], 'bar', 'Data retrieved from cache_form successfully.');
+  }
+
+  /**
+   * Tests changing form_cache_expiration.
+   */
+  function testCacheFormCustomExpiration() {
+    variable_set('form_cache_expiration', -1 * (24 * 60 * 60));
+
+    $form = drupal_get_form('form_test_cache_form');
+    $form_state = array('foo' => 'bar', 'build_info' => array('baz'));
+    form_set_cache($form['#build_id'], $form, $form_state);
+
+    // Clear expired entries from cache_form, which should include the entry we
+    // just stored. Without this, the form will still be retrieved from cache.
+    cache_clear_all(NULL, 'cache_form');
+
+    $cached_form_state = array();
+    $cached_form = form_get_cache($form['#build_id'], $cached_form_state);
+
+    $this->assertNull($cached_form, 'Expired form was not returned from cache.');
+    $this->assertTrue(empty($cached_form_state), 'No data retrieved from cache for expired form.');
   }
 }
 
@@ -2097,5 +2200,38 @@ class HTMLIdTestCase extends DrupalWebTestCase {
     $edit = array();
     $this->drupalPost(NULL, $edit, 'Save', array(), array(), 'form-test-html-id--2');
     $this->assertNoDuplicateIds('There are no duplicate IDs');
+  }
+}
+
+/**
+ * Tests for form textarea.
+ */
+class FormTextareaTestCase extends DrupalUnitTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Form textarea',
+      'description' => 'Tests form textarea related functions.',
+      'group' => 'Form API',
+    );
+  }
+
+  /**
+   * Tests that textarea value is properly set.
+   */
+  public function testValueCallback() {
+    $element = array();
+    $form_state = array();
+    $test_cases = array(
+      array(NULL, FALSE),
+      array(NULL, NULL),
+      array('', array('test')),
+      array('test', 'test'),
+      array('123', 123),
+    );
+    foreach ($test_cases as $test_case) {
+      list($expected, $input) = $test_case;
+      $this->assertIdentical($expected, form_type_textarea_value($element, $input, $form_state));
+    }
   }
 }

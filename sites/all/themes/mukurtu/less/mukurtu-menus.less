@@ -1,0 +1,281 @@
+#navbar {
+	margin-bottom: 0px;
+}
+
+// Drupal admin menu
+body #admin-menu {
+    // Admin menu gets messed up at small sizes
+    display: none;
+
+    // Display on tablet or above
+    @media (min-width: @screen-sm-min) {
+        display: block;
+    }
+}
+
+
+.nav.tabs--primary {
+    ul,li {
+        display: inline;
+        a {
+            .mukurtu-standard-link;
+        }
+
+        a:hover {
+            background-color: transparent;
+        }
+    }
+
+    &.dropdown-menu {
+        li {
+             a.active {
+                color: @text-color;
+                border: none;
+            }
+        }
+    }
+
+    &.dropdown-menu li {
+        width: 100%;
+    }
+}
+
+// Top menu with Mukurtu links (add content, my account, dashboard, etc)
+.mukurtu-menu {
+	background-color: @brand-primary;
+	min-height: 6px;
+
+    ul.navbar-nav {
+        width: 100%;
+        text-align: center;
+        margin: 0;
+
+        li {
+            float: left;
+            width: 100%;
+
+            @media (min-width: @screen-sm-min) {
+                display: inline-block;
+                float: none;
+                width: auto;
+            }
+
+            &.active-trail,
+            &.dropdown.active-trail {
+                a {
+                    background-color: @brand-primary;
+                    color: @mukurtu-default-container-font-color;
+                }
+            }
+
+            &.expanded.dropdown.open,
+            &.expanded.dropdown.open:focus,
+            &.expanded.dropdown.open:hover,
+            &.expanded.dropdown.open > a,
+            &.expanded.dropdown.open:focus > a,
+            &.expanded.dropdown.open:hover > a {
+                background-color: @mukurtu-navbar-default-link-hover-bg;
+                color: @mukurtu-navbar-default-link-color;
+
+                ul.dropdown-menu {
+                    background-color: @mukurtu-navbar-default-link-hover-bg;
+
+                    li.leaf {
+                        width: 100%;
+                        a {
+                            background-color: @mukurtu-navbar-default-link-hover-bg;
+                            color: @mukurtu-navbar-default-link-color;
+                            padding: 10px 20px;
+                            width: 100%;
+
+                            &:hover {
+                                background-color: @brand-primary;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .navbar-nav, .links {
+		 li {
+	    	&:hover,
+	    	&:focus {
+				background-color: @mukurtu-navbar-default-link-hover-bg;
+			}
+
+	    	> a {
+				font-weight: @mukurtu-navbar-default-font-weight;
+				color: @mukurtu-navbar-default-link-color;
+		  		&:hover,
+		  		&:focus {
+		      		color: @mukurtu-navbar-default-link-hover-color;
+		      		text-decoration: none;
+			  	}
+			}
+		}
+	}
+}
+
+// Log in/Log out menu
+.mukurtu-login-menu {
+	float: right;
+	border-radius: 0px 0px 5px 5px;
+	ul {
+		list-style-type: none;
+		text-align: center;
+		padding-left: 0px;
+		margin-bottom: 4px;
+		width: @mukurtu-login-menu-width;
+	}
+
+	a {
+		text-transform: uppercase;
+		font-size: @font-size-mukurtu-login-menu;
+	}
+
+    // Tablet
+	@media (min-width: @screen-sm-min) {
+		margin-right: @grid-gutter-width !important;
+    }
+
+    // Desktop
+	@media (min-width: @screen-md-min) {
+		margin-right: @mukurtu-main-container-padding !important;
+	}
+}
+
+// Navbar toggle
+.navbar-default {
+	.navbar-toggle {
+		border: none;
+		padding-left: 0px;
+		padding-right: 20px;
+		clear: right;
+		width: @mukurtu-login-menu-width;
+
+		&:hover,
+		&:focus {
+		    background-color: @navbar-default-bg;
+		}
+
+		.collapse-menu-color-bars {
+			float: left;
+			width: 20%;
+			.icon-bar {
+				background-color: @brand-secondary;
+				height: 4px;
+			}
+		}
+
+		.collapse-menu-label {
+			padding-left: 5px;
+			float: right;
+			width: 80%;
+
+		}
+	}
+}
+
+// Logo and collapse menu
+.navbar.container-fluid > #mukurtu-collapse-menu-container.container-fluid {
+	.navbar-header {
+		margin-left: @grid-gutter-width;
+
+		// Desktop
+		@media (min-width: @screen-md-min) {
+			margin-left: @mukurtu-main-container-padding;
+		}
+	}
+
+	// Logo
+	.logo {
+		img {
+			// Mobile
+			width: 60px;
+
+			// Tablet
+			@media (min-width: @screen-sm-min) {
+				width: 70px;
+			}
+
+			// Desktop
+			@media (min-width: @screen-md-min) {
+				width: 100px;
+			}
+		}
+	}
+
+	// Main Mukurtu Browse Menu (About/Collections/Digital Heritage/etc)
+	.navbar-collapse {
+		// Min height in case where site logo is small/disabled
+		min-height: 60px;
+
+		ul.navbar-nav.secondary {
+			// Tablet
+			@media (min-width: @screen-sm-min) {
+				position: relative;
+				float: left;
+				clear: left;
+				font-size: @mukurtu-navbar-collapse-tablet-font-size;
+
+				> li {
+					// Non-hover border
+					border-bottom: @navbar-mukurtu-accent-height solid transparent;
+					border-right: 1px solid rgba(70, 70, 70, 0.25);
+
+					&.last {
+						border-right: none;
+					}
+
+					&.active,
+					&:hover,
+					&:focus {
+						border-bottom: @navbar-mukurtu-accent-height solid @brand-secondary;
+						a {
+							background-color: @navbar-default-bg;
+						}
+					}
+
+					> a {
+						color: @text-color;
+					}
+				}
+			}
+
+			// Desktop
+			@media (min-width: @screen-md-min) {
+				position: absolute;
+				bottom: 0;
+				margin-left: 25%;
+				font-size: @mukurtu-navbar-collapse-font-size;
+			}
+		}
+	}
+}
+
+// Mobile Menu
+#navbar-collapse.in,
+#navbar-collapse.collapsing {
+	border: none;
+
+	.menu {
+		position: relative;
+		text-align: center;
+		width: 100%;
+
+		> li {
+			padding: @mukurtu-navbar-collapse-padding;
+
+			> a {
+				font-size: @mukurtu-navbar-collapse-font-size;
+				color: @mukurtu-navbar-collapse-link-color;
+		  		&:hover,
+		  		&:focus {
+		      		color: @mukurtu-navbar-collapse-link-hover-color;
+		      		text-decoration: none;
+			  	}
+			}
+		}
+	}
+}

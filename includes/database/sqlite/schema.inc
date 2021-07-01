@@ -244,7 +244,7 @@ class DatabaseSchema_sqlite extends DatabaseSchema {
     // database. So the syntax '...RENAME TO database.table' would fail.
     // So we must determine the full table name here rather than surrounding
     // the table with curly braces incase the db_prefix contains a reference
-    // to a database outside of our existsing database.
+    // to a database outside of our existing database.
     $info = $this->getPrefixInfo($new_name);
     $this->connection->query('ALTER TABLE {' . $table . '} RENAME TO ' . $info['table']);
 
@@ -668,6 +668,9 @@ class DatabaseSchema_sqlite extends DatabaseSchema {
     $this->alterTable($table, $old_schema, $new_schema);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function findTables($table_expression) {
     // Don't add the prefix, $table_expression already includes the prefix.
     $info = $this->getPrefixInfo($table_expression, FALSE);
@@ -680,4 +683,32 @@ class DatabaseSchema_sqlite extends DatabaseSchema {
     ));
     return $result->fetchAllKeyed(0, 0);
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function findTablesD8($table_expression) {
+    $tables = array();
+
+    // The SQLite implementation doesn't need to use the same filtering strategy
+    // as the parent one because individually prefixed tables live in their own
+    // schema (database), which means that neither the main database nor any
+    // attached one will contain a prefixed table name, so we just need to loop
+    // over all known schemas and filter by the user-supplied table expression.
+    $attached_dbs = $this->connection->getAttachedDatabases();
+    foreach ($attached_dbs as $schema) {
+      // Can't use query placeholders for the schema because the query would
+      // have to be :prefixsqlite_master, which does not work. We also need to
+      // ignore the internal SQLite tables.
+      $result = db_query("SELECT name FROM " . $schema . ".sqlite_master WHERE type = :type AND name LIKE :table_name AND name NOT LIKE :pattern", array(
+        ':type' => 'table',
+        ':table_name' => $table_expression,
+        ':pattern' => 'sqlite_%',
+      ));
+      $tables += $result->fetchAllKeyed(0, 0);
+    }
+
+    return $tables;
+  }
+
 }

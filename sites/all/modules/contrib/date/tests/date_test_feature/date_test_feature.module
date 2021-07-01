@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * @file
+ * Migration integration for Date Migrate Example.
+ */
+
+include_once 'date_test_feature.features.inc';

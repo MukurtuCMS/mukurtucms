@@ -115,7 +115,7 @@ function _views_xml_render_fields($view, $row) {
     $field = $view->field[$id];
     $field_is_multiple = FALSE;
     $field_raw = array();
-    if ((isset($field->options['multiple']['group']))&& isset($field->field_values)) {
+    if ((isset($field->options['multiple']['group'])) && isset($field->field_values)) {
       $field_output = _views_xml_render_multiple_field($field, $row);
       $n = 0;
       if (is_array($field_output)) {
@@ -124,7 +124,9 @@ function _views_xml_render_fields($view, $row) {
         }
         $field_is_multiple = TRUE;
       }
-      else $field_raw = $view->field[$field->options['id']]->advanced_render($row);
+      else {
+        $field_raw = $view->field[$field->options['id']]->advanced_render($row);
+      }
     }
     else {
       $field_output = $view->field[$field->options['id']]->advanced_render($row);
@@ -136,19 +138,21 @@ function _views_xml_render_fields($view, $row) {
     if (is_array($field_output)) {
       foreach ($field_output as $i => $f) {
         if (preg_match("/<img[^>]+>/i", $f, $img_match)) {
-          if (preg_match('/(src)="([^"]*)"/i', $img_match[0], $src_match))
-          $field_output[$i] = ($src_match[2]);
+          if (preg_match('/(src)="([^"]*)"/i', $img_match[0], $src_match)) {
+            $field_output[$i] = ($src_match[2]);
+          }
         }
       }
     }
     else {
       if (preg_match("/<img[^>]+>/i", $field_output, $img_match)) {
-        if (preg_match('/(src)="([^"]*)"/i', $img_match[0], $src_match))
+        if (preg_match('/(src)="([^"]*)"/i', $img_match[0], $src_match)) {
           $field_output = ($src_match[2]);
+        }
       }
     }
 
-    if (empty($field->options['exclude']) && ($field_output != "") && !empty($field_output)) {
+    if (empty($field->options['exclude']) && !empty($field_output) && ($field_output !== "" || $field_output === '0')) {
       $object = new stdClass();
       $object->id = $id;
       $object->content = $field_output;
@@ -178,8 +182,212 @@ function _views_xml_strip_illegal_xml_attribute_value_chars($input) {
 }
 
 function _views_xml_xmlEntities($str) {
-  $xml = array('&#34;','&#38;','&#38;','&#60;','&#62;','&#160;','&#161;','&#162;','&#163;','&#164;','&#165;','&#166;','&#167;','&#168;','&#169;','&#170;','&#171;','&#172;','&#173;','&#174;','&#175;','&#176;','&#177;','&#178;','&#179;','&#180;','&#181;','&#182;','&#183;','&#184;','&#185;','&#186;','&#187;','&#188;','&#189;','&#190;','&#191;','&#192;','&#193;','&#194;','&#195;','&#196;','&#197;','&#198;','&#199;','&#200;','&#201;','&#202;','&#203;','&#204;','&#205;','&#206;','&#207;','&#208;','&#209;','&#210;','&#211;','&#212;','&#213;','&#214;','&#215;','&#216;','&#217;','&#218;','&#219;','&#220;','&#221;','&#222;','&#223;','&#224;','&#225;','&#226;','&#227;','&#228;','&#229;','&#230;','&#231;','&#232;','&#233;','&#234;','&#235;','&#236;','&#237;','&#238;','&#239;','&#240;','&#241;','&#242;','&#243;','&#244;','&#245;','&#246;','&#247;','&#248;','&#249;','&#250;','&#251;','&#252;','&#253;','&#254;','&#255;');
-  $html = array('&quot;','&amp;','&amp;','&lt;','&gt;','&nbsp;','&iexcl;','&cent;','&pound;','&curren;','&yen;','&brvbar;','&sect;','&uml;','&copy;','&ordf;','&laquo;','&not;','&shy;','&reg;','&macr;','&deg;','&plusmn;','&sup2;','&sup3;','&acute;','&micro;','&para;','&middot;','&cedil;','&sup1;','&ordm;','&raquo;','&frac14;','&frac12;','&frac34;','&iquest;','&Agrave;','&Aacute;','&Acirc;','&Atilde;','&Auml;','&Aring;','&AElig;','&Ccedil;','&Egrave;','&Eacute;','&Ecirc;','&Euml;','&Igrave;','&Iacute;','&Icirc;','&Iuml;','&ETH;','&Ntilde;','&Ograve;','&Oacute;','&Ocirc;','&Otilde;','&Ouml;','&times;','&Oslash;','&Ugrave;','&Uacute;','&Ucirc;','&Uuml;','&Yacute;','&THORN;','&szlig;','&agrave;','&aacute;','&acirc;','&atilde;','&auml;','&aring;','&aelig;','&ccedil;','&egrave;','&eacute;','&ecirc;','&euml;','&igrave;','&iacute;','&icirc;','&iuml;','&eth;','&ntilde;','&ograve;','&oacute;','&ocirc;','&otilde;','&ouml;','&divide;','&oslash;','&ugrave;','&uacute;','&ucirc;','&uuml;','&yacute;','&thorn;','&yuml;');
+  $xml = array(
+    '&#34;',
+    '&#38;',
+    '&#38;',
+    '&#60;',
+    '&#62;',
+    '&#160;',
+    '&#161;',
+    '&#162;',
+    '&#163;',
+    '&#164;',
+    '&#165;',
+    '&#166;',
+    '&#167;',
+    '&#168;',
+    '&#169;',
+    '&#170;',
+    '&#171;',
+    '&#172;',
+    '&#173;',
+    '&#174;',
+    '&#175;',
+    '&#176;',
+    '&#177;',
+    '&#178;',
+    '&#179;',
+    '&#180;',
+    '&#181;',
+    '&#182;',
+    '&#183;',
+    '&#184;',
+    '&#185;',
+    '&#186;',
+    '&#187;',
+    '&#188;',
+    '&#189;',
+    '&#190;',
+    '&#191;',
+    '&#192;',
+    '&#193;',
+    '&#194;',
+    '&#195;',
+    '&#196;',
+    '&#197;',
+    '&#198;',
+    '&#199;',
+    '&#200;',
+    '&#201;',
+    '&#202;',
+    '&#203;',
+    '&#204;',
+    '&#205;',
+    '&#206;',
+    '&#207;',
+    '&#208;',
+    '&#209;',
+    '&#210;',
+    '&#211;',
+    '&#212;',
+    '&#213;',
+    '&#214;',
+    '&#215;',
+    '&#216;',
+    '&#217;',
+    '&#218;',
+    '&#219;',
+    '&#220;',
+    '&#221;',
+    '&#222;',
+    '&#223;',
+    '&#224;',
+    '&#225;',
+    '&#226;',
+    '&#227;',
+    '&#228;',
+    '&#229;',
+    '&#230;',
+    '&#231;',
+    '&#232;',
+    '&#233;',
+    '&#234;',
+    '&#235;',
+    '&#236;',
+    '&#237;',
+    '&#238;',
+    '&#239;',
+    '&#240;',
+    '&#241;',
+    '&#242;',
+    '&#243;',
+    '&#244;',
+    '&#245;',
+    '&#246;',
+    '&#247;',
+    '&#248;',
+    '&#249;',
+    '&#250;',
+    '&#251;',
+    '&#252;',
+    '&#253;',
+    '&#254;',
+    '&#255;'
+  );
+  $html = array(
+    '&quot;',
+    '&amp;',
+    '&amp;',
+    '&lt;',
+    '&gt;',
+    '&nbsp;',
+    '&iexcl;',
+    '&cent;',
+    '&pound;',
+    '&curren;',
+    '&yen;',
+    '&brvbar;',
+    '&sect;',
+    '&uml;',
+    '&copy;',
+    '&ordf;',
+    '&laquo;',
+    '&not;',
+    '&shy;',
+    '&reg;',
+    '&macr;',
+    '&deg;',
+    '&plusmn;',
+    '&sup2;',
+    '&sup3;',
+    '&acute;',
+    '&micro;',
+    '&para;',
+    '&middot;',
+    '&cedil;',
+    '&sup1;',
+    '&ordm;',
+    '&raquo;',
+    '&frac14;',
+    '&frac12;',
+    '&frac34;',
+    '&iquest;',
+    '&Agrave;',
+    '&Aacute;',
+    '&Acirc;',
+    '&Atilde;',
+    '&Auml;',
+    '&Aring;',
+    '&AElig;',
+    '&Ccedil;',
+    '&Egrave;',
+    '&Eacute;',
+    '&Ecirc;',
+    '&Euml;',
+    '&Igrave;',
+    '&Iacute;',
+    '&Icirc;',
+    '&Iuml;',
+    '&ETH;',
+    '&Ntilde;',
+    '&Ograve;',
+    '&Oacute;',
+    '&Ocirc;',
+    '&Otilde;',
+    '&Ouml;',
+    '&times;',
+    '&Oslash;',
+    '&Ugrave;',
+    '&Uacute;',
+    '&Ucirc;',
+    '&Uuml;',
+    '&Yacute;',
+    '&THORN;',
+    '&szlig;',
+    '&agrave;',
+    '&aacute;',
+    '&acirc;',
+    '&atilde;',
+    '&auml;',
+    '&aring;',
+    '&aelig;',
+    '&ccedil;',
+    '&egrave;',
+    '&eacute;',
+    '&ecirc;',
+    '&euml;',
+    '&igrave;',
+    '&iacute;',
+    '&icirc;',
+    '&iuml;',
+    '&eth;',
+    '&ntilde;',
+    '&ograve;',
+    '&oacute;',
+    '&ocirc;',
+    '&otilde;',
+    '&ouml;',
+    '&divide;',
+    '&oslash;',
+    '&ugrave;',
+    '&uacute;',
+    '&ucirc;',
+    '&uuml;',
+    '&yacute;',
+    '&thorn;',
+    '&yuml;'
+  );
   $str = str_replace($html, $xml, $str);
   $str = str_ireplace($html, $xml, $str);
   return $str;
@@ -245,15 +453,15 @@ function _views_xml_format_author($username) {
  *   Either the original input or a date string.
  */
 /** may never be used as the properly rendered date strings are available
-function views_xml_is_date($input) {
-  if (strpos($input, 'a:3:{s:5:"month"') !== 0) {
-    return $input;
-  }
-  else {        // serialized date array
-    $date = unserialize($input);
-    return format_date(mktime(0, 0, 0, $date['month'], $date['day'], $date['year']), 'custom', DATE_ISO8601);
-  }
-}
+ * function views_xml_is_date($input) {
+ * if (strpos($input, 'a:3:{s:5:"month"') !== 0) {
+ * return $input;
+ * }
+ * else {        // serialized date array
+ * $date = unserialize($input);
+ * return format_date(mktime(0, 0, 0, $date['month'], $date['day'], $date['year']), 'custom', DATE_ISO8601);
+ * }
+ * }
  */
 
 function _views_xml_debug_stop($var) {

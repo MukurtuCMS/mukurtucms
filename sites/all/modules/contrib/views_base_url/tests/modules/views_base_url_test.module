@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ * Test cases for views base url module.
+ */
+
+/**
+ * Implements hook_views_api().
+ */
+function views_base_url_test_views_api() {
+  return array(
+    'api' => 3,
+  );
+}

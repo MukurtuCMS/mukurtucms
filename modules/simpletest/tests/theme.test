@@ -238,6 +238,27 @@ class ThemeTableTestCase extends DrupalWebTestCase {
     $this->assertNoRaw('class="odd"', 'Odd/even classes were not added because $no_striping = TRUE.');
     $this->assertNoRaw('no_striping', 'No invalid no_striping HTML attribute was printed.');
   }
+
+  /**
+   * Test that the 'footer' option works correctly.
+   */
+  function testThemeTableFooter() {
+    $footer = array(
+      array(
+        'data' => array(1),
+      ),
+      array('Foo'),
+    );
+
+    $table = array(
+      'rows' => array(),
+      'footer' => $footer,
+    );
+
+    $this->content = theme('table', $table);
+    $this->content = preg_replace('@>\s+<@', '><', $this->content);
+    $this->assertRaw('<tfoot><tr><td>1</td></tr><tr><td>Foo</td></tr></tfoot>', 'Table footer found.');
+  }
 }
 
 /**
@@ -643,6 +664,37 @@ class ThemeDebugMarkupTestCase extends DrupalWebTestCase {
 
     $this->drupalGet('node/' . $node->nid);
     $this->assertNoRaw('<!-- THEME DEBUG -->', 'Theme debug markup not found in theme output when debug is disabled.');
+  }
+
+}
+
+/**
+ * Tests module-provided theme engines.
+ */
+class ModuleProvidedThemeEngineTestCase extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Theme engine test',
+      'description' => 'Tests module-provided theme engines.',
+      'group' => 'Theme',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('theme_test');
+    theme_enable(array('test_theme', 'test_theme_nyan_cat'));
+  }
+
+  /**
+   * Ensures that the module provided theme engine is found and used by core.
+   */
+  function testEngineIsFoundAndWorking() {
+    variable_set('theme_default', 'test_theme_nyan_cat');
+    variable_set('admin_theme', 'test_theme_nyan_cat');
+
+    $this->drupalGet('theme-test/engine-info-test');
+    $this->assertText('Miaou');
   }
 
 }

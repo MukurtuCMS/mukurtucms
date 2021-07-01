@@ -1,19 +1,19 @@
 <?php
 /**
  * @file
- * 
- * 
  *
- * @author Kálmán Hosszu - hosszu.kalman@gmail.com - http://premiumcmsthemes.com http://www.kalman-hosszu.com
+ *
+ *
+ * @author Kálmán Hosszu - http://drupal.org/user/267481
  */
- 
+
 function multiform_test_menu() {
   return array(
     'multiform_test' => array(
       'access callback' => TRUE,
       'type' => MENU_CALLBACK,
       'page callback' => 'multiform_get_form',
-      'page arguments' => array(array('multiform_eaxample_test1'), array('multiform_test2')),
+      'page arguments' => array(array('multiform_test1'), array('multiform_test2')),
     ),
   );
 }

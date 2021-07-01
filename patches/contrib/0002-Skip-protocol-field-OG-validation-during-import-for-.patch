@@ -1,0 +1,29 @@
+From db2ae66a7045eaf19f26fa429a9cef76b796ecc9 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Tue, 19 Feb 2019 14:50:12 -0800
+Subject: [PATCH] Skip protocol field OG validation during import for admins
+
+---
+ .../entityreference/behavior/OgBehaviorHandler.class.php    | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/plugins/entityreference/behavior/OgBehaviorHandler.class.php b/plugins/entityreference/behavior/OgBehaviorHandler.class.php
+index d17a8e26..b49482c7 100644
+--- a/plugins/entityreference/behavior/OgBehaviorHandler.class.php
++++ b/plugins/entityreference/behavior/OgBehaviorHandler.class.php
+@@ -277,6 +277,12 @@ class OgBehaviorHandler extends EntityReference_BehaviorHandler_Abstract {
+         continue;
+       }
+
++      // Mukurtu patch.
++      // Skip validation if coming from a Mukurtu importer.
++      if ($field_mode == 'mukurtu_import') {
++        continue;
++      }
++
+       $instance['field_mode'] = $field_mode;
+       $valid_ids = entityreference_get_selection_handler($field, $instance, $entity_type, $entity)->validateReferencableEntities($ids);
+
+--
+2.19.0.windows.1
+

@@ -6,8 +6,7 @@ core = 7.x
 files[] = poll.test
 stylesheets[all][] = poll.css
 
-; Information added by Drupal.org packaging script on 2015-10-21
-version = "7.41"
+; Information added by Drupal.org packaging script on 2021-06-02
+version = "7.81"
 project = "drupal"
-datestamp = "1445457729"
-
+datestamp = "1622633234"

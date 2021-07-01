@@ -10,7 +10,7 @@
 function features_test_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'node-features_test-field_features_test'
+  // Exported field_instance: 'node-features_test-field_features_test'.
   $field_instances['node-features_test-field_features_test'] = array(
     'bundle' => 'features_test',
     'default_value' => NULL,
