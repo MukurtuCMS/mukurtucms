@@ -360,7 +360,10 @@ function ma_mobile_client_generate_toggle_link($node, $color = '') {
       'mobile-sync-icon',
       'mobile-sync-' . $node->nid,
     ];
-    return l('<img src="/sites/all/themes/mukurtu/images/icons/mobile-' . $icon . '-' . $color . '.png">', 'node/' . $node->nid . '/mobile-sync-toggle/' . $color, ['html' => TRUE, 'attributes' => ['class' => $classes, 'title' => $link_text]]);
+
+    global $base_path;
+    $theme_path = drupal_get_path('theme', 'mukurtu');
+    return l('<img src="' . $base_path . $theme_path . '/images/icons/mobile-' . $icon . '-' . $color . '.png">', 'node/' . $node->nid . '/mobile-sync-toggle/' . $color, ['html' => TRUE, 'attributes' => ['class' => $classes, 'title' => $link_text]]);
   }
 
 }
