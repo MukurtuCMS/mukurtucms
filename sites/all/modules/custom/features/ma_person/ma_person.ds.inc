@@ -18,16 +18,6 @@ function ma_person_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'person';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
-    'mukurtu_icon_actions' => array(
-      'weight' => '0',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'table_of_contents' => array(
-      'weight' => '1',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
     'field_date_born' => array(
       'formatter_settings' => array(
         'ft' => array(
@@ -54,8 +44,8 @@ function ma_person_ds_field_settings_info() {
         'ft' => array(
           'func' => 'theme_ds_field_expert',
           'lb' => 'Referenced Content',
-          'lb-cl' => 'field-name-field-node-aggregate',
           'lb-at' => 'name="found-in"',
+          'lb-cl' => 'field-name-field-node-aggregate',
           'lb-col' => TRUE,
           'lbw' => 1,
           'lbw-el' => 'h3',
@@ -76,6 +66,21 @@ function ma_person_ds_field_settings_info() {
         ),
       ),
     ),
+    'mukurtu_icon_actions' => array(
+      'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '0',
+    ),
+    'mukurtu_mobile_sync' => array(
+      'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '0',
+    ),
+    'table_of_contents' => array(
+      'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '1',
+    ),
   );
   $export['node|person|default'] = $ds_fieldsetting;
 
@@ -87,28 +92,43 @@ function ma_person_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'featured_content';
   $ds_fieldsetting->settings = array(
     'featured_content_type' => array(
-      'weight' => '2',
-      'label' => 'hidden',
       'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '2',
     ),
     'featured_content_view_link' => array(
-      'weight' => '0',
-      'label' => 'hidden',
       'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '0',
     ),
     'title' => array(
-      'weight' => '16',
-      'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
-        'link' => '1',
-        'wrapper' => 'h2',
         'class' => '',
         'ft' => array(),
+        'link' => '1',
+        'wrapper' => 'h2',
       ),
+      'label' => 'hidden',
+      'weight' => '16',
     ),
   );
   $export['node|person|featured_content'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|person|mukurtu_mobile';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'person';
+  $ds_fieldsetting->view_mode = 'mukurtu_mobile';
+  $ds_fieldsetting->settings = array(
+    'title' => array(
+      'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '0',
+    ),
+  );
+  $export['node|person|mukurtu_mobile'] = $ds_fieldsetting;
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
@@ -118,15 +138,15 @@ function ma_person_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'person_teaser';
   $ds_fieldsetting->settings = array(
     'title' => array(
-      'weight' => '0',
-      'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
-        'link' => '1',
-        'wrapper' => 'h3',
         'class' => '',
         'ft' => array(),
+        'link' => '1',
+        'wrapper' => 'h3',
       ),
+      'label' => 'hidden',
+      'weight' => '0',
     ),
   );
   $export['node|person|person_teaser'] = $ds_fieldsetting;
@@ -139,15 +159,15 @@ function ma_person_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'related_person_teaser';
   $ds_fieldsetting->settings = array(
     'title' => array(
-      'weight' => '0',
-      'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
-        'link' => '1',
-        'wrapper' => 'h4',
         'class' => '',
         'ft' => array(),
+        'link' => '1',
+        'wrapper' => 'h4',
       ),
+      'label' => 'hidden',
+      'weight' => '0',
     ),
   );
   $export['node|person|related_person_teaser'] = $ds_fieldsetting;
@@ -160,25 +180,30 @@ function ma_person_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'search_result';
   $ds_fieldsetting->settings = array(
     'featured_content_type' => array(
-      'weight' => '15',
-      'label' => 'hidden',
       'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '1',
+    ),
+    'mukurtu_icon_actions' => array(
+      'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '3',
+    ),
+    'mukurtu_mobile_sync' => array(
+      'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '2',
     ),
     'title' => array(
-      'weight' => '13',
-      'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
-        'link' => '1',
-        'wrapper' => 'h2',
         'class' => '',
         'ft' => array(),
+        'link' => '1',
+        'wrapper' => 'h2',
       ),
-    ),
-    'field_media_asset' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
+      'label' => 'hidden',
+      'weight' => '0',
     ),
   );
   $export['node|person|search_result'] = $ds_fieldsetting;
@@ -191,9 +216,9 @@ function ma_person_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'taxonomy_record_teaser';
   $ds_fieldsetting->settings = array(
     'title' => array(
-      'weight' => '0',
-      'label' => 'hidden',
       'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '0',
     ),
   );
   $export['node|person|taxonomy_record_teaser'] = $ds_fieldsetting;
@@ -206,20 +231,20 @@ function ma_person_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'teaser';
   $ds_fieldsetting->settings = array(
     'featured_content_type' => array(
-      'weight' => '0',
-      'label' => 'hidden',
       'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '0',
     ),
     'title' => array(
-      'weight' => '0',
-      'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
-        'link' => '1',
-        'wrapper' => 'h2',
         'class' => '',
         'ft' => array(),
+        'link' => '1',
+        'wrapper' => 'h2',
       ),
+      'label' => 'hidden',
+      'weight' => '0',
     ),
   );
   $export['node|person|teaser'] = $ds_fieldsetting;
@@ -241,6 +266,21 @@ function ma_person_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'paragraphs_item|person_relationship_bundle|mukurtu_mobile';
+  $ds_fieldsetting->entity_type = 'paragraphs_item';
+  $ds_fieldsetting->bundle = 'person_relationship_bundle';
+  $ds_fieldsetting->view_mode = 'mukurtu_mobile';
+  $ds_fieldsetting->settings = array(
+    'field_related_person' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['paragraphs_item|person_relationship_bundle|mukurtu_mobile'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'paragraphs_item|text_section|default';
   $ds_fieldsetting->entity_type = 'paragraphs_item';
   $ds_fieldsetting->bundle = 'text_section';
@@ -257,6 +297,26 @@ function ma_person_ds_field_settings_info() {
     ),
   );
   $export['paragraphs_item|text_section|default'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'paragraphs_item|text_section|mukurtu_mobile';
+  $ds_fieldsetting->entity_type = 'paragraphs_item';
+  $ds_fieldsetting->bundle = 'text_section';
+  $ds_fieldsetting->view_mode = 'mukurtu_mobile';
+  $ds_fieldsetting->settings = array(
+    'field_left_media' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_right_media' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['paragraphs_item|text_section|mukurtu_mobile'] = $ds_fieldsetting;
 
   return $export;
 }
@@ -278,6 +338,7 @@ function ma_person_ds_custom_fields_info() {
   $ds_field->ui_limit = 'person|default';
   $ds_field->properties = array(
     'code' => array(
+      'format' => 'ds_code',
       'value' => '<?php
          // We want to build a table of contents for the following:
         // 1. Related People
@@ -318,7 +379,6 @@ function ma_person_ds_custom_fields_info() {
             print drupal_render($toc);
         }
 ?>',
-      'format' => 'ds_code',
     ),
     'use_token' => 0,
   );
@@ -341,59 +401,61 @@ function ma_person_ds_layout_settings_info() {
   $ds_layout->view_mode = 'default';
   $ds_layout->layout = 'bootstrap_6_6_stacked';
   $ds_layout->settings = array(
-    'regions' => array(
-      'top' => array(
-        0 => 'mukurtu_icon_actions',
-      ),
-      'left' => array(
-        1 => 'field_media_asset',
-      ),
-      'right' => array(
-        2 => 'table_of_contents',
-        3 => 'field_date_born',
-        4 => 'field_date_died',
-        5 => 'field_tags',
-        6 => 'field_collection',
-        7 => 'field_related_people',
-      ),
-      'bottom' => array(
-        8 => 'field_sections',
-        9 => 'field_node_aggregate',
-        10 => 'field_related_content',
-        11 => 'field_media_aggregate',
-      ),
-    ),
-    'fields' => array(
-      'mukurtu_icon_actions' => 'top',
-      'field_media_asset' => 'left',
-      'table_of_contents' => 'right',
-      'field_date_born' => 'right',
-      'field_date_died' => 'right',
-      'field_tags' => 'right',
-      'field_collection' => 'right',
-      'field_related_people' => 'right',
-      'field_sections' => 'bottom',
-      'field_node_aggregate' => 'bottom',
-      'field_related_content' => 'bottom',
-      'field_media_aggregate' => 'bottom',
-    ),
     'classes' => array(
       'layout_class' => array(
         '' => '',
       ),
     ),
-    'wrappers' => array(
-      'top' => 'div',
-      'left' => 'div',
-      'right' => 'div',
-      'bottom' => 'div',
+    'fields' => array(
+      'field_collection' => 'right',
+      'field_date_born' => 'right',
+      'field_date_died' => 'right',
+      'field_media_aggregate' => 'bottom',
+      'field_media_asset' => 'left',
+      'field_node_aggregate' => 'bottom',
+      'field_related_content' => 'bottom',
+      'field_related_people' => 'right',
+      'field_sections' => 'bottom',
+      'field_tags' => 'right',
+      'mukurtu_icon_actions' => 'top',
+      'mukurtu_mobile_sync' => 'top',
+      'table_of_contents' => 'right',
     ),
-    'layout_wrapper' => 'div',
     'layout_attributes' => '',
     'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
+    'layout_wrapper' => 'div',
+    'regions' => array(
+      'bottom' => array(
+        9 => 'field_sections',
+        10 => 'field_node_aggregate',
+        11 => 'field_related_content',
+        12 => 'field_media_aggregate',
+      ),
+      'left' => array(
+        1 => 'field_media_asset',
+      ),
+      'right' => array(
+        3 => 'table_of_contents',
+        4 => 'field_date_born',
+        5 => 'field_date_died',
+        6 => 'field_tags',
+        7 => 'field_collection',
+        8 => 'field_related_people',
+      ),
+      'top' => array(
+        0 => 'mukurtu_icon_actions',
+        2 => 'mukurtu_mobile_sync',
+      ),
+    ),
+    'wrappers' => array(
+      'bottom' => 'div',
+      'left' => 'div',
+      'right' => 'div',
+      'top' => 'div',
+    ),
   );
   $export['node|person|default'] = $ds_layout;
 
@@ -405,6 +467,23 @@ function ma_person_ds_layout_settings_info() {
   $ds_layout->view_mode = 'featured_content';
   $ds_layout->layout = 'bootstrap_12';
   $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      'featured_content_type' => 'central',
+      'featured_content_view_link' => 'central',
+      'field_media_asset' => 'central',
+      'title' => 'central',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
     'regions' => array(
       'central' => array(
         0 => 'featured_content_view_link',
@@ -413,26 +492,9 @@ function ma_person_ds_layout_settings_info() {
         3 => 'title',
       ),
     ),
-    'fields' => array(
-      'featured_content_view_link' => 'central',
-      'field_media_asset' => 'central',
-      'featured_content_type' => 'central',
-      'title' => 'central',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
     'wrappers' => array(
       'central' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['node|person|featured_content'] = $ds_layout;
 
@@ -444,76 +506,123 @@ function ma_person_ds_layout_settings_info() {
   $ds_layout->view_mode = 'form';
   $ds_layout->layout = 'ds_1col';
   $ds_layout->settings = array(
-    'regions' => array(
-      'ds_content' => array(
-        0 => 'field_pre_actions',
-        1 => 'title',
-        2 => 'group_tabs',
-        3 => 'field_media_asset',
-        4 => 'field_node_aggregate',
-        5 => 'field_date_born',
-        7 => 'field_date_died',
-        10 => 'field_deceased',
-        11 => 'field_tags',
-        13 => 'field_sections',
-        14 => 'field_mukurtu_terms',
-        15 => 'field_related_people',
-        16 => 'group_biographic',
-        17 => 'field_related_content',
-        18 => 'group_relations',
-        19 => 'field_collection',
-        20 => 'field_personal_collections',
-        21 => 'group_record_connections',
-        22 => '_add_existing_field',
-      ),
-      'hidden' => array(
-        6 => 'og_group_ref',
-        8 => 'redirect',
-        9 => 'path',
-        12 => 'field_media_aggregate',
-      ),
-    ),
-    'fields' => array(
-      'field_pre_actions' => 'ds_content',
-      'title' => 'ds_content',
-      'group_tabs' => 'ds_content',
-      'field_media_asset' => 'ds_content',
-      'field_node_aggregate' => 'ds_content',
-      'field_date_born' => 'ds_content',
-      'og_group_ref' => 'hidden',
-      'field_date_died' => 'ds_content',
-      'redirect' => 'hidden',
-      'path' => 'hidden',
-      'field_deceased' => 'ds_content',
-      'field_tags' => 'ds_content',
-      'field_media_aggregate' => 'hidden',
-      'field_sections' => 'ds_content',
-      'field_mukurtu_terms' => 'ds_content',
-      'field_related_people' => 'ds_content',
-      'group_biographic' => 'ds_content',
-      'field_related_content' => 'ds_content',
-      'group_relations' => 'ds_content',
-      'field_collection' => 'ds_content',
-      'field_personal_collections' => 'ds_content',
-      'group_record_connections' => 'ds_content',
-      '_add_existing_field' => 'ds_content',
-    ),
     'classes' => array(
       'layout_class' => array(
         '' => '',
       ),
     ),
+    'fields' => array(
+      '_add_existing_field' => 'ds_content',
+      'field_collection' => 'ds_content',
+      'field_date_born' => 'ds_content',
+      'field_date_died' => 'ds_content',
+      'field_deceased' => 'ds_content',
+      'field_media_aggregate' => 'hidden',
+      'field_media_asset' => 'ds_content',
+      'field_mukurtu_terms' => 'ds_content',
+      'field_node_aggregate' => 'ds_content',
+      'field_personal_collections' => 'ds_content',
+      'field_pre_actions' => 'ds_content',
+      'field_related_content' => 'ds_content',
+      'field_related_people' => 'ds_content',
+      'field_sections' => 'ds_content',
+      'field_tags' => 'ds_content',
+      'group_biographic' => 'ds_content',
+      'group_record_connections' => 'ds_content',
+      'group_relations' => 'ds_content',
+      'group_tabs' => 'ds_content',
+      'og_group_ref' => 'hidden',
+      'path' => 'hidden',
+      'redirect' => 'hidden',
+      'title' => 'ds_content',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_pre_actions',
+        1 => 'group_tabs',
+        2 => 'field_node_aggregate',
+        7 => 'field_mukurtu_terms',
+        8 => 'field_related_people',
+        9 => 'field_related_content',
+        10 => 'group_biographic',
+        11 => 'field_collection',
+        12 => 'group_relations',
+        13 => 'field_personal_collections',
+        14 => 'title',
+        15 => 'field_media_asset',
+        16 => 'group_record_connections',
+        17 => 'field_tags',
+        18 => 'field_sections',
+        19 => 'field_date_born',
+        20 => 'field_date_died',
+        21 => 'field_deceased',
+        22 => '_add_existing_field',
+      ),
+      'hidden' => array(
+        3 => 'og_group_ref',
+        4 => 'redirect',
+        5 => 'path',
+        6 => 'field_media_aggregate',
+      ),
+    ),
     'wrappers' => array(
       'ds_content' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['node|person|form'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|person|mukurtu_mobile';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'person';
+  $ds_layout->view_mode = 'mukurtu_mobile';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      'field_collection' => 'ds_content',
+      'field_date_born' => 'ds_content',
+      'field_date_died' => 'ds_content',
+      'field_media_asset' => 'ds_content',
+      'field_related_people' => 'ds_content',
+      'field_sections' => 'ds_content',
+      'field_tags' => 'ds_content',
+      'title' => 'ds_content',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'title',
+        1 => 'field_media_asset',
+        2 => 'field_date_born',
+        3 => 'field_date_died',
+        4 => 'field_tags',
+        5 => 'field_sections',
+        6 => 'field_collection',
+        7 => 'field_related_people',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+  );
+  $export['node|person|mukurtu_mobile'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -523,30 +632,30 @@ function ma_person_ds_layout_settings_info() {
   $ds_layout->view_mode = 'person_teaser';
   $ds_layout->layout = 'bootstrap_12';
   $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      'field_media_asset' => 'central',
+      'title' => 'central',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
     'regions' => array(
       'central' => array(
         0 => 'title',
         1 => 'field_media_asset',
       ),
     ),
-    'fields' => array(
-      'title' => 'central',
-      'field_media_asset' => 'central',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
     'wrappers' => array(
       'central' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['node|person|person_teaser'] = $ds_layout;
 
@@ -558,6 +667,21 @@ function ma_person_ds_layout_settings_info() {
   $ds_layout->view_mode = 'related_person_teaser';
   $ds_layout->layout = 'bootstrap_9_3';
   $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      'field_media_asset' => 'right',
+      'title' => 'left',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
     'regions' => array(
       'left' => array(
         0 => 'title',
@@ -566,25 +690,10 @@ function ma_person_ds_layout_settings_info() {
         1 => 'field_media_asset',
       ),
     ),
-    'fields' => array(
-      'title' => 'left',
-      'field_media_asset' => 'right',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
     'wrappers' => array(
       'left' => 'div',
       'right' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['node|person|related_person_teaser'] = $ds_layout;
 
@@ -596,35 +705,41 @@ function ma_person_ds_layout_settings_info() {
   $ds_layout->view_mode = 'search_result';
   $ds_layout->layout = 'bootstrap_4_8';
   $ds_layout->settings = array(
-    'regions' => array(
-      'left' => array(
-        0 => 'field_media_asset',
-      ),
-      'right' => array(
-        1 => 'title',
-        2 => 'featured_content_type',
-      ),
-    ),
-    'fields' => array(
-      'field_media_asset' => 'left',
-      'title' => 'right',
-      'featured_content_type' => 'right',
-    ),
     'classes' => array(
       'layout_class' => array(
         '' => '',
+      ),
+    ),
+    'fields' => array(
+      'featured_content_type' => 'right',
+      'field_media_asset' => 'left',
+      'group_list_view_fields' => 'right',
+      'mukurtu_icon_actions' => 'right',
+      'mukurtu_mobile_sync' => 'right',
+      'title' => 'right',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
+    'regions' => array(
+      'left' => array(
+        1 => 'field_media_asset',
+      ),
+      'right' => array(
+        0 => 'title',
+        2 => 'featured_content_type',
+        3 => 'mukurtu_mobile_sync',
+        4 => 'mukurtu_icon_actions',
+        5 => 'group_list_view_fields',
       ),
     ),
     'wrappers' => array(
       'left' => 'div',
       'right' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['node|person|search_result'] = $ds_layout;
 
@@ -636,6 +751,25 @@ function ma_person_ds_layout_settings_info() {
   $ds_layout->view_mode = 'taxonomy_record_teaser';
   $ds_layout->layout = 'bootstrap_12';
   $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      'body' => 'central',
+      'field_date_born' => 'central',
+      'field_date_died' => 'central',
+      'field_media_asset' => 'central',
+      'group_metadata_div' => 'central',
+      'title' => 'central',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
     'regions' => array(
       'central' => array(
         0 => 'title',
@@ -646,28 +780,9 @@ function ma_person_ds_layout_settings_info() {
         5 => 'field_date_died',
       ),
     ),
-    'fields' => array(
-      'title' => 'central',
-      'field_media_asset' => 'central',
-      'group_metadata_div' => 'central',
-      'body' => 'central',
-      'field_date_born' => 'central',
-      'field_date_died' => 'central',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
     'wrappers' => array(
       'central' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['node|person|taxonomy_record_teaser'] = $ds_layout;
 
@@ -679,35 +794,35 @@ function ma_person_ds_layout_settings_info() {
   $ds_layout->view_mode = 'teaser';
   $ds_layout->layout = 'bootstrap_4_8';
   $ds_layout->settings = array(
-    'regions' => array(
-      'right' => array(
-        0 => 'title',
-        2 => 'featured_content_type',
-      ),
-      'left' => array(
-        1 => 'field_media_asset',
-      ),
-    ),
-    'fields' => array(
-      'title' => 'right',
-      'field_media_asset' => 'left',
-      'featured_content_type' => 'right',
-    ),
     'classes' => array(
       'layout_class' => array(
         '' => '',
+      ),
+    ),
+    'fields' => array(
+      'featured_content_type' => 'right',
+      'field_media_asset' => 'left',
+      'title' => 'right',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
+    'regions' => array(
+      'left' => array(
+        1 => 'field_media_asset',
+      ),
+      'right' => array(
+        0 => 'title',
+        2 => 'featured_content_type',
       ),
     ),
     'wrappers' => array(
       'left' => 'div',
       'right' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['node|person|teaser'] = $ds_layout;
 
@@ -719,32 +834,67 @@ function ma_person_ds_layout_settings_info() {
   $ds_layout->view_mode = 'default';
   $ds_layout->layout = 'bootstrap_12';
   $ds_layout->settings = array(
-    'regions' => array(
-      'central' => array(
-        0 => 'field_related_person',
-        1 => 'field_relationship_type',
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
       ),
     ),
     'fields' => array(
       'field_related_person' => 'central',
       'field_relationship_type' => 'central',
     ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
+    'regions' => array(
+      'central' => array(
+        0 => 'field_related_person',
+        1 => 'field_relationship_type',
       ),
     ),
     'wrappers' => array(
       'central' => 'div',
     ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
   );
   $export['paragraphs_item|person_relationship_bundle|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'paragraphs_item|person_relationship_bundle|mukurtu_mobile';
+  $ds_layout->entity_type = 'paragraphs_item';
+  $ds_layout->bundle = 'person_relationship_bundle';
+  $ds_layout->view_mode = 'mukurtu_mobile';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      'field_related_person' => 'ds_content',
+      'field_relationship_type' => 'ds_content',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_related_person',
+        1 => 'field_relationship_type',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+  );
+  $export['paragraphs_item|person_relationship_bundle|mukurtu_mobile'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -754,44 +904,44 @@ function ma_person_ds_layout_settings_info() {
   $ds_layout->view_mode = 'default';
   $ds_layout->layout = 'bootstrap_4_4_4_stacked';
   $ds_layout->settings = array(
-    'regions' => array(
-      'top' => array(
-        0 => 'field_section_title',
-      ),
-      'left' => array(
-        1 => 'field_left_media',
-      ),
-      'central' => array(
-        2 => 'field_section_body',
-      ),
-      'right' => array(
-        3 => 'field_right_media',
-      ),
-    ),
-    'fields' => array(
-      'field_section_title' => 'top',
-      'field_left_media' => 'left',
-      'field_section_body' => 'central',
-      'field_right_media' => 'right',
-    ),
     'classes' => array(
       'layout_class' => array(
         '' => '',
       ),
     ),
-    'wrappers' => array(
-      'top' => 'div',
-      'left' => 'div',
-      'central' => 'div',
-      'right' => 'div',
-      'bottom' => 'div',
+    'fields' => array(
+      'field_left_media' => 'left',
+      'field_right_media' => 'right',
+      'field_section_body' => 'central',
+      'field_section_title' => 'top',
     ),
-    'layout_wrapper' => 'div',
     'layout_attributes' => '',
     'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
+    'layout_wrapper' => 'div',
+    'regions' => array(
+      'central' => array(
+        2 => 'field_section_body',
+      ),
+      'left' => array(
+        1 => 'field_left_media',
+      ),
+      'right' => array(
+        3 => 'field_right_media',
+      ),
+      'top' => array(
+        0 => 'field_section_title',
+      ),
+    ),
+    'wrappers' => array(
+      'bottom' => 'div',
+      'central' => 'div',
+      'left' => 'div',
+      'right' => 'div',
+      'top' => 'div',
+    ),
   );
   $export['paragraphs_item|text_section|default'] = $ds_layout;
 
@@ -803,6 +953,26 @@ function ma_person_ds_layout_settings_info() {
   $ds_layout->view_mode = 'form';
   $ds_layout->layout = 'bootstrap_12';
   $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'fields' => array(
+      '_add_existing_field' => 'hidden',
+      'field_left_media' => 'central',
+      'field_right_media' => 'central',
+      'field_section_body' => 'central',
+      'field_section_title' => 'central',
+      'group_section' => 'central',
+      'group_section_group' => 'central',
+    ),
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_wrapper' => 'div',
     'regions' => array(
       'central' => array(
         0 => 'group_section_group',
@@ -816,31 +986,50 @@ function ma_person_ds_layout_settings_info() {
         5 => '_add_existing_field',
       ),
     ),
-    'fields' => array(
-      'group_section_group' => 'central',
-      'field_section_title' => 'central',
-      'field_left_media' => 'central',
-      'field_section_body' => 'central',
-      'field_right_media' => 'central',
-      '_add_existing_field' => 'hidden',
-      'group_section' => 'central',
+    'wrappers' => array(
+      'central' => 'div',
     ),
+  );
+  $export['paragraphs_item|text_section|form'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'paragraphs_item|text_section|mukurtu_mobile';
+  $ds_layout->entity_type = 'paragraphs_item';
+  $ds_layout->bundle = 'text_section';
+  $ds_layout->view_mode = 'mukurtu_mobile';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
     'classes' => array(
       'layout_class' => array(
         '' => '',
       ),
     ),
-    'wrappers' => array(
-      'central' => 'div',
+    'fields' => array(
+      'field_left_media' => 'ds_content',
+      'field_right_media' => 'ds_content',
+      'field_section_body' => 'ds_content',
+      'field_section_title' => 'ds_content',
     ),
-    'layout_wrapper' => 'div',
     'layout_attributes' => '',
     'layout_attributes_merge' => 1,
+    'layout_disable_css' => FALSE,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
+    'layout_wrapper' => 'div',
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_section_title',
+        1 => 'field_left_media',
+        2 => 'field_section_body',
+        3 => 'field_right_media',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
   );
-  $export['paragraphs_item|text_section|form'] = $ds_layout;
+  $export['paragraphs_item|text_section|mukurtu_mobile'] = $ds_layout;
 
   return $export;
 }
@@ -856,8 +1045,8 @@ function ma_person_ds_view_modes_info() {
   $ds_view_mode->view_mode = 'person_teaser';
   $ds_view_mode->label = 'Person Teaser';
   $ds_view_mode->entities = array(
-    'scald_atom' => 'scald_atom',
     'node' => 'node',
+    'scald_atom' => 'scald_atom',
   );
   $export['person_teaser'] = $ds_view_mode;
 

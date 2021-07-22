@@ -21,8 +21,6 @@ function ma_collection_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
-    'label' => 'Basic',
-    'weight' => '1',
     'children' => array(
       0 => 'field_collection_credit',
       1 => 'field_collection_image',
@@ -31,16 +29,18 @@ function ma_collection_field_group_info() {
       4 => 'field_tags',
       5 => 'title',
     ),
-    'format_type' => 'htab',
     'format_settings' => array(
-      'label' => 'Basic',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'required_fields' => 1,
         'classes' => '',
         'description' => '',
+        'required_fields' => 1,
       ),
-      'formatter' => 'open',
+      'label' => 'Basic',
     ),
+    'format_type' => 'htab',
+    'label' => 'Basic',
+    'weight' => '1',
   );
   $field_groups['group_basic|node|collection|form'] = $field_group;
 
@@ -54,8 +54,6 @@ function ma_collection_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
-    'label' => 'Basic',
-    'weight' => '14',
     'children' => array(
       0 => 'field_collection_image',
       1 => 'field_collection_summary',
@@ -63,16 +61,18 @@ function ma_collection_field_group_info() {
       3 => 'field_description',
       4 => 'title',
     ),
-    'format_type' => 'htab',
     'format_settings' => array(
-      'label' => 'Basic',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'required_fields' => 1,
         'classes' => 'group-basic field-group-htab',
         'description' => '',
+        'required_fields' => 1,
       ),
-      'formatter' => 'open',
+      'label' => 'Basic',
     ),
+    'format_type' => 'htab',
+    'label' => 'Basic',
+    'weight' => '14',
   );
   $field_groups['group_basic|node|personal_collection|form'] = $field_group;
 
@@ -86,22 +86,22 @@ function ma_collection_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
-    'label' => 'Collections Tree',
-    'weight' => '3',
     'children' => array(
       0 => 'field_collections_child_coll',
       1 => 'field_collections_parent_coll',
     ),
-    'format_type' => 'htab',
     'format_settings' => array(
-      'label' => 'Collections Tree',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'required_fields' => 1,
         'classes' => 'group-collections-related field-group-htab',
         'description' => '',
+        'required_fields' => 1,
       ),
-      'formatter' => 'open',
+      'label' => 'Collections Tree',
     ),
+    'format_type' => 'htab',
+    'label' => 'Collections Tree',
+    'weight' => '3',
   );
   $field_groups['group_collections_related|node|collection|form'] = $field_group;
 
@@ -115,21 +115,21 @@ function ma_collection_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
-    'label' => 'Digital Heritage Items',
-    'weight' => '2',
     'children' => array(
       0 => 'field_digital_heritage_items',
     ),
-    'format_type' => 'htab',
     'format_settings' => array(
-      'label' => 'Digital Heritage Items',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'required_fields' => 0,
         'classes' => '',
         'description' => '',
+        'required_fields' => 0,
       ),
-      'formatter' => 'open',
+      'label' => 'Digital Heritage Items',
     ),
+    'format_type' => 'htab',
+    'label' => 'Digital Heritage Items',
+    'weight' => '2',
   );
   $field_groups['group_digital_heritage_items|node|collection|form'] = $field_group;
 
@@ -143,24 +143,24 @@ function ma_collection_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
-    'label' => 'Relations',
-    'weight' => '2',
     'children' => array(
       0 => 'field_digital_heritage_items',
       1 => 'field_item_privacy_setting',
       2 => 'og_group_ref',
       3 => 'field_related_content',
     ),
-    'format_type' => 'htab',
     'format_settings' => array(
-      'label' => 'Relations',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'required_fields' => 1,
         'classes' => 'group-items field-group-htab',
         'description' => '',
+        'required_fields' => 1,
       ),
-      'formatter' => 'open',
+      'label' => 'Relations',
     ),
+    'format_type' => 'htab',
+    'label' => 'Relations',
+    'weight' => '2',
   );
   $field_groups['group_items|node|collection|form'] = $field_group;
 
@@ -174,21 +174,21 @@ function ma_collection_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
-    'label' => 'Items',
-    'weight' => '15',
     'children' => array(
       0 => 'field_digital_heritage_items',
     ),
-    'format_type' => 'htab',
     'format_settings' => array(
-      'label' => 'Items',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'required_fields' => 1,
         'classes' => 'group-items field-group-htab',
         'description' => '',
+        'required_fields' => 1,
       ),
-      'formatter' => 'open',
+      'label' => 'Items',
     ),
+    'format_type' => 'htab',
+    'label' => 'Items',
+    'weight' => '15',
   );
   $field_groups['group_items|node|personal_collection|form'] = $field_group;
 
@@ -202,28 +202,30 @@ function ma_collection_field_group_info() {
   $field_group->mode = 'search_result';
   $field_group->parent_name = '';
   $field_group->data = array(
-    'label' => 'List View Fields',
-    'weight' => '1',
     'children' => array(
       0 => 'field_collection_credit',
       1 => 'field_collection_summary',
       2 => 'featured_content_type',
-      3 => 'title',
+      3 => 'mukurtu_icon_actions',
+      4 => 'mukurtu_mobile_sync',
+      5 => 'title',
     ),
-    'format_type' => 'div',
     'format_settings' => array(
-      'label' => 'List View Fields',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'id' => '',
         'classes' => '',
         'description' => '',
-        'show_label' => '0',
-        'label_element' => 'h3',
         'effect' => 'none',
+        'id' => '',
+        'label_element' => 'h3',
+        'show_label' => '0',
         'speed' => 'fast',
       ),
-      'formatter' => 'open',
+      'label' => 'List View Fields',
     ),
+    'format_type' => 'div',
+    'label' => 'List View Fields',
+    'weight' => '1',
   );
   $field_groups['group_list_view_fields|node|collection|search_result'] = $field_group;
 
@@ -237,27 +239,27 @@ function ma_collection_field_group_info() {
   $field_group->mode = 'search_result';
   $field_group->parent_name = '';
   $field_group->data = array(
-    'label' => 'List View Fields',
-    'weight' => '27',
     'children' => array(
       0 => 'field_collection_summary',
       1 => 'featured_content_type',
       2 => 'title',
     ),
-    'format_type' => 'div',
     'format_settings' => array(
-      'label' => 'List View Fields',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'id' => '',
         'classes' => '',
         'description' => '',
-        'show_label' => '0',
-        'label_element' => 'h3',
         'effect' => 'none',
+        'id' => '',
+        'label_element' => 'h3',
+        'show_label' => '0',
         'speed' => 'fast',
       ),
-      'formatter' => 'open',
+      'label' => 'List View Fields',
     ),
+    'format_type' => 'div',
+    'label' => 'List View Fields',
+    'weight' => '27',
   );
   $field_groups['group_list_view_fields|node|personal_collection|search_result'] = $field_group;
 
@@ -271,22 +273,22 @@ function ma_collection_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
-    'label' => 'Relations',
-    'weight' => '15',
     'children' => array(
       0 => 'field_digital_heritage_items',
       1 => 'field_related_content',
     ),
-    'format_type' => 'fieldset',
     'format_settings' => array(
       'formatter' => 'collapsible',
       'instance_settings' => array(
-        'description' => '',
         'classes' => 'group-relations field-group-fieldset',
-        'required_fields' => 1,
+        'description' => '',
         'id' => '',
+        'required_fields' => 1,
       ),
     ),
+    'format_type' => 'fieldset',
+    'label' => 'Relations',
+    'weight' => '15',
   );
   $field_groups['group_relations|node|personal_collection|form'] = $field_group;
 
@@ -300,20 +302,20 @@ function ma_collection_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = '';
   $field_group->data = array(
-    'label' => 'Tabs',
-    'weight' => '1',
     'children' => array(
       0 => 'group_basic',
       1 => 'group_collections_related',
       2 => 'group_items',
     ),
-    'format_type' => 'htabs',
     'format_settings' => array(
-      'label' => 'Tabs',
       'instance_settings' => array(
         'classes' => '',
       ),
+      'label' => 'Tabs',
     ),
+    'format_type' => 'htabs',
+    'label' => 'Tabs',
+    'weight' => '1',
   );
   $field_groups['group_tabs|node|collection|form'] = $field_group;
 
@@ -327,13 +329,10 @@ function ma_collection_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = '';
   $field_group->data = array(
-    'label' => 'Tabs',
-    'weight' => '1',
     'children' => array(
       0 => 'group_relations',
       1 => 'group_basic',
     ),
-    'format_type' => 'htabs',
     'format_settings' => array(
       'formatter' => '',
       'instance_settings' => array(
@@ -341,6 +340,9 @@ function ma_collection_field_group_info() {
         'id' => '',
       ),
     ),
+    'format_type' => 'htabs',
+    'label' => 'Tabs',
+    'weight' => '1',
   );
   $field_groups['group_tabs|node|personal_collection|form'] = $field_group;
 

@@ -13,6 +13,9 @@
 class backup_migrate_destination_filesource extends backup_migrate_source {
   public $supported_ops = array('restore', 'configure', 'delete', 'source');
 
+  /**
+   *
+   */
   public function type_name() {
     return t("Files Directory");
   }
@@ -77,7 +80,7 @@ class backup_migrate_destination_filesource extends backup_migrate_source {
    */
   public function backup_settings_default() {
     return array(
-      'exclude_filepaths' => "backup_migrate\nstyles\ncss\njs\nctools\nless\nlanguages",
+      'exclude_filepaths' => "backup_migrate\nstyles\ncss\njs\nctools\nless\nlanguages\nadvagg_css\nadvagg_js",
     );
   }
 

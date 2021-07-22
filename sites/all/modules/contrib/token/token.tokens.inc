@@ -848,7 +848,7 @@ function token_tokens($type, $tokens, array $data = array(), array $options = ar
     // [array:value:*] dynamic tokens.
     if ($value_tokens = token_find_with_prefix($tokens, 'value')) {
       foreach ($value_tokens as $key => $original) {
-        if ($key[0] !== '#' && isset($array[$key])) {
+        if (array_key_exists($key, $array) && in_array($key, $keys)) {
           $replacements[$original] = token_render_array_value($array[$key], $options);
         }
       }

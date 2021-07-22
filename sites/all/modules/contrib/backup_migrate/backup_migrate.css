@@ -4,7 +4,7 @@
  */
 
 .schedule-list-disabled {
-  filter:alpha(opacity=50);
+  filter: alpha(opacity=50);
   -moz-opacity: .50;
   opacity: .50;
 }
@@ -42,7 +42,7 @@ table.backup-migrate-listing td {
 }
 
 div.row-error {
-  color: #FF0000;
+  color: #ff0000;
   font-weight: bold;
 }
 

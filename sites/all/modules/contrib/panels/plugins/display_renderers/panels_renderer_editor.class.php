@@ -615,7 +615,7 @@ class panels_renderer_editor extends panels_renderer_standard {
     }
     elseif (isset($content_type['category'])) {
       if (is_array($content_type['category'])) {
-        list($category, $weight) = $content_type['category'];
+        $category = reset($content_type['category']);
       }
       else {
         $category = $content_type['category'];
@@ -1052,9 +1052,8 @@ class panels_renderer_editor extends panels_renderer_standard {
         case 'pane':
           $pane->style['style'] = $form_state['style'];
           if (isset($pane->style['settings'])) {
-            unset($pane->style['settings']);
+            $pane->style['settings'] = NULL;
           }
-
           break;
       }
       panels_edit_cache_set($this->cache);
@@ -1149,7 +1148,7 @@ class panels_renderer_editor extends panels_renderer_standard {
 
     // Backward compatibility: Translate old-style stylizer to new style
     // stylizer.
-    if ($style['name'] == 'stylizer' && !empty($conf['style']) && $conf['style'] != '$') {
+    if (isset($style['name']) && $style['name'] == 'stylizer' && !empty($conf['style']) && $conf['style'] != '$') {
       $style = panels_get_style('stylizer:' . $conf['style']);
     }
 
@@ -1404,6 +1403,8 @@ class panels_renderer_editor extends panels_renderer_standard {
     );
 
     $output = ctools_modal_form_wrapper('panels_edit_configure_access_test_form', $form_state);
+    $pane->access['plugins'][$id] = $form_state['test'];
+
     if (empty($form_state['executed'])) {
       $this->commands = $output;
       return;
@@ -2063,6 +2064,9 @@ function panels_edit_configure_access_test_form_submit(&$form, &$form_state) {
     $function($form, $form_state);
   }
 
+  if (!isset($form_state['values']['settings'])) {
+    $form_state['values']['settings'] = array();
+  }
   $form_state['test']['settings'] = $form_state['values']['settings'];
   if (isset($form_state['values']['context'])) {
     $form_state['test']['context'] = $form_state['values']['context'];

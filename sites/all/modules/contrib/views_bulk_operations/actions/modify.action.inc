@@ -570,7 +570,7 @@ function _views_bulk_operations_modify_action_get_bundles($entity_type, $context
 
     $has_enabled_fields = FALSE;
     foreach ($display_values as $key) {
-      if (strpos($key, $bundle_name . '::') !== FALSE) {
+      if (strpos($key, $bundle_name . '::') === 0) {
         $has_enabled_fields = TRUE;
       }
     }
@@ -588,7 +588,7 @@ function _views_bulk_operations_modify_action_get_bundles($entity_type, $context
  * Helper function that recursively strips #required from field widgets.
  */
 function _views_bulk_operations_modify_action_unset_required(&$element) {
-  unset($element['#required']);
+  $element['#required'] = FALSE;
   foreach (element_children($element) as $key) {
     _views_bulk_operations_modify_action_unset_required($element[$key]);
   }

@@ -168,7 +168,6 @@ function theme_date_part_label_time($variables) {
   return t('Time', array(), array('context' => 'datetime'));
 }
 
-
 /**
  * Returns HTML for a date block that looks like a mini calendar day.
  *
@@ -194,7 +193,7 @@ function theme_date_calendar_day($variables) {
 function theme_date_time_ago($variables) {
   $start_date = $variables['start_date'];
   $end_date = $variables['end_date'];
-  $use_end_date = isset($variables['use_end_date']) ? $variables['use_end_date'] : false;
+  $use_end_date = isset($variables['use_end_date']) ? $variables['use_end_date'] : FALSE;
   $interval = !empty($variables['interval']) ? $variables['interval'] : 2;
   $display = isset($variables['interval_display']) ? $variables['interval_display'] : 'time ago';
 
@@ -204,7 +203,7 @@ function theme_date_time_ago($variables) {
   }
 
   // We use the end date only when the option is checked.
-  if ($use_end_date){
+  if ($use_end_date) {
     $date = date_format($end_date, DATE_FORMAT_UNIX);
   }
   else {
@@ -212,10 +211,10 @@ function theme_date_time_ago($variables) {
   }
 
   // Time to compare dates to.
-
   $now = date_format(date_now(), DATE_FORMAT_UNIX);
 
-  // Will be positive for a datetime in the past (ago), and negative for a datetime in the future (hence).
+  // Will be positive for a datetime in the past (ago), and negative for a
+  // datetime in the future (hence).
   $time_diff = $now - $date;
 
   // Uses the same options used by Views format_interval.
@@ -240,6 +239,5 @@ function theme_date_time_ago($variables) {
 
     case 'time span':
       return t(($time_diff < 0 ? '%time hence' : '%time ago'), array('%time' => format_interval(abs($time_diff), $interval)));
-
   }
 }

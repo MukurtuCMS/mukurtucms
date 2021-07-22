@@ -6,6 +6,23 @@
  */
 
 /**
+ * Implements hook_default_cer().
+ */
+function ma_culturalprotocol_default_cer() {
+  $items = array();
+  $items['node:cultural_protocol_group:field_comm_dh_items*node:digital_heritage:og_group_ref'] = entity_import('cer', '{
+    "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
+    "cer_enabled" : { "und" : [ { "value" : "1" } ] },
+    "cer_left" : { "und" : [ { "path" : "node:cultural_protocol_group:field_comm_dh_items" } ] },
+    "cer_right" : { "und" : [ { "path" : "node:digital_heritage:og_group_ref" } ] },
+    "cer_weight" : { "und" : [ { "value" : "0" } ] },
+    "identifier" : "node:cultural_protocol_group:field_comm_dh_items*node:digital_heritage:og_group_ref",
+    "rdf_mapping" : []
+  }');
+  return $items;
+}
+
+/**
  * Implements hook_ctools_plugin_api().
  */
 function ma_culturalprotocol_ctools_plugin_api($module = NULL, $api = NULL) {

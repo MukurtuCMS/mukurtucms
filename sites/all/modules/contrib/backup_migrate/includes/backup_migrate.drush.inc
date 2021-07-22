@@ -6,7 +6,7 @@
  */
 
 /**
- * Implementation of hook_drush_command().
+ * Implements hook_drush_command().
  */
 function backup_migrate_drush_command() {
   $items['bam-backup'] = array(
@@ -70,7 +70,7 @@ function backup_migrate_drush_command() {
 }
 
 /**
- * Implementation of hook_drush_help().
+ * Implements hook_drush_help().
  */
 function backup_migrate_drush_help($section) {
   switch ($section) {
@@ -95,7 +95,9 @@ function backup_migrate_drush_help($section) {
  * Backup the default database.
  */
 function backup_migrate_drush_backup($source_id = 'db', $destination_id = 'manual', $profile_id = 'default') {
-  backup_migrate_include('profiles', 'destinations', 'sources');
+  require_once dirname(__FILE__) . '/destinations.inc';
+  require_once dirname(__FILE__) . '/profiles.inc';
+  require_once dirname(__FILE__) . '/sources.inc';
 
   // Set the message mode to logging.
   _backup_migrate_message_callback('_backup_migrate_message_drush');
@@ -124,7 +126,7 @@ function backup_migrate_drush_backup($source_id = 'db', $destination_id = 'manua
  * Backup using schedule.
  */
 function backup_migrate_drush_schedule($schedule_id = '') {
-  backup_migrate_include('schedules');
+  require_once dirname(__FILE__) . '/schedules.inc';
 
   // Set the message mode to drush output.
   _backup_migrate_message_callback('_backup_migrate_message_drush');
@@ -148,7 +150,8 @@ function backup_migrate_drush_schedule($schedule_id = '') {
  * Get a list of available destinations.
  */
 function backup_migrate_drush_schedules() {
-  backup_migrate_include('schedules');
+  require_once dirname(__FILE__) . '/schedules.inc';
+
   $rows = array(array(dt('ID'), dt('Name')));
   foreach (backup_migrate_get_schedules() as $schedule) {
     $rows[] = array(
@@ -163,7 +166,9 @@ function backup_migrate_drush_schedules() {
  * Restore to the default database.
  */
 function backup_migrate_drush_restore($source_id = '', $destination_id = '', $file_id = '') {
-  backup_migrate_include('profiles', 'destinations', 'sources');
+  require_once dirname(__FILE__) . '/destinations.inc';
+  require_once dirname(__FILE__) . '/profiles.inc';
+  require_once dirname(__FILE__) . '/sources.inc';
 
   // Set the message mode to drush output.
   _backup_migrate_message_callback('_backup_migrate_message_drush');
@@ -204,12 +209,12 @@ function backup_migrate_drush_sources() {
   return _backup_migrate_drush_sources('source');
 }
 
-
 /**
  * Get a list of available destinations with the given op.
  */
 function _backup_migrate_drush_destinations($op = NULL) {
-  backup_migrate_include('destinations');
+  require_once dirname(__FILE__) . '/destinations.inc';
+
   $rows = array(array(dt('ID'), dt('Name'), dt('Operations')));
   foreach (backup_migrate_get_destinations($op) as $destination) {
     $rows[] = array(
@@ -221,12 +226,12 @@ function _backup_migrate_drush_destinations($op = NULL) {
   drush_print_table($rows, TRUE, array(32, 32));
 }
 
-
 /**
  * Get a list of available destinations with the given op.
  */
 function _backup_migrate_drush_sources($op = NULL) {
-  backup_migrate_include('sources');
+  require_once dirname(__FILE__) . '/sources.inc';
+
   $rows = array(array(dt('ID'), dt('Name'), dt('Operations')));
   foreach (backup_migrate_get_sources($op) as $destination) {
     $rows[] = array(
@@ -242,7 +247,8 @@ function _backup_migrate_drush_sources($op = NULL) {
  * Get a list of available profiles.
  */
 function backup_migrate_drush_profiles() {
-  backup_migrate_include('profiles');
+  require_once dirname(__FILE__) . '/profiles.inc';
+
   $rows = array(array(dt('ID'), dt('Name')));
   foreach (backup_migrate_get_profiles() as $profile) {
     $rows[] = array(
@@ -257,7 +263,8 @@ function backup_migrate_drush_profiles() {
  * Get a list of files in a given destination.
  */
 function backup_migrate_drush_destination_files($destination_id = NULL) {
-  backup_migrate_include('destinations');
+  require_once dirname(__FILE__) . '/destinations.inc';
+
   $destinations = array();
 
   // Set the message mode to drush output.

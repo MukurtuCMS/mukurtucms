@@ -14,7 +14,7 @@
  * - Checkboxes don't have their own id, so you need to add one in a div
  *   around the checkboxes via #prefix and #suffix. You actually need to add TWO
  *   divs because it's the parent that gets hidden. Also be sure to retain the
- *   'expand_checkboxes' in the #process array, because the CTools process will
+ *   'form_process_checkboxes' in the #process array, because the CTools process will
  *   override it.
  */
 
@@ -34,7 +34,7 @@
       }
     }
     return false;
-  }
+  };
 
 
   Drupal.CTools.dependent.autoAttach = function() {
@@ -118,7 +118,7 @@
             }
           }
           return val;
-        }
+        };
 
         var setChangeTrigger = function(trigger_id, bind_id) {
           // Triggered when change() is clicked.
@@ -205,7 +205,7 @@
                 }
               }
             }
-          }
+          };
 
           $(trigger_id).bind('change.ctools-dependent', function() {
             // Trigger the internal change function
@@ -214,11 +214,11 @@
           });
           // Trigger initial reaction
           changeTrigger(trigger_id, bind_id);
-        }
+        };
         setChangeTrigger(trigger_id, bind_id);
       }
     }
-  }
+  };
 
   Drupal.behaviors.CToolsDependent = {
     attach: function (context) {
@@ -240,5 +240,5 @@
         })
         .trigger('change.ctools-dependent');
     }
-  }
+  };
 })(jQuery);

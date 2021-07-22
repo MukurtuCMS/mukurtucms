@@ -875,7 +875,7 @@ class FileEntityUsageTestCase extends FileEntityTestHelper {
 
     // Verify that the module name is used in place of a link to the entity.
     $this->assertNoLink('test_module');
-    $this->assertRaw('test_module', 'Module name used in place of link to the entity.');
+    $this->assertRaw('(entity not loaded)', '"(entity not loaded)" notice used in place of link to the entity.');
 
     // Verify that the entity type and use count information is also present.
     $expected_values = array(

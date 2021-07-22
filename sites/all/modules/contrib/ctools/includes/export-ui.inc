@@ -456,18 +456,20 @@ function ctools_export_ui_switcher_page($plugin_name, $op) {
 
   // Load the $plugin information.
   $plugin = ctools_get_export_ui($plugin_name);
-  $handler = ctools_export_ui_get_handler($plugin);
-
-  if ($handler) {
-    $method = $op . '_page';
-    if (method_exists($handler, $method)) {
-      // Replace the first two arguments:
-      $args[0] = $js;
-      $args[1] = $_POST;
-      return call_user_func_array(array($handler, $method), $args);
-    }
+  if (!$plugin) {
+    return t('Configuration error. No plugin found: %plugin_name.', array('%plugin_name' => $plugin_name));
   }
-  else {
+
+  $handler = ctools_export_ui_get_handler($plugin);
+  if (!$handler) {
     return t('Configuration error. No handler found.');
+  }
+
+  $method = $op . '_page';
+  if (method_exists($handler, $method)) {
+    // Replace the first two arguments:
+    $args[0] = $js;
+    $args[1] = $_POST;
+    return call_user_func_array(array($handler, $method), $args);
   }
 }

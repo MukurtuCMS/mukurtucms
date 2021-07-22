@@ -58,6 +58,7 @@ function panels_theme() {
       'image' => NULL,
       'link' => NULL,
       'class' => NULL,
+      'options' => NULL,
     ),
   );
   $theme['panels_layout_icon'] = array(
@@ -552,8 +553,8 @@ function panels_ctools_style_base_types() {
 function panels_stylizer_lipsum() {
   return <<<LIPSUM
     <p>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus at 
-      velit dolor. Donec egestas tellus sit amet urna rhoncus adipiscing. Proin 
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus at
+      velit dolor. Donec egestas tellus sit amet urna rhoncus adipiscing. Proin
       nec porttitor sem. Maecenas aliquam, purus nec tempus dignissim, nulla arcu
       aliquam diam, non tincidunt massa ante vel dolor. Aliquam sapien sapien,
       tincidunt id tristique at, pretium sagittis libero.
@@ -803,6 +804,15 @@ class panels_display {
   public function duplicate_pane($pid, $location = FALSE) {
     $pane = $this->clone_pane($pid);
     $this->add_pane($pane, $location);
+  }
+
+  /**
+   * Clone a pane.
+   */
+  public function clone_pane($pid) {
+    $pane = clone $this->content[$pid];
+    $pane->uuid = ctools_uuid_generate();
+    return $pane;
   }
 
   /**
@@ -1368,11 +1378,14 @@ function theme_panels_layout_icon($vars) {
  * @todo Why does this take 4 arguments but only makes use of two?
  */
 function theme_panels_layout_link($vars) {
-  $output = '<div class="' . implode(' ', $vars['class']) . '">';
-  $output .= $vars['image'];
-  $output .= '<div>' . $vars['title'] . '</div>';
-  $output .= '</div>';
-  return $output;
+  $options = !empty($vars['options']) ? $vars['options'] : array();
+  if (!isset($options['attributes']['class'])) {
+    $options['attributes']['class'] = array();
+  }
+  $options['attributes']['class'] = array_merge($options['attributes']['class'], $vars['class']);
+
+  $content = $vars['image'] . '<span>' . $vars['title'] . '</span>';
+  return l($content, $vars['link'], $options + array('html' => TRUE));
 }
 
 /**
@@ -1394,18 +1407,15 @@ function panels_print_layout_link($id, $layout, $link, $options = array(), $curr
 
   ctools_add_css('panels_admin', 'panels');
   $file = $layout['path'] . '/' . $layout['icon'];
-  $image = l(
-    theme('image', array('path' => $file)),
-    $link,
-    array('html' => TRUE) + $options
-  );
-  $title = l($layout['title'], $link, $options);
+  $image = theme('image', array('path' => $file));
   return theme(
     'panels_layout_link',
     array(
-      'title' => $title,
+      'title' => $layout['title'],
       'image' => $image,
+      'link' => $link,
       'class' => $class,
+      'options' => $options,
     )
   );
 }
@@ -2057,7 +2067,7 @@ function panels_get_pane_links_alter(&$links, $pane, $content_type) {
     $subtype_prefix_hyphen = $exploded_subtype[0] . '-';
 
     // Remove the prefix block- to get the name.
-    $name_of_block = ltrim($prefixed_name, $subtype_prefix_hyphen);
+    $name_of_block = preg_replace("/^$subtype_prefix_hyphen/", '', $prefixed_name, 1);
 
     // Check for user added menus created at /admin/structure/menu/add
     // menus of that type have a subtype that is prefixed with menu-menu-.

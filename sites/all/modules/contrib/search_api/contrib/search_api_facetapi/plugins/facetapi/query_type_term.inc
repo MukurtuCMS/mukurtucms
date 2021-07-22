@@ -65,7 +65,7 @@ class SearchApiFacetapiTerm extends FacetapiQueryType implements FacetapiQueryTy
         foreach (array_reverse($values) as $filter) {
           // Skip this filter if it was already removed, or if it is the
           // "missing value" filter ("!").
-          if (!isset($active[$filter]) || !is_numeric($filter)) {
+          if (!isset($active[$filter]) || $filter == '!') {
             continue;
           }
           // Go through the entire hierarchy of the value and remove all its

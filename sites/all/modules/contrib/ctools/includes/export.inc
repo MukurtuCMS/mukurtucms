@@ -637,11 +637,19 @@ function ctools_get_default_object($table, $name) {
 }
 
 /**
+ * Get export object defaults.
+ *
  * Call the hook to get all default objects of the given type from the
  * export. If configured properly, this could include loading up an API
  * to get default objects.
+ *
+ * @param string $table
+ *   The name of the table to be loaded. Data is expected to be in the
+ *   schema to make all this work.
+ * @param array $export
+ *   The export definition from the table's hook_schema() definition.
  */
-function _ctools_export_get_defaults($table, $export) {
+function _ctools_export_get_defaults($table, array $export) {
   $cache = &drupal_static(__FUNCTION__, array());
 
   // If defaults may be cached, first see if we can load from cache.
@@ -684,7 +692,8 @@ function _ctools_export_get_defaults($table, $export) {
               $cache[$table][$name] = $object;
             }
             else {
-              // If version checking is enabled, ensure that the object can be used.
+              // If version checking is enabled, ensure that the object can be
+              // used.
               if (isset($object->api_version) &&
                 version_compare($object->api_version, $export['api']['minimum_version']) >= 0 &&
                 version_compare($object->api_version, $export['api']['current_version']) <= 0) {
@@ -866,6 +875,7 @@ function ctools_var_export($var, $prefix = '') {
     }
     else {
       $output = "array(\n";
+      ksort($var);
       foreach ($var as $key => $value) {
         $output .= $prefix . "  " . ctools_var_export($key) . " => " . ctools_var_export($value, $prefix . '  ') . ",\n";
       }

@@ -127,7 +127,7 @@ class FieldCollectionItemEntity extends Entity {
   public function translatedInstanceLabel($langcode = NULL) {
     if ($info = $this->instanceInfo()) {
       if (module_exists('i18n_field')) {
-        return i18n_string("field:{$this->field_name}:{$info['bundle']}:label", $info['label'], array('langcode' => $langcode));
+        return i18n_string("field:{$this->field_name}:{$info['bundle']}:label", $info['label'], array('langcode' => $langcode, 'sanitize' => FALSE));
       }
       return $info['label'];
     }
@@ -330,8 +330,10 @@ class FieldCollectionItemEntity extends Entity {
           $query->entityCondition('entity_type', $entity_type);
           $query->entityCondition('entity_id', $hostEntity->{$key});
           $query->entityCondition('bundle', $bundle);
-          if (isset($entity_info['entity keys']['language'])) {
-            $query->propertyCondition('language', $hostEntity->language);
+          // Only filter by language if this entity type has a language key that
+          // has a corresponding field in its base table.
+          if (!empty($entity_info['entity keys']['language']) && !empty($entity_info['schema_fields_sql']['base table']) && in_array($entity_info['entity keys']['language'], $entity_info['schema_fields_sql']['base table'], TRUE)) {
+            $query->propertyCondition($entity_info['entity keys']['language'], $hostEntity->{$entity_info['entity keys']['language']});
           }
         }
         $query->addTag('DANGEROUS_ACCESS_CHECK_OPT_OUT');
@@ -607,6 +609,10 @@ class FieldCollectionItemEntity extends Entity {
           ->fields(array('archived' => 1, 'revision_id' => $row['revision_id']))
           ->condition('item_id', $this->item_id)
           ->execute();
+
+        // Let other modules know about the archived item.
+        entity_get_controller('field_collection_item')->invoke('archive', $this);
+
         entity_get_controller('field_collection_item')->resetCache(array($this->item_id));
         entity_revision_delete('field_collection_item', $this->revision_id);
       }
@@ -648,8 +654,7 @@ class FieldCollectionItemEntity extends Entity {
    */
   public function __sleep() {
     $vars = get_object_vars($this);
-    unset($vars['entityInfo'], $vars['idKey'], $vars['nameKey'], $vars['statusKey']);
-    unset($vars['fieldInfo']);
+    unset($vars['entityInfo'], $vars['idKey'], $vars['nameKey'], $vars['statusKey'], $vars['fieldInfo']);
     // Also do not serialize the host entity, but only if it has already an id.
     if ($this->hostEntity && ($this->hostEntityId || $this->hostEntityRevisionId)) {
       unset($vars['hostEntity']);

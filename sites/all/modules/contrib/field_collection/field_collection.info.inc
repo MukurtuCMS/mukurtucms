@@ -32,7 +32,7 @@ class FieldCollectionItemMetadataController extends EntityDefaultMetadataControl
       foreach ($bundles as $bundle => $fields) {
         if (array_intersect_key($fields, $field_collection_fields)) {
           $args = array('@type' => $entity_types[$entity_type]['label']);
-          $properties["host_entity_$entity_type"] = array(
+          $properties["host_entity_{$entity_type}"] = array(
             'label' => t('Host entity (@type)', $args),
             'type' => $entity_type,
             'description' => t('The @type containing the field collection field (empty if this field collection is attached to an item of a different type).', $args),

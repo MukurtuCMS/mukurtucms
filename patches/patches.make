@@ -64,7 +64,7 @@ projects[community_tags][patch][] = https://www.drupal.org/files/issues/communit
 
 ;;; Ctools
 ; Modal dialog position after ajax load is not refreshed
-projects[ctools][patch][] = https://www.drupal.org/files/issues/ctools-fix_modal_position_after_ajax-1803104-25.patch
+projects[ctools][patch][] = https://www.drupal.org/files/issues/2021-02-03/ctools-fix_modal_position_after_ajax-1803104-28.patch
 
 ;;; Dummy Image
 ; The 'For missing images' option will always fail
@@ -178,6 +178,8 @@ projects[scald_feeds][patch][] = contrib/83564940-add_scald_metadata_support.pat
 ;;; Scald Soundcloud
 ; Respect quoted strings in Soundcloud tags
 projects[scald_soundcloud][patch][] = contrib/Respect-quoted-strings-in-Soundcloud-tags.patch
+; Don't use versioned API URLs
+projects[scald_soundcloud][patch][] = contrib/0001-Default-to-not-using-versioned-URL.patch
 
 ;;; Search API
 ; Fix 'For missing images' option will always fail
@@ -198,9 +200,14 @@ projects[search_api_glossary][patch][] = contrib/index_display_and_sort_ALL_char
 projects[select2][patch][] = contrib/allow-drag-and-dropg-on-select2-fields-even-if-no-add-terms-on-fly.patch
 
 ;;; Services
-; Fix services issue with multivals
-; see https://www.drupal.org/project/services/issues/2224803
-projects[services][patch][] = contrib/fix_services_multivals-2224803-comment-8844431
+; Fix for submitting multi-value fields.
+projects[services][patch][] = https://www.drupal.org/files/issues/2019-05-09/services-multivalue_fields_fix-2224803-78.patch
+; Custom validation on paragraph fields.
+projects[services][patch][] = contrib/custom_validation_on_paragraph_fields.patch
+
+;;; Services Field Collection
+; Fix the sandbox project services_field_collection so that field collections can be created.
+projects[services_field_collection][patch][] = contrib/fix_services_field_collection_create.patch
 
 ;;; Tree (treeable)
 ; Skip treeable field formatter patch

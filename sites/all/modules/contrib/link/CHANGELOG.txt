@@ -1,3 +1,42 @@
+Link 7.x-1.9, 2021-04-19
+------------------------
+#3209434 by DamienMcKenna, tiziano.sartori: Syntax error, unexpected '(' after
+  upgrade to 7.x-1.8.
+
+
+Link 7.x-1.8, 2021-04-16
+------------------------
+#2537248 by osopolar, Ronino, DamienMcKenna: Allow title without url on
+  migration.
+#836710 by DamienMcKenna, ciss, Johan den Hollander, joachim, mstrelan, sos4nt,
+  Paul Lomax, rcross, rooby, timofey, seanB, Adirael, esbite, kay_v,
+  joep.hendrix: Convert links to their internal link representation if they
+  exist.
+#3110061 by DamienMcKenna: Tidy up test files.
+#3120382 by dsnopek, RenatoG, DamienMcKenna: Notice: Undefined index: title in
+  link_field_load() (line 310 of link.module).
+By DamienMcKenna: Unnecessary syntax change broke PHP 5.3 compatibility.
+#3156021 by roman.haluska, klausi, DamienMcKenna, RenatoG: According to RFC4343
+  uppercase letters in the domain name should be allowed.
+#3208147 by DamienMcKenna: Simplify nested ternary logic in _link_sanitize().
+#3121196 by torotil, DamienMcKenna, calebtr: Support relative fragment or query
+  -only links.
+#3208151 by DamienMcKenna: Coding standards cleanup.
+#3178419 by DamienMcKenna: Simplify the theme functions.
+#3208738 by jedihe, DamienMcKenna: Missing proper test_dependencies, testbot
+  ignoring some tests.
+#3208869 by DamienMcKenna: Simplify tests by extending LinkBaseTestClass.
+#3208869 by DamienMcKenna: Forgot to update LinkSanitizeTest.
+#3208957 by DamienMcKenna: Add unit tests for _link_parse_url().
+#3095484 by DamienMcKenna, jedihe, silverham, circuscowboy, dungahk,
+  codebymikey, bondjimbond, tcnolan7, La558, timwright_, Ron Collins, Summit,
+  BrianLewisDesign, chegor, danbarron, SKrossa, wylbur, zorya: Query string,
+  fragment stripped from URL.
+#3158296 by marcosdr, opdavies, DamienMcKenna, paulocs: Enable to switch default
+  link protocol between HTTP and HTTPS.
+#3201437 by xlin, DamienMcKenna: Optional title for Selected Title.
+
+
 Link 7.x-1.7, 2019-11-14
 ------------------------
 #3094381 by DamienMcKenna: Add a CHANGELOG.txt file.
@@ -327,7 +366,7 @@ Link 7.x-1.0, 2011-10-23
 #948658 by brenk28, Dave Reid, becw, jcfiala, iMiksu, BTMash, Digidog: Fixed
   noticeof Undefined index: title in _link_sanitize() - hopefully, finally.
 #1079782 by fago, klausi, drunken monkey, jcfiala, Digidog: Fixed support for
-  hook_entity_property_info() including search API and Rules. @TODO: needs
+  hook_entity_property_info() including search API and Rules. @todo: needs
   simpletests to be submitted for rc1.
 
 Link 7.x-1.0-beta1, 2011-09-26

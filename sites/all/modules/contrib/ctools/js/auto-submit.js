@@ -98,5 +98,5 @@ Drupal.behaviors.CToolsAutoSubmit = {
           });
       });
   }
-}
+};
 })(jQuery);

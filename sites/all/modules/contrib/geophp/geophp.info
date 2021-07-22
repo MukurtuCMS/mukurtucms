@@ -2,9 +2,8 @@ name = geoPHP
 description = Wraps the geoPHP library: advanced geometry operations in PHP
 core = 7.x
 
-; Information added by Drupal.org packaging script on 2015-02-23
-version = "7.x-1.7+7-dev"
+; Information added by Drupal.org packaging script on 2020-09-12
+version = "7.x-1.8"
 core = "7.x"
 project = "geophp"
-datestamp = "1424680682"
-
+datestamp = "1599928822"

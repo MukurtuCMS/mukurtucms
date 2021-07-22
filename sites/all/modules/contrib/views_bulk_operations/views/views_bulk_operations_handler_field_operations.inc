@@ -65,6 +65,7 @@ class views_bulk_operations_handler_field_operations extends views_handler_field
         'force_single' => array('default' => FALSE),
         'entity_load_capacity' => array('default' => 10),
         'skip_batching' => array('default' => 0),
+        'save_view_object_when_batching' => array('default' => 0),
       ),
     );
     $options['vbo_operations'] = array(
@@ -152,6 +153,12 @@ class views_bulk_operations_handler_field_operations extends views_handler_field
       '#title' => t('Skip batching'),
       '#default_value' => $this->options['vbo_settings']['skip_batching'],
       '#description' => '<b>' . t('Warning:') . '</b> ' . t('This will cause timeouts for larger amounts of selected items.'),
+    );
+    $form['vbo_settings']['save_view_object_when_batching'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Save the whole view object when batching'),
+      '#default_value' => $this->options['vbo_settings']['save_view_object_when_batching'],
+      '#description' => '<b>' . t('Warning:') . '</b> ' . t('Use this option when your view contains query conditions which are not defined as arguments.'),
     );
 
     // Display operations and their settings.

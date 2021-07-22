@@ -2,14 +2,13 @@
 
 /**
  * @file
- * A light-weight, customizable lightbox plugin for jQuery 1.3
+ * A light-weight, customizable lightbox plugin for jQuery 1.3.
  */
 
 /**
  * The minimum required version of the Colorbox plugin.
  */
 define('COLORBOX_MIN_PLUGIN_VERSION', '1.6.1');
-
 
 /**
  * Implements hook_theme().
@@ -25,7 +24,6 @@ function colorbox_theme() {
       ),
       'file' => 'colorbox.theme.inc',
     ),
-
     'colorbox_insert_image' => array(
       'variables' => array(
         'item' => NULL,
@@ -35,13 +33,13 @@ function colorbox_theme() {
       'pattern' => 'colorbox_insert_image__[a-z0-9_]+',
       'file' => 'colorbox.theme.inc',
     ),
-
     'colorbox_image_formatter' => array(
       'variables' => array(
         'item' => NULL,
         'entity_type' => NULL,
         'entity' => NULL,
-        'node' => NULL,  // Left for legacy support.
+        // Left for legacy support.
+        'node' => NULL,
         'field' => array(),
         'display_settings' => array(),
         'delta' => NULL,
@@ -56,7 +54,8 @@ function colorbox_theme() {
  */
 function colorbox_init() {
   // Do not load colorbox during the Drupal installation process, e.g. if part
-  // of installation profiles. Only add the JavaScript and CSS on specified paths.
+  // of installation profiles. Only add the JavaScript and CSS on specified
+  // paths.
   if (!drupal_installation_attempted() && _colorbox_active()) {
     _colorbox_doheader();
   }
@@ -164,7 +163,8 @@ function _colorbox_active() {
 function _colorbox_doheader() {
   static $already_added = FALSE;
   if ($already_added) {
-    return; // Don't add the JavaScript and CSS multiple times.
+    // Don't add the JavaScript and CSS multiple times.
+    return;
   }
 
   // Insert options and translated strings as JavaScript settings.
@@ -209,6 +209,8 @@ function _colorbox_doheader() {
     );
   }
 
+  $js_settings['specificPagesDefaultValue'] = "admin*\nimagebrowser*\nimg_assist*\nimce*\nnode/add/*\nnode/*/edit\nprint/*\nprintpdf/*\nsystem/ajax\nsystem/ajax/*";
+
   $path = drupal_get_path('module', 'colorbox');
   $style = variable_get('colorbox_style', 'default');
 
@@ -229,12 +231,14 @@ function _colorbox_doheader() {
   switch ($style) {
     case 'none':
       break;
+
     case 'default':
     case 'plain':
     case 'stockholmsyndrome':
       drupal_add_css($path . '/styles/' . $style . '/colorbox_style.css');
       drupal_add_js($path . '/styles/' . $style . '/colorbox_style.js');
       break;
+
     default:
       drupal_add_css($style . '/colorbox.css');
   }
@@ -338,7 +342,7 @@ function colorbox_field_formatter_settings_form($field, $instance, $view_mode, $
   );
 
   $caption = array(
-    'auto' =>  t('Automatic'),
+    'auto' => t('Automatic'),
     'title' => t('Title text'),
     'alt' => t('Alt text'),
     'node_title' => t('Content title'),
@@ -363,7 +367,8 @@ function colorbox_field_formatter_settings_form($field, $instance, $view_mode, $
     ),
   );
   // Allow users to hide or set a custom recursion limit.
-  // The module token_tweaks sets a global recursion limit that can not be bypassed.
+  // The module token_tweaks sets a global recursion limit that can not be
+  // bypassed.
   if (module_exists('token') && $recursion_limit = min(variable_get('token_tree_recursion_limit', 3), variable_get('colorbox_token_recursion_limit', 3))) {
     // File entities do not have $field, only $instance.
     if (!empty($field)) {
@@ -459,7 +464,7 @@ function colorbox_field_formatter_settings_summary($field, $instance, $view_mode
   }
 
   $caption = array(
-    'auto' =>  t('Automatic'),
+    'auto' => t('Automatic'),
     'title' => t('Title text'),
     'alt' => t('Alt text'),
     'node_title' => t('Content title'),
@@ -487,7 +492,8 @@ function colorbox_field_formatter_view($entity_type, $entity, $field, $instance,
         '#item' => $item,
         '#entity_type' => $entity_type,
         '#entity' => $entity,
-        '#node' => $entity, // Left for legacy support.
+        // Left for legacy support.
+        '#node' => $entity,
         '#field' => $field,
         '#display_settings' => $display['settings'],
         '#delta' => $delta,
@@ -501,7 +507,9 @@ function colorbox_field_formatter_view($entity_type, $entity, $field, $instance,
 /**
  * Implements hook_insert_styles().
  *
+ * @codingStandardsIgnoreStart
  * @return array
+ *   Returns a array with styles.
  */
 function colorbox_insert_styles() {
   $insert_styles = array();
@@ -514,15 +522,87 @@ function colorbox_insert_styles() {
 }
 
 /**
+ * Implements hook_help().
+ */
+function colorbox_help($path, $arg) {
+
+  switch ($path) {
+    case 'admin/help#colorbox':
+      $output = '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('<a target="_blank" href="@colorbox_project_link">Colorbox</a> is a light-weight customizable lightbox plugin for jQuery. This module allows for integration of Colorbox into Drupal.', array('@colorbox_project_link' => 'https://www.drupal.org/project/colorbox')) . '</p>';
+      $output .= '<p>' . t('Images, iframed or inline content etc. can be displayed in a overlay above the current page.') . '</p>';
+
+      $output .= '<h3>' . t('Usage') . '</h3>';
+      $output .= '<p>' . t('Go to "Configuration" » "Media" » "Colorbox" to find all the configuration options.') . '</p>';
+
+      $output .= '<h3>' . t('Features') . '</h3>';
+      $output .= '<b>' . t('The Colorbox:') . '</b>';
+      $output .= '<ul>';
+      $output .= '<li>' . t('Excellent integration with Image field and Image styles') . '</li>';
+      $output .= '<li>' . t('Choose between a default style and 5 example styles that are included.') . '</li>';
+      $output .= '<li>' . t('Style the Colorbox with a custom colorbox.css file in your theme.') . '</li>';
+      $output .= '<li>' . t('Drush command to download and install the Colorbox plugin in sites/all/libraries') . '</li>';
+      $output .= '</ul>';
+
+      $output .= '<b>' . t('The Colorbox plugin:') . '</b>';
+      $output .= '<ul>';
+      $output .= '<li>' . t('Supports photos, grouping, slideshow, ajax, inline, and iframed content.') . '</li>';
+      $output .= '<li>' . t('Appearance is controlled through CSS so it can be restyled.') . '</li>';
+      $output .= '<li>' . t('Preloads upcoming images in a photo group.') . '</li>';
+      $output .= '<li>' . t('Completely unobtrusive, options are set in the JS and require no') . '</li>';
+      $output .= '<li>' . t('changes to existing HTML.') . '</li>';
+      $output .= '<li>' . t('Compatible with: jQuery 1.3.2+ in Firefox, Safari, Chrome, Opera,') . '</li>';
+      $output .= '<li>' . t('Internet Explorer 7+.') . '</li>';
+      $output .= '<li>' . t('Released under the MIT License.') . '</p>';
+      $output .= '</ul>';
+
+      $output .= '<h3>' . t('Colorbox screencasts') . '</h3>';
+      $output .= '<b>' . t('Part 1 to 3 is for an older 7.x-1.x version of the Colorbox:') . '</b>';
+      $output .= '<ul>';
+      $output .= '<li>' . t('Part 1: <a href="@colorbox_screencasts_part1" target="blank">Installation and image field integration on Vimeo</a>', array('@colorbox_screencasts_part1' => 'https://vimeo.com/19122850')) . '</li>';
+      $output .= '<li>' . t('Part 2: <a href="@colorbox_screencasts_part2" target="blank">Inline images with the Insert module on Vimeo</a>', array('@colorbox_screencasts_part2' => 'https://vimeo.com/19386122')) . '</li>';
+      $output .= '<li>' . t('Part 3: <a href="@colorbox_screencasts_part3" target="blank">Building a image gallery and a image slideshow.</a>', array('@colorbox_screencasts_part3' => 'https://vimeo.com/26411524')) . '</li>';
+      $output .= '</ul>';
+
+      $output .= '<b>' . t('Contributed screencasts:') . '</b>';
+      $output .= '<ul>';
+      $output .= '<li>' . t('<a href="@colorbox_contributed_screencasts_part1" target="blank">Drupal 7 Colorbox project</a> by Code Karate', array('@colorbox_contributed_screencasts_part1' => 'http://codekarate.com/daily-dose-of-drupal/drupal-7-colorbox-module')) . '</li>';
+      $output .= '<li>' . t('<a href="@colorbox_contributed_screencasts_part2" target="blank">Creating and Theming a Node Photo Gallery with Drupal 7 and Colorbox</a> by High Rock Media.', array('@colorbox_contributed_screencasts_part2' => 'http://dannyenglander.com/blog/screencast-creating-and-theming-node-photo-gallery-drupal-7-and-colorbox')) . '</li>';
+      $output .= '<li>' . t('<a href="@colorbox_contributed_screencasts_part3" target="blank">How to Build a Lightbox Portfolio in Drupal 7</a> by CMS Quickstart', array('@colorbox_contributed_screencasts_part3' => 'http://www.cmsquickstart.com/blog/tutorial-how-build-lightbox-portfolio-drupal-7')) . '</li>';
+      $output .= '</ul>';
+
+      $output .= '<h3>' . t('Load Content in a Colorbox') . '</h3>';
+      $output .= '<p>' . t('Check the "Enable Colorbox load" option in Colorbox settings.') . '</p>';
+      $output .= '<p>' . t('This enables custom links that can open content in a Colorbox.') . '</p>';
+      $output .= '<p>' . t('Add the class "colorbox-load" to the link and build the url like this "[path]?width=500&height=500&iframe=true" or "[path]?width=500&height=500" if you don\'t want an iframe.') . '</p>';
+      $output .= '<p>' . t('Other projects may activate this for easy Colorbox integration.') . '</p>';
+
+      $output .= '<h3>' . t('Load Images from custom links in a Colorbox') . '</h3>';
+      $output .= '<p>' . t('Add the class "colorbox" to the link and point its href attribute to the image you want to display in the Colorbox.') . '</p>';
+
+      return $output;
+  }
+}
+
+/**
  * Implements hook_insert_content().
  */
 function colorbox_insert_content($item, $style, $widget) {
   list($item['module_name'], $item['style_name']) = explode('__', $style['name'], 2);
-  return theme(array('colorbox_insert_image__' . str_replace('-', '_', $item['style_name']), 'colorbox_insert_image'), array('item' => $item, 'widget' => $widget));
+  return theme(array(
+    'colorbox_insert_image__' . str_replace('-', '_', $item['style_name']),
+    'colorbox_insert_image',
+      ), array(
+    'item' => $item,
+    'widget' => $widget,
+  ));
 }
 
 /**
- * Machine names normally need to be unique but that does not apply to galleries.
+ * Gallery Exists Function.
+ *
+ * Machine names normally need to be unique but that does not apply to
+ * galleries.
  *
  * @return false
  *   Always FALSE

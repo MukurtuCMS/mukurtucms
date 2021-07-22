@@ -5,7 +5,7 @@
  */
 Drupal.behaviors.viewsPHPVariables = {
   attach: function (context) {
-    $('.views-php-variables', context).delegate('a', 'click', function() {
+    $('.views-php-variables', context).delegate('a', 'click', function () {
       var textarea = $(this.href.replace(/^.*#/, '#'))[0];
       var text = $(this).text();
       textarea.focus();

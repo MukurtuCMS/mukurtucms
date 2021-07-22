@@ -1,7 +1,40 @@
+Search API 1.27 (2021-02-01):
+-----------------------------
+- #3178035 by mvc, drunken monkey: Fixed OR facets for non-numeric hierarchical
+  fields.
+- #3132404 by janadam, klausi, drunken monkey: Fixed support for latest Date
+  module version.
+- #3123171 by drunken monkey: Fixed wrong Views filter handler used for URI
+  fields.
+- #3109880 by drunken monkey: Fixed unnecessary processing of disabled indexes.
+- #3122167 by pandaski, drunken monkey: Provided a processor for excluding
+  private file entities from being indexed.
+- #3119271 by mibfire, drunken monkey: Fixed incomplete whitespace detection in
+  HTML filter.
+- #3052798 by drunken monkey, smhnaji: Fixed errors on duplicate tracking of
+  new items.
+- #3096993 by KarlShea, drunken monkey: Fixed Views "between" filters with only
+  maximum value.
+- #3081180 by mibfire, drunken monkey: Fixed HTML filter sometimes leaving whitespace.
+- #3070125 by chrisclark, drunken monkey: Fixed Views "Reset" button validating
+  minimum keywords length.
+- #2378945 by DamienMcKenna, drunken monkey, capysara, JPHuxley, minorOffense:
+  Added option to keep facets when submitting Views exposed form.
+- #3035977 by das-peter, drunken monkey: Fixed edge case problems with "Entity
+  HTML output" on multilingual sites.
+- #3056882 by drunken monkey, WalkingDexter: Fixed highlighting in some edge
+  cases.
+- #3041704 by drunken monkey: Added multi-type support for entity status filter
+  processors.
+- #2290019 by n3or, azinck, drunken monkey: Added support for OR operator to
+  date facets.
+- #3040980 by drunken monkey: Fixed undefined index notice in Highlighting
+  processor.
+
 Search API 1.26 (2019-03-11):
 -----------------------------
-- #2324023 by drumm, drunken monkey: Changed Views field definition for to
-  float.
+- #2324023 by drumm, drunken monkey: Changed Views field definition for
+  Relevance to float.
 - #3008849 by pamatt, drunken monkey: Fixed non-exposed numeric and date
   filters in Views.
 - #3009744 by evgeny.chernyavskiy, drunken monkey: Fixed wrong "continue" in

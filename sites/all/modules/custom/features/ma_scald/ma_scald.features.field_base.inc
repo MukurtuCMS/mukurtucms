@@ -104,7 +104,6 @@ function ma_scald_field_default_field_bases() {
         'second' => 0,
         'year' => 'year',
       ),
-      'repeat' => 0,
       'timezone_db' => 'UTC',
       'todate' => '',
       'treeable' => FALSE,

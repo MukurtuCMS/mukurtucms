@@ -11,14 +11,18 @@
  * Implements hook_colorbox_settings_alter().
  *
  * @param array $settings
- *   An associative array of Colorbox settings. See the
- *   @link http://colorpowered.com/colorbox/ Colorbox documentation @endlink
- *   for the full list of supported parameters.
+ *   An associative array of Colorbox settings. See the.
  * @param string $style
  *   The name of the active style plugin. If $style is 'none', no Colorbox
  *   theme will be loaded.
+ *
+ * @link http://colorpowered.com/colorbox/ Colorbox documentation @endlink
+ *   for the full list of supported parameters.
+ *
+ * @codingStandardsIgnoreStart
  */
 function hook_colorbox_settings_alter(&$settings, &$style) {
+  // @codingStandardsIgnoreEnd.
   // Disable automatic downscaling of images to maxWidth/maxHeight size.
   $settings['scalePhotos'] = FALSE;
 
