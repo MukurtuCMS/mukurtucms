@@ -1,3 +1,22 @@
+## Mukurtu 3.0.0
+- Added support for the new version of [Mukurtu Mobile](https://mukurtu.org/mobile/)
+- Updated to Drupal 7.81
+- Many contrib module updates
+
+#### Manual Upgrade Steps
+This version requires both database and feature updates.
+Many features have been changed. It is strongly recommended to have a current backup of your site before updating.
+- database update: `drush updb`
+- revert all features: `drush fra`
+
+## Mukurtu 2.1.8
+- Updated to Drupal 7.80
+- Updated handling of Soundcloud API
+- Fixed a date format bug for original date field import
+
+#### Manual Upgrade Steps
+- database update: `drush updb`
+
 ## Mukurtu 2.1.7
 - Updated to Drupal 7.78
 - Fixed a bug where imported content would not use the correct field language

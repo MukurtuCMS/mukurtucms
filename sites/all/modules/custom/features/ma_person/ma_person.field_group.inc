@@ -21,8 +21,6 @@ function ma_person_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
-    'label' => 'Biographic Information',
-    'weight' => '13',
     'children' => array(
       0 => 'field_date_born',
       1 => 'field_date_died',
@@ -32,16 +30,18 @@ function ma_person_field_group_info() {
       5 => 'field_tags',
       6 => 'title',
     ),
-    'format_type' => 'htab',
     'format_settings' => array(
-      'label' => 'Biographic Information',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'required_fields' => 1,
         'classes' => 'group-biographic field-group-htab',
         'description' => '',
+        'required_fields' => 1,
       ),
-      'formatter' => 'open',
+      'label' => 'Biographic Information',
     ),
+    'format_type' => 'htab',
+    'label' => 'Biographic Information',
+    'weight' => '13',
   );
   $field_groups['group_biographic|node|person|form'] = $field_group;
 
@@ -55,27 +55,27 @@ function ma_person_field_group_info() {
   $field_group->mode = 'taxonomy_record_teaser';
   $field_group->parent_name = '';
   $field_group->data = array(
-    'label' => 'Metadata',
-    'weight' => '2',
     'children' => array(
       0 => 'body',
       1 => 'field_date_born',
       2 => 'field_date_died',
     ),
-    'format_type' => 'div',
     'format_settings' => array(
-      'label' => 'Metadata',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'id' => '',
         'classes' => 'group-metadata-div field-group-div col-md-8',
         'description' => '',
-        'show_label' => '0',
-        'label_element' => 'h3',
         'effect' => 'none',
+        'id' => '',
+        'label_element' => 'h3',
+        'show_label' => '0',
         'speed' => 'none',
       ),
-      'formatter' => 'open',
+      'label' => 'Metadata',
     ),
+    'format_type' => 'div',
+    'label' => 'Metadata',
+    'weight' => '2',
   );
   $field_groups['group_metadata_div|node|person|taxonomy_record_teaser'] = $field_group;
 
@@ -89,26 +89,26 @@ function ma_person_field_group_info() {
   $field_group->mode = 'default';
   $field_group->parent_name = '';
   $field_group->data = array(
-    'label' => '',
-    'weight' => '1',
     'children' => array(
       0 => 'field_date_born',
       1 => 'field_date_died',
     ),
-    'format_type' => 'div',
     'format_settings' => array(
-      'label' => '',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'id' => '',
         'classes' => 'person metadata col-md-4',
         'description' => '',
-        'show_label' => '0',
-        'label_element' => 'h3',
         'effect' => 'none',
+        'id' => '',
+        'label_element' => 'h3',
+        'show_label' => '0',
         'speed' => 'none',
       ),
-      'formatter' => 'open',
+      'label' => '',
     ),
+    'format_type' => 'div',
+    'label' => '',
+    'weight' => '1',
   );
   $field_groups['group_metadata|node|person|default'] = $field_group;
 
@@ -122,25 +122,25 @@ function ma_person_field_group_info() {
   $field_group->mode = 'default';
   $field_group->parent_name = '';
   $field_group->data = array(
-    'label' => '',
-    'weight' => '0',
     'children' => array(
       0 => 'field_media_asset',
     ),
-    'format_type' => 'div',
     'format_settings' => array(
-      'label' => '',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'id' => '',
         'classes' => 'group-person-media field-group-div col-md-8',
         'description' => '',
-        'show_label' => '1',
-        'label_element' => 'h3',
         'effect' => 'none',
+        'id' => '',
+        'label_element' => 'h3',
+        'show_label' => '1',
         'speed' => 'none',
       ),
-      'formatter' => 'open',
+      'label' => '',
     ),
+    'format_type' => 'div',
+    'label' => '',
+    'weight' => '0',
   );
   $field_groups['group_person_media|node|person|default'] = $field_group;
 
@@ -154,21 +154,21 @@ function ma_person_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
-    'label' => 'Record Management',
-    'weight' => '16',
     'children' => array(
       0 => 'field_mukurtu_terms',
     ),
-    'format_type' => 'htab',
     'format_settings' => array(
-      'label' => 'Record Management',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'required_fields' => 1,
         'classes' => 'group-record-connections field-group-htab',
         'description' => '',
+        'required_fields' => 1,
       ),
-      'formatter' => 'open',
+      'label' => 'Record Management',
     ),
+    'format_type' => 'htab',
+    'label' => 'Record Management',
+    'weight' => '16',
   );
   $field_groups['group_record_connections|node|person|form'] = $field_group;
 
@@ -182,24 +182,24 @@ function ma_person_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
-    'label' => 'Relations',
-    'weight' => '14',
     'children' => array(
       0 => 'field_related_people',
       1 => 'field_related_content',
       2 => 'field_collection',
       3 => 'field_personal_collections',
     ),
-    'format_type' => 'htab',
     'format_settings' => array(
-      'label' => 'Relations',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'required_fields' => 1,
         'classes' => 'group-relations field-group-htab',
         'description' => '',
+        'required_fields' => 1,
       ),
-      'formatter' => 'open',
+      'label' => 'Relations',
     ),
+    'format_type' => 'htab',
+    'label' => 'Relations',
+    'weight' => '15',
   );
   $field_groups['group_relations|node|person|form'] = $field_group;
 
@@ -213,20 +213,20 @@ function ma_person_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = '';
   $field_group->data = array(
-    'label' => 'Section Group',
-    'weight' => '0',
     'children' => array(
       0 => 'group_section',
     ),
-    'format_type' => 'accordion',
     'format_settings' => array(
       'formatter' => '',
       'instance_settings' => array(
-        'effect' => 'none',
         'classes' => 'group-section-group field-group-accordion',
+        'effect' => 'none',
         'id' => '',
       ),
     ),
+    'format_type' => 'accordion',
+    'label' => 'Section Group',
+    'weight' => '0',
   );
   $field_groups['group_section_group|paragraphs_item|text_section|form'] = $field_group;
 
@@ -240,24 +240,24 @@ function ma_person_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_section_group';
   $field_group->data = array(
-    'label' => 'Section',
-    'weight' => '7',
     'children' => array(
       0 => 'field_section_title',
       1 => 'field_left_media',
       2 => 'field_right_media',
       3 => 'field_section_body',
     ),
-    'format_type' => 'accordion-item',
     'format_settings' => array(
-      'label' => 'Section',
+      'formatter' => 'open',
       'instance_settings' => array(
-        'required_fields' => 0,
         'classes' => 'group-section field-group-accordion-item',
         'description' => '',
+        'required_fields' => 0,
       ),
-      'formatter' => 'open',
+      'label' => 'Section',
     ),
+    'format_type' => 'accordion-item',
+    'label' => 'Section',
+    'weight' => '7',
   );
   $field_groups['group_section|paragraphs_item|text_section|form'] = $field_group;
 
@@ -271,14 +271,11 @@ function ma_person_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = '';
   $field_group->data = array(
-    'label' => 'Tabs',
-    'weight' => '1',
     'children' => array(
       0 => 'group_biographic',
       1 => 'group_record_connections',
       2 => 'group_relations',
     ),
-    'format_type' => 'htabs',
     'format_settings' => array(
       'formatter' => '',
       'instance_settings' => array(
@@ -286,6 +283,9 @@ function ma_person_field_group_info() {
         'id' => '',
       ),
     ),
+    'format_type' => 'htabs',
+    'label' => 'Tabs',
+    'weight' => '1',
   );
   $field_groups['group_tabs|node|person|form'] = $field_group;
 

@@ -41,9 +41,12 @@ function ctools_context_create_user($empty, $data = NULL, $conf = FALSE) {
   if ($conf) {
     if ($data['type'] == 'current') {
       global $user;
-      $data = user_load($user->uid);
       if (user_is_logged_in()) {
+        $data = user_load($user->uid);
         $data->logged_in_user = TRUE;
+      }
+      else {
+        $data = drupal_anonymous_user();
       }
     }
     else {

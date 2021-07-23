@@ -140,11 +140,17 @@ class backup_migrate_filter_utils extends backup_migrate_filter {
     return $form;
   }
 
+  /**
+   *
+   */
   public function pre_backup($file, $settings) {
     $this->take_site_offline($settings);
     $this->disable_devel_query($settings);
   }
 
+  /**
+   *
+   */
   public function post_backup($file, $settings) {
     $this->enable_devel_query($settings);
     $this->take_site_online($settings);
@@ -153,11 +159,17 @@ class backup_migrate_filter_utils extends backup_migrate_filter {
     }
   }
 
+  /**
+   *
+   */
   public function pre_restore($file, $settings) {
     $this->disable_devel_query($settings);
     $this->take_site_offline($settings);
   }
 
+  /**
+   *
+   */
   public function post_restore($file, $settings) {
     $this->enable_devel_query($settings);
     $this->take_site_online($settings);
@@ -186,19 +198,19 @@ class backup_migrate_filter_utils extends backup_migrate_filter {
    * Add the backup metadata to the file.
    */
   public function add_file_info($file, $settings) {
-    $file->file_info['description']       = $settings->filters['utils_description'];
-    $file->file_info['datestamp']         = time();
-    $file->file_info['generator']         = 'Backup and Migrate (http://drupal.org/project/backup_migrate)';
-    $file->file_info['generatorversion']  = BACKUP_MIGRATE_VERSION;
-    $file->file_info['siteurl']           = url('', array('absolute' => TRUE));
-    $file->file_info['sitename']          = variable_get('site_name', '');
-    $file->file_info['drupalversion']     = VERSION;
+    $file->file_info['description']      = $settings->filters['utils_description'];
+    $file->file_info['datestamp']        = time();
+    $file->file_info['generator']        = 'Backup and Migrate (http://drupal.org/project/backup_migrate)';
+    $file->file_info['generatorversion'] = BACKUP_MIGRATE_VERSION;
+    $file->file_info['siteurl']          = url('', array('absolute' => TRUE));
+    $file->file_info['sitename']         = variable_get('site_name', '');
+    $file->file_info['drupalversion']    = VERSION;
     $file->calculate_filesize();
 
-    $source = $settings->get('source');
-    $file->file_info['bam_sourceid']      = $source->get('id');
-    $file->file_info['bam_sourcetype']    = $source->get('subtype');
-    $file->file_info['bam_sourcename']    = $source->get('name');
+    $source                            = $settings->get('source');
+    $file->file_info['bam_sourceid']   = $source->get('id');
+    $file->file_info['bam_sourcetype'] = $source->get('subtype');
+    $file->file_info['bam_sourcename'] = $source->get('name');
 
     // Add any additional info that has been added to the settings by other plugins.
     if (!empty($settings->file_info)) {

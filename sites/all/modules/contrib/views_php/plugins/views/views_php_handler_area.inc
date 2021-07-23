@@ -10,7 +10,7 @@ class views_php_handler_area extends views_handler_area {
   /**
    * Implements views_object#option_definition().
    */
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $options['php_output'] = array('default' => "<h4>Example PHP code</h4>\n<p>Time: <?php print date('H:i', time());?></p>\n");
     return $options;
@@ -19,7 +19,7 @@ class views_php_handler_area extends views_handler_area {
   /**
    * Implements views_handler#option_definition().
    */
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
 
     $form += views_php_form_element($this,
@@ -29,18 +29,21 @@ class views_php_handler_area extends views_handler_area {
     );
   }
 
-
   /**
    * Implements views_handler_area#render().
    */
-  function render($empty = FALSE) {
-    // Ecexute output PHP code.
+  public function render($empty = FALSE) {
+    // Execute output PHP code.
     if ((!$empty || !empty($this->options['empty'])) && !empty($this->options['php_output'])) {
-      $function = create_function('$view, $handler, $results', ' ?>' . $this->options['php_output'] . '<?php ');
+      $code = ' ?>' . $this->options['php_output'];
+      $function = function ($view, $handler, $results) use ($code) {
+        eval($code);
+      };
       ob_start();
       $function($this->view, $this, $this->view->result);
       return ob_get_clean();
     }
     return '';
   }
+
 }

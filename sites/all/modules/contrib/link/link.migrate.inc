@@ -102,7 +102,28 @@ class MigrateLinkFieldHandler extends MigrateFieldHandler {
     }
 
     $language = $this->getFieldLanguage($entity, $field_info, $arguments);
-    $values = array_filter($values);
+
+    // URLs are numeric array elements, keyed by delta. As those elements don't
+    // exist for empty URLs they are allowed and it's up to the developer what
+    // data to migrate, add elements for those URLs up to the maximum delta
+    // found.
+    //
+    // First of all, determine the maximum delta from non-empty URLs.
+    $max_delta = max(array_merge(array(0), array_keys($values)));
+
+    // Next, determine the max delta from arguments.
+    foreach ($arguments as $key => $value) {
+      if (is_array($value)) {
+        $max_delta = max($max_delta, max(array_keys($value)));
+      }
+    }
+
+    // Finally, add missing elements for empty URLs.
+    for ($delta = 0; $delta <= $max_delta; $delta++) {
+      if (!isset($values[$delta])) {
+        $values[$delta] = '';
+      }
+    }
 
     foreach ($values as $delta => $value) {
       $item = array();

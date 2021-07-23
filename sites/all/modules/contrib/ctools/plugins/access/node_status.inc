@@ -21,7 +21,7 @@ $plugin = array(
  * Check for access.
  */
 function ctools_node_status_ctools_access_check($conf, $context) {
-  return (!empty($context->data) && $context->data->status);
+  return (!empty($context->data->status) && $context->data->status);
 }
 
 /**

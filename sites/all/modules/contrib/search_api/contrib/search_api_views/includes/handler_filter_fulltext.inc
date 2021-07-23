@@ -100,6 +100,13 @@ class SearchApiViewsHandlerFilterFulltext extends SearchApiViewsHandlerFilterTex
       return;
     }
 
+    // Don't validate on form reset.
+    if (!empty($form_state['triggering_element'])
+        && !empty($form['reset'])
+        && $form_state['triggering_element']['#value'] === $form['reset']['#value']) {
+      return;
+    }
+
     // We only need to validate if there is a minimum word length set.
     if ($this->options['min_length'] < 2) {
       return;

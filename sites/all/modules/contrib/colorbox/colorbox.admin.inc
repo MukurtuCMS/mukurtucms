@@ -50,7 +50,7 @@ function colorbox_admin_settings() {
     '#type' => 'checkbox',
     '#title' => t('Enable Colorbox inline'),
     '#default_value' => variable_get('colorbox_inline', 0),
-    '#description' => t('This enables custom links that can open inline content in a Colorbox. Add the class "colorbox-inline" to the link and build the url like this "?width=500&height=500&inline=true#id-of-content". Other modules may activate this for easy Colorbox integration.'),
+    '#description' => t('<a href="https://www.drupal.org/files/druplicon-small.png" class="colorbox">This</a> enables custom links that can open inline content in a Colorbox. Add the class "colorbox-inline" to the link and build the url like this "?width=500&height=500&inline=true#id-of-content". Other modules may activate this for easy Colorbox integration.'),
   );
 
   $form['colorbox_custom_settings'] = array(
@@ -73,7 +73,7 @@ function colorbox_admin_settings() {
     '#title' => t('Style'),
     '#options' => $colorbox_styles,
     '#default_value' => variable_get('colorbox_style', 'default'),
-    '#description' => t('Select the style to use for the Colorbox. The example styles are the ones that come with the Colorbox plugin. Select "None" if you have added Colorbox styles to your theme.'),
+    '#description' => t('Select the style to use for the Colorbox. The example styles are the ones that come with the Colorbox plugin. Select "None" if you have added Colorbox styles to your theme. <br> <strong>Examples</strong>: <ul><li><a href="/sites/all/modules/colorbox/images/admin/example_default.png" target="blank">Default</a></li><li><a href="/sites/all/modules/colorbox/images/admin/example_plain.png" target="blank">Plain</a></li><li><a href="/sites/all/modules/colorbox/images/admin/example_stockholm_syndrome.png" target="blank">Stockholm Syndrome</a></li><li><a href="/sites/all/modules/colorbox/images/admin/colorbox_example_1.png" target="blank">Example 1</a></li><li><a href="/sites/all/modules/colorbox/images/admin/colorbox_example_2.png" target="blank">Example 2</a></li><li><a href="/sites/all/modules/colorbox/images/admin/colorbox_example_3.png" target="blank">Example 3</a></li><li><a href="/sites/all/modules/colorbox/images/admin/colorbox_example_4.png" target="blank">Example 4</a></li><li><a href="/sites/all/modules/colorbox/images/admin/colorbox_example_5.png" target="blank">Example 5</a></li><li><a href="/sites/all/modules/colorbox/images/admin/example_none.png" target="blank">None</a></li></ul>'),
   );
   $form['colorbox_custom_settings']['colorbox_custom_settings_activate'] = array(
     '#type' => 'radios',
@@ -93,21 +93,58 @@ function colorbox_admin_settings() {
   $form['colorbox_custom_settings']['colorbox_transition_type'] = array(
     '#type' => 'radios',
     '#title' => t('Transition type'),
-    '#options' => array('elastic' => t('Elastic'), 'fade' => t('Fade'), 'none' => t('None')),
+    '#options' => array(
+      'elastic' => t('Elastic'),
+      'fade' => t('Fade'),
+      'none' => t('None'),
+    ),
     '#default_value' => variable_get('colorbox_transition_type', 'elastic'),
     '#description' => t('The transition type.'),
   );
   $form['colorbox_custom_settings']['colorbox_transition_speed'] = array(
     '#type' => 'select',
     '#title' => t('Transition speed'),
-    '#options' => drupal_map_assoc(array(100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600)),
+    '#options' => drupal_map_assoc(array(
+      100,
+      150,
+      200,
+      250,
+      300,
+      350,
+      400,
+      450,
+      500,
+      550,
+      600,
+    )),
     '#default_value' => variable_get('colorbox_transition_speed', 350),
     '#description' => t('Sets the speed of the fade and elastic transitions, in milliseconds.'),
   );
   $form['colorbox_custom_settings']['colorbox_opacity'] = array(
     '#type' => 'select',
     '#title' => t('Opacity'),
-    '#options' => drupal_map_assoc(array('0', '0.10', '0.15', '0.20', '0.25', '0.30', '0.35', '0.40', '0.45', '0.50', '0.55', '0.60', '0.65', '0.70', '0.75', '0.80', '0.85', '0.90', '0.95', '1')),
+    '#options' => drupal_map_assoc(array(
+      '0',
+      '0.10',
+      '0.15',
+      '0.20',
+      '0.25',
+      '0.30',
+      '0.35',
+      '0.40',
+      '0.45',
+      '0.50',
+      '0.55',
+      '0.60',
+      '0.65',
+      '0.70',
+      '0.75',
+      '0.80',
+      '0.85',
+      '0.90',
+      '0.95',
+      '1',
+    )),
     '#default_value' => variable_get('colorbox_opacity', '0.85'),
     '#description' => t('The overlay opacity level. Range: 0 to 1.'),
   );
@@ -183,7 +220,7 @@ function colorbox_admin_settings() {
     '#type' => 'checkbox',
     '#title' => t('Fixed'),
     '#default_value' => variable_get('colorbox_fixed', 1),
-    '#description' => t('If the Colorbox should be displayed in a fixed position within the visitor\'s viewport or relative to the document.'),
+    '#description' => t("If the Colorbox should be displayed in a fixed position within the visitor's viewport or relative to the document."),
   );
 
   $form['colorbox_custom_settings']['colorbox_slideshow_settings'] = array(
@@ -223,7 +260,19 @@ function colorbox_admin_settings() {
   $form['colorbox_custom_settings']['colorbox_slideshow_settings']['colorbox_slideshowspeed'] = array(
     '#type' => 'select',
     '#title' => t('Slideshow speed'),
-    '#options' => drupal_map_assoc(array(1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000)),
+    '#options' => drupal_map_assoc(array(
+      1000,
+      1500,
+      2000,
+      2500,
+      3000,
+      3500,
+      4000,
+      4500,
+      5000,
+      5500,
+      6000,
+    )),
     '#default_value' => variable_get('colorbox_slideshowspeed', 2500),
     '#description' => t('Sets the speed of the slideshow, in milliseconds.'),
   );
@@ -292,7 +341,24 @@ function colorbox_admin_settings() {
   $form['colorbox_advanced_settings']['colorbox_caption_trim_length'] = array(
     '#type' => 'select',
     '#title' => t('Caption max length'),
-    '#options' => drupal_map_assoc(array(40, 45, 50, 55, 60, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120)),
+    '#options' => drupal_map_assoc(array(
+      40,
+      45,
+      50,
+      55,
+      60,
+      70,
+      75,
+      80,
+      85,
+      90,
+      95,
+      100,
+      105,
+      110,
+      115,
+      120,
+    )),
     '#default_value' => variable_get('colorbox_caption_trim_length', 75),
     '#states' => array(
       'visible' => array(
@@ -310,7 +376,11 @@ function colorbox_admin_settings() {
     '#type' => 'textarea',
     '#title' => '<span class="element-invisible">' . t('Pages') . '</span>',
     '#default_value' => variable_get('colorbox_pages', "admin*\nimagebrowser*\nimg_assist*\nimce*\nnode/add/*\nnode/*/edit\nprint/*\nprintpdf/*\nsystem/ajax\nsystem/ajax/*"),
-    '#description' => t("Specify pages by using their paths. Enter one path per line. The '*' character is a wildcard. Example paths are %blog for the blog page and %blog-wildcard for every personal blog. %front is the front page.", array('%blog' => 'blog', '%blog-wildcard' => 'blog/*', '%front' => '<front>')),
+    '#description' => t("Specify pages by using their paths. Enter one path per line. The '*' character is a wildcard. Example paths are %blog for the blog page and %blog-wildcard for every personal blog. %front is the front page. <p><a href=\"#\" class=\"colorbox-reset-specific-pages-default\">Reset to default</a></p>", array(
+      '%blog' => 'blog',
+      '%blog-wildcard' => 'blog/*',
+      '%front' => '<front>',
+    )),
   );
   $form['colorbox_advanced_settings']['colorbox_compression_type'] = array(
     '#type' => 'radios',

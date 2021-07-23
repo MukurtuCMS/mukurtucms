@@ -5,7 +5,8 @@
  * All of the destination handling code needed for Backup and Migrate.
  */
 
-backup_migrate_include('crud', 'locations');
+require_once dirname(__FILE__) . '/crud.inc';
+require_once dirname(__FILE__) . '/locations.inc';
 
 /**
  * Get the available destination types.
@@ -15,11 +16,10 @@ function backup_migrate_get_destination_subtypes() {
 }
 
 /**
- * Implementation of hook_backup_migrate_destination_subtypes().
- *
- * Get the built in Backup and Migrate destination types.
+ * Implements hook_backup_migrate_destination_subtypes().
  */
 function backup_migrate_backup_migrate_destination_subtypes() {
+  // Get the built-in Backup and Migrate destination types.
   $out = array();
   if (variable_get('backup_migrate_allow_backup_to_file', TRUE)) {
     $out += array(
@@ -52,14 +52,6 @@ function backup_migrate_backup_migrate_destination_subtypes() {
       'file' => drupal_get_path('module', 'backup_migrate') . '/includes/destinations.browser.inc',
       'class' => 'backup_migrate_destination_browser_upload',
     ),
-    'nodesquirrel' => array(
-      'description' => t('Save the backup files to the <a href="@link" target="_blank">NodeSquirrel</a> backup service.', array('@link' => url('http://nodesquirrel.com'))),
-      'file' => drupal_get_path('module', 'backup_migrate') . '/includes/destinations.nodesquirrel.inc',
-      'class' => 'backup_migrate_destination_nodesquirrel',
-      'type_name' => t('NodeSquirrel.com'),
-      'can_create' => TRUE,
-      'remote' => TRUE,
-    ),
     'ftp' => array(
       'description' => t('Save the backup files to any a directory on an FTP server.'),
       'file' => drupal_get_path('module', 'backup_migrate') . '/includes/destinations.ftp.inc',
@@ -90,12 +82,13 @@ function backup_migrate_backup_migrate_destination_subtypes() {
 }
 
 /**
- * Implementation of hook_backup_migrate_destinations().
- *
- * Get the built in backup destinations and those in the db.
+ * Implements hook_backup_migrate_destinations().
  */
 function backup_migrate_backup_migrate_destinations() {
-  $out              = array();
+  require_once dirname(__FILE__) . '/filters.inc';
+
+  // Get the built in backup destinations and those in the db.
+  $out = array();
 
   // Add the default, out of the box destinations for new users.
   if (variable_get('backup_migrate_allow_backup_to_file', TRUE)) {
@@ -109,12 +102,12 @@ function backup_migrate_backup_migrate_destinations() {
   }
   // Add the browser destination for downloading to the desktop.
   if (variable_get('backup_migrate_allow_backup_to_download', TRUE)) {
-    $out['download']  = backup_migrate_create_destination('browser_download');
+    $out['download'] = backup_migrate_create_destination('browser_download');
   }
-  $out['upload']    = backup_migrate_create_destination('browser_upload');
+  $out['upload'] = backup_migrate_create_destination('browser_upload');
+
   // Expose the configured databases as sources.
-  backup_migrate_include('filters');
-  $out              += backup_migrate_filters_invoke_all('destinations');
+  $out += backup_migrate_filters_invoke_all('destinations');
 
   return $out;
 }
@@ -123,9 +116,9 @@ function backup_migrate_backup_migrate_destinations() {
  * Get all the available backup destination.
  *
  * @param $op
- *  The operation which will be performed on the destination. Hooks can use this
- *  to return only those destinations appropriate for the given op.
- *  Options include:
+ *   The operation which will be performed on the destination. Hooks can use this
+ *   to return only those destinations appropriate for the given op.
+ *   Options include:
  *    'manual backup' - destinations available for manual backup
  *    'scheduled backup' - destinations available for schedules backup
  *    'list files' - destinations whose backup files can be listed
@@ -202,7 +195,6 @@ function backup_migrate_destination_get_latest_file($destination_id) {
   }
   return $out;
 }
-
 
 /**
  * Check if a file exists in the given destination.
@@ -345,7 +337,7 @@ function _backup_migrate_ui_destination_display_file_list($files, $options = arr
     $sort_key   = $sort_order['sql'] ? $sort_order['sql'] : 'filetime';
     $sort_dir   = tablesort_get_sort($headers) == 'desc' ? SORT_DESC : SORT_ASC;
 
-    $i          = 0;
+    $i = 0;
     foreach ((array) $files as $id => $file) {
       $info = $file->info();
 
@@ -378,11 +370,19 @@ function _backup_migrate_ui_destination_display_file_list($files, $options = arr
       $sort[] = $info[$sort_key];
       $row = array(
         check_plain($info['filename']) . $description,
-        t('!time ago', array('!time' => format_interval(time() - $info['filetime'], 2))) . '<div class="backup-migrate-date">' . format_date($info['filetime'], 'small') . '</div>',
+          t('!time ago', array(
+            '!time' => format_interval(time() - $info['filetime'], 2),
+          ))
+          . '<div class="backup-migrate-date">'
+          . format_date($info['filetime'], 'small')
+          . '</div>',
         format_size($info['filesize']),
       );
       if ($options['operations']) {
-        $row[] = array('data' => implode(' &nbsp; ', $file->destination->get_file_links($file->file_id())), 'class' => 'backup-migrate-actions');
+        $row[] = array(
+          'data' => implode(' &nbsp; ', $file->destination->get_file_links($file->file_id())),
+          'class' => 'backup-migrate-actions',
+        );
       }
       if (isset($options['form_elements'][$id])) {
         array_unshift($row, $options['form_elements'][$id]);
@@ -423,13 +423,21 @@ function _backup_migrate_ui_destination_display_file_list($files, $options = arr
       if ($total > $limit && $options['more']) {
         $more = ' ' . l(t('view all'), $options['more']);
       }
-      $showing = t('Showing @start to @end of @total files.', array('@start' => $start + 1, '@end' => $end, '@total' => $total));
+      $showing = t('Showing @start to @end of @total files.', array(
+        '@start' => $start + 1,
+        '@end' => $end,
+        '@total' => $total,
+      ));
 
       // Limit the number of rows shown.
       $rows = array_slice($rows, $start, $limit, TRUE);
     }
 
-    $out = theme("table", array('header' => $headers, 'rows' => $rows, 'class' => 'backup-migrate-listing backup-migrate-listing-files'));
+    $out = theme('table', array(
+      'header' => $headers,
+      'rows' => $rows,
+      'class' => 'backup-migrate-listing backup-migrate-listing-files',
+    ));
     $out .= $showing;
     $out .= $pager;
     $out .= $more;
@@ -459,11 +467,12 @@ function _backup_migrate_ui_destination_display_file_list_options($files, $limit
     $sort_key   = $sort_order['sql'] ? $sort_order['sql'] : 'filetime';
     $sort_dir   = tablesort_get_sort($headers) == 'desc' ? SORT_DESC : SORT_ASC;
 
-    $i          = 0;
+    $i = 0;
     foreach ((array) $files as $file) {
       $info = $file->info();
 
-      // If there's a datestamp, it should override the filetime as it's probably more reliable.
+      // If there's a datestamp, it should override the filetime as it's
+      // probably more reliable.
       $info['filetime'] = !empty($info['datestamp']) ? $info['datestamp'] : $info['filetime'];
 
       $description = '';
@@ -493,7 +502,12 @@ function _backup_migrate_ui_destination_display_file_list_options($files, $limit
       $rows[] = array(
         'radio',
         check_plain($info['filename']) . $description,
-        t('!time ago', array('!time' => format_interval(time() - $info['filetime'], 2))) . '<div class="backup-migrate-date">' . format_date($info['filetime'], 'small') . '</div>',
+        t('!time ago', array(
+          '!time' => format_interval(time() - $info['filetime'], 2),
+        ))
+          . '<div class="backup-migrate-date">'
+          . format_date($info['filetime'], 'small')
+          . '</div>',
         format_size($info['filesize']),
       );
     }
@@ -507,13 +521,21 @@ function _backup_migrate_ui_destination_display_file_list_options($files, $limit
       $end = $limit;
       $start = 0;
 
-      $showing = t('Showing @start to @end of @total files.', array('@start' => $start + 1, '@end' => $end + 1, '@total' => $total));
+      $showing = t('Showing @start to @end of @total files.', array(
+        '@start' => $start + 1,
+        '@end' => $end + 1,
+        '@total' => $total,
+      ));
 
       // Limit the number of rows shown.
       $rows = array_slice($rows, $start, $limit, TRUE);
     }
 
-    $out = theme("table", array('header' => $headers, 'rows' => $rows, 'class' => 'backup-migrate-listing backup-migrate-listing-files'));
+    $out = theme('table', array(
+      'header' => $headers,
+      'rows' => $rows,
+      'class' => 'backup-migrate-listing backup-migrate-listing-files',
+    ));
     $out .= $showing;
   }
   else {
@@ -522,15 +544,16 @@ function _backup_migrate_ui_destination_display_file_list_options($files, $limit
   return $out;
 }
 
-
 /**
  * Download a file to the browser.
  */
 function backup_migrate_ui_destination_download_file($destination_id = NULL, $file_id = NULL) {
   if ($file = backup_migrate_destination_get_file($destination_id, $file_id)) {
-    backup_migrate_include('files');
+    require_once dirname(__FILE__) . '/files.inc';
+
     $file->transfer();
   }
+
   drupal_goto(BACKUP_MIGRATE_MENU_PATH);
 }
 
@@ -733,11 +756,14 @@ function _backup_migrate_destination_pulldown_set_value(&$values, $parents, $val
 function _backup_migrate_get_destination_form_item_options($op) {
   $remote = $local = array();
   foreach (backup_migrate_get_destinations($op) as $key => $destination) {
-    if ($destination->op('remote backup')) {
-      $remote[$key] = $destination->get_name();
-    }
-    else {
-      $local[$key] = $destination->get_name();
+    // Only work with destinations that are currently configured and will work.
+    if ($destination->confirm_destination()) {
+      if ($destination->op('remote backup')) {
+        $remote[$key] = $destination->get_name();
+      }
+      else {
+        $local[$key] = $destination->get_name();
+      }
     }
   }
   $out = array();
@@ -757,8 +783,8 @@ function _backup_migrate_get_destination_form_item_options($op) {
  * A base class for creating destinations.
  */
 class backup_migrate_destination extends backup_migrate_location {
-  public $db_table = "backup_migrate_destinations";
-  public $type_name = "destination";
+  public $db_table = 'backup_migrate_destinations';
+  public $type_name = 'destination';
   public $default_values = array('settings' => array());
   public $singular = 'destination';
   public $plural = 'destinations';
@@ -766,15 +792,21 @@ class backup_migrate_destination extends backup_migrate_location {
   public $title_singular = 'Destination';
   public $cache_files = FALSE;
   public $fetch_time = NULL;
-  public $cache_expire = 86400;
-  // 24 hours.
   public $weight = 0;
-
-  public $destination_type = "";
+  public $destination_type = '';
   public $supported_ops = array();
 
   /**
-   * This function is not supposed to be called. It is just here to help the po extractor out.
+   * 24 hours, i.e. 24 * 60 * 60 seconds.
+   * 
+   * @var int.
+   */
+  public $cache_expire = 86400;
+
+  /**
+   * This function is not supposed to be called.
+   *
+   * It is just here to help the po extractor out.
    */
   public function strings() {
     // Help the pot extractor find these strings.
@@ -805,6 +837,9 @@ class backup_migrate_destination extends backup_migrate_location {
 
   /**
    * Save the file metadata.
+   *
+   * @return object
+   *   The file object after it has been saved.
    */
   public function save_file_info($file, $settings) {
     $info = $this->create_info_file($file);
@@ -813,7 +848,10 @@ class backup_migrate_destination extends backup_migrate_location {
   }
 
   /**
-   * Load the file with the given destination specific id and return as a backup_file object.
+   * Load the file with the given destination specific ID.
+   *
+   * @return \backup_file
+   *   A backup file.
    */
   public function load_file($file_id) {
     // This must be overriden.
@@ -821,16 +859,19 @@ class backup_migrate_destination extends backup_migrate_location {
   }
 
   /**
-   * Check if a file exists in the given destination.
+   * Check if the file exists in the list of available files.
+   *
+   * Actual destination types may have more efficient ways of doing this.
    */
   public function file_exists($file_id) {
-    // Check if the file exists in the list of available files. Actual destination types may have more efficient ways of doing this.
     $files = $this->list_files();
     return isset($files[$file_id]);
   }
 
   /**
-   * List all the available files in the given destination with their destination specific id.
+   * List all the available files in the given destination.
+   *
+   * Includes their destination specific id.
    */
   public function list_files() {
     $files = NULL;
@@ -838,11 +879,15 @@ class backup_migrate_destination extends backup_migrate_location {
       $files = $this->file_cache_get();
     }
     if ($files === NULL) {
+      require_once dirname(__FILE__) . '/files.inc';
+
       $files = $this->_list_files();
       $files = $this->load_files_info($files);
       if ($this->cache_files) {
         $this->file_cache_set($files);
       }
+
+      // Clean up any previous abandoned tmp files before going further.
       _backup_migrate_temp_files_delete();
     }
 
@@ -859,14 +904,16 @@ class backup_migrate_destination extends backup_migrate_location {
   }
 
   /**
-   * List all the available files in the given destination with their destination specific id.
+   * Count all the available files in the given destination.
    */
   public function count_files() {
     return count($this->list_files());
   }
 
   /**
-   * List all the available files in the given destination with their destination specific id.
+   * List all the available files in the given destination.
+   *
+   * Includes their destination specific id.
    */
   public function _list_files() {
     return array();
@@ -932,13 +979,15 @@ class backup_migrate_destination extends backup_migrate_location {
    * Retrieve the file list.
    */
   public function file_cache_get() {
-    backup_migrate_include('files');
+    require_once dirname(__FILE__) . '/files.inc';
+
     $cache = cache_get('backup_migrate_file_list:' . $this->get_id());
     if (!empty($cache->data) && $cache->created > (time() - $this->cache_expire)) {
       $this->fetch_time = $cache->created;
       return $cache->data;
     }
     $this->fetch_time = 0;
+
     return NULL;
   }
 
@@ -999,7 +1048,8 @@ class backup_migrate_destination extends backup_migrate_location {
 
       );
 
-      // If no (valid) node type has been provided, display a node type overview.
+      // If no (valid) node type has been provided, display a node type
+      // overview.
       $path = $this->get_settings_path();
       foreach ($types as $key => $type) {
         if (@$type['can_create']) {
@@ -1039,7 +1089,7 @@ class backup_migrate_destination extends backup_migrate_location {
   }
 
   /**
-   * Get the message to send to the user when confirming the deletion of the item.
+   * Get a message to send to the user when confirming the deletion of the item.
    */
   public function delete_confirm_message() {
     return t('Are you sure you want to delete the destination %name? Backup files already saved to this destination will not be deleted.', array('%name' => $this->get_name()));
@@ -1059,7 +1109,8 @@ class backup_migrate_destination extends backup_migrate_location {
     $out = parent::get_action_links();
     $item_id = $this->get_id();
 
-    // Don't display the download/delete/restore ops if they are not available for this destination.
+    // Don't display the download/delete/restore ops if they are not available
+    // for this destination.
     if ($this->op('list files') && user_access("access backup files")) {
       $out = array('list files' => l(t("list files"), $this->get_settings_path() . '/list/files/' . $item_id)) + $out;
     }
@@ -1075,9 +1126,10 @@ class backup_migrate_destination extends backup_migrate_location {
   public function get_file_links($file_id) {
     $out = array();
 
-    // Don't display the download/delete/restore ops if they are not available for this destination.
-    $can_read       = $this->can_read_file($file_id);
-    $can_delete     = $this->can_delete_file($file_id);
+    // Don't display the download/delete/restore ops if they are not available
+    // for this destination.
+    $can_read   = $this->can_read_file($file_id);
+    $can_delete = $this->can_delete_file($file_id);
 
     $path = $this->get_settings_path();
 
@@ -1153,7 +1205,11 @@ class backup_migrate_destination extends backup_migrate_location {
     $items[$path . '/list/files'] = array(
       'title' => 'Destination Files',
       'page callback' => 'backup_migrate_menu_callback',
-      'page arguments' => array('destinations', 'backup_migrate_ui_destination_display_files', TRUE),
+      'page arguments' => array(
+        'destinations',
+        'backup_migrate_ui_destination_display_files',
+        TRUE,
+      ),
       'access arguments' => array('access backup files'),
       'type' => MENU_LOCAL_TASK,
     );
@@ -1161,7 +1217,11 @@ class backup_migrate_destination extends backup_migrate_location {
       'title' => 'Delete File',
       'description' => 'Delete a backup file',
       'page callback' => 'backup_migrate_menu_callback',
-      'page arguments' => array('destinations', 'backup_migrate_ui_destination_delete_file', TRUE),
+      'page arguments' => array(
+        'destinations',
+        'backup_migrate_ui_destination_delete_file',
+        TRUE,
+      ),
       'access arguments' => array('delete backup files'),
       'type' => MENU_LOCAL_TASK,
     );
@@ -1169,7 +1229,11 @@ class backup_migrate_destination extends backup_migrate_location {
       'title' => 'Restore from backup',
       'description' => 'Restore database from a backup file on the server',
       'page callback' => 'backup_migrate_menu_callback',
-      'page arguments' => array('destinations', 'backup_migrate_ui_destination_restore_file', TRUE),
+      'page arguments' => array(
+        'destinations',
+        'backup_migrate_ui_destination_restore_file',
+        TRUE,
+      ),
       'access arguments' => array('restore from backup'),
       'type' => MENU_LOCAL_TASK,
     );
@@ -1177,7 +1241,11 @@ class backup_migrate_destination extends backup_migrate_location {
       'title' => 'Download File',
       'description' => 'Download a backup file',
       'page callback' => 'backup_migrate_menu_callback',
-      'page arguments' => array('destinations', 'backup_migrate_ui_destination_download_file', TRUE),
+      'page arguments' => array(
+        'destinations',
+        'backup_migrate_ui_destination_download_file',
+        TRUE,
+      ),
       'access arguments' => array('access backup files'),
       'type' => MENU_CALLBACK,
     );
@@ -1190,6 +1258,7 @@ class backup_migrate_destination extends backup_migrate_location {
  * A base class for creating destinations.
  */
 class backup_migrate_destination_remote extends backup_migrate_destination {
+
   /**
    * The location is a URI so parse it and store the parts.
    */
@@ -1257,13 +1326,16 @@ class backup_migrate_destination_remote extends backup_migrate_destination {
         "#type" => "value",
         "#value" => @$this->dest_url['pass'],
       );
-      $form['pass']["#description"] .= t(' You do not need to enter a password unless you wish to change the currently saved password.');
+      $form['pass']["#description"] .= ' ' . t('You do not need to enter a password unless you wish to change the currently saved password.');
     }
     return $form;
   }
 
   /**
-   * Submit the configuration form. Glue the url together and add the old password back if a new one was not specified.
+   * Submit the configuration form.
+   *
+   * Glue the url together and add the old password back if a new one was not
+   * specified.
    */
   public function edit_form_submit($form, &$form_state) {
     $form_state['values']['pass'] = $form_state['values']['pass'] ? $form_state['values']['pass'] : $form_state['values']['old_password'];

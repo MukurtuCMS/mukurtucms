@@ -8,7 +8,7 @@
  */
 
 // Adapters
-include_once("lib/adapters/GeoAdapter.class.php"); // Abtract class
+include_once("lib/adapters/GeoAdapter.class.php"); // Abstract class.
 include_once("lib/adapters/GeoJSON.class.php");
 include_once("lib/adapters/WKT.class.php");
 include_once("lib/adapters/EWKT.class.php");
@@ -21,9 +21,9 @@ include_once("lib/adapters/GoogleGeocode.class.php");
 include_once("lib/adapters/GeoHash.class.php");
 
 // Geometries
-include_once("lib/geometry/Geometry.class.php"); // Abtract class
+include_once("lib/geometry/Geometry.class.php"); // Abstract class.
 include_once("lib/geometry/Point.class.php");
-include_once("lib/geometry/Collection.class.php"); // Abtract class
+include_once("lib/geometry/Collection.class.php"); // Abstract class.
 include_once("lib/geometry/LineString.class.php");
 include_once("lib/geometry/MultiPoint.class.php");
 include_once("lib/geometry/Polygon.class.php");
@@ -45,6 +45,10 @@ class geoPHP
 
     $data = array_shift($args);
     $type = array_shift($args);
+
+    if (empty($data)) {
+      return null;
+    }
 
     $type_map = geoPHP::getAdapterMap();
 
@@ -78,7 +82,7 @@ class geoPHP
     if (!is_array($data)) {
       $result = call_user_func_array(array($processor, "read"), array_merge(array($data), $args));
     }
-    // Data is an array, combine all passed in items into a single geomtetry
+    // Data is an array, combine all passed in items into a single geometry
     else {
       $geoms = array();
       foreach ($data as $item) {
@@ -160,7 +164,7 @@ class geoPHP
       }
     }
 
-    // If it is a mutlti-geometry, check to see if it just has one member
+    // If it is a multi-geometry, check to see if it just has one member
     // If it does, then pass the member, if not, then just pass back the geometry
     if (gettype($geometry) == 'object') {
       $simple_collections = array('MultiPoint','MultiLineString','MultiPolygon');

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_file_fixity.features.field_instance.inc
@@ -49,6 +50,8 @@ function ma_file_fixity_field_default_field_instances() {
     'label' => 'Hashes checked against	',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -57,6 +60,7 @@ function ma_file_fixity_field_default_field_instances() {
       'settings' => array(
         'apply_chosen' => 0,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 2,
@@ -90,6 +94,8 @@ function ma_file_fixity_field_default_field_instances() {
     'label' => 'Files failed',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'max' => '',
       'min' => '',
       'prefix' => '',
@@ -148,6 +154,8 @@ function ma_file_fixity_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 1,
@@ -192,6 +200,8 @@ function ma_file_fixity_field_default_field_instances() {
     'label' => 'Files checked',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'max' => '',
       'min' => '',
       'prefix' => '',
@@ -236,6 +246,8 @@ function ma_file_fixity_field_default_field_instances() {
     'label' => 'Processing time',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'max' => '',
       'min' => '',
       'prefix' => '',
@@ -283,6 +295,8 @@ function ma_file_fixity_field_default_field_instances() {
     'label' => 'Time of check run',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_value' => 'now',
       'default_value2' => 'same',
       'default_value_code' => '',
@@ -295,6 +309,7 @@ function ma_file_fixity_field_default_field_instances() {
       'settings' => array(
         'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 0,
@@ -304,6 +319,8 @@ function ma_file_fixity_field_default_field_instances() {
   // Exported field_instance: 'node-fixity_check-field_fixity_cps'.
   $field_instances['node-fixity_check-field_fixity_cps'] = array(
     'bundle' => 'fixity_check',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -333,14 +350,24 @@ function ma_file_fixity_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 3,
@@ -373,6 +400,8 @@ function ma_file_fixity_field_default_field_instances() {
     'label' => 'Frequency in days',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'max' => '',
       'min' => 1,
       'prefix' => '',
@@ -421,6 +450,8 @@ function ma_file_fixity_field_default_field_instances() {
     'label' => 'Email all Mukurtu Administrators',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -484,6 +515,8 @@ function ma_file_fixity_field_default_field_instances() {
     'label' => 'Hashes to check against',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -530,6 +563,8 @@ function ma_file_fixity_field_default_field_instances() {
     'label' => 'Latest check run result',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -538,6 +573,7 @@ function ma_file_fixity_field_default_field_instances() {
       'settings' => array(
         'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 8,
@@ -580,6 +616,8 @@ function ma_file_fixity_field_default_field_instances() {
     'label' => 'Latest check run time',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
@@ -642,6 +680,8 @@ function ma_file_fixity_field_default_field_instances() {
     'label' => 'Next check run time',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
@@ -694,6 +734,8 @@ function ma_file_fixity_field_default_field_instances() {
     'label' => 'Check runs',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -733,6 +775,8 @@ function ma_file_fixity_field_default_field_instances() {
     'label' => 'Schedule',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -741,6 +785,7 @@ function ma_file_fixity_field_default_field_instances() {
       'settings' => array(
         'apply_chosen' => 0,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 1,
@@ -777,6 +822,8 @@ function ma_file_fixity_field_default_field_instances() {
     'label' => 'Pre-Actions',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(

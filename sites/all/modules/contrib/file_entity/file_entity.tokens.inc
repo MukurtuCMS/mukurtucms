@@ -169,7 +169,7 @@ function file_entity_tokens($type, $tokens, array $data = array(), array $option
           unset($entity->_field_view_prepared);
           $field_output = field_view_field($entity_type, $entity, $field_name, 'token', $langcode);
           $field_output['#token_options'] = $options;
-          $field_output['#prerender'][] = 'token_pre_render_field_token';
+          $field_output['#pre_render'][] = 'token_pre_render_field_token';
           $replacements[$original] = drupal_render($field_output);
         }
         else {

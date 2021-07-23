@@ -18,7 +18,7 @@ class backup_migrate_destination_email extends backup_migrate_destination {
    */
   public function save_file($file, $settings) {
     $size = filesize($file->filepath());
-    $max = variable_get('backup_migrate_max_email_size', 20971520);
+    $max = variable_get('backup_migrate_max_email_size', BACKUP_MIGRATE_MAX_EMAIL_SIZE);
     if ($size > $max) {
       _backup_migrate_message('Could not email the file @file because it is @size and Backup and Migrate only supports emailing files smaller than @max.', array('@file' => $file->filename(), '@size' => format_size($size), '@max' => format_size($max)), 'error');
       return FALSE;
@@ -81,9 +81,10 @@ function _backup_migrate_destination_email_mail_backup($attachment, $to) {
   $mail->subject = t('Database backup from !site: !file', array('!site' => variable_get('site_name', 'drupal'), '!file' => $attachment->filename));
   $mail->body    = t('Database backup attached.') . "\n\n";
 
-  $mail->add_attachment("$attach", $attachment->filename, "Content-Transfer-Encoding: base64 /9j/4AAQSkZJRgABAgEASABIAAD/7QT+UGhvdG9zaG", NULL, TRUE);
+  $mail->add_attachment($attach, $attachment->filename, "application/octet-stream");
   $mail->send();
 }
+
 /**
  *
  */
@@ -95,55 +96,82 @@ class mime_mail {
   public $subject;
   public $body;
 
+  /**
+   *
+   */
   public function __construct() {
     $this->parts   = array();
     $this->to      = "";
     $this->from    = "";
-    $this->headers = "";
+    $this->headers = array();
     $this->subject = "";
     $this->body    = "";
   }
 
-  public function add_attachment($message, $name = "", $ctype = "application/octet-stream", $encode = NULL, $attach = FALSE) {
+  /**
+   *
+   */
+  public function add_attachment($message, $name, $ctype) {
     $this->parts[] = array(
-      "ctype" => $ctype,
       "message" => $message,
-      "encode" => $encode,
       "name" => $name,
-      "attach" => $attach,
+      "ctype" => $ctype,
     );
   }
 
+  /**
+   *
+   */
   public function build_message($part) {
-    $message  = $part["message"];
-    $message  = chunk_split(base64_encode($message));
-    $encoding = "base64";
-    $disposition = $part['attach'] ? "Content-Disposition: attachment; filename=$part[name]\n" : '';
-    return "Content-Type: " . $part["ctype"] . ($part["name"] ? "; name = \"" . $part["name"] . "\"" : "") . "\nContent-Transfer-Encoding: $encoding\n$disposition\n$message\n";
-  }
+    $crlf = "\r\n";
+    // See RFC 2184.
+    $continuation = $crlf . '  ';
+    $name = $part['name'];
+    $len = strlen($name);
 
-  public function build_multipart() {
-    $boundary = "b" . md5(uniqid(time()));
-    $multipart = "Content-Type: multipart/mixed; boundary = $boundary\n\nThis is a MIME encoded message.\n\n--$boundary";
-    for ($i = sizeof($this->parts) - 1; $i >= 0; $i--) {
-      $multipart .= "\n" . $this->build_message($this->parts[$i]) . "--$boundary";
+    // RFC 5322 recommends lines of no longer than 78 chars, which in
+    // this case comes down to filenames of no longer than 64 chars.
+    if ($len > 64) {
+      // We want to preserve the time stamp and extension and such.
+      $head = substr($name, 0, 28);
+      $tail = substr($name, ($len - 32));
+      $name = $head . '___' . $tail;
     }
-    return $multipart .= "--\n";
+    $message = chunk_split(base64_encode($part["message"]), 70, $crlf);
+    $disposition = $name ? "Content-Disposition: attachment; {$continuation}filename=\"$name\"$crlf" : "";
+    return "Content-Type: " . $part["ctype"] . ($name ? ";{$continuation}name=\"$name\"" : "") .
+    "{$crlf}Content-Transfer-Encoding: base64$crlf$disposition$crlf$message";
   }
 
+  /**
+   *
+   */
+  public function build_multipart($boundary) {
+    $multipart = "This is a MIME encoded message.\r\n\r\n--$boundary";
+    for ($i = count($this->parts) - 1; $i >= 0; $i--) {
+      $multipart .= "\r\n" . $this->build_message($this->parts[$i]) . "--$boundary";
+    }
+    return $multipart . "--\r\n";
+  }
+
+  /**
+   *
+   */
   public function send() {
-    $mime = "";
-    if (!empty($this->from)) {
-      $mime .= "From: " . $this->from . "\n";
-    }
-    if (!empty($this->headers)) {
-      $mime .= $this->headers . "\n";
-    }
+    $headers = array();
     if (!empty($this->body)) {
       $this->add_attachment($this->body, "", "text/plain");
     }
-    $mime .= "MIME-Version: 1.0\n" . $this->build_multipart();
-    mail(trim($this->to), $this->subject, "", $mime);
+    $headers['MIME-Version'] = "1.0";
+    $boundary = "b" . md5(uniqid(time()));
+    $headers['Content-Type'] = "multipart/mixed; boundary=\"$boundary\"";
+    $message = $this->build_multipart($boundary);
+    $params = array();
+    $params['body'] = $message;
+    $params['headers'] = $headers;
+    $params['subject'] = $this->subject;
+
+    drupal_mail('backup_migrate', 'destination_mail', trim($this->to), '', $params, $this->from);
   }
 
 }

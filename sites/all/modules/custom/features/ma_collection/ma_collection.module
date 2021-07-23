@@ -159,7 +159,6 @@ function ma_collection_node_postupdate($node) {
       }
     }
   }
-
 }
 
 
@@ -542,7 +541,7 @@ function ma_collection_add_to_collection_form($form, $form_state, $type = 'colle
     '#title' => t('Add Item to ' . $type_name[$type]),
     '#type' => 'select',
     '#options' => $colls,
-    '#chosen' => TRUE,
+    '#select2' => [],
   ];
   $form['actions'] = [
     'submit' => [

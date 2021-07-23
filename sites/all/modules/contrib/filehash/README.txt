@@ -6,7 +6,7 @@ archive.org to wikileaks.org, allow files to be uniquely identified, allow
 duplicate files to be detected, and allow copies to be verified against the
 original source.
 
-File hash module generates and stores MD5, SHA-1 and/or SHA-256 hashes for each
+File Hash module generates and stores MD5, SHA-1 and/or SHA-256 hashes for each
 file uploaded to the site.
 
 Hash algorithms can be enabled and disabled by the site administrator.
@@ -27,7 +27,7 @@ to configure the file upload directory, File Entity Paths module
 (https://www.drupal.org/project/fe_paths) or File (Field) Paths module
 (https://www.drupal.org/project/filefield_paths) is required.
 
-A checkbox in file hash settings allows duplicate uploaded files to be rejected.
+A checkbox in File Hash settings allows duplicate uploaded files to be rejected.
 This feature should be considered a proof-of-concept - you likely want better UX
 for such a feature. Note, in Drupal 7, empty files are not considered duplicate
 files, as such "files" may represent remote media assets, etc.

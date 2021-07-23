@@ -445,7 +445,7 @@ function panels_node_panels_cache_get($nid) {
     $cache->display->context = panels_node_get_context($node);
     $cache->display->cache_key = 'panels_node:' . $node->nid;
     $cache->content_types = panels_common_get_allowed_types('panels_node', $cache->display->context);
-    $cache->allwed_layouts = panels_common_get_allowed_layouts('panels_node');
+    $cache->allowed_layouts = panels_common_get_allowed_layouts('panels_node');
   }
 
   return $cache;

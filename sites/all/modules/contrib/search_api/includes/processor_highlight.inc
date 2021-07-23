@@ -270,7 +270,7 @@ class SearchApiHighlight extends SearchApiAbstractProcessor {
     $keywords = drupal_map_assoc(array_filter($keywords));
     // Remove quotes from keywords.
     foreach ($keywords as $key) {
-      $keywords[$key] = trim($key, "'\"");
+      $keywords[$key] = trim($key, "'\" ");
     }
     return drupal_map_assoc(array_filter($keywords));
   }
@@ -298,7 +298,7 @@ class SearchApiHighlight extends SearchApiAbstractProcessor {
         $keywords += $this->flattenKeysArray($key);
       }
       else {
-        $keywords[$key] = $key;
+        $keywords[$key] = trim($key);
       }
     }
 
@@ -360,7 +360,7 @@ class SearchApiHighlight extends SearchApiAbstractProcessor {
         // and ends with a space.
         $matches = array();
 
-        if (!$this->options['highlight_partial']) {
+        if (empty($this->options['highlight_partial'])) {
           $found_position = FALSE;
           $regex = '/' . static::$boundary . preg_quote($key, '/') . static::$boundary . '/iu';
           if (preg_match($regex, ' ' . $text . ' ', $matches, PREG_OFFSET_CAPTURE, $look_start[$key])) {

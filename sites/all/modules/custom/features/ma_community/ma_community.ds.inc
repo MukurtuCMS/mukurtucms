@@ -99,6 +99,11 @@ function ma_community_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
+    'mukurtu_mobile_sync' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'community_membership_status' => array(
       'weight' => '0',
       'label' => 'hidden',
@@ -110,7 +115,7 @@ function ma_community_ds_field_settings_info() {
       'format' => 'default',
     ),
     'community_browse_all_dh_link' => array(
-      'weight' => '9',
+      'weight' => '8',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -124,33 +129,13 @@ function ma_community_ds_field_settings_info() {
         ),
       ),
     ),
-    'community_membership_status' => array(
-      'weight' => '4',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
     'community_protocol_items' => array(
-      'weight' => '6',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'featured_collections' => array(
-      'weight' => '13',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'group_management_links' => array(
-      'weight' => '1',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'group_members' => array(
       'weight' => '5',
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'create_content_block_ds_field' => array(
-      'weight' => '12',
+    'group_members' => array(
+      'weight' => '4',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -173,13 +158,33 @@ function ma_community_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|community|mukurtu_mobile';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'community';
+  $ds_fieldsetting->view_mode = 'mukurtu_mobile';
+  $ds_fieldsetting->settings = array(
+    'title' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+  );
+  $export['node|community|mukurtu_mobile'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|community|teaser';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'community';
   $ds_fieldsetting->view_mode = 'teaser';
   $ds_fieldsetting->settings = array(
-    'featured_content_type' => array(
+    'mukurtu_mobile_sync' => array(
       'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'featured_content_type' => array(
+      'weight' => '3',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -242,7 +247,7 @@ function ma_community_ds_custom_fields_info() {
   $ds_field->entities = array(
     'node' => 'node',
   );
-  $ds_field->ui_limit = 'community|full';
+  $ds_field->ui_limit = 'community|*';
   $ds_field->properties = array(
     'code' => array(
       'value' => '<h2 class="block-title">Digital Heritage</h2><div class="view-content"><a href="<?php print url("/digital-heritage/community");?>/[node:nid]">Browse All Digital Heritage in [node:title]</a></div>',
@@ -484,54 +489,56 @@ function ma_community_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'group_basic',
-        1 => 'title',
+        0 => 'title',
+        1 => 'group_basic',
         2 => 'field_pre_actions',
         3 => 'body',
-        4 => 'group_advanced',
-        5 => 'group_tabs',
-        6 => 'redirect',
+        4 => 'group_tabs',
+        5 => 'group_advanced',
+        6 => 'field_community_image',
         7 => 'group_access',
-        8 => 'field_community_image',
+        8 => 'redirect',
         9 => 'field_community_image_thumbnail',
         10 => 'path',
-        11 => 'og_roles_permissions',
-        12 => 'field_parent_community',
+        11 => 'field_parent_community',
+        13 => 'og_roles_permissions',
         14 => 'group_register',
         15 => 'field_child_communities',
-        17 => 'field_community_featured_colls',
-        18 => 'field_membership_list_options',
+        17 => 'field_membership_list_options',
+        18 => 'field_community_featured_colls',
         20 => 'group_custom_tk_label_text',
       ),
       'hidden' => array(
         13 => 'group_group',
         16 => 'og_group_ref',
         19 => 'field_dhan_notified_users',
-        21 => '_add_existing_field',
+        21 => 'field_comm_protocols',
+        22 => '_add_existing_field',
       ),
     ),
     'fields' => array(
-      'group_basic' => 'ds_content',
       'title' => 'ds_content',
+      'group_basic' => 'ds_content',
       'field_pre_actions' => 'ds_content',
       'body' => 'ds_content',
-      'group_advanced' => 'ds_content',
       'group_tabs' => 'ds_content',
-      'redirect' => 'ds_content',
-      'group_access' => 'ds_content',
+      'group_advanced' => 'ds_content',
       'field_community_image' => 'ds_content',
+      'group_access' => 'ds_content',
+      'redirect' => 'ds_content',
       'field_community_image_thumbnail' => 'ds_content',
       'path' => 'ds_content',
-      'og_roles_permissions' => 'ds_content',
       'field_parent_community' => 'ds_content',
       'group_group' => 'hidden',
+      'og_roles_permissions' => 'ds_content',
       'group_register' => 'ds_content',
       'field_child_communities' => 'ds_content',
       'og_group_ref' => 'hidden',
-      'field_community_featured_colls' => 'ds_content',
       'field_membership_list_options' => 'ds_content',
+      'field_community_featured_colls' => 'ds_content',
       'field_dhan_notified_users' => 'hidden',
       'group_custom_tk_label_text' => 'ds_content',
+      'field_comm_protocols' => 'hidden',
       '_add_existing_field' => 'hidden',
     ),
     'classes' => array(
@@ -562,25 +569,27 @@ function ma_community_ds_layout_settings_info() {
     'regions' => array(
       'top' => array(
         0 => 'field_community_image',
+        1 => 'mukurtu_mobile_sync',
       ),
       'left' => array(
-        1 => 'group_management_links',
-        2 => 'body',
-        3 => 'community_dh_items',
+        2 => 'group_management_links',
+        3 => 'body',
+        4 => 'community_dh_items',
       ),
       'right' => array(
-        4 => 'community_membership_status',
-        5 => 'group_members',
-        6 => 'community_protocol_items',
-        7 => 'field_parent_community',
-        8 => 'field_child_communities',
-        9 => 'community_browse_all_dh_link',
-        10 => 'create_content_block_ds_field',
+        5 => 'community_membership_status',
+        6 => 'group_members',
+        7 => 'community_protocol_items',
+        8 => 'field_parent_community',
+        9 => 'field_child_communities',
+        10 => 'community_browse_all_dh_link',
         11 => 'featured_collections',
+        12 => 'create_content_block_ds_field',
       ),
     ),
     'fields' => array(
       'field_community_image' => 'top',
+      'mukurtu_mobile_sync' => 'top',
       'group_management_links' => 'left',
       'body' => 'left',
       'community_dh_items' => 'left',
@@ -590,8 +599,8 @@ function ma_community_ds_layout_settings_info() {
       'field_parent_community' => 'right',
       'field_child_communities' => 'right',
       'community_browse_all_dh_link' => 'right',
-      'create_content_block_ds_field' => 'right',
       'featured_collections' => 'right',
+      'create_content_block_ds_field' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -615,6 +624,56 @@ function ma_community_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|community|mukurtu_mobile';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'community';
+  $ds_layout->view_mode = 'mukurtu_mobile';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'title',
+        1 => 'field_community_image',
+        2 => 'body',
+        3 => 'field_comm_protocols',
+        4 => 'field_parent_community',
+        5 => 'field_child_communities',
+        6 => 'field_community_featured_colls',
+        7 => 'field_comm_dh_items',
+      ),
+    ),
+    'fields' => array(
+      'title' => 'ds_content',
+      'field_community_image' => 'ds_content',
+      'body' => 'ds_content',
+      'field_comm_protocols' => 'ds_content',
+      'field_parent_community' => 'ds_content',
+      'field_child_communities' => 'ds_content',
+      'field_community_featured_colls' => 'ds_content',
+      'field_comm_dh_items' => 'ds_content',
+    ),
+    'limit' => array(
+      'field_comm_dh_items' => '8',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|community|mukurtu_mobile'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|community|teaser';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'community';
@@ -627,13 +686,15 @@ function ma_community_ds_layout_settings_info() {
       ),
       'right' => array(
         1 => 'title',
-        2 => 'featured_content_type',
-        3 => 'body',
+        2 => 'mukurtu_mobile_sync',
+        3 => 'featured_content_type',
+        4 => 'body',
       ),
     ),
     'fields' => array(
       'field_community_image_thumbnail' => 'left',
       'title' => 'right',
+      'mukurtu_mobile_sync' => 'right',
       'featured_content_type' => 'right',
       'body' => 'right',
     ),

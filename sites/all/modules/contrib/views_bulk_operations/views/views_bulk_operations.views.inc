@@ -17,6 +17,10 @@ function views_bulk_operations_views_data_alter(&$data) {
           'click sortable' => FALSE,
         ),
       );
+      // Check that the base table has the entity type key set.
+      if (!isset($data[$info['base table']]['table']['entity type'])) {
+        $data[$info['base table']]['table']['entity type'] = $entity_type;
+      }
     }
     if (isset($info['revision table']) && isset($data[$info['revision table']]['table'])) {
       $data[$info['revision table']]['views_bulk_operations'] = array(

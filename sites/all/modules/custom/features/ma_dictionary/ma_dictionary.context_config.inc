@@ -48,8 +48,8 @@ function ma_dictionary_default_scald_context_config() {
     ),
   );
   $context_config->data = array(
-    'width' => '50px',
     'height' => '20px',
+    'width' => '50px',
   );
   $export['mukurtu_dictionary_table'] = $context_config;
 

@@ -106,3 +106,12 @@ function custom_add_another_preprocess_field_multiple_value_form(&$variables) {
     }
   }
 }
+
+/**
+ * Implements hook_preprocess_HOOK().
+ *
+ * Support the field_collection_table module.
+ */
+function custom_add_another_preprocess_field_collection_table_multiple_value_fields(&$variables) {
+  custom_add_another_preprocess_field_multiple_value_form($variables);
+}

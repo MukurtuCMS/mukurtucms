@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Tokens for file hash module.
+ * Tokens for File Hash module.
  */
 
 /**

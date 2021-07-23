@@ -637,6 +637,18 @@ function mukurtu_splash_block_site_config() {
       ];
     }
 
+    if (module_exists('ma_mobile_client')) {
+      $items[] = [
+        'title' => 'Configure Mukurtu Mobile',
+        'href' => 'mukurtu-mobile',
+        'localized_options' => [
+          'attributes' => ['class' => ['opic-dashboard-content']],
+          'query' => drupal_get_destination(),
+        ],
+        'description' => t("Configure access to the site with the Mukurtu Mobile client."),
+      ];
+    }
+
     if (user_access('administer modules')) {
       $items[] = [
         'title' => 'Enable/Disable Mukurtu Modules',

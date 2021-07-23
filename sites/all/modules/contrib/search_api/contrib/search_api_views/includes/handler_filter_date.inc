@@ -104,6 +104,10 @@ class SearchApiViewsHandlerFilterDate extends SearchApiViewsHandlerFilterNumeric
     // If we are using the date popup widget, overwrite the settings of the form
     // according to what date_popup expects.
     elseif ($is_date_popup) {
+      // Add an "id" for the "value" field, since it is expected in
+      // date_views_form_views_exposed_form_alter().
+      // @see date_views_filter_handler_simple::value_form()
+      $form['value']['#id'] = 'date_views_exposed_filter-' . bin2hex(drupal_random_bytes(16));
       $form['value']['#type'] = 'date_popup';
       $form['value']['#date_format'] =  $this->options['date_popup_format'];
       $form['value']['#date_year_range'] = $this->options['year_range'];

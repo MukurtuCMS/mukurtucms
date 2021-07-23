@@ -12,8 +12,8 @@ files[] = field_collection.migrate.inc
 configure = admin/structure/field-collections
 package = Fields
 
-; Information added by Drupal.org packaging script on 2019-09-03
-version = "7.x-1.1"
+; Information added by Drupal.org packaging script on 2020-12-26
+version = "7.x-1.2"
 core = "7.x"
 project = "field_collection"
-datestamp = "1567537827"
+datestamp = "1609006493"

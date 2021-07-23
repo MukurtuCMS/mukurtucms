@@ -927,7 +927,7 @@ function ma_scald_node_view($node, $view_mode) {
   if ($view_mode == 'search_result') {
 
     // If no media items at all for an item the search results, put a placeholder.
-    if (!$node->field_media_asset) {
+    if (empty($node->field_media_asset)) {
       $node->content['field_media_asset'][0]['#markup'] = '
       <div class="field field-name-field-media-asset field-type-atom-reference field-label-hidden">
         <div class="field-items">

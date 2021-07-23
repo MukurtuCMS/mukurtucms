@@ -24,7 +24,7 @@ function backup_migrate_temp_files_add($filepath = NULL) {
  * Delete all temporary files.
  */
 function _backup_migrate_temp_files_delete() {
-  if (variable_get('backup_migrate_cleanup_temp_files', TRUE)) {
+  if (variable_get('backup_migrate_cleanup_temp_files', BACKUP_MIGRATE_CLEANUP_TEMP_FILES)) {
     // Delete the temp files created during this run.
     foreach (backup_migrate_temp_files_add() as $file) {
       if (file_exists($file) && is_writable($file)) {
@@ -34,7 +34,7 @@ function _backup_migrate_temp_files_delete() {
 
     // Delete temp files abandoned for 6 or more hours.
     $dir = file_directory_temp();
-    $expire = time() - variable_get('backup_migrate_cleanup_time', 21600);
+    $expire = time() - variable_get('backup_migrate_cleanup_time', BACKUP_MIGRATE_CLEANUP_TIME);
     if (file_exists($dir) && is_dir($dir) && is_readable($dir) && $handle = opendir($dir)) {
       while (FALSE !== ($file = @readdir($handle))) {
         // Delete 'backup_migrate_' files in the temp directory that are older than the expire time.
@@ -93,8 +93,6 @@ function _backup_migrate_move_files($from, $to) {
   return FALSE;
 }
 
-
-
 /**
  * Create a temporary directory.
  */
@@ -116,13 +114,14 @@ function backup_migrate_temp_directory() {
  * Return a list of backup filetypes.
  */
 function _backup_migrate_filetypes() {
-  backup_migrate_include('filters');
+  require_once dirname(__FILE__) . '/filters.inc';
 
   $out = backup_migrate_filters_file_types();
 
   foreach ($out as $key => $info) {
     $out[$key]['id'] = empty($info['id']) ? $key : $info['id'];
   }
+
   return $out;
 }
 
@@ -199,7 +198,6 @@ function _backup_migrate_clean_filename($filename) {
 function _backup_migrate_file_dispose_buffer($buffer) {
   return "";
 }
-
 
 /**
  * A backup file which allows for saving to and reading from the server.
@@ -287,6 +285,7 @@ class backup_file {
   public function info_set($key, $value) {
     $this->file_info[$key] = $value;
   }
+
   /**
    * Get the file extension.
    */
@@ -315,6 +314,9 @@ class backup_file {
     return @$this->type['id'];
   }
 
+  /**
+   *
+   */
   public function filesize() {
     if (empty($this->file_info['filesize'])) {
       $this->calculate_filesize();
@@ -322,6 +324,9 @@ class backup_file {
     return $this->file_info['filesize'];
   }
 
+  /**
+   *
+   */
   public function calculate_filesize() {
     $this->file_info['filesize'] = '';
     if (!empty($this->path) && file_exists($this->path)) {

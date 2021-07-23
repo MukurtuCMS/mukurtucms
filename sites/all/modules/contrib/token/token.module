@@ -161,6 +161,8 @@ function token_theme() {
       'attributes' => array(),
       'empty' => '',
       'caption' => '',
+      'colgroups' => array(),
+      'sticky' => TRUE,
     ),
     'file' => 'token.pages.inc',
   );
@@ -1228,7 +1230,7 @@ function token_menu_link_load_all_parents($mlid) {
   if (!isset($cache[$mlid])) {
     $cache[$mlid] = array();
     $plid = db_query("SELECT plid FROM {menu_links} WHERE mlid = :mlid", array(':mlid' => $mlid))->fetchField();
-    while ($plid && $parent = token_menu_link_load($plid)) {
+    while ($plid && $plid != $mlid && $parent = token_menu_link_load($plid)) {
       $cache[$mlid] = array($plid => $parent['title']) + $cache[$mlid];
       $plid = $parent['plid'];
     }

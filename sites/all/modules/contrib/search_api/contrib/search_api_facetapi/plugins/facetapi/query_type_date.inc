@@ -54,13 +54,29 @@ class SearchApiFacetapiDate extends SearchApiFacetapiTerm implements FacetapiQue
       $options['search_api_facets'][$this->facet['name']]['limit'] = -1;
     }
 
-    if ($active = $this->adapter->getActiveItems($this->facet)) {
-      $item = end($active);
+    if ($active_items = $this->adapter->getActiveItems($this->facet)) {
       $field = $this->facet['field'];
-      $filter = $this->createRangeFilter($item['value']);
-      if ($filter) {
-        $this->addFacetFilter($query, $field, $filter);
+      $operator = 'OR';
+      if ($settings['operator'] !== FACETAPI_OPERATOR_OR) {
+        $operator = 'AND';
+        // If the operator is AND, we just need to apply the lowest-level
+        // filter(s) to make this work correctly. For single-valued fields, this
+        // will always just be the last value, so just use that to improve
+        // performance for that case.
+        $fields = $query->getIndex()->getFields();
+        if (isset($fields[$field]['type'])
+            && !search_api_is_list_type($fields[$field]['type'])) {
+          $active_items = array(end($active_items));
+        }
       }
+      $date_query = $query->createFilter($operator, array("facet:$field"));
+      foreach($active_items as $active_item) {
+        $filter = $this->createRangeFilter($active_item['value']);
+        if ($filter) {
+          $this->addFacetFilter($date_query, $field, $filter);
+        }
+      }
+      $query->filter($date_query);
     }
   }
 
@@ -224,8 +240,9 @@ class SearchApiFacetapiDate extends SearchApiFacetapiTerm implements FacetapiQue
     // Executes query, iterates over results.
     if (isset($results['search_api_facets']) && isset($results['search_api_facets'][$this->facet['name']])) {
       $values = $results['search_api_facets'][$this->facet['name']];
+      $mincount = $facet->getSettings()->settings['facet_mincount'];
       foreach ($values as $value) {
-        if ($value['count']) {
+        if ($value['count'] >= $mincount) {
           $filter = $value['filter'];
           // We only process single values further. The "missing" filter and
           // range filters will be passed on unchanged.
@@ -286,9 +303,6 @@ class SearchApiFacetapiDate extends SearchApiFacetapiTerm implements FacetapiQue
         $build[$parent]['#item_children'][$value] = &$build[$value];
         $build[$value]['#item_parents'][$parent] = $parent;
       }
-
-      // Stores the last value iterated over.
-      $parent = $value;
     }
 
     if (empty($raw_values)) {
