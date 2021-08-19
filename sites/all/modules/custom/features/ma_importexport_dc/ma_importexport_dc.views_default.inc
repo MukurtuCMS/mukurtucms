@@ -426,13 +426,6 @@ function ma_importexport_dc_views_default_views() {
   );
   $handler->display->display_options['fields']['field_media_asset']['delta_offset'] = '0';
   $handler->display->display_options['fields']['field_media_asset']['separator'] = ';;;';
-  /* Field: Content: Nid */
-  $handler->display->display_options['fields']['nid']['id'] = 'nid';
-  $handler->display->display_options['fields']['nid']['table'] = 'node';
-  $handler->display->display_options['fields']['nid']['field'] = 'nid';
-  $handler->display->display_options['fields']['nid']['relationship'] = 'field_community_record_parent_target_id';
-  $handler->display->display_options['fields']['nid']['label'] = 'hidden';
-  $handler->display->display_options['fields']['nid']['exclude'] = TRUE;
   /* Field: Global: PHP */
   $handler->display->display_options['fields']['php']['id'] = 'php';
   $handler->display->display_options['fields']['php']['table'] = 'views';
@@ -441,12 +434,8 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['fields']['php']['hide_empty'] = TRUE;
   $handler->display->display_options['fields']['php']['use_php_setup'] = 0;
   $handler->display->display_options['fields']['php']['php_output'] = '<?php
-if (isset($row->nid)) {
-  global $base_url;
-  print $base_url . \'/\' . drupal_get_path_alias(\'node/\' . $row->nid);
-}
-?>
-';
+ma_importexport_dc_get_relation_field($data->_field_data["nid"]["entity"]);
+?>';
   $handler->display->display_options['fields']['php']['use_php_click_sortable'] = '0';
   $handler->display->display_options['fields']['php']['php_click_sortable'] = '';
   /* Sort criterion: Content: Post date */
@@ -627,6 +616,9 @@ if (isset($row->nid)) {
   $handler->display->display_options['style_options']['transform'] = 1;
   $handler->display->display_options['style_options']['root_node'] = 'rdf:RDF';
   $handler->display->display_options['style_options']['item_node'] = 'rdf:Description';
+  $handler->display->display_options['style_options']['no_entity_encode'] = array(
+    'php' => 'php',
+  );
   $handler->display->display_options['path'] = 'export/digital-heritage-dc-xml';
   $handler->display->display_options['displays'] = array(
     'page' => 'page',
@@ -823,7 +815,6 @@ if (isset($row->nid)) {
     t('dcterms:spatial'),
     t('dc:rights'),
     t('dc:hasformat'),
-    t('hidden'),
     t('dcterms:relation'),
     t('Title'),
     t('Community'),

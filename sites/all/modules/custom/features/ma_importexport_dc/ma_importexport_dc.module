@@ -726,3 +726,26 @@ function ma_importexport_dc_views_pre_render(&$view) {
     }
   }
 }
+
+/**
+ * Helper function to get the DC relation field in the DC export view for both CR children and parents
+ */
+function ma_importexport_dc_get_relation_field($node) {
+  global $base_url;
+  if (isset($node->field_community_record_parent[LANGUAGE_NONE][0]["target_id"])) {
+    // Currently on a Child Record
+    print $base_url . '/' . drupal_get_path_alias('node/' . $node->field_community_record_parent[LANGUAGE_NONE][0]["target_id"]);
+  }
+  elseif (isset($node->field_community_record_children[LANGUAGE_NONE])) {
+    // Currently on a Parent Record
+    $child_count = 0;
+    foreach ($node->field_community_record_children[LANGUAGE_NONE] as $child) {
+      $child_count++;
+      if ($child_count > 1) {
+        print "</dcterms:relation>\n    <dcterms:relation>"; // This is hacky, but it works.
+      }
+      print $base_url . '/' . drupal_get_path_alias('node/' .$child["target_id"]);
+    }
+  }
+}
+
