@@ -244,11 +244,15 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
   else {
     $description .= ' This is typically "location/url" or "relateditem".';
   }
+  $options = [
+    'none' => 'None',
+    'rdf_about' => "rdf:about attribute of the containing rdf:Description",
+  ];
   $form['media'] = array(
     '#type' => 'radios',
     '#title' => 'Media',
     '#description' => $description,
-    '#options' => array_merge(['none' => 'None'], $nested_attributes),
+    '#options' => array_merge($options, $nested_attributes),
   );
   $typical_media_values = ['dc:hasformat', 'dc:relation', 'location/url', 'relatedItem'];
   foreach ($typical_media_values as $typical_media_value) {
@@ -426,7 +430,7 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
     ];
 
     // Loop through the items.
-    foreach ($result->items as &$item) {
+    foreach ($result->items as $item_index => &$item) {
 
       // Set the GUID and dc:hasformat field values according to their source as selected in the options form.
       $guid_values = [];
@@ -438,7 +442,12 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
       // Set the media field.
       $media_value = '';
       if ($import_options['media'] <> 'none') {
-        $media_value = $item[$xpath_mapping[$import_options['media']]];
+        if ($import_options['media'] == 'rdf_about') {
+          $media_value = $item['rdf_about'][$item_index]; // unable to create xpath query for this to just select the child. It selects all children, so we grab the value based on the item index.
+        }
+        else {
+          $media_value = $item[$xpath_mapping[$import_options['media']]];
+        }
       }
       $item['dc_hasformat'] = $media_value;
 
