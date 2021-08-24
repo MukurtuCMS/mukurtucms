@@ -449,6 +449,10 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
           $media_value = $item[$xpath_mapping[$import_options['media']]];
         }
       }
+      // If the media file path is not an absolute URL, try to grab it from the extraction of the zip.
+      if (substr( $media_value, 0, 4 ) <> "http") {
+        $media_value = drupal_realpath($_SESSION['mukurtu_zip_import']['temp_extract_path'] . $media_value);
+      }
       $item['dc_hasformat'] = $media_value;
 
       // Special handling for Creator and Contributor Fields
