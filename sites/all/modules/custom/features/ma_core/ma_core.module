@@ -55,7 +55,7 @@ function ma_core_user_login(&$edit, $account) {
   }
   else {
     $login_path = ''; // Non-admin users go to front page.
-    drupal_alter('ma_core_user_login', $login_path);
+    drupal_alter('ma_core_user_login', $login_path, $user);
     drupal_goto($login_path);
   }
 }
