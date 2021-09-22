@@ -45,11 +45,18 @@ function ma_core_user_login(&$edit, $account) {
   }
 
   global $user;
-  if (array_intersect(array('administrator', 'Mukurtu Administrator'), $user->roles)) {
+  $dashboard_roles = array();
+  $dashboard_homebox = homebox_get_page('mukurtu_dashboard');
+  if (!empty($dashboard_homebox)) {
+    $dashboard_roles = $dashboard_homebox->settings['roles'];
+  }
+  if (array_intersect($dashboard_roles, $user->roles)) {
     drupal_goto('dashboard');
   }
   else {
-    drupal_goto(); // Non-admin users go to front page
+    $login_path = ''; // Non-admin users go to front page.
+    drupal_alter('ma_core_user_login', $login_path);
+    drupal_goto($login_path);
   }
 }
 
