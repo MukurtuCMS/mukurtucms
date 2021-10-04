@@ -512,6 +512,12 @@ function ma_importexport_dc_feeds_presave(FeedsSource $source, $entity, $item) {
   if (ma_importexport_dc_is_xml_importer($source->id)) {
     $import_options = variable_get('dh_xml_import_options');
 
+    // Set the author to the importing user (on the non-MODS import only, as the MODS import includes a username mapping)
+    if ($source->id == 'digital_heritage_dc') {
+      global $user;
+      $entity->uid = $user->uid;
+    }
+
     // Set the protocol(s) (the community(s) gets added in mukurtu_protocol_field_node_presave()).
     $protocols = [];
     foreach ($import_options['oggroup_fieldset'] as $ogg_fieldset) {
