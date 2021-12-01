@@ -32,7 +32,7 @@ function wysiwyg_ckeditor_editor() {
       ),
     ),
     'install note callback' => 'wysiwyg_ckeditor_install_note',
-    'verified version range' => array('3.0', '4.16.1.cae20318d4'),
+    'verified version range' => array('3.0', '4.17.1.f6dd30807a'),
     'migrate settings callback' => 'wysiwyg_ckeditor_migrate_settings',
     'version callback' => 'wysiwyg_ckeditor_version',
     'themes callback' => 'wysiwyg_ckeditor_themes',
