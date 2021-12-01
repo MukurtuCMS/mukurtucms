@@ -21,6 +21,9 @@ projects[drupal][patch][] = core/mukurtu_custom_default_settings_file.patch
 ; 117661693-Stop-double-quoting-quotes-in-term-autocomplete.patch
 projects[drupal][patch][] = core/multipatch-109315810-109315810-109315810.patch
 
+;DCP-383
+projects[wysiwyg][patch][] = https://www.drupal.org/files/issues/2021-11-17/wysiwyg-update_to_ckeditor_4_17_0-3227897-15.patch
+
 ; Redirect on empty database for Reclaim.
 projects[drupal][patch][] = https://www.drupal.org/files/issues/2019-12-19/3077423-11.patch
 
