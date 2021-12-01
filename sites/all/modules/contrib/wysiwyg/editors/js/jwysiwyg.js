@@ -4,12 +4,14 @@
  * Attach this editor to a target element.
  */
 Drupal.wysiwyg.editor.attach.jwysiwyg = function(context, params, settings) {
+  var $field = this.$field;
   // Attach editor.
-  $('#' + params.field).wysiwyg();
+  $field.wysiwyg(settings);
+  this.startWatching($($field.data('wysiwyg').editorDoc).find('body'));
 };
 
 /**
- * Detach a single or all editors.
+ * Detach a single editor instance.
  */
 Drupal.wysiwyg.editor.detach.jwysiwyg = function (context, params, trigger) {
   var $field = $('#' + params.field);
