@@ -108,3 +108,21 @@ Drupal.settings.cke_toolbar_DrupalFull = [
   ['Maximize', 'ShowBlocks'],
   ['DrupalBreak', 'DrupalPageBreak']
 ];
+
+/**
+* To enable browser native spell checker uncomment (default) first of following two lines.
+* The second line (is a default setting and can leave commented) allows access to browser context menu with ctrl-right-click
+* otherwise there is no access to the browser context menu without further config changes
+*/
+CKEDITOR.config.disableNativeSpellChecker = false;
+// CKEDITOR.config.browserContextMenuOnCtrl = true;
+
+/** NOT TESTED
+* For browser default context menu on right-click rather than ctrl-right-click
+* Note: Disabling CKEditor's context menu may render it impossible to work with tables
+* uncomment following lines;
+* three plugins need to be removed because scayt depends on menubutton which depends on contextmenu
+*/
+// config.browserContextMenuOnCtrl = false;
+// config.removePlugins = 'scayt,menubutton,contextmenu';
+

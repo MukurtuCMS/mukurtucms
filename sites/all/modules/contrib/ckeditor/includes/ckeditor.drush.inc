@@ -30,32 +30,47 @@
 function ckeditor_drush_command() {
   $items['ckeditor-download'] = array(
     'callback' => 'ckeditor_drush_download',
-    'description' => dt('Downloads the required CKEditor library from svn.ckeditor.com.'),
+    'description' => dt('Downloads the required CKEditor library.'),
     'arguments' => array(
-      'path' => dt('Optional. The path to the download folder. If omitted, Drush will use the default location (<code>sites/all/libraries/ckeditor</code>).'),
+      'path' => dt('Optional. The path to the download folder. If omitted, Drush will use the default location (sites/all/libraries/ckeditor).'),
     ),
   );
   return $items;
 }
 
 /**
- * Downloads
+ * Downloads.
  */
 function ckeditor_drush_download() {
   $args = func_get_args();
-  if (!empty($args[0])) {
-    $path = $args[0];
+  $path = !empty($args[0]) ? $args[0] : drush_get_context('DRUSH_DRUPAL_ROOT') . '/sites/all/libraries/ckeditor';
+
+  $zip_url = 'https://download.cksource.com/CKEditor/CKEditor/CKEditor%20' . CKEDITOR_LATEST . '/';
+  $file_name = 'ckeditor_' . CKEDITOR_LATEST . '_full.zip';
+
+  $file = drush_download_file($zip_url . $file_name, $file_name, 3600);
+  if (empty($file)) {
+    drush_log(dt('Drush was unable to download CKEditor !version to !path from the !url', array(
+      '!version' => CKEDITOR_LATEST,
+      '!path' => $path,
+      '!url' => $zip_url . $file_name
+    )), 'error');
+
+    return FALSE;
   }
-  else {
-    $path = drush_get_context('DRUSH_DRUPAL_ROOT') . '/sites/all/libraries/ckeditor';
+
+  $tmp = drush_tempdir();
+  if (!drush_tarball_extract($file, $tmp)) {
+    drush_log(dt('CKEditor was not extracted to !path.', array('!path' => $path)), 'error');
+
+    return FALSE;
   }
-  $svn_cmd = 'svn checkout http://svn.ckeditor.com/CKEditor/releases/stable/ ' . $path;
-  if (drush_shell_exec($svn_cmd)) {
-    drush_log(dt('CKEditor was downloaded to !path.', array('!path' => '<code>' . $path . '</code>')), 'success');
-  }
-  else {
-    drush_log(dt('Drush was unable to download CKEditor to !path.', array('!path' => '<code>' . $path . '</code>')) . '<br/>' . dt('Attempted command: !svn_cmd.', array('!svn_cmd' => '<code>' . $svn_cmd . '</code>')), 'error');
-  }
+
+  drush_move_dir($tmp . '/ckeditor', $path, TRUE);
+
+  drush_log(dt('CKEditor !version was downloaded to !path.', array('!version' => CKEDITOR_LATEST, '!path' => $path)), 'success');
+
+  return TRUE;
 }
 
 /**
