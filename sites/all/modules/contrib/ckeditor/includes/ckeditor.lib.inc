@@ -161,9 +161,10 @@ function ckeditor_load_toolbar_options() {
  */
 function ckeditor_load_skin_options() {
   $arr = array();
+  $editor_path = ckeditor_path('relative');
   $editor_local_path = ckeditor_path('local');
-  $skin_dir = $editor_local_path . '/skins';
-  if ($editor_local_path != '<URL>' && is_dir($skin_dir)) {
+  $skin_dir = ckeditor_skins_path('local');
+  if (is_dir($skin_dir) && ($editor_local_path != '<URL>' || ($editor_path == '<URL>' && $editor_local_path == '<URL>') ) ) {
     $dh = @opendir($skin_dir);
     if (FALSE !== $dh) {
       while (($file = readdir($dh)) !== FALSE) {
@@ -179,15 +180,14 @@ function ckeditor_load_skin_options() {
   }
 
   // If we have no information about skins, use the default for this version.
-  if (!$arr) {
-    $version = explode('.', ckeditor_get_version());
-    if ($version[0] == 3) {
-      $arr = array('kama' => 'Kama');
-    }
-    elseif ($version[0] == 4) {
-      $arr = ($version[1] <= 5) ? array('moono' => 'Moono') : array('moono-lisa' => 'Moono-lisa');
-    }
+  if (empty($arr)) {
+    $arr = array(
+      'moono-lisa' => 'Moono-lisa',
+      'moono' => 'Moono',
+      'kama' => 'Kama',
+    );
   }
+
   asort($arr);
 
   return $arr;
@@ -199,22 +199,20 @@ function ckeditor_load_skin_options() {
  * @return string
  */
 function ckeditor_default_skin() {
-  // If there is no available list then bail.
-  if (!$skin_options = ckeditor_load_skin_options()) {
-    return '';
+  $skin_options = ckeditor_load_skin_options();
+
+  // Return default skin for used CKEditor version
+  $version = explode('.', ckeditor_get_version());
+  if ($version[0] == 3 && array_key_exists('kama', $skin_options)) {
+    return 'kama';
+  }
+  elseif ($version[0] == 4 && $version[1] <= 5 && array_key_exists('moono', $skin_options)) {
+    return 'moono';
   }
 
-  // Default skins in descending order
-  $defaults = array(
-    'moono-lisa' => 'Moono-lisa',
-    'moono' => 'Moono',
-    'kama' => 'Kama'
-  );
-
-  // If there is more than one skin to choose from, use the most current
-  // default.
-  if ($skin_options && ($default = array_intersect_key($defaults, $skin_options))) {
-    return key($default);
+  // Check if default skin is in options
+  if (array_key_exists('moono-lisa', $skin_options)) {
+    return 'moono-lisa';
   }
 
   // If there are no defaults, or only one skin, select the first from the list.
@@ -352,9 +350,33 @@ function ckeditor_load_plugins($render = FALSE) {
   // to a plugin returned by hook_ckeditor_plugin() to be a full URL. This
   // breaks backward compatibility for external plugins, so we're fixing it
   // below.
-  foreach ($plugins as $i => $plugin) {
+  foreach ($plugins as $i => &$plugin) {
+    if (is_array($plugin['path'])) {
+      $msg = t('<b>Plugins conflict detected.</b>');
+      $msg .= t('There is more than one plugin with the same name: <b>%name</b>.', array('%name' => $i));
+      $msg .= t('Please remove duplicated plugins leaving only one version.');
+      drupal_set_message($msg, 'warning', false);
+
+      $msg = 'Plugins conflict detected. Multiple plugins with name: <b>%name</b>. Please remove duplicated plugins leaving only one version.';
+      watchdog('CKEditor', $msg, array('%name' => $i), WATCHDOG_WARNING);
+
+      // Leave only the first plugin details
+      foreach(array('name', 'desc', 'path') as $field) {
+        if (isset($plugin[$field]) && is_array($plugin[$field])) {
+          $plugin[$field] = array_shift($plugin[$field]);
+        }
+      }
+      foreach($plugin['buttons'] as &$buttons) {
+        foreach(array('label', 'icon') as $field) {
+          if (isset($buttons[$field]) && is_array($buttons[$field])) {
+            $buttons[$field] = array_shift($buttons[$field]);
+          }
+        }
+      }
+    }
+
     if (strpos($plugin['path'], '%') !== 0 && !preg_match('|^(http(s)?:)?\/?\/|i', $plugin['path'])) {
-      $plugins[$i]['path'] = '%base_path%' . $plugin['path'];
+      $plugin['path'] = '%base_path%' . $plugin['path'];
     }
   }
 
@@ -588,14 +610,30 @@ function ckeditor_profile_settings_compile($global_profile, $profile) {
   $module_drupal_local_path = ckeditor_module_path('local');
   $editor_path = ckeditor_path('relative');
   $editor_local_path = ckeditor_path('local');
+  $skins_path = ckeditor_skins_path('relative');
+  $skins_local_path = ckeditor_skins_path('local');
 
   $toolbar = $conf['toolbar'];
 
-  if (!empty($conf['theme_config_js']) && $conf['theme_config_js'] == 't' && file_exists($themepath . 'ckeditor.config.js')) {
-    $ckeditor_config_path = $host . $themepath . 'ckeditor.config.js?' . @filemtime($themepath . 'ckeditor.config.js');
-  }
-  else {
-    $ckeditor_config_path = $module_drupal_path . "/ckeditor.config.js?" . @filemtime($module_drupal_path . "/ckeditor.config.js");
+  $query_string = '?' . variable_get('css_js_query_string', '0');
+
+  $config_js = isset($conf['config_js']) ? $conf['config_js'] : 'none';
+
+  switch ($config_js) {
+    case 'theme':
+      $ckeditor_config_path = $host . $themepath . 'ckeditor.config.js' . $query_string;
+      break;
+
+    case 'self':
+      $config_js_path = trim(str_replace("%h%t", "%t", $conf['config_js_path']));
+      $config_js_path = str_replace(array('%h', '%t'), array($host, $host . $themepath), $config_js_path);
+      $ckeditor_config_path = $config_js_path . $query_string;
+      break;
+
+    case 'none':
+    default:
+      $ckeditor_config_path = $module_drupal_path . "/ckeditor.config.js" . $query_string;
+      break;
   }
 
   $settings['customConfig'] = $ckeditor_config_path;
@@ -609,8 +647,37 @@ function ckeditor_profile_settings_compile($global_profile, $profile) {
   }
   $settings['width'] = $conf['width'];
   //check if skin exists, if not select default one
-  if (isset($global_profile->settings['skin']) && file_exists($editor_local_path . '/skins/' . $global_profile->settings['skin'])) {
+  if (isset($global_profile->settings['skin']) && file_exists($editor_local_path . '/skins/' . $global_profile->settings['skin']) ||
+    isset($global_profile->settings['skin']) && $editor_local_path == '<URL>'
+  ) {
     $settings['skin'] = $global_profile->settings['skin'];
+    // Check if skin exists, if not select default one
+    if (isset($global_profile->settings['skin'])) {
+      // If the skin exists, check if local file is present
+      if (file_exists($skins_local_path . '/' . $global_profile->settings['skin'])) {
+        // If editor is local, set skin as profile value
+        if ($editor_local_path != '<URL>') {
+          $settings['skin'] = $global_profile->settings['skin'];
+        }
+        // If editor is remote, set skin as profile value plus local path
+        // example: http://docs.ckeditor.com/#!/api/CKEDITOR.config-cfg-skin
+        else if ($editor_path == '<URL>' && $editor_local_path == '<URL>') {
+          $settings['skin'] = $global_profile->settings['skin'] . ',' . $skins_path . '/' . $global_profile->settings['skin'] . '/';
+        }
+        else {
+          $settings['skin'] = ckeditor_default_skin();
+        }
+      }
+      else {
+        // If no local skin file, check if editor is hosted remotely
+        if ($editor_path == '<URL>' && $editor_local_path == '<URL>') {
+          $settings['skin'] = $global_profile->settings['skin'];
+        }
+        else {
+          $settings['skin'] = ckeditor_default_skin();
+        }
+      }
+    }
   }
   else {
     $settings['skin'] = ckeditor_default_skin();
@@ -919,35 +986,74 @@ function ckeditor_profile_settings_compile($global_profile, $profile) {
   }
 
   if (!empty($conf['js_conf'])) {
-    preg_match_all('#config\.(\w+)[\s]*=[\s]*(.+?);[\s]*(?=config\.|$)#is', preg_replace("/[\n\r]+/", "", $conf['js_conf']), $matches);
+    // CKEDITOR.dtd holds and object representation of the HTML DTD to be used by the editor in its internal operations.
+    // See more at https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_dtd.html
+    $dtd = [];
+
+    $js_conf = $conf['js_conf'];
+    // Remove multiple-line JavaScript comment blocks.
+    $js_conf = preg_replace('#^/\*(?:[^*]*(?:\*(?!/))*)*\*/#m', '', $js_conf);
+    // Remove single-line JavaScript comments.
+    $js_conf = preg_replace('#([;,{}()\[\]]|[\s\t]+)//.*[ \t]*#m', '', $js_conf);
+    // Remove empty lines.
+    $js_conf = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", '', $js_conf);
+
+    preg_match_all('#config\.(\w+)[\s]*=[\s]*(.+?)[\s]*(?=(^[\s]*|;[\s]*)config\.|$)#is', $js_conf, $matches);
     foreach ($matches[2] as $i => $match) {
       if (!empty($match)) {
+        $match = rtrim($match, ';') . ';';
+
+        // Custom processing is required for lines that manipulate existing
+        // CKEditor object variables.
+        preg_match_all('#(CKEDITOR\.+[\w\.\$]+[\s]*)=[\s]*(.+?);[\s]*(?=CKEDITOR\.|\/\/|\/*$)#is', $match, $sub_matches);
+        if (!empty($sub_matches[2])) {
+          foreach ($sub_matches[2] as $j => $sub_match) {
+            $match = str_replace($sub_matches[0][$j], '', $match);
+            $dtd[$sub_matches[1][$j]] = $sub_match;
+          }
+        }
+
         $value = trim($match, " ;\n\r\t\0\x0B");
+
+        // Custom processing is required for Javascript boolean assignment and
+        // string concatenation operations.
         if (strcasecmp($value, 'true') == 0) {
           $value = TRUE;
         }
-        if (strcasecmp($value, 'false') == 0) {
+        elseif (strcasecmp($value, 'false') == 0) {
           $value = FALSE;
         }
-        $settings["js_conf"][$matches[1][$i]] = $value;
+        elseif (preg_match('#["|\'][\s]*\+[\s]*["|\']#is', $value)) {
+          // Special case for JS concatenated strings.
+          // For example, one can have config.colorButton_colors defined as below, which would cause parsing problems.
+          //     config.colorButton_colors = 'B3B3B3,'+'000,800000,696969,'+'F00,FF8C00'
+          // This regex will replace it into single string:
+          //     config.colorButton_colors = 'B3B3B3,000,800000,696969,F00,FF8C00'
+          $value = preg_replace('#["|\'][\s]*\+[\s]*["|\']#', '', $value);
+        }
+
+        $settings['js_conf'][$matches[1][$i]] = $value;
       }
+    }
+
+    if (!empty($dtd)) {
+      $settings['js_conf']['dtd'] = $dtd;
     }
   }
 
-  $settings['stylesCombo_stylesSet'] = "drupal:" . $module_drupal_path . '/ckeditor.styles.js';
+  $settings['stylesCombo_stylesSet'] = "drupal:" . $module_drupal_path . '/ckeditor.styles.js' . $query_string;
   if (!empty($conf['css_style'])) {
     if ($conf['css_style'] == 'theme' && file_exists($themepath . 'ckeditor.styles.js')) {
-      $settings['stylesCombo_stylesSet'] = "drupal:" . $host . $themepath . 'ckeditor.styles.js';
+      $settings['stylesCombo_stylesSet'] = "drupal:" . $host . $themepath . 'ckeditor.styles.js' . $query_string;
     }
     elseif (!empty($conf['css_style']) && $conf['css_style'] == 'self') {
       $conf['styles_path'] = str_replace("%h%t", "%t", $conf['styles_path']);
-      $settings['stylesCombo_stylesSet'] = "drupal:" . str_replace(array('%h', '%t', '%m'), array($host, $host . $themepath, $module_drupal_path), $conf['styles_path']);
+      $settings['stylesCombo_stylesSet'] = "drupal:" . str_replace(array('%h', '%t', '%m'), array($host, $host . $themepath, $module_drupal_path), $conf['styles_path']) . $query_string;
     }
   }
 
   // add custom stylesheet if configured
   // lets hope it exists but we'll leave that to the site admin
-  $query_string = '?' . variable_get('css_js_query_string', '0');
   $css_files = array();
   switch ($conf['css_mode']) {
     case 'theme':
@@ -1174,7 +1280,11 @@ function ckeditor_load_by_field($field, $format, $show_toggle = TRUE, $add_field
     return $field;
   }
 
-  drupal_add_js(array('ckeditor' => array('textarea_default_format' => array($field['#id'] => $format))), 'setting');
+  // Pass Drupal's JS cache-busting string via settings along to CKEditor.
+  drupal_add_js(array('ckeditor' => array(
+    'textarea_default_format' => array($field['#id'] => $format),
+    'timestamp' => variable_get('css_js_query_string', '0')
+  )), 'setting');
 
   if (!isset($processed_ids[$field['#id']])) {
     $processed_ids[$field['#id']] = array();
@@ -1186,12 +1296,14 @@ function ckeditor_load_by_field($field, $format, $show_toggle = TRUE, $add_field
 
   if ($profile === FALSE) {
     $ckeditor_in_default_format = FALSE;
-    foreach ((array) $format_arr['#options'] as $key => $val) {
-      if ($key == $format)
-        continue;
-      if ($profile = ckeditor_get_profile($key)) {
-        $use_ckeditor = $key;
-        break;
+    if (isset($format_arr['#options'])) {
+      foreach ((array) $format_arr['#options'] as $key => $val) {
+        if ($key == $format)
+          continue;
+        if ($profile = ckeditor_get_profile($key)) {
+          $use_ckeditor = $key;
+          break;
+        }
       }
     }
     if ($use_ckeditor === FALSE) {

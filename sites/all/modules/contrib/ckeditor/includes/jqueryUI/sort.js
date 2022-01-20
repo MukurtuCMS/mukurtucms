@@ -150,10 +150,18 @@ jQuery(document).ready(function() {
         Drupal.ckeditorToolbarToArray = function (toolbar) {
             toolbar = toolbar.replace(/\r?\n|\r/gmi, '')
                 .replace(/\s/gmi, '')
-                .replace(/([a-zA-Z0-9]+?):/g, '"$1":')
                 .replace(/'/g, '"');
 
-            return JSON.parse(toolbar);
+            try {
+                return JSON.parse(toolbar);
+            } catch (e) {
+                toolbar = toolbar.replace(/([a-zA-Z0-9]+?):/g, '"$1":')
+                try {
+                    return JSON.parse(toolbar);
+                } catch (e) {
+                    return toolbar;
+                }
+            }
         };
     }
 

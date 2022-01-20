@@ -103,6 +103,10 @@ function ckeditor_install() {
   $arr['css_mode'] = "none";
   $arr['css_path'] = variable_get("ckeditor_stylesheet", "");
 
+  //config location
+  $arr['config_js'] = "none";
+  $arr['config_js_path'] = "";
+
   //upload
   //get permissions here like in _update_role_permissions
   $arr['filebrowser'] = "none";
@@ -579,6 +583,29 @@ function ckeditor_update_7005() {
         ))
         ->condition('name', $name, '=')
         ->execute();
+  }
+}
+
+/**
+ * Import missing translations.
+ * @see https://www.drupal.org/project/ckeditor/issues/3134399
+ */
+function ckeditor_update_7006() {
+  if (!module_exists('locale') || !db_table_exists('locales_source')) {
+    return t('No translations to fix as the locale system is not enabled.');
+  }
+
+  module_load_include('module', 'ckeditor');
+  $module_path = ckeditor_module_path('url');
+
+  $javascript = [
+    ['type' => 'file', 'data' => $module_path. '/includes/ckeditor.utils.js'],
+    ['type' => 'file', 'data' => $module_path. '/plugins/drupalbreaks/plugin.js'],
+    ['type' => 'file', 'data' => $module_path. '/plugins/mediaembed/dialogs/mediaembed.js'],
+  ];
+
+  if (function_exists('locale_js_alter')) {
+    locale_js_alter($javascript);
   }
 }
 
