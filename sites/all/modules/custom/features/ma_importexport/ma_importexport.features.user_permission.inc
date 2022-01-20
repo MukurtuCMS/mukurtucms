@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_importexport.features.user_permission.inc
@@ -41,109 +42,77 @@ function ma_importexport_user_default_permissions() {
   // Exported permission: 'clear import_categories feeds'.
   $permissions['clear import_categories feeds'] = array(
     'name' => 'clear import_categories feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 
   // Exported permission: 'clear import_collection feeds'.
   $permissions['clear import_collection feeds'] = array(
     'name' => 'clear import_collection feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 
   // Exported permission: 'clear import_communities feeds'.
   $permissions['clear import_communities feeds'] = array(
     'name' => 'clear import_communities feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 
   // Exported permission: 'clear import_cultural_protocols feeds'.
   $permissions['clear import_cultural_protocols feeds'] = array(
     'name' => 'clear import_cultural_protocols feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 
   // Exported permission: 'clear import_digital_heritage_community_records feeds'.
   $permissions['clear import_digital_heritage_community_records feeds'] = array(
     'name' => 'clear import_digital_heritage_community_records feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 
   // Exported permission: 'clear import_media_audio feeds'.
   $permissions['clear import_media_audio feeds'] = array(
     'name' => 'clear import_media_audio feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 
   // Exported permission: 'clear import_media_files feeds'.
   $permissions['clear import_media_files feeds'] = array(
     'name' => 'clear import_media_files feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 
   // Exported permission: 'clear import_media_images feeds'.
   $permissions['clear import_media_images feeds'] = array(
     'name' => 'clear import_media_images feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 
   // Exported permission: 'clear import_media_video feeds'.
   $permissions['clear import_media_video feeds'] = array(
     'name' => 'clear import_media_video feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 
   // Exported permission: 'clear import_users feeds'.
   $permissions['clear import_users feeds'] = array(
     'name' => 'clear import_users feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 
   // Exported permission: 'clear media_feed_importer feeds'.
   $permissions['clear media_feed_importer feeds'] = array(
     'name' => 'clear media_feed_importer feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 
