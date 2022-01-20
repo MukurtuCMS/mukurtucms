@@ -67,11 +67,8 @@ function bootstrap_item_list(array $variables) {
   $output = '';
   if ($items) {
     $output .= '<' . $type . drupal_attributes($list_attributes) . '>';
-    $num_items = count($items);
-    $i = 0;
     foreach ($items as $key => $item) {
       $attributes = array();
-      $i++;
 
       if (is_array($item)) {
         $value = '';
@@ -110,12 +107,7 @@ function bootstrap_item_list(array $variables) {
       else {
         $value = $item;
       }
-      if ($i == 1) {
-        $attributes['class'][] = 'first';
-      }
-      if ($i == $num_items) {
-        $attributes['class'][] = 'last';
-      }
+
       $output .= '<li' . drupal_attributes($attributes) . '>' . $value . "</li>\n";
     }
     $output .= "</$type>";
