@@ -4,13 +4,14 @@
  * @file
  * Test date UI.
  */
+
 /**
- *
+ * Date UI related tests.
  */
 class DateUiTestCase extends DateFieldTestBase {
 
   /**
-   * @todo.
+   * Field UI.
    */
   public static function getInfo() {
     return array(
@@ -21,7 +22,7 @@ class DateUiTestCase extends DateFieldTestBase {
   }
 
   /**
-   * @todo.
+   * Setup test.
    */
   public function setUp(array $modules = array()) {
     parent::setUp($modules);
@@ -30,9 +31,9 @@ class DateUiTestCase extends DateFieldTestBase {
   }
 
   /**
-   * @todo.
+   * Test field UI.
    */
-  public function testFieldUI() {
+  public function testFieldUi() {
     $label = 'Test';
     $current_year = date('Y');
 
@@ -57,24 +58,24 @@ class DateUiTestCase extends DateFieldTestBase {
   /**
    * {@inheritdoc}
    */
-  function dateForm($field_name, $field_type, $widget_type, $todate = TRUE) {
+  public function dateForm($field_name, $field_type, $widget_type, $todate = TRUE) {
     // Tests that date field functions properly.
     $edit = array();
-    $edit['title'] = $this->randomName(8);
-    $edit['body[und][0][value]'] = $this->randomName(16);
+    $edit['title'] = self::randomName(8);
+    $edit['body[und][0][value]'] = self::randomName(16);
     $current_year = date('Y');
 
-    if ($widget_type == 'date_select') {
+    if ($widget_type === 'date_select') {
       $edit['field_test[und][0][value][year]'] = $current_year;
       $edit['field_test[und][0][value][month]'] = '10';
       $edit['field_test[und][0][value][day]'] = '7';
       $edit['field_test[und][0][value][hour]'] = '10';
       $edit['field_test[und][0][value][minute]'] = '30';
     }
-    elseif ($widget_type == 'date_text') {
+    elseif ($widget_type === 'date_text') {
       $edit['field_test[und][0][value][date]'] = format_string('10/07/!year - 10:30', array('!year' => $current_year));
     }
-    elseif ($widget_type == 'date_popup') {
+    elseif ($widget_type === 'date_popup') {
       $edit['field_test[und][0][value][date]'] = format_string('10/07/!year', array('!year' => $current_year));
       $edit['field_test[und][0][value][time]'] = '10:30';
     }

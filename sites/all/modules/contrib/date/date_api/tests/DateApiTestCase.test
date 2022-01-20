@@ -11,12 +11,12 @@
 class DateApiTestCase extends DrupalWebTestCase {
 
   /**
-   * @todo.
+   * Date API.
    */
   public static function getInfo() {
     return array(
       'name' => t('Date API'),
-      'description' => t('Test Date API functions.') ,
+      'description' => t('Test Date API functions.'),
       'group' => t('Date'),
     );
   }
@@ -33,10 +33,9 @@ class DateApiTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * @todo.
+   * Test date_format_date().
    */
-  public function testDateAPI() {
-    // Test date_format_date().
+  public function testDateApi() {
     $formatters = array(
       'a',
       'A',
@@ -86,11 +85,27 @@ class DateApiTestCase extends DrupalWebTestCase {
     // Test the order of the weeks days for a calendar that starts on Monday and
     // one that starts on Sunday.
     variable_set('date_first_day', 1);
-    $expected = array(0 => t('Mon'), 1 => t('Tue'), 2 => t('Wed'), 3 => t('Thu'), 4 => t('Fri'), 5 => t('Sat'), 6 => t('Sun'));
+    $expected = array(
+      0 => t('Mon'),
+      1 => t('Tue'),
+      2 => t('Wed'),
+      3 => t('Thu'),
+      4 => t('Fri'),
+      5 => t('Sat'),
+      6 => t('Sun'),
+    );
     $days = date_week_days_ordered(date_week_days_abbr(1));
     $this->assertEqual($expected, $days, 'Test that date_week_days_ordered() array starts on Monday when the site first day is on Monday.');
     variable_set('date_first_day', 0);
-    $expected = array(0 => t('Sun'), 1 => t('Mon'), 2 => t('Tue'), 3 => t('Wed'), 4 => t('Thu'), 5 => t('Fri'), 6 => t('Sat'));
+    $expected = array(
+      0 => t('Sun'),
+      1 => t('Mon'),
+      2 => t('Tue'),
+      3 => t('Wed'),
+      4 => t('Thu'),
+      5 => t('Fri'),
+      6 => t('Sat'),
+    );
     $days = date_week_days_ordered(date_week_days_abbr(1));
     $this->assertEqual($expected, $days, 'Test that date_week_days_ordered() array starts on Sunday when the site first day is on Sunday.');
 
@@ -346,9 +361,10 @@ class DateApiTestCase extends DrupalWebTestCase {
     $timezone = NULL;
     $format = 'Y-m';
     $date = new dateObject($input, $timezone, $format);
-    $value = $date->format('Y-m');
+    $value = $date->format($format);
     $expected = '2009-10';
     $this->assertEqual($expected, $value, "Test new dateObject($input, $timezone, $format): should be $expected, found $value.");
+    $this->assertTrue($date->dateOnly, "Test New dateObject($input, $timezone, $format): should be date only.");
 
     // Create time-only date.
     $input = '0000-00-00T10:30:00';
@@ -358,6 +374,7 @@ class DateApiTestCase extends DrupalWebTestCase {
     $value = $date->format('H:i:s');
     $expected = '10:30:00';
     $this->assertEqual($expected, $value, "Test new dateObject($input, $timezone, $format): should be $expected, found $value.");
+    $this->assertTrue($date->timeOnly, "Test new dateObject($input, $timezone, $format): should be time only.");
 
     // Create time-only date.
     $input = '10:30:00';
@@ -402,6 +419,12 @@ class DateApiTestCase extends DrupalWebTestCase {
     $date = @new dateObject($input, $timezone, $format);
     $this->assertNotEqual(count($date->errors), 0, '23 abc 2012 should be an invalid date');
 
+    // Test invalid dates (i.e. '0' as date) with and without a timezone gives the same result.
+    $date = new dateObject('0000-00-00');
+    $this->assertEqual($date->format('Y-m-d'), '-0001-11-30');
+    $date = new dateObject('0000-00-00', 'Europe/Berlin');
+    $this->assertEqual($date->format('Y-m-d'), '-0001-11-30');
+
     // Test Granularity.
     $input = '2005-06-01 10:30:45';
     $timezone = NULL;
@@ -427,7 +450,22 @@ class DateApiTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * @todo.
+   * Test creating a DateObject from a timestamp.
+   */
+  public function testDateObjectFromTimestamp() {
+    // Test a negative timestamp.
+    $date = new \DateTime('1960-01-01');
+    $obj = new DateObject($date->getTimestamp(), 'UTC');
+    $this->assertEqual('1960-01-01', $obj->format('Y-m-d'));
+
+    // Test a positive timestamp.
+    $date = new \DateTime('1980-01-01');
+    $obj = new DateObject($date->getTimestamp(), 'UTC');
+    $this->assertEqual('1980-01-01', $obj->format('Y-m-d'));
+  }
+
+  /**
+   * Tear down tests.
    */
   public function tearDown() {
     variable_del('date_first_day');

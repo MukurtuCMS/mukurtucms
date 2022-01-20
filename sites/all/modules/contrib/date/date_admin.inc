@@ -284,6 +284,8 @@ function _date_field_instance_settings_form($field, $instance) {
     'field' => $field,
     'instance' => $instance,
   );
+
+  // Trigger hook_date_field_instance_settings_form_alter().
   drupal_alter('date_field_instance_settings_form', $form, $context);
 
   return $form;
@@ -352,7 +354,7 @@ function _date_field_widget_settings_form($field, $instance) {
       '#type' => 'textfield',
       '#title' => t('Custom input format'),
       '#default_value' => $settings['input_format_custom'],
-      '#description' => t("Override the input format selected above. Define a php date format string like 'm-d-Y H:i' (see <a href=\"@link\">http://php.net/date</a> for more details).", array('@link' => 'http://php.net/date')),
+      '#description' => t("Override the input format selected above. Define a PHP date format string like 'm-d-Y H:i' (see <a href=\"@link\">http://php.net/date</a> for more details).", array('@link' => 'http://php.net/date')),
       '#weight' => 5,
       '#fieldset' => 'date_format',
       '#attributes' => array('class' => array('indent')),
@@ -472,6 +474,7 @@ function _date_field_widget_settings_form($field, $instance) {
     'field' => $field,
     'instance' => $instance,
   );
+  // Trigger hook_date_field_widget_settings_form_alter().
   drupal_alter('date_field_widget_settings_form', $form, $context);
 
   return $form;
@@ -607,6 +610,8 @@ function _date_field_settings_form($field, $instance, $has_data) {
     'instance' => $instance,
     'has_data' => $has_data,
   );
+
+  // Trigger hook_date_field_settings_form_alter().
   drupal_alter('date_field_settings_form', $form, $context);
 
   return $form;

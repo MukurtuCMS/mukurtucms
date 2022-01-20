@@ -11,17 +11,6 @@
 class DatePopupValidationTestCase extends DateValidationTestCase {
 
   /**
-   * @todo.
-   */
-  // public static function getInfo() {
-  //   return array(
-  //     'name' => 'Date Popup Validation',
-  //     'description' => 'Data validation tests for the Date Popup module.',
-  //     'group' => 'Date',
-  //   );
-  // }
-
-  /**
    * {@inheritdoc}
    */
   public function setUp(array $modules = array()) {

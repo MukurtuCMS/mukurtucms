@@ -11,12 +11,12 @@
 class DateNowUnitTestCase extends DrupalUnitTestCase {
 
   /**
-   *
+   * Test Date Now function.
    */
   public static function getInfo() {
     return array(
       'name' => t('Date Now'),
-      'description' => t('Test Date Now function.') ,
+      'description' => t('Test Date Now function.'),
       'group' => t('Date'),
     );
   }
@@ -29,15 +29,18 @@ class DateNowUnitTestCase extends DrupalUnitTestCase {
     parent::setUp();
   }
 
+  /**
+   * Test without passing a timezone.
+   */
   public function testDateNowNoTimezone() {
-    // Test without passing a timezone.
     $now = date_now();
-
     $this->assertTrue(($now instanceof DateObject), 'Test date_now() returns a DateObject');
   }
 
+  /**
+   * Test with a string timezone.
+   */
   public function testDateNowStringTimezones() {
-    // Test with a string timezone.
     $la_time = date_now('America/Los_Angeles');
     $ny_time = date_now('America/New_York');
 
@@ -47,8 +50,10 @@ class DateNowUnitTestCase extends DrupalUnitTestCase {
     $this->assertEqual($la_time->getTimestamp(), $ny_time->getTimestamp(), 'Test different timezones have same Unix timestamp');
   }
 
+  /**
+   * Test with object timezones.
+   */
   public function testDateNowObjectTimezones() {
-    // Test with object timezones.
     $la_tz = new DateTimeZone('America/Los_Angeles');
     $ny_tz = new DateTimeZone('America/New_York');
 

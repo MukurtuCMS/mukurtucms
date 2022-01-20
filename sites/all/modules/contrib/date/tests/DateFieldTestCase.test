@@ -28,13 +28,13 @@ class DateFieldTestCase extends DateFieldTestBase {
     $this->createDateField($options);
 
     $edit = array();
-    $edit['title'] = $this->randomName(8);
+    $edit['title'] = self::randomName(8);
     $this->drupalPost('node/add/date-relative-default-test', $edit, t('Save'));
 
   }
 
   /**
-   * @todo.
+   * Date Field.
    */
   public static function getInfo() {
     return array(

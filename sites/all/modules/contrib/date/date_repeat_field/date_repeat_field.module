@@ -438,8 +438,17 @@ function date_repeat_after_build(&$element, &$form_state) {
  *
  * Pass in either the RRULE or the $form_values array for the RRULE, whichever
  * is missing will be created when needed.
+ *
+ * @param string|null $rrule
+ *   An RRULE string.
+ * @param array|null $rrule_values
+ *   An array of rrule values.
+ * @param array $field
+ *   A field definition from Field API.
+ * @param array $item
+ *   The field value to process.
  */
-function date_repeat_build_dates($rrule = NULL, $rrule_values = NULL, $field, $item) {
+function date_repeat_build_dates($rrule = NULL, $rrule_values = NULL, array $field = array(), array $item = array()) {
   include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'date_api') . '/date_api_ical.inc';
   $field_name = $field['field_name'];
 
@@ -708,7 +717,8 @@ function date_repeat_field_date_field_formatter_settings_form_alter(&$form, &$fo
       '#type' => 'select',
       '#options' => array(
         'show' => t('Show repeat rule'),
-        'hide' => t('Hide repeat rule')),
+        'hide' => t('Hide repeat rule'),
+      ),
       '#default_value' => $settings['show_repeat_rule'],
       '#access' => $field['settings']['repeat'],
       '#weight' => 5,

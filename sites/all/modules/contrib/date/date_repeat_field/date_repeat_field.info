@@ -9,8 +9,8 @@ dependencies[] = date:date_repeat
 
 stylesheets[all][] = date_repeat_field.css
 
-; Information added by Drupal.org packaging script on 2021-03-05
-version = "7.x-2.11"
+; Information added by Drupal.org packaging script on 2021-10-07
+version = "7.x-2.12"
 core = "7.x"
 project = "date"
-datestamp = "1614952728"
+datestamp = "1633627650"

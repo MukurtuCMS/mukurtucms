@@ -5,10 +5,13 @@
  * Tests date filter handler in Views.
  */
 
+/**
+ * Test Date views filter functions.
+ */
 class DateViewsFilterTestCase extends DateFieldTestBase {
 
   /**
-   * {@inheritdoc}
+   * Date Views filter Test.
    */
   public static function getInfo() {
     return array(
@@ -50,9 +53,9 @@ class DateViewsFilterTestCase extends DateFieldTestBase {
     // This is used in views configuration and on the view page.
     variable_set('date_format_short', 'Y-m-d H:i');
 
-    if ($this->privileged_user) {
+    if ($this->privilegedUser) {
       // Add required permissions.
-      $roles = $this->privileged_user->roles;
+      $roles = $this->privilegedUser->roles;
       unset($roles[2]);
       $rid = key($roles);
       $permissions = array('administer views'/*, 'administer site configuration'*/);
@@ -82,7 +85,7 @@ class DateViewsFilterTestCase extends DateFieldTestBase {
   public function createDateContent() {
     $years = range(date('Y') - 3, date('Y') + 3);
     foreach ($years as $year) {
-      for($month = 1; $month < 13; $month++) {
+      for ($month = 1; $month < 13; $month++) {
         $node = array(
           'type' => 'story',
           'title' => "Story from $year-$month-01",
@@ -266,10 +269,10 @@ class DateViewsFilterTestCase extends DateFieldTestBase {
 
       // @todo Seems to be a bug in popup code that reuses the last filter value
       // so that query condition is invalid.
-      // (DATE_FORMAT(field_data_sample_date.sample_date_value, '%Y') = '2018-06')
+      // DATE_FORMAT(field_data_sample_date.sample_date_value, '%Y') = '2018-06'
       $this->validateFilters();
     }
-    catch(Exception $e) {
+    catch (Exception $e) {
     }
 
     if ($this->loggedInUser) {
@@ -498,7 +501,7 @@ class DateViewsFilterTestCase extends DateFieldTestBase {
     }
 
     // Check values in table.
-    // views-field views-field-sample-date
+    // views-field views-field-sample-date.
     $xpath = '//td[contains(@class, "views-field-sample-date")]//span';
     $elements = $this->xpath($xpath);
     if (is_array($elements)) {

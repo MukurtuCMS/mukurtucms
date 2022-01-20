@@ -2,11 +2,11 @@
 
 /**
  * @file
- * Tests Date Popup in the Views interface.
+ * Tests date popup in Views.
  */
 
 /**
- * Tests Date Popup in the Views interface.
+ * Tests date popup in Views.
  */
 class DatePopupWithViewsTestCase extends DateFieldTestBase {
 
@@ -18,19 +18,17 @@ class DatePopupWithViewsTestCase extends DateFieldTestBase {
       'name' => 'Date Views - Popup Test',
       'description' => 'Tests date popup in Views',
       'group' => 'Date',
-      'dependencies' => array('ctools', 'views'),
     );
   }
 
   /**
-   * {@inheritdoc}
+   * Test setup actions.
    */
   public function setUp(array $modules = array()) {
-    $modules[] = 'date_popup';
-    $modules[] = 'date_views';
-    $modules[] = 'ctools';
     $modules[] = 'views';
     $modules[] = 'views_ui';
+    $modules[] = 'date_views';
+    $modules[] = 'date_popup';
     parent::setUp($modules);
 
     // Reset/rebuild all data structures after enabling the modules.
@@ -63,7 +61,7 @@ class DatePopupWithViewsTestCase extends DateFieldTestBase {
     $view->human_name = 'Test date_popup';
     $view->core = 7;
     $view->api_version = '3.0';
-    $view->disabled = FALSE; /* Edit this to TRUE to make a default view disabled initially */
+    $view->disabled = FALSE;
 
     /* Display: Master */
     $handler = $view->new_display('default', 'Master', 'default');
@@ -104,6 +102,8 @@ class DatePopupWithViewsTestCase extends DateFieldTestBase {
 
   /**
    * Test date popup.
+   *
+   * @todo Fill this out more.
    */
   public function testDatePopup() {
     // Go to view page.

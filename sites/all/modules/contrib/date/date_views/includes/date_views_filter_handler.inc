@@ -17,7 +17,7 @@ class date_views_filter_handler extends date_views_filter_handler_simple {
   /**
    * {@inheritdoc}
    */
-  function init(&$view, &$options) {
+  public function init(&$view, &$options) {
     parent::init($view, $options);
 
     if (empty($this->view->date_info)) {
@@ -32,7 +32,7 @@ class date_views_filter_handler extends date_views_filter_handler_simple {
   /**
    * {@inheritdoc}
    */
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $options['date_fields'] = array('default' => array());
     $options['date_method'] = array('default' => 'OR');
@@ -41,30 +41,30 @@ class date_views_filter_handler extends date_views_filter_handler_simple {
   }
 
   /**
-   * @todo
+   * @todo Document this.
    */
-  function op_between($field) {
+  public function op_between($field) {
     $this->date_combine_conditions('op_between');
   }
 
   /**
-   * @todo
+   * @todo Document this.
    */
-  function op_simple($field) {
+  public function op_simple($field) {
     $this->date_combine_conditions('op_simple');
   }
 
   /**
-   * @todo
+   * @todo Document this.
    */
-  function op_contains($field) {
+  public function op_contains($field) {
     $this->date_combine_conditions('op_contains');
   }
 
   /**
-   * @todo
+   * @todo Document this.
    */
-  function op_empty($field) {
+  public function op_empty($field) {
     $this->get_query_fields();
     if (empty($this->query_fields)) {
       return;
@@ -146,7 +146,7 @@ class date_views_filter_handler extends date_views_filter_handler_simple {
   /**
    * {@inheritdoc}
    */
-  function extra_options_form(&$form, &$form_state) {
+  public function extra_options_form(&$form, &$form_state) {
     parent::extra_options_form($form, $form_state);
 
     $fields = date_views_fields($this->base_table);
@@ -170,13 +170,13 @@ class date_views_filter_handler extends date_views_filter_handler_simple {
       '#options' => array('OR' => t('OR'), 'AND' => t('AND')),
       '#default_value' => $this->options['date_method'],
       '#description' => t('Method of handling multiple date fields in the same query. Return items that have any matching date field (date = field_1 OR field_2), or only those with matches in all selected date fields (date = field_1 AND field_2).'),
-      );
+    );
   }
 
   /**
    * {@inheritdoc}
    */
-  function extra_options_validate($form, &$form_state) {
+  public function extra_options_validate($form, &$form_state) {
     $check_fields = array_filter($form_state['values']['options']['date_fields']);
     if (empty($check_fields)) {
       form_error($form['date_fields'], t('You must select at least one date field for this filter.'));
@@ -186,14 +186,14 @@ class date_views_filter_handler extends date_views_filter_handler_simple {
   /**
    * {@inheritdoc}
    */
-  function extra_options_submit($form, &$form_state) {
+  public function extra_options_submit($form, &$form_state) {
     $form_state['values']['options']['date_fields'] = array_filter($form_state['values']['options']['date_fields']);
   }
 
   /**
    * {@inheritdoc}
    */
-  function admin_summary() {
+  public function admin_summary() {
     if (empty($this->options['date_fields'])) {
       return t('Missing date fields!');
     }
@@ -214,7 +214,11 @@ class date_views_filter_handler extends date_views_filter_handler_simple {
     $widget_options = $this->widget_options();
     // If the filter is exposed, display the granularity.
     if ($this->options['exposed']) {
-      return t('(@field) <strong>Exposed</strong> @widget @format', array('@field' => $field, '@format' => $parts[$handler->granularity], '@widget' => $widget_options[$this->options['form_type']]));
+      return t('(@field) <strong>Exposed</strong> @widget @format', array(
+        '@field' => $field,
+        '@format' => $parts[$handler->granularity],
+        '@widget' => $widget_options[$this->options['form_type']],
+      ));
     }
     // If not exposed, display the value.
     if (in_array($this->operator, $this->operator_values(2))) {
@@ -229,9 +233,9 @@ class date_views_filter_handler extends date_views_filter_handler_simple {
   }
 
   /**
-   * @todo
+   * @todo Document this.
    */
-  function get_query_fields() {
+  public function get_query_fields() {
     $fields = date_views_fields($this->base_table);
     $fields = $fields['name'];
     $this->query_fields = array();
@@ -241,7 +245,10 @@ class date_views_filter_handler extends date_views_filter_handler_simple {
         $date_handler->granularity = $this->options['granularity'];
         $date_handler->db_timezone = date_get_timezone_db($field['tz_handling']);
         $date_handler->local_timezone = date_get_timezone($field['tz_handling']);
-        $this->query_fields[] = array('field' => $field, 'date_handler' => $date_handler);
+        $this->query_fields[] = array(
+          'field' => $field,
+          'date_handler' => $date_handler,
+        );
       }
     }
   }

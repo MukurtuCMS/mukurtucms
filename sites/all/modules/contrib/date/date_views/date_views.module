@@ -156,7 +156,7 @@ function date_views_fields($base = 'node', $reset = FALSE) {
       $fields[$base] = _date_views_fields($base);
     }
   }
-  // Make sure that empty values will be arrays in he expected format.
+  // Make sure that empty values will be arrays in the expected format.
   return !empty($fields) && !empty($fields[$base]) ? $fields[$base] : $empty;
 }
 
@@ -314,7 +314,8 @@ function date_pager_url($view, $date_type = NULL, $date_arg = NULL, $force_view_
     if (!empty($key)) {
       return url($_GET['q'], array(
         'query' => date_views_querystring($view, array($key => $url)),
-        'absolute' => $absolute));
+        'absolute' => $absolute,
+      ));
     }
   }
 
@@ -323,7 +324,7 @@ function date_pager_url($view, $date_type = NULL, $date_arg = NULL, $force_view_
   return url($view->get_url($args), array(
     'query' => date_views_querystring($view),
     'absolute' => $absolute,
-    )
+  )
   );
 }
 
@@ -363,8 +364,10 @@ function date_views_field_views_data_alter(&$result, $field, $module) {
           // Not sure yet if we still need a custom field handler in D7 now
           // that custom formatters are available. Might still need it to
           // handle grouping of multiple value dates.
+          // @code
           // $result[$table][$column]['field']['handler'] = 'date_handler_field_date';
           // $result[$table][$column]['field']['add fields to query'] = TRUE;
+          // @endcode
         }
 
         // For filters, arguments, and sorts, determine if this column is for
