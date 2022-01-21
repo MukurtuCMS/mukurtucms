@@ -84,7 +84,7 @@ developing, you may stop reading now.
     To see how to provide a separate class have a look at the "EntityClass" from
     the "entity_test.module".
 
-  * Implement hook_entity_info() for your entity. At least specifiy the
+  * Implement hook_entity_info() for your entity. At least specify the
     controller class (EntityAPIController, EntityAPIControllerExportable or your
     own), your db table and your entity's keys.
     Again just look at "entity_test.module"'s hook_entity_info() for guidance.
