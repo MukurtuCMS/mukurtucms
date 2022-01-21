@@ -276,5 +276,5 @@ class RulesTaxonomyVocabularyWrapper extends EntityDrupalWrapper {
 }
 
 /**
- * @}
+ * @} End of "addtogroup rules"
  */

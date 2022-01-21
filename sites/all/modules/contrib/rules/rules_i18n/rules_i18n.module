@@ -16,9 +16,8 @@ function rules_i18n_rules_ui_menu_alter(&$items, $base_path, $base_count) {
     'weight' => -100,
   );
 
-  // For reaction-rules i18n generates the menu items, for the others we provide
-  // further i18n menu items for all other base paths.
-
+  // I18n generates the menu items for reaction rules. For the others,
+  // we provide further i18n menu items for all other base paths.
   if ($base_path != 'admin/config/workflow/rules/reaction') {
 
     $items[$base_path . '/manage/%rules_config/translate'] = array(

@@ -139,5 +139,5 @@ class RulesNodeConditionPromoted extends RulesNodeConditionBase {
 }
 
 /**
- * @}
+ * @} End of "addtogroup rules"
  */
