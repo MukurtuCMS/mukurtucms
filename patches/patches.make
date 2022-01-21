@@ -189,7 +189,7 @@ projects[search_api_db][patch][] = contrib/modify_dictionary_search_results_base
 
 ;;; Search API DB
 ; Change Seach API DB to pull regex from Search API
-projects[search_api_db][patch][] = contrib/0001-Change-Search-API-DB-to-pull-regex-from-Search-API.patch
+projects[search_api_db][patch][] = contrib/0001-Pull-regex-from-config.patch
 
 ;;; Search API Glossary
 ; 1. Index display and sort ALL characters. 2. Option to skip padding
