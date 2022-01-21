@@ -437,10 +437,17 @@ function file_entity_field_formatter_view($entity_type, $entity, $field, $instan
           if (isset($item['description'])) {
             $file->description = $item['description'];
           }
+
+          $text = $settings['text'];
+          if (module_exists('i18n_string')) {
+            $key = 'file_entity:file_download_link:' . $entity_type . ':' . $instance['bundle'] . ':link_text:' . $text;
+            $text = i18n_string($key, $text);
+          }
+
           $element[$delta] = array(
             '#theme' => 'file_entity_download_link',
             '#file' => $file,
-            '#text' => $settings['text'],
+            '#text' => $text,
           );
         }
       }

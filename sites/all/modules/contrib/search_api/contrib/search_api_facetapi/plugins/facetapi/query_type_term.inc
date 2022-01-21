@@ -95,7 +95,7 @@ class SearchApiFacetapiTerm extends FacetapiQueryType implements FacetapiQueryTy
 
     foreach ($active as $filter => $filter_array) {
       $field = $this->facet['field'];
-      $this->addFacetFilter($facet_filter, $field, $filter);
+      $this->addFacetFilter($facet_filter, $field, $filter, $query);
     }
 
     // Now add the filter to the query.
@@ -104,6 +104,16 @@ class SearchApiFacetapiTerm extends FacetapiQueryType implements FacetapiQueryTy
 
   /**
    * Helper method for setting a facet filter on a query or query filter object.
+   *
+   * @param SearchApiQueryInterface|SearchApiQueryFilterInterface $query_filter
+   *   The query or filter to which apply the filter.
+   * @param string $field
+   *   The field to apply the filter to.
+   * @param string $filter
+   *   The filter, in the internal string representation used by this module.
+   * @param SearchApiQuery|null $query
+   *   (optional) If available, the search query object should be passed as the
+   *   fourth parameter.
    */
   protected function addFacetFilter($query_filter, $field, $filter) {
     // Test if this filter should be negated.
@@ -118,8 +128,25 @@ class SearchApiFacetapiTerm extends FacetapiQueryType implements FacetapiQueryTy
     elseif ($filter && $filter[0] == '[' && $filter[strlen($filter) - 1] == ']' && ($pos = strpos($filter, ' TO '))) {
       $lower = trim(substr($filter, 1, $pos));
       $upper = trim(substr($filter, $pos + 4, -1));
+      $supports_between = FALSE;
+      if (func_num_args() > 3) {
+        $query = func_get_arg(3);
+        if ($query instanceof SearchApiQuery) {
+          try {
+            $supports_between = $query->getIndex()->server()
+              ->supportsFeature('search_api_between');
+          }
+          catch (SearchApiException $e) {
+            // Ignore, really not that important (and rather unlikely).
+          }
+        }
+      }
       if ($lower == '*' && $upper == '*') {
         $query_filter->condition($field, NULL, $exclude ? '=' : '<>');
+      }
+      elseif ($supports_between && $lower != '*' && $upper != '*') {
+        $operator = $exclude ? 'NOT BETWEEN' : 'BETWEEN';
+        $query_filter->condition($field, array($lower, $upper), $operator);
       }
       elseif (!$exclude) {
         if ($lower != '*') {

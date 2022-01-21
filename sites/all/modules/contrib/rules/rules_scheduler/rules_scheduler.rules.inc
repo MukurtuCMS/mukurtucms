@@ -213,5 +213,5 @@ function rules_scheduler_action_delete_help() {
 }
 
 /**
- * @}
+ * @} End of "addtogroup rules"
  */

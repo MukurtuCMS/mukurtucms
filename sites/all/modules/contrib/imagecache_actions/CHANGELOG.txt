@@ -4,6 +4,11 @@ Imagecache Actions
 Imagecache Actions 7.x-1.x-dev
 ------------------------------
 
+Imagecache Actions 7.x-1.13
+---------------------------
+- [#3255527] by loze, fietserwin: Notice: Undefined property:
+  stdClass::$extension in image_imagemagick_imagecache_autorotate().
+
 Imagecache Actions 7.x-1.12
 ---------------------------
 - [#3151871]: by DamienMcKenna: EXIF autorotate support for remote images.

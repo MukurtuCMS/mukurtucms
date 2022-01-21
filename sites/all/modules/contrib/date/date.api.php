@@ -367,7 +367,7 @@ function hook_date_combo_process_alter(array &$element, array &$form_state, arra
  * @see date_timezone_element_process()
  */
 function hook_date_timezone_process_alter(array &$element, array &$form_state, array $context) {
-  // @todo.
+  // @todo Document this.
 }
 
 /**
@@ -384,7 +384,7 @@ function hook_date_timezone_process_alter(array &$element, array &$form_state, a
  * @see date_year_range_element_process()
  */
 function hook_date_year_range_process_alter(array &$element, array &$form_state, array $context) {
-  // @todo.
+  // @todo Document this.
 }
 
 /**

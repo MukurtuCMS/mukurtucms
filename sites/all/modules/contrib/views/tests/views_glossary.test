@@ -35,22 +35,47 @@ class ViewsGlossaryTestCase extends ViewsSqlTest {
       'a' => 3,
       'l' => 6,
     );
-    $nodes = array();
+    $published = array();
+    $unpublished = array();
     foreach ($nodes_per_character as $character => $count) {
       $setting = array(
         'type' => $type->type,
       );
-      for ($i = 0; $i < $count; $i++) {
+      for ($i = 0; $i < $count + 1; $i++) {
         $node = $setting;
         $node['title'] = $character . strtolower($this->randomName());
-        $nodes[$character][] = $this->drupalCreateNode($node);
+
+        // Make the first node unpublished, which will allow testing to make
+        // sure that only published nodes are displayed. Also, don't add it to
+        // the array of expected nodes.
+        if ($i === 0) {
+          $node['status'] = 0;
+          $test_node = $this->drupalCreateNode($node);
+          $unpublished[$test_node->nid] = $test_node;
+        }
+        else {
+          $published[$character][] = $this->drupalCreateNode($node);
+        }
       }
+    }
+
+    // Verify that there are the same number of unpublished nodeas as there are
+    // letters.
+    $this->assertEqual(count($unpublished), count($nodes_per_character));
+
+    // Verify that each unpublished item is a full node and that each one starts
+    // with a letter from the list.
+    foreach ($unpublished as $node) {
+      $this->assertTrue(is_object($node));
+      $this->assertTrue(!empty($node->nid));
+      $first_letter = substr($node->title, 0, 1);
+      $this->assertTrue(isset($nodes_per_character[$first_letter]));
     }
 
     // Sort created nodes the same way the view does, so that we can assert
     // correct node ids for each row in the result set later.
     foreach ($nodes_per_character as $character => $count) {
-      usort($nodes[$character], function ($a, $b) {
+      usort($published[$character], function ($a, $b) {
         return strcmp($a->title, $b->title);
       });
     }
@@ -60,7 +85,8 @@ class ViewsGlossaryTestCase extends ViewsSqlTest {
     $view->set_display('attachment');
     $view->execute_display('attachment');
 
-    // Check the amount of nodes per character.
+    // Check the amount of nodes per character - note that the unpublished nodes
+    // will not be included.
     foreach ($view->result as $item) {
       $this->assertEqual($nodes_per_character[$item->title_truncated], $item->num_records);
     }
@@ -75,7 +101,8 @@ class ViewsGlossaryTestCase extends ViewsSqlTest {
     $this->assertIdentical($result_count, 3, 'View has 3 results.');
     foreach ($view->result as $delta => $item) {
       $nid = isset($view->result[$delta]->nid) ? $view->result[$delta]->nid : '0';
-      $this->assertIdentical($nid, $nodes['a'][$delta]->nid, 'View result ' . (string) (int) $delta . ' has correct node id.');
+      $this->assertIdentical($nid, $published['a'][$delta]->nid, 'View result ' . (string) (int) $delta . ' has correct node id.');
+      $this->assertFalse(isset($unpublished[$nid]));
     }
     $view->destroy();
 
@@ -91,11 +118,11 @@ class ViewsGlossaryTestCase extends ViewsSqlTest {
     $result_count = isset($view->result) && is_array($view->result) ? count($view->result) : 0;
     $this->assertIdentical($result_count, 3, 'View has 3 results.');
     $nid = isset($view->result[0]->nid) ? $view->result[0]->nid : '0';
-    $this->assertIdentical($nid, $nodes['d'][0]->nid, 'View result 0 has correct node id.');
+    $this->assertIdentical($nid, $published['d'][0]->nid, 'View result 0 has correct node id.');
     $nid = isset($view->result[1]->nid) ? $view->result[1]->nid : '0';
-    $this->assertIdentical($nid, $nodes['p'][0]->nid, 'View result 1 has correct node id.');
+    $this->assertIdentical($nid, $published['p'][0]->nid, 'View result 1 has correct node id.');
     $nid = isset($view->result[2]->nid) ? $view->result[2]->nid : '0';
-    $this->assertIdentical($nid, $nodes['p'][1]->nid, 'View result 2 has correct node id.');
+    $this->assertIdentical($nid, $published['p'][1]->nid, 'View result 2 has correct node id.');
     $view->destroy();
 
     // Checks that a glossary view with a phrase as an argument does not
@@ -139,7 +166,7 @@ class ViewsGlossaryTestCase extends ViewsSqlTest {
         $character_delta = 0;
       }
       $nid = isset($view->result[$delta]->nid) ? $view->result[$delta]->nid : '0';
-      $this->assertIdentical($nid, $nodes[$character][$character_delta]->nid, 'View result ' . (string) (int) $delta . ' has correct node id.');
+      $this->assertIdentical($nid, $published[$character][$character_delta]->nid, 'View result ' . (string) (int) $delta . ' has correct node id.');
       $character_delta++;
     }
     $view->destroy();
@@ -171,7 +198,7 @@ class ViewsGlossaryTestCase extends ViewsSqlTest {
         $character_delta = 0;
       }
       $nid = isset($view->result[$delta]->nid) ? $view->result[$delta]->nid : '0';
-      $this->assertIdentical($nid, $nodes[$character][$character_delta]->nid, 'View result ' . (string) (int) $delta . ' has correct node id.');
+      $this->assertIdentical($nid, $published[$character][$character_delta]->nid, 'View result ' . (string) (int) $delta . ' has correct node id.');
       $character_delta++;
     }
     $view->destroy();

@@ -9,12 +9,21 @@
  * Test Date Repeat form.
  */
 class DateRepeatFormTestCase extends DrupalWebTestCase {
-  protected $privileged_user;
 
+  /**
+   * Drupal privileged users.
+   *
+   * @var object|false
+   */
+  protected $privilegedUser;
+
+  /**
+   * Date repeat forms test.
+   */
   public static function getInfo() {
     return array(
       'name' => t('Date Repeat Form'),
-      'description' => t('Test Date Repeat form.') ,
+      'description' => t('Test Date Repeat form.'),
       'group' => t('Date'),
     );
   }
@@ -34,10 +43,10 @@ class DateRepeatFormTestCase extends DrupalWebTestCase {
     parent::setUp($modules);
 
     // Create and log in our privileged user.
-    $this->privileged_user = $this->drupalCreateUser(array(
+    $this->privilegedUser = $this->drupalCreateUser(array(
       'administer content types', 'administer nodes', 'bypass node access', 'view date repeats', 'administer fields',
     ));
-    $this->drupalLogin($this->privileged_user);
+    $this->drupalLogin($this->privilegedUser);
 
     variable_set('date_format_short', 'Y-m-d H:i');
   }
@@ -57,7 +66,8 @@ class DateRepeatFormTestCase extends DrupalWebTestCase {
     $widget_options = array(
       'date_select' => 'select',
       'date_text' => 'text',
-      'date_popup' => 'popup');
+      'date_popup' => 'popup',
+    );
 
     foreach ($widget_options as $widget => $options) {
       // Daily tests
@@ -200,8 +210,10 @@ class DateRepeatFormTestCase extends DrupalWebTestCase {
     }
   }
 
-  function dateForm($options, $test_id = NULL, $is_count = FALSE, $exclude_include = NULL) {
-    // Tests that date field functions properly.
+  /**
+   * Tests date field functions.
+   */
+  public function dateForm($options, $test_id = NULL, $is_count = FALSE, $exclude_include = NULL) {
     $edit = array();
     $edit['title'] = $this->randomName(8);
     $edit['body[und][0][value]'] = $this->randomName(16);
@@ -467,7 +479,10 @@ class DateRepeatFormTestCase extends DrupalWebTestCase {
     return $edit;
   }
 
-  function verifyDateForm($edit) {
+  /**
+   * Verify date forms.
+   */
+  public function verifyDateForm($edit) {
     $title = $edit['title'];
     $node = $this->drupalGetNodeByTitle($title);
 
@@ -481,7 +496,10 @@ class DateRepeatFormTestCase extends DrupalWebTestCase {
     $this->assertRaw(t('Date %title has been deleted.', array('%title' => $title)), t('Deleted Date content.'));
   }
 
-  function createDateField($type, $widget, $display_all_day = FALSE) {
+  /**
+   * Test date field creation.
+   */
+  public function createDateField($type, $widget, $display_all_day = FALSE) {
     $edit = array();
     $edit['fields[_add_new_field][label]'] = 'Test';
     $edit['fields[_add_new_field][field_name]'] = 'test';
@@ -523,14 +541,20 @@ class DateRepeatFormTestCase extends DrupalWebTestCase {
     $this->assertFieldByXPath('//table[@id="field-overview"]//td[1]', $label, t('Field was created and appears in the overview page.'));
   }
 
-  function deleteDateField() {
+  /**
+   * Test date field removal.
+   */
+  public function deleteDateField() {
     $this->drupalGet('admin/structure/types/manage/date/fields');
     $this->clickLink('delete');
     $this->drupalPost(NULL, NULL, t('Delete'));
     $this->assertText(t('The field Test has been deleted from the Date content type.'), t('Removed date field.'));
   }
 
-  function formatDateForRRULEInputs($form_field_name, $date_widget_type, $date) {
+  /**
+   * Date repeat RRULE test.
+   */
+  public function formatDateForRruleInputs($form_field_name, $date_widget_type, $date) {
     $return = array();
 
     switch ($date_widget_type) {
@@ -541,6 +565,7 @@ class DateRepeatFormTestCase extends DrupalWebTestCase {
         break;
 
       case 'text':
+
       case 'popup':
         $return["{$form_field_name}[datetime][date]"] = "{$date['year']}-{$date['month']}-{$date['day']}";
         break;

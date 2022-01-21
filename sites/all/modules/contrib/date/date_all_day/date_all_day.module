@@ -88,20 +88,16 @@ function date_all_day_date_formatter_dates_alter(&$dates, $context) {
 /**
  * Adjust start/end date format to account for 'all day' .
  *
- * @param array $field
- *   The field definition for this date field.
- * @param string $which
- *   Which value to return, 'date1' or 'date2'.
- * @param object $date1
- *   A date/time object for the 'start' date.
- * @param object $date2
- *   A date/time object for the 'end' date.
- * @param string $format
- *   A date/time format.
- * @param object $entity
- *   The node this date comes from (may be incomplete, always contains nid).
- * @param object $view
- *   The view this node comes from, if applicable.
+ * @param array $vars
+ *   Contains the following items:
+ *   'field' - The field definition for this date field.
+ *    'which' - Which value to return, 'date1' or 'date2'.
+ *    'date1' - A date/time object for the 'start' date.
+ *    'date2' - A date/time object for the 'end' date.
+ *    'format' - A date/time format.
+ *    'entity' - The node this date comes from (may be incomplete, always
+ *       contains nid).
+ *    'view' - The view this node comes from, if applicable.
  *
  * @return string|null
  *   Formatted date.

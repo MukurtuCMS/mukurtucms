@@ -681,9 +681,9 @@ abstract class RulesIdentifiableDataWrapper extends EntityStructureWrapper {
    * @param $type
    *   The type of the passed data.
    * @param $data
-   *   Optional. The data to wrap or its identifier.
+   *   (optional) The data to wrap or its identifier.
    * @param array $info
-   *   Optional. Used internally to pass info about properties down the tree.
+   *   (optional) Used internally to pass info about properties down the tree.
    */
   public function __construct($type, $data = NULL, $info = array()) {
     parent::__construct($type, $data, $info);

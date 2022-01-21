@@ -169,5 +169,5 @@ function rules_path_condition_info() {
 }
 
 /**
- * @}
+ * @} End of "addtogroup rules"
  */

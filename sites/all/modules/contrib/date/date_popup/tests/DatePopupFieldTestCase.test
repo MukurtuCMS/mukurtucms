@@ -9,7 +9,7 @@
  * Test the custom field functionality provided by the Date Popup module.
  */
 class DatePopupFieldTestCase extends DateFieldTestBase {
-  
+
   /**
    * Define this test class.
    */

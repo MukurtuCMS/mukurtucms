@@ -525,9 +525,6 @@ class backup_migrate_schedule extends backup_migrate_item {
       ),
     );
 
-    $keep_hourly = variable_get('backup_migrate_smart_keep_hourly', BACKUP_MIGRATE_SMART_KEEP_HOURLY);
-    $keep_daily = variable_get('backup_migrate_smart_keep_daily', BACKUP_MIGRATE_SMART_KEEP_DAILY);
-    $keep_weekly = variable_get('backup_migrate_smart_keep_weekly', BACKUP_MIGRATE_SMART_KEEP_WEEKLY);
     $form['delete_settings']['smartdelete'] = array(
       "#type" => "radio",
       "#title" => t('Smart Delete'),
@@ -536,6 +533,34 @@ class backup_migrate_schedule extends backup_migrate_item {
       "#default_value" => $keep ? $keep : BACKUP_MIGRATE_SMART_DELETE,
       '#parents' => array('deletetype'),
     );
+    $form['delete_settings']['smartdelete_keep_settings'] = array(
+      '#type' => 'backup_migrate_dependent',
+      '#dependencies' => array(
+        'deletetype' => BACKUP_MIGRATE_SMART_DELETE,
+      ),
+    );
+    $form['delete_settings']['smartdelete_keep_settings']['keep_hourly'] = array(
+      "#type" => "textfield",
+      "#title" => t('Number of Hourly Backup files to Keep'),
+      '#length' => 20,
+      "#description" => t('Keep a specified number of hourly backups before deleting the oldest ones.'),
+      "#default_value" => variable_get('backup_migrate_smart_keep_hourly', BACKUP_MIGRATE_SMART_KEEP_HOURLY),
+    );
+    $form['delete_settings']['smartdelete_keep_settings']['keep_daily'] = array(
+      "#type" => "textfield",
+      "#title" => t('Number of Daily Backup files to Keep'),
+      '#length' => 20,
+      "#description" => t('Keep a specified number of daily backups before deleting the oldest ones.'),
+      "#default_value" => variable_get('backup_migrate_smart_keep_daily', BACKUP_MIGRATE_SMART_KEEP_DAILY),
+    );
+    $form['delete_settings']['smartdelete_keep_settings']['keep_weekly'] = array(
+      "#type" => "textfield",
+      "#title" => t('Number of Weekly Backup files to Keep'),
+      '#length' => 20,
+      "#description" => t('Keep a specified number of weekly backups before deleting the oldest ones.'),
+      "#default_value" => variable_get('backup_migrate_smart_keep_weekly', BACKUP_MIGRATE_SMART_KEEP_WEEKLY),
+    );
+
     $form['delete_settings']['standarddelete'] = array(
       "#type" => "radio",
       "#title" => t('Simple Delete'),
@@ -576,6 +601,16 @@ class backup_migrate_schedule extends backup_migrate_item {
     }
     elseif ($form_state['values']['deletetype'] == BACKUP_MIGRATE_SMART_DELETE) {
       $form_state['values']['keep'] = BACKUP_MIGRATE_SMART_DELETE;
+
+      if (!is_numeric($form_state['values']['keep_hourly']) || $form_state['values']['keep_hourly'] < 0) {
+        form_set_error('keep_hourly', t('Number to keep hourly must be an integer greater than or equal to 0.'));
+      }
+      elseif (!is_numeric($form_state['values']['keep_daily']) || $form_state['values']['keep_daily'] < 0) {
+        form_set_error('keep_daily', t('Number to keep daily must be an integer greater than or equal to 0.'));
+      }
+      elseif (!is_numeric($form_state['values']['keep_weekly']) || $form_state['values']['keep_weekly'] < 0) {
+        form_set_error('keep_weekly', t('Number to keep weekly must be an integer greater than or equal to 0.'));
+      }
     }
     elseif (!is_numeric($form_state['values']['keep']) || $form_state['values']['keep'] <= 0) {
       form_set_error('keep', t('Number to keep must be a number greater than 0.'));
@@ -587,6 +622,10 @@ class backup_migrate_schedule extends backup_migrate_item {
    * Submit the edit form.
    */
   public function edit_form_submit($form, &$form_state) {
+    variable_set('backup_migrate_smart_keep_hourly', $form_state['values']['keep_hourly']);
+    variable_set('backup_migrate_smart_keep_daily', $form_state['values']['keep_daily']);
+    variable_set('backup_migrate_smart_keep_weekly', $form_state['values']['keep_weekly']);
+
     $periods = $this->frequency_periods();
     $period = $periods[$form_state['values']['period']['type']];
     $form_state['values']['period'] = $form_state['values']['period']['number'] * $period['seconds'];

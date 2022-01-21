@@ -349,7 +349,7 @@ function date_tools_wizard_create_content_type($name, $bundle, $description, $ty
   date_tools_wizard_include();
 
   // Create the content type.
-  $values  = array(
+  $values = array(
     'name' => $name,
     'type' => $bundle,
     'description' => $description,

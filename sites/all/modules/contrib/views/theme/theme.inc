@@ -93,7 +93,7 @@ function template_preprocess_views_view(&$vars) {
   $vars['attachment_before'] = !empty($view->attachment_before) ? $view->attachment_before : '';
   $vars['attachment_after'] = !empty($view->attachment_after) ? $view->attachment_after : '';
 
-  // Add contextual links to the view. We need to attach them to the dummy
+  // Add contextual links to the view. We need to attach them to the sample
   // $view_array variable, since contextual_preprocess() requires that they be
   // attached to an array (not an object) in order to process them. For our
   // purposes, it doesn't matter what we attach them to, since once they are
@@ -199,7 +199,11 @@ function template_preprocess_views_view_fields(&$vars) {
       $object->handler = &$view->field[$id];
       $object->inline = !empty($vars['options']['inline'][$id]);
 
-      $object->element_type = $object->handler->element_type(TRUE, !$vars['options']['default_field_elements'], $object->inline);
+      $default_field_elements_value = TRUE;
+      if (isset($vars['options']['default_field_elements'])) {
+        $default_field_elements_value = $vars['options']['default_field_elements'];
+      }
+      $object->element_type = $object->handler->element_type(TRUE, !$default_field_elements_value, $object->inline);
       if ($object->element_type) {
         $class = '';
         if ($object->handler->options['element_default_classes']) {
@@ -244,7 +248,7 @@ function template_preprocess_views_view_fields(&$vars) {
 
       $previous_inline = $object->inline;
       $object->inline_html = $object->handler->element_wrapper_type(TRUE, TRUE);
-      if ($object->inline_html === '' && $vars['options']['default_field_elements']) {
+      if ($object->inline_html === '' && $default_field_elements_value) {
         $object->inline_html = $object->inline ? 'span' : 'div';
       }
 
@@ -283,7 +287,7 @@ function template_preprocess_views_view_fields(&$vars) {
           $object->label_html .= ': ';
         }
 
-        $object->element_label_type = $object->handler->element_label_type(TRUE, !$vars['options']['default_field_elements']);
+        $object->element_label_type = $object->handler->element_label_type(TRUE, !$default_field_elements_value);
         if ($object->element_label_type) {
           $class = '';
           if ($object->handler->options['element_default_classes']) {

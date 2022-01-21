@@ -36,6 +36,10 @@ files[] = includes/sources.filesource.inc
 
 ; Test dependencies.
 test_dependencies[] = ctools
+; This is required because of a test dependency in the CTools module's tests,
+; which testbot/drupalci will auto-discover after downloading CTools; it is not
+; actually used by Backup Migrate.
+test_dependencies[] = views
 
 ; Test suite.
 files[] = tests/BmTestBase.test
@@ -45,8 +49,8 @@ files[] = tests/BmTestEmail.test
 files[] = tests/BmTestCtools.test
 files[] = tests/BmTestUpdate7310.test
 
-; Information added by Drupal.org packaging script on 2020-07-15
-version = "7.x-3.9"
+; Information added by Drupal.org packaging script on 2022-01-09
+version = "7.x-3.10"
 core = "7.x"
 project = "backup_migrate"
-datestamp = "1594807678"
+datestamp = "1641732924"

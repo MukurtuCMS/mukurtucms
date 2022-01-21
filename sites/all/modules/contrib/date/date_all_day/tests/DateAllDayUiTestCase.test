@@ -11,14 +11,15 @@
 class DateAllDayUiTestCase extends DateFieldTestBase {
 
   /**
-   *
+   * Date All Day.
    */
   public static function getInfo() {
     return array(
       'name' => t('Date All Day unit'),
-      'description' => t('Test Date All Day functions.') ,
+      'description' => t('Test Date All Day functions.'),
       'group' => t('Date'),
     );
+
   }
 
   /**

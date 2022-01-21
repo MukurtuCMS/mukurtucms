@@ -5,8 +5,8 @@ package     = User interface
 configure   = admin/config/content/ckeditor
 
 files[] = tests/ckeditor.test
-; Information added by Drupal.org packaging script on 2020-03-17
-version = "7.x-1.19"
+; Information added by Drupal.org packaging script on 2021-11-22
+version = "7.x-1.22"
 core = "7.x"
 project = "ckeditor"
-datestamp = "1584474894"
+datestamp = "1637581213"

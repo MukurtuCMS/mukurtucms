@@ -11,12 +11,12 @@
 class DateApiUnitTestCase extends DrupalUnitTestCase {
 
   /**
-   * @todo.
+   * Date API unit tests.
    */
   public static function getInfo() {
     return array(
       'name' => t('Date API unit tests'),
-      'description' => t('Unit test coverage for Date API functions.') ,
+      'description' => t('Unit test coverage for Date API functions.'),
       'group' => t('Date'),
     );
   }

@@ -32,7 +32,6 @@
                     else {
                       return dependency.val() == inval;
                     }
-                    return false;
                   };
                   if (!checkval(dependentval)) {
                     // Hide doesn't work inside collapsed fieldsets.

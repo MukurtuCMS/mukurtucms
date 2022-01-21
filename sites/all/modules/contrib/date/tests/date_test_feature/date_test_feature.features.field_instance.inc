@@ -11,9 +11,9 @@
 function date_test_feature_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'node-date_test_feature-body'.
-  $field_instances['node-date_test_feature-body'] = array(
-    'bundle' => 'date_test_feature',
+  // Exported field_instance: 'node-date_test-body'.
+  $field_instances['node-date_test-body'] = array(
+    'bundle' => 'date_test',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -55,9 +55,9 @@ function date_test_feature_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-date_test_feature-field_date'.
-  $field_instances['node-date_test_feature-field_date'] = array(
-    'bundle' => 'date_test_feature',
+  // Exported field_instance: 'node-date_test-field_date'.
+  $field_instances['node-date_test-field_date'] = array(
+    'bundle' => 'date_test',
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -114,9 +114,9 @@ function date_test_feature_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-date_test_feature-field_date_range'.
-  $field_instances['node-date_test_feature-field_date_range'] = array(
-    'bundle' => 'date_test_feature',
+  // Exported field_instance: 'node-date_test-field_date_range'.
+  $field_instances['node-date_test-field_date_range'] = array(
+    'bundle' => 'date_test',
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -173,9 +173,9 @@ function date_test_feature_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-date_test_feature-field_date_repeat'.
-  $field_instances['node-date_test_feature-field_date_repeat'] = array(
-    'bundle' => 'date_test_feature',
+  // Exported field_instance: 'node-date_test-field_date_repeat'.
+  $field_instances['node-date_test-field_date_repeat'] = array(
+    'bundle' => 'date_test',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -234,9 +234,9 @@ function date_test_feature_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-date_test_feature-field_datestamp'.
-  $field_instances['node-date_test_feature-field_datestamp'] = array(
-    'bundle' => 'date_test_feature',
+  // Exported field_instance: 'node-date_test-field_datestamp'.
+  $field_instances['node-date_test-field_datestamp'] = array(
+    'bundle' => 'date_test',
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -293,9 +293,9 @@ function date_test_feature_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-date_test_feature-field_datestamp_range'.
-  $field_instances['node-date_test_feature-field_datestamp_range'] = array(
-    'bundle' => 'date_test_feature',
+  // Exported field_instance: 'node-date_test-field_datestamp_range'.
+  $field_instances['node-date_test-field_datestamp_range'] = array(
+    'bundle' => 'date_test',
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -352,9 +352,9 @@ function date_test_feature_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-date_test_feature-field_datetime'.
-  $field_instances['node-date_test_feature-field_datetime'] = array(
-    'bundle' => 'date_test_feature',
+  // Exported field_instance: 'node-date_test-field_datetime'.
+  $field_instances['node-date_test-field_datetime'] = array(
+    'bundle' => 'date_test',
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -411,9 +411,9 @@ function date_test_feature_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-date_test_feature-field_datetime_range'.
-  $field_instances['node-date_test_feature-field_datetime_range'] = array(
-    'bundle' => 'date_test_feature',
+  // Exported field_instance: 'node-date_test-field_datetime_range'.
+  $field_instances['node-date_test-field_datetime_range'] = array(
+    'bundle' => 'date_test',
     'deleted' => 0,
     'description' => '',
     'display' => array(
