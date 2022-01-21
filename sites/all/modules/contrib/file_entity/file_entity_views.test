@@ -24,7 +24,7 @@ class FileEntityViewsFieldLinkUsageHandlerTest extends FileEntityTestHelper {
     return array(
       'name' => 'File entity views integration: file link usage',
       'description' => 'Test file usage Views field.',
-      'group' => 'File entity',
+      'group' => 'file_entity',
     );
   }
 
