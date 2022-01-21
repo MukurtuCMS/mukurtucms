@@ -40,6 +40,8 @@ function views_ajax() {
         unset($cleaned_post[$key]);
       }
     }
+    // Remove the HTML IDs passed in via AJAX.
+    unset($_POST['ajax_html_ids']);
 
     // Load the view.
     $view = views_get_view($name);
@@ -69,7 +71,9 @@ function views_ajax() {
       // Override the display's pager_element with the one actually used.
       if (isset($pager_element)) {
         $commands[] = views_ajax_command_scroll_top('.view-dom-id-' . $dom_id);
-        $view->display[$display_id]->handler->set_option('pager_element', $pager_element);
+        $pager = $view->display[$display_id]->handler->get_option('pager');
+        $pager['options']['id'] = $pager_element;
+        $view->display[$display_id]->handler->set_option('pager', $pager);
       }
       // Reuse the same DOM id so it matches that in Drupal.settings.
       $view->dom_id = $dom_id;

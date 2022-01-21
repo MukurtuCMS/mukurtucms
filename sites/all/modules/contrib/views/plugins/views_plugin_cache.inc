@@ -198,16 +198,11 @@ class views_plugin_cache extends views_plugin {
    * Gather out of band data, compare it to the start data and store the diff.
    */
   public function gather_headers() {
-    // Simple replacement for head.
-    if (isset($this->storage['head'])) {
-      $this->storage['head'] = str_replace($this->storage['head'], '', drupal_add_html_head());
-    }
-    else {
-      $this->storage['head'] = '';
-    }
-
     // Check if the advanced mapping function of D 7.23 is available.
     $array_mapping_func = function_exists('drupal_array_diff_assoc_recursive') ? 'drupal_array_diff_assoc_recursive' : 'array_diff_assoc';
+
+    // Get difference for head.
+    $this->storage['head'] = $array_mapping_func(drupal_add_html_head(), $this->storage['head']);
 
     // Slightly less simple for CSS.
     $css = drupal_add_css();
@@ -267,7 +262,9 @@ class views_plugin_cache extends views_plugin {
    */
   public function restore_headers() {
     if (!empty($this->storage['head'])) {
-      drupal_add_html_head($this->storage['head']);
+      foreach ($this->storage['head'] as $key => $data) {
+        drupal_add_html_head($data, $key);
+      }
     }
     if (!empty($this->storage['css'])) {
       foreach ($this->storage['css'] as $args) {
@@ -345,6 +342,7 @@ class views_plugin_cache extends views_plugin {
       'language' => $GLOBALS['language']->language,
       'language_content' => $GLOBALS['language_content']->language,
       'base_url' => $GLOBALS['base_url'],
+      'display_options' => $this->display->display_options,
     );
 
     if (empty($key_data['build_info'])) {
