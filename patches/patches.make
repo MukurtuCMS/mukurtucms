@@ -170,6 +170,8 @@ projects[scald][patch][] = contrib/uploaded_video_dimension_fix.patch
 projects[scald][patch][] = contrib/uploaded_video_do_not_fill_dimenions_on_upload.patch
 ; In scald_invoke_atom_access, pass account variable to user_access call
 projects[scald][patch][] = contrib/scald_atom_access_account_parameter.patch
+; PHP 7.4 patch
+projects[scald][patch][] = contrib/issue-3248924.patch
 
 ;;; Scald Feeds
 ; Add scald feeds metadata support
