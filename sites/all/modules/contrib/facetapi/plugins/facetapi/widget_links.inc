@@ -146,14 +146,14 @@ class FacetapiWidgetLinks extends FacetapiWidget {
               break;
           }
         }
-
-        // Add an ID to identify this link.
-        $variables['options']['attributes']['id'] = drupal_html_id('facetapi-link');
-        $variables['options'] += array(
-          'html' => $item['#html'],
-          'query' => $item['#query'],
-        );
       }
+
+      // Add an ID to identify this link.
+      $variables['options']['attributes']['id'] = drupal_html_id('facetapi-link');
+      $variables['options'] += array(
+        'html' => $item['#html'],
+        'query' => $item['#query'],
+      );
 
       // If the item is active, the li is active
       if ($item['#active']) {
