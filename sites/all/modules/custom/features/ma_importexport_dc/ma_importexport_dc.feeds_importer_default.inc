@@ -102,6 +102,14 @@ function ma_importexport_dc_feeds_importer_default() {
             'value' => 'dc:hasformat',
             'weight' => '15',
           ),
+          'dc_hasversion' => array(
+            'debug' => 0,
+            'inner' => 0,
+            'name' => 'dc:hasVersion',
+            'raw' => 0,
+            'value' => 'dc:hasVersion',
+            'weight' => '18',
+          ),
           'dc_identifier' => array(
             'debug' => 0,
             'inner' => 0,
@@ -191,7 +199,7 @@ function ma_importexport_dc_feeds_importer_default() {
             'weight' => '17',
           ),
         ),
-        'use_tidy' => 0,
+        'use_tidy' => FALSE,
       ),
       'plugin_key' => 'FeedsExXml',
     ),
@@ -220,12 +228,14 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           2 => array(
             'autocreate' => 1,
+            'language' => 'und',
             'source' => 'dc_creator',
             'target' => 'field_creator',
             'term_search' => '0',
           ),
           3 => array(
             'autocreate' => 1,
+            'language' => 'und',
             'source' => 'dc_contributor',
             'target' => 'field_contributor',
             'term_search' => '0',
@@ -244,6 +254,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           6 => array(
             'autocreate' => 1,
+            'language' => 'und',
             'source' => 'dc_publisher',
             'target' => 'field_publisher',
             'term_search' => '0',
@@ -256,12 +267,14 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           8 => array(
             'autocreate' => 1,
+            'language' => 'und',
             'source' => 'dc_format',
             'target' => 'field_format',
             'term_search' => '0',
           ),
           9 => array(
             'autocreate' => 1,
+            'language' => 'und',
             'source' => 'dc_type',
             'target' => 'field_dh_type',
             'term_search' => '0',
@@ -274,6 +287,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           11 => array(
             'autocreate' => 1,
+            'language' => 'und',
             'source' => 'dc_language',
             'target' => 'field_language',
             'term_search' => '0',
@@ -286,6 +300,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           13 => array(
             'autocreate' => 1,
+            'language' => 'und',
             'source' => 'dc_subject',
             'target' => 'field_subject',
             'term_search' => '0',
@@ -300,6 +315,11 @@ function ma_importexport_dc_feeds_importer_default() {
             'language' => 'und',
             'source' => 'dc_hasformat',
             'target' => 'field_media_asset',
+            'unique' => FALSE,
+          ),
+          16 => array(
+            'source' => 'dc_hasversion',
+            'target' => 'field_external_links:url',
             'unique' => FALSE,
           ),
         ),
