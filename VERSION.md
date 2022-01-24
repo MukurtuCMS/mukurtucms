@@ -1,3 +1,13 @@
+## Mukurtu 3.0.1
+- Updated to Drupal 7.87
+- Change default permissions for 'delete all items' option in feeds
+- Updated contrib modules for PHP 7.4
+
+#### Manual Upgrade Steps
+This version requires both a database update and a cache clear.
+- database update: `drush updb`
+- cache clear: `drush cc all`
+
 ## Mukurtu 3.0.0
 - Added support for the new version of [Mukurtu Mobile](https://mukurtu.org/mobile/)
 - Updated to Drupal 7.81
