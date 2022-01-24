@@ -438,6 +438,17 @@ ma_importexport_dc_get_relation_field($data->_field_data["nid"]["entity"]);
 ?>';
   $handler->display->display_options['fields']['php']['use_php_click_sortable'] = '0';
   $handler->display->display_options['fields']['php']['php_click_sortable'] = '';
+  /* Field: Content: External Links */
+  $handler->display->display_options['fields']['field_external_links']['id'] = 'field_external_links';
+  $handler->display->display_options['fields']['field_external_links']['table'] = 'field_data_field_external_links';
+  $handler->display->display_options['fields']['field_external_links']['field'] = 'field_external_links';
+  $handler->display->display_options['fields']['field_external_links']['label'] = 'dc:hasVersion';
+  $handler->display->display_options['fields']['field_external_links']['click_sort_column'] = 'url';
+  $handler->display->display_options['fields']['field_external_links']['type'] = 'link_plain';
+  $handler->display->display_options['fields']['field_external_links']['settings'] = array(
+    'custom_title' => '',
+  );
+  $handler->display->display_options['fields']['field_external_links']['delta_offset'] = '0';
   /* Sort criterion: Content: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
@@ -816,6 +827,7 @@ ma_importexport_dc_get_relation_field($data->_field_data["nid"]["entity"]);
     t('dc:rights'),
     t('dc:hasformat'),
     t('dcterms:relation'),
+    t('dc:hasVersion'),
     t('Title'),
     t('Community'),
     t('Category'),
