@@ -244,11 +244,15 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
   else {
     $description .= ' This is typically "location/url" or "relateditem".';
   }
+  $options = [
+    'none' => 'None',
+    'rdf_about' => "rdf:about attribute of the containing rdf:Description",
+  ];
   $form['media'] = array(
     '#type' => 'radios',
     '#title' => 'Media',
     '#description' => $description,
-    '#options' => array_merge(['none' => 'None'], $nested_attributes),
+    '#options' => array_merge($options, $nested_attributes),
   );
   $typical_media_values = ['dc:hasformat', 'dc:relation', 'location/url', 'relatedItem'];
   foreach ($typical_media_values as $typical_media_value) {
@@ -426,7 +430,7 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
     ];
 
     // Loop through the items.
-    foreach ($result->items as &$item) {
+    foreach ($result->items as $item_index => &$item) {
 
       // Set the GUID and dc:hasformat field values according to their source as selected in the options form.
       $guid_values = [];
@@ -438,42 +442,53 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
       // Set the media field.
       $media_value = '';
       if ($import_options['media'] <> 'none') {
-        $media_value = $item[$xpath_mapping[$import_options['media']]];
+        if ($import_options['media'] == 'rdf_about') {
+          $media_value = $item['rdf_about'][$item_index]; // unable to create xpath query for this to just select the child. It selects all children, so we grab the value based on the item index.
+        }
+        else {
+          $media_value = $item[$xpath_mapping[$import_options['media']]];
+        }
+      }
+      // If the media file path is not an absolute URL, try to grab it from the extraction of the zip.
+      if (substr( $media_value, 0, 4 ) <> "http") {
+        $media_value = drupal_realpath($_SESSION['mukurtu_zip_import']['temp_extract_path'] . $media_value);
       }
       $item['dc_hasformat'] = $media_value;
 
       // Special handling for Creator and Contributor Fields
-      foreach ($name_fields as $name_field_role_term => $name_field) {
-
-        foreach ($item[$name_field] as &$name_field_value) {
-          $skip = 0;
-          $xml_data = new SimpleXMLElement($name_field_value);
-
-          // Exclude name values for contributor that have a role term denoting creator,
-          // and exclude name values for creator that have a role term denoting contributor.
-          // TODO: need the role term for contributor. Add above.
-          if (isset($xml_data->role->roleTerm)) {
-            $role_term = (string) $xml_data->role->roleTerm;
-            if (array_key_exists($role_term, $name_fields) && $name_fields[$role_term] <> $name_field) {
-              unset ($item[$name_field]); // Exclude it
-              $skip = 1;
-            }
-          }
-          // For the remaining names:
-          // 1) extract the names out of namePart (otherwise names would end up with the whole xml content of Name)
-          // 2) merge the multiple nameParts into singles (combines last and first names into single names), when needed.
-          // This might need more work as more sample data comes in.
-          if (!$skip) {
-            $nameParts = (array) $xml_data->namePart;
-            foreach ($nameParts as $key => $namePart) {
-              if (!is_int($key)) { // Need to drop out the Attirbutes, possibly other, items, and keep just the numeric ones which are the actual nameParts.
-                unset ($nameParts[$key]);
-              }
-            }
-            $name_field_value = implode (', ', $nameParts);
-          }
-        }
-      }
+      // TODO: this should be for MODS only (see https://kanopi.teamwork.com/#tasks/20893887?c=8803928). It is causing
+      // breakages however, so disable it and come back to this if MODS is ever enabled. And only run this in case of MODS, not DC.
+//      foreach ($name_fields as $name_field_role_term => $name_field) {
+//
+//        foreach ($item[$name_field] as $name_field_value) {
+//          $skip = 0;
+//          $xml_data = new SimpleXMLElement($name_field_value);
+//
+//          // Exclude name values for contributor that have a role term denoting creator,
+//          // and exclude name values for creator that have a role term denoting contributor.
+//          // TODO: need the role term for contributor. Add above.
+//          if (isset($xml_data->role->roleTerm)) {
+//            $role_term = (string) $xml_data->role->roleTerm;
+//            if (array_key_exists($role_term, $name_fields) && $name_fields[$role_term] <> $name_field) {
+//              unset ($item[$name_field]); // Exclude it
+//              $skip = 1;
+//            }
+//          }
+//          // For the remaining names:
+//          // 1) extract the names out of namePart (otherwise names would end up with the whole xml content of Name)
+//          // 2) merge the multiple nameParts into singles (combines last and first names into single names), when needed.
+//          // This might need more work as more sample data comes in.
+//          if (!$skip) {
+//            $nameParts = (array) $xml_data->namePart;
+//            foreach ($nameParts as $key => $namePart) {
+//              if (!is_int($key)) { // Need to drop out the Attirbutes, possibly other, items, and keep just the numeric ones which are the actual nameParts.
+//                unset ($nameParts[$key]);
+//              }
+//            }
+//            $name_field_value = implode (', ', $nameParts);
+//          }
+//        }
+//      }
     }
   }
 }
@@ -496,6 +511,12 @@ function trim_multi_assoc_array($data) {
 function ma_importexport_dc_feeds_presave(FeedsSource $source, $entity, $item) {
   if (ma_importexport_dc_is_xml_importer($source->id)) {
     $import_options = variable_get('dh_xml_import_options');
+
+    // Set the author to the importing user (on the non-MODS import only, as the MODS import includes a username mapping)
+    if ($source->id == 'digital_heritage_dc') {
+      global $user;
+      $entity->uid = $user->uid;
+    }
 
     // Set the protocol(s) (the community(s) gets added in mukurtu_protocol_field_node_presave()).
     $protocols = [];
@@ -726,3 +747,26 @@ function ma_importexport_dc_views_pre_render(&$view) {
     }
   }
 }
+
+/**
+ * Helper function to get the DC relation field in the DC export view for both CR children and parents
+ */
+function ma_importexport_dc_get_relation_field($node) {
+  global $base_url;
+  if (isset($node->field_community_record_parent[LANGUAGE_NONE][0]["target_id"])) {
+    // Currently on a Child Record
+    print $base_url . '/' . drupal_get_path_alias('node/' . $node->field_community_record_parent[LANGUAGE_NONE][0]["target_id"]);
+  }
+  elseif (isset($node->field_community_record_children[LANGUAGE_NONE])) {
+    // Currently on a Parent Record
+    $child_count = 0;
+    foreach ($node->field_community_record_children[LANGUAGE_NONE] as $child) {
+      $child_count++;
+      if ($child_count > 1) {
+        print "</dcterms:relation>\n    <dcterms:relation>"; // This is hacky, but it works.
+      }
+      print $base_url . '/' . drupal_get_path_alias('node/' .$child["target_id"]);
+    }
+  }
+}
+
