@@ -21,14 +21,8 @@ bootstrap_include('bootstrap', 'includes/process.inc');
  * Implements hook_css_alter().
  */
 function bootstrap_css_alter(&$css) {
-  $theme_path = drupal_get_path('theme', 'bootstrap');
-
-  // Exclude specified CSS files from theme.
-  $excludes = bootstrap_get_theme_info(NULL, 'exclude][css');
-
   // Add CDN assets, if any.
-  $provider = bootstrap_setting('cdn_provider');
-  if ($cdn_assets = bootstrap_get_cdn_assets('css', $provider)) {
+  if (($provider = bootstrap_setting('cdn_provider')) && ($cdn_assets = bootstrap_get_cdn_assets('css', $provider))) {
     $cdn_weight = -2.99;
     foreach ($cdn_assets as $cdn_asset) {
       $cdn_weight += .01;
@@ -44,31 +38,27 @@ function bootstrap_css_alter(&$css) {
       );
     }
 
-    // Add a specific version and theme CSS overrides file.
-    $version = bootstrap_setting('cdn_' . $provider . '_version');
-    if (!$version) {
-      $version = BOOTSTRAP_VERSION;
-    }
-    $theme = bootstrap_setting('cdn_' . $provider . '_theme');
-    if (!$theme) {
-      $theme = 'bootstrap';
-    }
-    $theme = $theme === 'bootstrap' || $theme === 'bootstrap_theme' ? '' : "-$theme";
-    $overrides = "$theme_path/css/$version/overrides$theme.min.css";
-    if (file_exists($overrides)) {
-      $css[$overrides] = array(
-        'data' => $overrides,
-        'type' => 'file',
+    // Add Drupal Bootstrap Styles.
+    // @see https://github.com/unicorn-fail/drupal-bootstrap-styles
+    $version = bootstrap_setting('cdn_' . $provider . '_version') ?: BOOTSTRAP_VERSION;
+    $theme = bootstrap_setting('cdn_' . $provider . '_theme') ?: 'bootstrap';
+    if ($url = _bootstrap_cdn_get_drupal_bootstrap_styles_url($version, $theme)) {
+      $external = url_is_external($url);
+      $css[$url] = array(
+        'data' => $url,
+        'type' => $external ? 'external' : 'file',
         'every_page' => TRUE,
         'media' => 'all',
-        'preprocess' => TRUE,
+        'preprocess' => $external ? FALSE : TRUE,
         'group' => CSS_THEME,
         'browsers' => array('IE' => TRUE, '!IE' => TRUE),
         'weight' => -1,
       );
     }
   }
-  if (!empty($excludes)) {
+
+  // Exclude specified CSS files from theme.
+  if ($excludes = bootstrap_get_theme_info(NULL, 'exclude][css')) {
     $excludes = array_merge($excludes, str_replace('.css', '-rtl.css', $excludes));
     $css = array_diff_key($css, drupal_map_assoc($excludes));
   }

@@ -19,7 +19,7 @@ $plugin = array(
   'defaults' => array(
     'selector' => '',
     'target_context' => 'entity',
-    'concatenator' => ','
+    'concatenator' => ',',
   ),
 );
 
@@ -90,7 +90,7 @@ function entity_entity_property_edit_form($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Data selector'),
     '#description' => t('Any valid data selector, e.g. "title" to select a node\'s title, or "field_tags:1" to select the second tag.'),
-    '#default_value' =>  $conf['selector'],
+    '#default_value' => $conf['selector'],
     '#required' => TRUE,
   );
   $form['concatenator'] = array(
@@ -116,7 +116,7 @@ function entity_entity_property_edit_form_validate($form, &$form_state) {
     $parts = explode(':', $form_state['values']['selector']);
     foreach ($parts as $part) {
       if (!($wrapper instanceof EntityStructureWrapper || $wrapper instanceof EntityListWrapper)) {
-        form_set_error('selector', t('Unable to apply the data selector part %key.'. array('%key' => $part)));
+        form_set_error('selector', t('Unable to apply the data selector part %key.', array('%key' => $part)));
         continue;
       }
       $wrapper = $wrapper->get($part);
@@ -142,7 +142,7 @@ function entity_entity_property_map_data_type($type) {
   while ($item_type = entity_property_list_extract_type($type)) {
     $type = $item_type;
   }
-  // Massage data type of entites to c
+  // Massage data type of entities to ctools type.
   if (entity_get_info($type)) {
     $type = "entity:$type";
   }

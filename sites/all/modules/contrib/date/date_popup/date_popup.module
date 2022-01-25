@@ -2,8 +2,7 @@
 
 /**
  * @file
- * A module to enable jquery calendar and time entry popups.
- * Requires the Date API.
+ * A module to enable jQuery calendar and time entry popups.
  *
  * Add a type of #date_popup to any date, time, or datetime field that will
  * use this popup. Set #date_format to the way the date should be presented
@@ -121,7 +120,7 @@ function date_popup_library() {
  *   The CSS id to assign to the element that should have $func($settings)
  *   invoked on it.
  */
-function date_popup_js_settings_id($id, $func, $settings) {
+function date_popup_js_settings_id($id, $func, array $settings) {
   static $js_added = FALSE;
   static $id_count = array();
 
@@ -222,9 +221,11 @@ function date_popup_element_info() {
     '#process' => array('date_popup_element_process'),
     '#value_callback' => 'date_popup_element_value_callback',
     '#theme_wrappers' => array('date_popup'),
-    '#attached' => array('css' => array(
-      drupal_get_path('module', 'date_popup'). '/themes/datepicker.1.7.css',
-    )),
+    '#attached' => array(
+      'css' => array(
+        drupal_get_path('module', 'date_popup') . '/themes/datepicker.1.7.css',
+      ),
+    ),
   );
 
   if (module_exists('ctools')) {
@@ -267,7 +268,7 @@ function date_popup_time_format($element) {
 /**
  * Element value callback for date_popup element.
  */
-function date_popup_element_value_callback($element, $input = FALSE, &$form_state) {
+function date_popup_element_value_callback($element, $input = FALSE, &$form_state = array()) {
   $granularity = date_format_order($element['#date_format']);
   $has_time = date_has_time($granularity);
   $date = NULL;
@@ -345,6 +346,8 @@ function date_popup_element_process($element, &$form_state, $form) {
   $context = array(
     'form' => $form,
   );
+
+  // Trigger hook_date_popup_process_alter().
   drupal_alter('date_popup_process', $element, $form_state, $context);
 
   return $element;
@@ -423,7 +426,10 @@ function date_popup_process_date_part(&$element) {
   $parents = array_merge($element['#parents'], array('date'));
   $sub_element = array(
     '#type' => 'textfield',
-    '#title' => theme('date_part_label_date', array('part_type' => 'date', 'element' => $element)),
+    '#title' => theme('date_part_label_date', array(
+      'part_type' => 'date',
+      'element' => $element,
+    )),
     '#title_display' => $element['#date_label_position'] == 'above' ? 'before' : 'invisible',
     '#default_value' => date_format_date($date, 'custom', date_popup_date_format($element)),
     '#id' => $id,
@@ -438,12 +444,12 @@ function date_popup_process_date_part(&$element) {
   // Do NOT overwrite the actual input with the default value.
   // @todo Figure out exactly when this is needed, in many places it is not.
   $sub_element['#description'] = ' ' . t('E.g., @date', array(
-      '@date' => date_format_date(
+    '@date' => date_format_date(
         date_example_date(),
         'custom',
         date_popup_date_format($element)
-        ),
-      ));
+    ),
+  ));
 
   return $sub_element;
 }
@@ -528,7 +534,10 @@ function date_popup_process_time_part(&$element) {
   $parents = array_merge($element['#parents'], array('time'));
   $sub_element = array(
     '#type' => 'textfield',
-    '#title' => theme('date_part_label_time', array('part_type' => 'time', 'element' => $element)),
+    '#title' => theme('date_part_label_time', array(
+      'part_type' => 'time',
+      'element' => $element,
+    )),
     '#title_display' => $element['#date_label_position'] == 'above' ? 'before' : 'invisible',
     '#default_value' => $element['#value']['time'],
     '#id' => $id,
@@ -542,7 +551,6 @@ function date_popup_process_time_part(&$element) {
   );
 
   // Do NOT overwrite the actual input with the default value.
-
   // @todo Figure out exactly when this is needed, in many places it is not.
   $example_date = date_now();
   date_increment_round($example_date, $element['#date_increment']);
@@ -551,7 +559,8 @@ function date_popup_process_time_part(&$element) {
       $example_date,
       'custom',
       date_popup_time_format($element)
-    )));
+    ),
+  ));
 
   return ($sub_element);
 }
@@ -583,6 +592,7 @@ function date_popup_validate($element, &$form_state) {
     return;
   }
 
+  // Trigger hook_date_popup_pre_validate_alter().
   drupal_alter('date_popup_pre_validate', $element, $form_state, $input);
 
   $granularity = date_format_order($element['#date_format']);
@@ -647,11 +657,11 @@ function date_popup_input_date($element, $input, $auto_complete = FALSE) {
 
   $format = date_popup_date_format($element);
   $format .= $has_time ? ' ' . date_popup_time_format($element) : '';
-  // check if date is empty, if yes, then leave it blank.
+  // Check if date is empty, if yes, then leave it blank.
   $datetime = !empty($input['date']) ? trim($input['date']) : '';
   $datetime .= $has_time ? ' ' . trim($input['time']) : '';
   $date = new DateObject($datetime, $element['#date_timezone'], $format);
-  // if the variable is time only then set TimeOnly to TRUE.
+  // If the variable is time only then set TimeOnly to TRUE.
   if (empty($input['date']) && !empty($input['time'])) {
     $date->timeOnly = 'TRUE';
   }
@@ -699,7 +709,7 @@ function date_popup_formats() {
  * Recreate a date format string so it has the values popup expects.
  *
  * @param string $format
- *   A normal date format string, like Y-m-d
+ *   A normal date format string, like Y-m-d.
  *
  * @return string
  *   A format string in popup format, like YMD-, for the earlier 'calendar'
@@ -753,7 +763,7 @@ function date_popup_format_to_popup_time($format, $timepicker = NULL) {
  * Reconstruct popup format string into normal format string.
  *
  * @param string $format
- *   A string in popup format, like YMD-
+ *   A string in popup format, like YMD-.
  *
  * @return string
  *   A normal date format string, like Y-m-d
@@ -877,7 +887,10 @@ function date_popup_settings() {
   );
 
   if (!$wvega_available) {
-    $form['#prefix'] .= t('<p>To install the dropdown timepicker, create a <code>!directory</code> directory in your site installation. Then visit <a href="@download">@download</a>, download the latest copy and unzip it. You will see files with names like jquery.timepicker-1.1.2.js and jquery.timepicker-1.1.2.css. Rename them to jquery.timepicker.js and jquery.timepicker.css and copy them into <code>!directory</code>.</p>', array('!directory' => 'sites/all/libraries/wvega-timepicker', '@download' => 'https://github.com/wvega/timepicker/archives/master'));
+    $form['#prefix'] .= t('<p>To install the dropdown timepicker, create a <code>!directory</code> directory in your site installation. Then visit <a href="@download">@download</a>, download the latest copy and unzip it. You will see files with names like jquery.timepicker-1.1.2.js and jquery.timepicker-1.1.2.css. Rename them to jquery.timepicker.js and jquery.timepicker.css and copy them into <code>!directory</code>.</p>', array(
+      '!directory' => 'sites/all/libraries/wvega-timepicker',
+      '@download' => 'https://github.com/wvega/timepicker/archives/master',
+    ));
     unset($form['date_popup_timepicker']['#options']['wvega']);
   }
 

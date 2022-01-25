@@ -134,6 +134,9 @@ function ckeditor_help_delegate($path, $arg) {
           ) .
           '</li>' .
           '<li>' .
+          t('By default, CKEditor is configured to leverage your browser\'s spell check capability. Make sure your browser\'s spell checker is enabled in your browser\'s settings. To access suggested corrections for misspelled words, it may be necessary to hold the <em>Control</em> or <em>command</em> (Mac) key while right-clicking the misspelling.') .
+          '</li>' .
+          '<li>' .
           t('All configuration options described in the !apidocs that cannot be easily changed in the administration area can be set in the <strong>Advanced Options</strong> section in the CKEditor profile.', array(
             '!apidocs' => l(t('API documentation'), 'http://docs.cksource.com/ckeditor_api/symbols/CKEDITOR.config.html')
               )

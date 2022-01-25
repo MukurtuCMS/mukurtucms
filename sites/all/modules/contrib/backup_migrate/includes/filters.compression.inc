@@ -102,7 +102,7 @@ class backup_migrate_filter_compression extends backup_migrate_filter {
   /**
    * Gzip encode a file.
    */
-  public function _backup_migrate_gzip_encode($source, $dest, $level = 9, $settings) {
+  public function _backup_migrate_gzip_encode($source, $dest, $level, $settings) {
     $success = FALSE;
     // Try command line gzip first.
     if (!empty($settings->filters['use_cli'])) {

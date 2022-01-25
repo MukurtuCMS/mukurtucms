@@ -173,6 +173,8 @@ projects[scald][patch][] = contrib/uploaded_video_dimension_fix.patch
 projects[scald][patch][] = contrib/uploaded_video_do_not_fill_dimenions_on_upload.patch
 ; In scald_invoke_atom_access, pass account variable to user_access call
 projects[scald][patch][] = contrib/scald_atom_access_account_parameter.patch
+; PHP 7.4 patch
+projects[scald][patch][] = contrib/issue-3248924.patch
 
 ;;; Scald Feeds
 ; Add scald feeds metadata support
@@ -192,7 +194,7 @@ projects[search_api_db][patch][] = contrib/modify_dictionary_search_results_base
 
 ;;; Search API DB
 ; Change Seach API DB to pull regex from Search API
-projects[search_api_db][patch][] = contrib/0001-Change-Search-API-DB-to-pull-regex-from-Search-API.patch
+projects[search_api_db][patch][] = contrib/0001-Pull-regex-from-config.patch
 
 ;;; Search API Glossary
 ; 1. Index display and sort ALL characters. 2. Option to skip padding

@@ -120,7 +120,7 @@ class views_plugin_query_default extends views_plugin_query {
   /**
    * {@inheritdoc}
    */
-  public function init($base_table = 'node', $base_field = 'nid', $options) {
+  public function init($base_table = 'node', $base_field = 'nid', $options = array()) {
     parent::init($base_table, $base_field, $options);
     $this->base_table = $base_table;
     // Predefine these above, for clarity.
@@ -283,9 +283,9 @@ class views_plugin_query_default extends views_plugin_query {
     );
     $form['slave'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Use Slave Server'),
-      '#description' => t('This will make the query attempt to connect to a slave server if available.  If no slave server is defined or available, it will fall back to the default server.'),
       '#default_value' => !empty($this->options['slave']),
+      '#title' => t('Use Replica Server'),
+      '#description' => t('This will make the query attempt to connect to a replica server if available.  If no replica server is defined or available, it will fall back to the default server.'),
     );
     $form['query_comment'] = array(
       '#type' => 'textfield',
@@ -1318,9 +1318,9 @@ class views_plugin_query_default extends views_plugin_query {
       $key = $this->view->base_database;
     }
 
-    // Set the slave target if the slave option is set.
     if (!empty($this->options['slave'])) {
       $target = 'slave';
+    // Set the replica target if the replica option is set.
     }
 
     // Go ahead and build the query. db_select doesn't support to specify the
@@ -1646,7 +1646,7 @@ class views_plugin_query_default extends views_plugin_query {
 
     if (!empty($relationship)) {
       foreach ($this->view->relationship as $current) {
-        if ($current->alias == $relationship) {
+        if (isset($current->alias) && $current->alias == $relationship) {
           $base_table = $current->definition['base'];
           $base_table_alias = $relationship;
           break;

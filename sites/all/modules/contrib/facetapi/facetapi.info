@@ -18,9 +18,9 @@ files[] = plugins/facetapi/widget_links.inc
 files[] = tests/facetapi_test.plugins.inc
 files[] = tests/facetapi.test
 
-version = "7.x-1.5"
-; Information added by Drupal.org packaging script on 2019-09-19
-version = "7.x-1.6"
+
+; Information added by Drupal.org packaging script on 2021-08-27
+version = "7.x-1.9"
 core = "7.x"
 project = "facetapi"
-datestamp = "1568909915"
+datestamp = "1630088972"

@@ -82,7 +82,7 @@ class entity_views_plugin_row_entity_view extends views_plugin_row {
   /**
    * Overridden to return the entity object.
    */
-  function get_value($values, $field = NULL) {
+  public function get_value($values, $field = NULL) {
     return isset($this->entities[$this->view->row_index]) ? $this->entities[$this->view->row_index] : FALSE;
   }
 
@@ -95,4 +95,5 @@ class entity_views_plugin_row_entity_view extends views_plugin_row {
       return drupal_render($render);
     }
   }
+
 }

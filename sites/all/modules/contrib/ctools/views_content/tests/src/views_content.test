@@ -6,6 +6,13 @@
  */
 
 /**
+ * Avoid simpletest "Class ViewsSqlTest not found" error.
+ */
+if (!class_exists('ViewsSqlTest')) {
+  return;
+}
+
+/**
  * Tests rendering views content pane displays.
  */
 class ViewsContentPanesTest extends ViewsSqlTest {

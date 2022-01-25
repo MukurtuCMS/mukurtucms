@@ -1,6 +1,26 @@
+Backup and Migrate 7.x-3.10, 2022-01-09
+---------------------------------------
+#3160105 by ron_s: Adjust README to match changes to default performance
+  settings.
+#3159270 by tobiasb, jeffschuler, DamienMcKenna, solideogloria, joelpittet:
+  Fixed compatibility with PHP 5.4.
+#3213452 by DamienMcKenna, solideogloria: PHP 8.0 compatibility.
+#3201469 by Jyaai, DamienMcKenna: Remove unreachable JS code.
+#3060980 by solideogloria, DamienMcKenna: Add settings options for custom smart
+  backup delete.
+#3214391 by DamienMcKenna: Add Views as a test dependency.
+#3172388 by mcdruid, DamienMcKenna, izmeez: backup_migrate resets sql_mode
+  causing problems with D7's MySQL 8 support.
+#3215180 by mibfire, hey_germano, DamienMcKenna: INI directive 'safe_mode' is
+  deprecated.
+#3231913 by Andrei Haurukovich, DamienMcKenna: Phan scan notice: Argument 1
+  ($value) is ($errors < 5) of type bool.
+#3121655 by DamienMcKenna, gisle: Link to Amazon S3 PHP class produces 404.
+
+
 Backup and Migrate 7.x-3.9, 2020-07-15
 --------------------------------------
-#3158379 by DamienMcKenna, monnerat: Fixed compatibility with PHP 5.4.
+#3158379 by DamienMcKenna, monnerat: Fixed compatibility with PHP 5.5.
 
 
 Backup and Migrate 7.x-3.8, 2020-07-10

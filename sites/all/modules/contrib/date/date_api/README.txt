@@ -41,7 +41,7 @@ Preconfigured arrays
 Both translated and untranslated values are available.  For example the
 'date_week_days_ordered()' function will shift an array of week day names so it
 starts with the site's first day of the week, otherwise the weekday names start
-with Sunday as the first value, which is the expected order for many php and sql
+with Sunday as the first value, which is the expected order for many PHP and SQL
 functions.
 
 date_month_names();

@@ -292,7 +292,8 @@ function rules_ui_add_element($form, &$form_state, $rules_config, $plugin_name, 
     $element = rules_plugin_factory($plugin_name);
     // Always add the new element at the bottom, thus set an appropriate weight.
     $iterator = $parent->getIterator();
-    if ($sibling = end($iterator)) {
+    $iterator_array = iterator_to_array($iterator, TRUE);
+    if ($sibling = end($iterator_array)) {
       $element->weight = $sibling->weight + 1;
     }
     $element->setParent($parent);
@@ -318,7 +319,8 @@ function rules_ui_add_element_submit($form, &$form_state) {
 
   // Always add the new element at the bottom, thus set an appropriate weight.
   $iterator = $form_state['parent_element']->getIterator();
-  if ($sibling = end($iterator)) {
+  $iterator_array = iterator_to_array($iterator, TRUE);
+  if ($sibling = end($iterator_array)) {
     $element->weight = $sibling->weight + 1;
   }
   // Clear the element settings so they won't be processed on serialization as
@@ -575,13 +577,23 @@ function rules_ui_import_form_validate($form, &$form_state) {
   if ($rules_config = rules_import($form_state['values']['import'], $error_msg)) {
     // Store the successfully imported entity in $form_state.
     $form_state['rules_config'] = $rules_config;
-    if (!$form_state['values']['overwrite']) {
-      // Check for existing entities with the same identifier.
-      if (rules_config_load($rules_config->name)) {
+
+    // Check for existing entities with the same identifier.
+    if ($existing_config = rules_config_load($rules_config->name)) {
+      // Don't import and overwrite the existing configuration unless the user
+      // has checked the 'overwrite' box.
+      if (!$form_state['values']['overwrite']) {
         $vars = array('@entity' => t('Rules configuration'), '%label' => $rules_config->label());
         form_set_error('import', t('Import of @entity %label failed, a @entity with the same machine name already exists. Check the overwrite option to replace it.', $vars));
       }
+      // Don't import if the existing configuration has the status ENTITY_FIXED
+      // because that means the configuration can't be modified.
+      if ($existing_config->status == ENTITY_FIXED) {
+        $vars = array('@entity' => t('Rules configuration'), '%label' => $rules_config->label());
+        form_set_error('import', t("Import of @entity %label failed, a @entity with the same machine name already exists and is marked as ENTITY_FIXED meaning it can't be mofified.", $vars));
+      }
     }
+
     try {
       $rules_config->integrityCheck();
     }
@@ -609,6 +621,9 @@ function rules_ui_import_form_submit($form, &$form_state) {
   if ($existing_config = rules_config_load($rules_config->name)) {
     // Copy DB id and remove the new indicator to overwrite the existing record.
     $rules_config->id = $existing_config->id;
+    // Set the ENTITY_CUSTOM bit in the status bitmask, because the
+    // configuration has now been customized by the import.
+    $rules_config->status = $existing_config->status | ENTITY_CUSTOM;
     unset($rules_config->is_new);
   }
   $rules_config->save();
@@ -975,7 +990,7 @@ function rules_autocomplete_tags($tags_typed = '') {
       ->groupBy('rt.tag')
       ->range(0, 10)
       ->execute()
-      ->fetchCol('rt.tag');
+      ->fetchCol();
 
     $prefix = count($tags_typed) ? drupal_implode_tags($tags_typed) . ', ' : '';
 

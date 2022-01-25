@@ -136,7 +136,7 @@ class FileEntityFileTypeClassificationTestCase extends DrupalWebTestCase {
     return array(
       'name' => 'File entity classification',
       'description' => 'Test existing file entity classification functionality.',
-      'group' => 'File entity',
+      'group' => 'file_entity',
     );
   }
 
@@ -206,7 +206,7 @@ class FileEntityUnitTestCase extends FileEntityTestHelper {
     return array(
       'name' => 'File entity unit tests',
       'description' => 'Test basic file entity functionality.',
-      'group' => 'File entity',
+      'group' => 'file_entity',
     );
   }
 
@@ -311,7 +311,7 @@ class FileEntityEditTestCase extends FileEntityTestHelper {
     return array(
       'name' => 'File entity edit',
       'description' => 'Create a file and test file edit functionality.',
-      'group' => 'File entity',
+      'group' => 'file_entity',
     );
   }
 
@@ -421,7 +421,7 @@ class FileEntityUploadWizardTestCase extends FileEntityTestHelper {
     return array(
       'name' => 'File entity upload wizard',
       'description' => 'Upload a file using the multi-step wizard.',
-      'group' => 'File entity',
+      'group' => 'file_entity',
       'dependencies' => array('token'),
     );
   }
@@ -646,7 +646,7 @@ class FileEntityAdminTestCase extends FileEntityTestHelper {
     return array(
       'name' => 'File administration',
       'description' => 'Test file administration page functionality.',
-      'group' => 'File entity',
+      'group' => 'file_entity',
     );
   }
 
@@ -809,7 +809,7 @@ class FileEntityUsageTestCase extends FileEntityTestHelper {
     return array(
       'name' => 'File entity usage',
       'description' => 'Create a file and verify its usage.',
-      'group' => 'File entity',
+      'group' => 'file_entity',
     );
   }
 
@@ -896,7 +896,7 @@ class FileEntityAltTitleTestCase extends FileEntityTestHelper {
     return array(
       'name' => 'File entity alt and title text',
       'description' => 'Create an image file with alt and title text.',
-      'group' => 'File entity',
+      'group' => 'file_entity',
       'dependencies' => array('token'),
     );
   }
@@ -987,7 +987,7 @@ class FileEntityChangeSchemeTestCase extends FileEntityTestHelper {
     return array(
       'name' => 'Changing file scheme',
       'description' => 'Test changing the scheme of a file.',
-      'group' => 'File entity',
+      'group' => 'file_entity',
     );
   }
 
@@ -1025,7 +1025,7 @@ class FileEntityReplaceTestCase extends FileEntityTestHelper {
     return array(
       'name' => 'File replacement',
       'description' => 'Test file replace functionality.',
-      'group' => 'File entity',
+      'group' => 'file_entity',
     );
   }
 
@@ -1109,7 +1109,7 @@ class FileEntityTokenTestCase extends FileEntityTestHelper {
     return array(
       'name' => 'File entity tokens',
       'description' => 'Test the file entity tokens.',
-      'group' => 'File entity',
+      'group' => 'file_entity',
     );
   }
 
@@ -1167,7 +1167,7 @@ class FileEntityTypeTestCase extends FileEntityTestHelper {
     return array(
       'name' => 'File entity types',
       'description' => 'Test the file entity types.',
-      'group' => 'File entity',
+      'group' => 'file_entity',
     );
   }
 
@@ -1296,7 +1296,7 @@ class FileEntityAccessTestCase extends FileEntityTestHelper {
     return array(
       'name' => 'File entity access',
       'description' => 'Test the access aspects of file entity.',
-      'group' => 'File entity',
+      'group' => 'file_entity',
     );
   }
 
@@ -1639,7 +1639,7 @@ class FileEntityAttributeOverrideTestCase extends FileEntityTestHelper {
     return array(
       'name' => 'File entity attribute override',
       'description' => 'Test overriding file entity attributes.',
-      'group' => 'File entity',
+      'group' => 'file_entity',
     );
   }
 

@@ -143,6 +143,7 @@ function mukurtu_batch_import_parse_zip($file) {
     $zip->extractTo($temp_extract_path);
     $zip->close();
     dsm('Zip file extracted');
+    $_SESSION['mukurtu_zip_import']['temp_extract_path'] = $temp_extract_path;
   } else {
     dsm('Zip file not extracted.');
   }

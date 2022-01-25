@@ -8,13 +8,13 @@ configure = admin/config/date/date_popup
 dependencies[] = date:date_api
 
 ; Test coverage.
-; @todo Replicate DateUiTestCase::testFieldUI().
+; @todo Replicate DateUiTestCase::testFieldUi().
 files[] = tests/DatePopupFieldTestCase.test
 files[] = tests/DatePopupValidationTestCase.test
 files[] = tests/DatePopupWithViewsTestCase.test
 
-; Information added by Drupal.org packaging script on 2021-03-05
-version = "7.x-2.11"
+; Information added by Drupal.org packaging script on 2021-10-07
+version = "7.x-2.12"
 core = "7.x"
 project = "date"
-datestamp = "1614952728"
+datestamp = "1633627650"

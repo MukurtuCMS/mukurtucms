@@ -1116,7 +1116,7 @@ function ctools_context_next_id($objects, $name) {
   foreach ($objects as $object) {
     if (isset($object['name']) && $object['name'] === $name) {
       if (isset($object['id']) && $object['id'] > $id) {
-        $id = $object['id'];
+        $id = (int) $object['id'];
       }
       // @todo If obj has no 'id', should we increment local id? $id = $id + 1;
     }

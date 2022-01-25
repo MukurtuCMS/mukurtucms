@@ -50,12 +50,12 @@ class views_handler_field_entity extends views_handler_field {
    * Overriden to add the field for the entity id.
    */
   public function query() {
-    $this->table_alias = $base_table = $this->view->base_table;
+    $this->table_alias = $this->view->base_table;
     $this->base_field = $this->view->base_field;
 
     if (!empty($this->relationship)) {
       foreach ($this->view->relationship as $relationship) {
-        if ($relationship->alias == $this->relationship) {
+        if (isset($relationship->alias) && $relationship->alias == $this->relationship) {
           $base_table = $relationship->definition['base'];
           $this->table_alias = $relationship->alias;
 

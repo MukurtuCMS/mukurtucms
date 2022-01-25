@@ -9,11 +9,10 @@
  * Implements hook_migrate_api().
  */
 function date_migrate_test_migrate_api() {
-  $api = array(
+  return array(
     'api' => 2,
     'migrations' => array(
       'DateExample' => array('class_name' => 'DateExampleMigration'),
     ),
   );
-  return $api;
 }
