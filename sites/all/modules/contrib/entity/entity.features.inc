@@ -86,7 +86,7 @@ class EntityDefaultFeaturesController {
       else {
         $export['features'][$this->type][$name] = $name;
 
-        // If this is a bundle of a fieldable entity, add its fields to the pipe.
+        // If this is a bundle of a fieldable entity add its fields to the pipe.
         if (!empty($this->info['bundle of'])) {
           $fields = field_info_instances($this->info['bundle of'], $entity->{$this->bundleKey});
           foreach ($fields as $name => $field) {
@@ -110,11 +110,11 @@ class EntityDefaultFeaturesController {
   /**
    * Generates the result for hook_features_export_render().
    */
-  function export_render($module, $data, $export = NULL) {
+  public function export_render($module, $data, $export = NULL) {
     $output = array();
     $output[] = '  $items = array();';
     foreach (entity_load_multiple_by_name($this->type, $data) as $name => $entity) {
-      $export  = "  \$items['$name'] = entity_import('{$this->type}', '";
+      $export = "  \$items['$name'] = entity_import('{$this->type}', '";
       // Make sure to escape the characters \ and '.
       $export .= addcslashes(entity_export($this->type, $entity, '  '), '\\\'');
       $export .= "');";
@@ -130,15 +130,16 @@ class EntityDefaultFeaturesController {
   /**
    * Generates the result for hook_features_revert().
    */
-  function revert($module = NULL) {
+  public function revert($module = NULL) {
     if ($defaults = features_get_default($this->type, $module)) {
       entity_delete_multiple($this->type, array_keys($defaults));
     }
   }
+
 }
 
 /**
- * Implements of hook_features_api().
+ * Implements hook_features_api().
  */
 function entity_features_api() {
   $items = array();
@@ -168,7 +169,7 @@ function entity_features_export_options($a1, $a2 = NULL) {
  *
  * Features component callback.
  */
-function entity_features_export($data, &$export, $module_name = '', $entity_type) {
+function entity_features_export($data, &$export, $module_name, $entity_type) {
   return entity_features_get_controller($entity_type)->export($data, $export, $module_name);
 }
 
@@ -177,7 +178,7 @@ function entity_features_export($data, &$export, $module_name = '', $entity_type
  *
  * Features component callback.
  */
-function entity_features_export_render($module, $data, $export = NULL, $entity_type) {
+function entity_features_export_render($module, $data, $export, $entity_type) {
   return entity_features_get_controller($entity_type)->export_render($module, $data, $export);
 }
 
@@ -186,7 +187,7 @@ function entity_features_export_render($module, $data, $export = NULL, $entity_t
  *
  * Features component callback.
  */
-function entity_features_revert($module = NULL, $entity_type) {
+function entity_features_revert($module, $entity_type) {
   return entity_features_get_controller($entity_type)->revert($module);
 }
 

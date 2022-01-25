@@ -1,3 +1,37 @@
+Date 7.x-2.12, 2021-10-07
+-------------------------
+No changes since 7.x-2.12-rc1.
+
+
+Date 7.x-2.12-rc1, 2021-08-27
+-----------------------------
+#3164305 by solideogloria: Follow-up to fix Damien's typoo.
+#3206100 by DamienMcKenna: Disable date_all_day_update_7200().
+#3154440 by Ronino, DamienMcKenna: PHP 7.4 notices: Trying to access array
+  offset on value of type.
+#2074457 by nedjo, DamienMcKenna, anrikun, rovo89, tame4tex, crstnkal,
+  johnlaine, Nels, akolahi, solideogloria, mdolnik, yazzbe, april26: Error
+  messages from date_entity_metadata_struct_getter().
+#3202888 by Ronino, jplana, DamienMcKenna, joelpittet: Undefined index: field
+  in date_entity_metadata_struct_getter().
+#3207998 by DamienMcKenna: PHP 8.0 compatibility fixes.
+#3208467 by DamienMcKenna: Rename "date_test_feature" test content type to just
+  "date_test".
+#3209659 by steinmb, DamienMcKenna: Coding standards improvements.
+#3210211 by DamienMcKenna, steinmb: Refactor date_repeat.test.
+#2101397 by Dean Reilly, vijaycs85, Paul B, scottm316, solideogloria,
+  DamienMcKenna, guilhermevp, manishsaharan29497, steinmb: DateObject accepts
+  "0" as a valid month, day or year.
+#3183402 by anrikun, torotil, steinmb, DamienMcKenna: Entity metadata wrapper:
+  Unable to set date before 1.1.1970.
+#3083197 by ron_s, anrikun, steinmb, DamienMcKenna: Option summary left in Views
+  Argument handler breaks Features.
+#3224973 by DamienMcKenna: Add "Trigger hook_HOOKNAME" comments in code.
+#3225158 by DamienMcKenna: Clean up the codebase using the Coder module.
+#3229882 by srdtwc, DamienMcKenna: Syntax issue in repeat_date.
+#3226602 by DamienMcKenna: Recover lost popups test file.
+
+
 Date 7.x-2.11, 2021-03-05
 -------------------------
 #3177831 by DamienMcKenna: Add test coverage for the All Day functionality.

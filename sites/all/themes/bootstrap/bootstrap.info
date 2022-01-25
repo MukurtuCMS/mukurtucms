@@ -125,11 +125,11 @@ settings[bootstrap_tooltip_container] = 'body'
 ; Advanced
 ; --------------
 settings[bootstrap_cdn_provider] = 'jsdelivr'
-settings[bootstrap_cdn_custom_css] = 'https://cdn.jsdelivr.net/npm/bootstrap@3.4.0/dist/css/bootstrap.css'
-settings[bootstrap_cdn_custom_css_min] = 'https://cdn.jsdelivr.net/npm/bootstrap@3.4.0/dist/css/bootstrap.min.css'
-settings[bootstrap_cdn_custom_js] = 'https://cdn.jsdelivr.net/npm/bootstrap@3.4.0/dist/js/bootstrap.js'
-settings[bootstrap_cdn_custom_js_min] = 'https://cdn.jsdelivr.net/npm/bootstrap@3.4.0/dist/js/bootstrap.min.js'
-settings[bootstrap_cdn_jsdelivr_version] = '3.4.0'
+settings[bootstrap_cdn_custom_css] = 'https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.css'
+settings[bootstrap_cdn_custom_css_min] = 'https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css'
+settings[bootstrap_cdn_custom_js] = 'https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.js'
+settings[bootstrap_cdn_custom_js_min] = 'https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js'
+settings[bootstrap_cdn_jsdelivr_version] = '3.4.1'
 settings[bootstrap_cdn_jsdelivr_theme] = 'bootstrap'
 
 ; Global
@@ -209,8 +209,8 @@ multipliers[screen-md-max][] = 2x
 multipliers[screen-lg-min][] = 1.5x
 multipliers[screen-lg-min][] = 2x
 
-; Information added by Drupal.org packaging script on 2019-01-21
-version = "7.x-3.23"
+; Information added by Drupal.org packaging script on 2019-06-20
+version = "7.x-3.26"
 core = "7.x"
 project = "bootstrap"
-datestamp = "1548102185"
+datestamp = "1561051701"

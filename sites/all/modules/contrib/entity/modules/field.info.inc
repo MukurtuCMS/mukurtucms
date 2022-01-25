@@ -27,7 +27,12 @@ function entity_metadata_field_entity_property_info() {
 
           if ($instance && empty($instance['deleted'])) {
             foreach ($field_type['property_callbacks'] as $callback) {
-              $callback($info, $entity_type, $field, $instance, $field_type);
+              if (function_exists($callback)) {
+                $callback($info, $entity_type, $field, $instance, $field_type);
+              }
+              else {
+                watchdog($entity_type, 'Missing property callback %callback.', array('%callback' => $callback), WATCHDOG_ERROR);
+              }
             }
           }
         }
@@ -39,7 +44,8 @@ function entity_metadata_field_entity_property_info() {
 
 /**
  * Callback to add in property info defaults per field instance.
- * @see entity_metadata_field_entity_property_info().
+ *
+ * @see entity_metadata_field_entity_property_info()
  */
 function entity_metadata_field_default_property_callback(&$info, $entity_type, $field, $instance, $field_type) {
   if (!empty($field_type['property_type'])) {
@@ -76,8 +82,8 @@ function entity_metadata_field_default_property_callback(&$info, $entity_type, $
 /**
  * Additional callback to adapt the property info for text fields. If a text
  * field is processed we make use of a separate data structure so that format
- * filters are available too. For the text value the sanitized, thus processed
- * value is returned by default.
+ * filters are available too. For the text value that is sanitized, this
+ * processed value is returned by default.
  *
  * @see entity_metadata_field_entity_property_info()
  * @see entity_field_info_alter()
@@ -94,7 +100,7 @@ function entity_metadata_field_text_property_callback(&$info, $entity_type, $fie
     unset($property['query callback']);
 
     if (empty($instance['settings']['text_processing'])) {
-      $property['property info'] =  entity_property_field_item_textsummary_info();
+      $property['property info'] = entity_property_field_item_textsummary_info();
     }
     else {
       // For formatted text we use the type name 'text_formatted'.
@@ -113,7 +119,8 @@ function entity_metadata_field_text_property_callback(&$info, $entity_type, $fie
 
 /**
  * Additional callback to adapt the property info for term reference fields.
- * @see entity_metadata_field_entity_property_info().
+ *
+ * @see entity_metadata_field_entity_property_info()
  */
 function entity_metadata_field_term_reference_callback(&$info, $entity_type, $field, $instance, $field_type) {
   $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$field['field_name']];
@@ -130,7 +137,8 @@ function entity_metadata_field_term_reference_callback(&$info, $entity_type, $fi
 
 /**
  * Additional callback to adapt the property info for file fields.
- * @see entity_metadata_field_entity_property_info().
+ *
+ * @see entity_metadata_field_entity_property_info()
  */
 function entity_metadata_field_file_callback(&$info, $entity_type, $field, $instance, $field_type) {
   $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$field['field_name']];
@@ -157,7 +165,8 @@ function entity_metadata_field_file_callback(&$info, $entity_type, $field, $inst
 /**
  * Additional callback to adapt the property info for image fields.
  * This callback gets invoked after entity_metadata_field_file_callback().
- * @see entity_metadata_field_entity_property_info().
+ *
+ * @see entity_metadata_field_entity_property_info()
  */
 function entity_metadata_field_image_callback(&$info, $entity_type, $field, $instance, $field_type) {
   $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$field['field_name']];

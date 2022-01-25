@@ -136,7 +136,7 @@ function rules_php_evaluator_help($var_info, $action_help = FALSE) {
 
   $cache = rules_get_cache();
   foreach ($var_info as $name => $info) {
-    $row   = array();
+    $row = array();
     $row[] = '$' . check_plain($name);
     $label = isset($cache['data_info'][$info['type']]['label']) ? $cache['data_info'][$info['type']]['label'] : $info['type'];
     $row[] = check_plain(drupal_ucfirst($label));
@@ -155,5 +155,5 @@ function rules_php_evaluator_help($var_info, $action_help = FALSE) {
 }
 
 /**
- * @}
+ * @} End of "addtogroup rules"
  */

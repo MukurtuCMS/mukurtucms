@@ -33,30 +33,21 @@ function ma_dictionary_user_default_permissions() {
   // Exported permission: 'clear import_dictionary_word_additional_entries feeds'.
   $permissions['clear import_dictionary_word_additional_entries feeds'] = array(
     'name' => 'clear import_dictionary_word_additional_entries feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 
   // Exported permission: 'clear import_dictionary_word_lists feeds'.
   $permissions['clear import_dictionary_word_lists feeds'] = array(
     'name' => 'clear import_dictionary_word_lists feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 
   // Exported permission: 'clear import_dictionary_words feeds'.
   $permissions['clear import_dictionary_words feeds'] = array(
     'name' => 'clear import_dictionary_words feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'feeds',
   );
 

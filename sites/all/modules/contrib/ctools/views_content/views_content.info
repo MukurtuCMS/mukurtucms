@@ -10,8 +10,8 @@ files[] = plugins/views/views_content_plugin_display_panel_pane.inc
 files[] = plugins/views/views_content_plugin_style_ctools_context.inc
 files[] = tests/src/views_content.test
 
-; Information added by Drupal.org packaging script on 2021-01-30
-version = "7.x-1.19"
+; Information added by Drupal.org packaging script on 2022-01-19
+version = "7.x-1.20"
 core = "7.x"
 project = "ctools"
-datestamp = "1611988843"
+datestamp = "1642577347"

@@ -83,28 +83,43 @@ function date_api_status() {
 
   $value = variable_get('date_default_timezone');
   if (isset($value)) {
-    $success_messages[] = $t('The timezone has been set to <a href="@regional_settings">@timezone</a>.', array('@regional_settings' => url('admin/config/regional/settings'), '@timezone' => $value));
+    $success_messages[] = $t('The timezone has been set to <a href="@regional_settings">@timezone</a>.', array(
+      '@regional_settings' => url('admin/config/regional/settings'),
+      '@timezone' => $value,
+    ));
   }
   else {
-    $error_messages[] = $t('The Date API requires that you set up the <a href="@regional_settings">site timezone</a> to function correctly.', array('@regional_settings' => url('admin/config/regional/settings')));
+    $error_messages[] = $t('The Date API requires that you set up the <a href="@regional_settings">site timezone</a> to function correctly.', array(
+      '@regional_settings' => url('admin/config/regional/settings'),
+    ));
   }
 
   $value = variable_get('date_first_day');
   if (isset($value)) {
     $days = date_week_days();
-    $success_messages[] = $t('The first day of the week has been set to <a href="@regional_settings">@day</a>.', array('@regional_settings' => url('admin/config/regional/settings'), '@day' => $days[$value]));
+    $success_messages[] = $t('The first day of the week has been set to <a href="@regional_settings">@day</a>.', array(
+      '@regional_settings' => url('admin/config/regional/settings'),
+      '@day' => $days[$value],
+    ));
   }
   else {
-    $error_messages[] = $t('The Date API requires that you set up the <a href="@regional_settings">site first day of week settings</a> to function correctly.', array('@regional_settings' => url('admin/config/regional/settings')));
+    $error_messages[] = $t('The Date API requires that you set up the <a href="@regional_settings">site first day of week settings</a> to function correctly.', array(
+      '@regional_settings' => url('admin/config/regional/settings'),
+    ));
   }
 
   $value = variable_get('date_format_medium');
   if (isset($value)) {
     $now = date_now();
-    $success_messages[] = $t('The medium date format type has been set to @value. You may find it helpful to add new format types like Date, Time, Month, or Year, with appropriate formats, at <a href="@regional_date_time">Date and time</a> settings.', array('@value' => $now->format($value), '@regional_date_time' => url('admin/config/regional/date-time')));
+    $success_messages[] = $t('The medium date format type has been set to @value. You may find it helpful to add new format types like Date, Time, Month, or Year, with appropriate formats, at <a href="@regional_date_time">Date and time</a> settings.', array(
+      '@value' => $now->format($value),
+      '@regional_date_time' => url('admin/config/regional/date-time'),
+    ));
   }
   else {
-    $error_messages[] = $t('The Date API requires that you set up the <a href="@regional_date_time">system date formats</a> to function correctly.', array('@regional_date_time' => url('admin/config/regional/date-time')));
+    $error_messages[] = $t('The Date API requires that you set up the <a href="@regional_date_time">system date formats</a> to function correctly.', array(
+      '@regional_date_time' => url('admin/config/regional/date-time'),
+    ));
   }
 
   return array('errors', $error_messages, 'success' => $success_messages);
@@ -200,7 +215,7 @@ class DateObject extends DateTime {
    *   PHP date() type format for parsing. Doesn't support timezones; if you
    *   have a timezone, send NULL and the default constructor method will
    *   hopefully parse it. $format is recommended in order to use negative or
-   *   large years, which php's parser fails on.
+   *   large years, which PHP's parser fails on.
    */
   public function __construct($time = 'now', $tz = NULL, $format = NULL) {
     $this->timeOnly = FALSE;
@@ -221,7 +236,7 @@ class DateObject extends DateTime {
     // Special handling for Unix timestamps expressed in the local timezone.
     // Create a date object in UTC and convert it to the local timezone. Don't
     // try to turn things like '2010' with a format of 'Y' into a timestamp.
-    if (!is_array($time) && ctype_digit((string)$time) && (empty($format) || $format == 'U')) {
+    if (!is_array($time) && preg_match('`^-?\d+$`', $time) && (empty($format) || $format == 'U')) {
       // Assume timestamp.
       $time = "@" . $time;
       $date = new DateObject($time, 'UTC');
@@ -650,12 +665,18 @@ class DateObject extends DateTime {
         case 'j':
           $final_date['day'] = intval($value);
           $this->addGranularity('day');
+          if (empty($value)) {
+            $this->errors['day'] = t('The day is invalid.');
+          }
           break;
 
         case 'n':
         case 'm':
           $final_date['month'] = intval($value);
           $this->addGranularity('month');
+          if (empty($value)) {
+            $this->errors['month'] = t('The month is invalid.');
+          }
           break;
 
         case 'F':
@@ -746,14 +767,13 @@ class DateObject extends DateTime {
     $this->errors += $this->arrayErrors($final_date);
     $granularity = drupal_map_assoc($this->granularity);
 
-    // If the input value is '0000-00-00', PHP's date class will later
-    // incorrectly convert it to something like '-0001-11-30' if we do setDate()
-    // here. If we don't do setDate() here, it will default to the current date
-    // and we will lose any way to tell that there was no date in the orignal
-    // input values. So set a flag we can use later to tell that this date
-    // object was created using only time values, and that the date values are
-    // artifical.
-    if (empty($final_date['year']) && empty($final_date['month']) && empty($final_date['day'])) {
+    // If the input year value is empty or '0000', PHP's date class will later
+    // incorrectly convert it if we do setDate() here. If we don't do setDate()
+    // here, it will default to the current date and we will lose any way to
+    // tell that there was no date in the original input value(s). So set a
+    // flag we can use later to tell that this date object was created using
+    // only time values, and that the date values are artificial.
+    if (empty($final_date['year'])) {
       $this->timeOnly = TRUE;
     }
     elseif (empty($this->errors)) {
@@ -770,10 +790,10 @@ class DateObject extends DateTime {
       $this->setDate($final_date['year'], $final_date['month'], $final_date['day']);
     }
 
-    if (!isset($final_date['hour']) && !isset($final_date['minute']) && !isset($final_date['second'])) {
+    if (empty($final_date['hour']) && empty($final_date['minute']) && empty($final_date['second'])) {
       $this->dateOnly = TRUE;
     }
-    elseif (empty($this->errors)) {
+    if (empty($this->errors)) {
       $this->setTime($final_date['hour'], $final_date['minute'], $final_date['second']);
     }
     return $this;
@@ -1782,24 +1802,38 @@ function date_format_date($date, $type = 'medium', $format = '', $langcode = NUL
     $c = $format[$i];
     switch ($c) {
       case 'l':
-        $datestring .= t($date->format('l'), array(), array('context' => '', 'langcode' => $langcode));
+        $datestring .= t($date->format('l'), array(), array(
+          'context' => '',
+          'langcode' => $langcode,
+        ));
         break;
 
       case 'D':
-        $datestring .= t($date->format('D'), array(), array('context' => '', 'langcode' => $langcode));
+        $datestring .= t($date->format('D'), array(), array(
+          'context' => '',
+          'langcode' => $langcode,
+        ));
         break;
 
       case 'F':
-        $datestring .= t($date->format('F'), array(), array('context' => 'Long month name', 'langcode' => $langcode));
+        $datestring .= t($date->format('F'), array(), array(
+          'context' => 'Long month name',
+          'langcode' => $langcode,
+        ));
         break;
 
       case 'M':
-        $datestring .= t($date->format('M'), array(), array('langcode' => $langcode));
+        $datestring .= t($date->format('M'), array(), array(
+          'langcode' => $langcode,
+        ));
         break;
 
       case 'A':
       case 'a':
-        $datestring .= t($date->format($c), array(), array('context' => 'ampm', 'langcode' => $langcode));
+        $datestring .= t($date->format($c), array(), array(
+          'context' => 'ampm',
+          'langcode' => $langcode,
+        ));
         break;
 
       // The timezone name translations can use t().
@@ -2527,17 +2561,70 @@ function date_api_theme($existing, $type, $theme, $path) {
     'date_textfield_element' => $base + array('render element' => 'element'),
     'date_part_hour_prefix' => $base + array('render element' => 'element'),
     'date_part_minsec_prefix' => $base + array('render element' => 'element'),
-    'date_part_label_year' => $base + array('variables' => array('date_part' => NULL, 'element' => NULL)),
-    'date_part_label_month' => $base + array('variables' => array('date_part' => NULL, 'element' => NULL)),
-    'date_part_label_day' => $base + array('variables' => array('date_part' => NULL, 'element' => NULL)),
-    'date_part_label_hour' => $base + array('variables' => array('date_part' => NULL, 'element' => NULL)),
-    'date_part_label_minute' => $base + array('variables' => array('date_part' => NULL, 'element' => NULL)),
-    'date_part_label_second' => $base + array('variables' => array('date_part' => NULL, 'element' => NULL)),
-    'date_part_label_ampm' => $base + array('variables' => array('date_part' => NULL, 'element' => NULL)),
-    'date_part_label_timezone' => $base + array('variables' => array('date_part' => NULL, 'element' => NULL)),
-    'date_part_label_date' => $base + array('variables' => array('date_part' => NULL, 'element' => NULL)),
-    'date_part_label_time' => $base + array('variables' => array('date_part' => NULL, 'element' => NULL)),
-    'date_views_filter_form' => $base + array('template' => 'date-views-filter-form', 'render element' => 'form'),
+    'date_part_label_year' => $base + array(
+      'variables' => array(
+        'date_part' => NULL,
+        'element' => NULL,
+      ),
+    ),
+    'date_part_label_month' => $base + array(
+      'variables' => array(
+        'date_part' => NULL,
+        'element' => NULL,
+      ),
+    ),
+    'date_part_label_day' => $base + array(
+      'variables' => array(
+        'date_part' => NULL,
+        'element' => NULL,
+      ),
+    ),
+    'date_part_label_hour' => $base + array(
+      'variables' => array(
+        'date_part' => NULL,
+        'element' => NULL,
+      ),
+    ),
+    'date_part_label_minute' => $base + array(
+      'variables' => array(
+        'date_part' => NULL,
+        'element' => NULL,
+      ),
+    ),
+    'date_part_label_second' => $base + array(
+      'variables' => array(
+        'date_part' => NULL,
+        'element' => NULL,
+      ),
+    ),
+    'date_part_label_ampm' => $base + array(
+      'variables' => array(
+        'date_part' => NULL,
+        'element' => NULL,
+      ),
+    ),
+    'date_part_label_timezone' => $base + array(
+      'variables' => array(
+        'date_part' => NULL,
+        'element' => NULL,
+      ),
+    ),
+    'date_part_label_date' => $base + array(
+      'variables' => array(
+        'date_part' => NULL,
+        'element' => NULL,
+      ),
+    ),
+    'date_part_label_time' => $base + array(
+      'variables' => array(
+        'date_part' => NULL,
+        'element' => NULL,
+      ),
+    ),
+    'date_views_filter_form' => $base + array(
+      'template' => 'date-views-filter-form',
+      'render element' => 'form',
+    ),
     'date_calendar_day' => $base + array('variables' => array('date' => NULL)),
     'date_time_ago' => $base + array(
       'variables' => array(

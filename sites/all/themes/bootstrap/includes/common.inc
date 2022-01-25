@@ -2,22 +2,21 @@
 
 /**
  * @file
- * List of common helper functions for use in Bootstrap based themes.
+ * List of common helper functions for use in Drupal Bootstrap based themes.
  */
 
-define('BOOTSTRAP_VERSION_MAJOR', 3);
-define('BOOTSTRAP_VERSION_MINOR', 4);
-define('BOOTSTRAP_VERSION_PATCH', 0);
-define('BOOTSTRAP_VERSION', BOOTSTRAP_VERSION_MAJOR . '.' . BOOTSTRAP_VERSION_MINOR . '.' . BOOTSTRAP_VERSION_PATCH);
-
 /**
- * @defgroup subtheme_helper_functions Helper Functions
- * @ingroup subtheme
+ * @defgroup utility Utilities
  *
  * List of common helper functions for use in Drupal Bootstrap based themes.
  *
  * @{
  */
+
+define('BOOTSTRAP_VERSION_MAJOR', 3);
+define('BOOTSTRAP_VERSION_MINOR', 4);
+define('BOOTSTRAP_VERSION_PATCH', 1);
+define('BOOTSTRAP_VERSION', BOOTSTRAP_VERSION_MAJOR . '.' . BOOTSTRAP_VERSION_MINOR . '.' . BOOTSTRAP_VERSION_PATCH);
 
 /**
  * Converts an element description into a tooltip based on certain criteria.
@@ -135,6 +134,47 @@ function bootstrap_element_smart_description(array &$element, array &$target = N
 }
 
 /**
+ * Retrieves a plugin that uses backported CDN Provider logic from 8.x-3.x.
+ *
+ * @param string $theme
+ *   The name of a given theme; defaults to the currently active theme.
+ *
+ * @return \Drupal\bootstrap\Backport\Plugin\Provider\ProviderBase|false
+ *   A CDN Provider instance or FALSE if provider cannot use backported code.
+ */
+function _bootstrap_backport_cdn_provider($theme = NULL, $provider = NULL) {
+  /** @var \Drupal\bootstrap\Backport\Plugin\Provider\ProviderBase[] $providers */
+  static $providers = array();
+
+  // If no key is given, use the current theme if we can determine it.
+  if (!isset($theme)) {
+    $theme = !empty($GLOBALS['theme_key']) ? $GLOBALS['theme_key'] : '';
+  }
+
+  if (!isset($provider)) {
+    $provider = bootstrap_setting('cdn_provider', $theme);
+  }
+
+  if (!isset($providers[$theme][$provider])) {
+    $providers[$theme][$provider]  = FALSE;
+    if (bootstrap_setting('cdn_use_backported_code', $theme, 'bootstrap', TRUE)) {
+      if ($provider === 'jsdelivr') {
+        require_once __DIR__ . '/cdn/ProviderBase.php';
+        require_once __DIR__ . '/cdn/JsDelivr.php';
+        $providers[$theme][$provider] = new \Drupal\bootstrap\Backport\Plugin\Provider\JsDelivr();
+      }
+      elseif ($provider === 'custom') {
+        require_once __DIR__ . '/cdn/ProviderBase.php';
+        require_once __DIR__ . '/cdn/Custom.php';
+        $providers[$theme][$provider] = new \Drupal\bootstrap\Backport\Plugin\Provider\Custom();
+      }
+    }
+  }
+
+  return $providers[$theme][$provider];
+}
+
+/**
  * Retrieves CDN assets for the active provider, if any.
  *
  * @param string|array $type
@@ -153,6 +193,8 @@ function bootstrap_element_smart_description(array &$element, array &$target = N
  *   is returned keyed by the type.
  */
 function bootstrap_get_cdn_assets($type = NULL, $provider = NULL, $theme = NULL) {
+  bootstrap_include('bootstrap', 'includes/cdn.inc');
+
   $original_type = $type;
   $assets = array();
   $types = array();
@@ -178,24 +220,43 @@ function bootstrap_get_cdn_assets($type = NULL, $provider = NULL, $theme = NULL)
     $provider = bootstrap_setting('cdn_provider', $theme);
   }
 
-  // Load the CDN provider data.
-  bootstrap_include('bootstrap', 'includes/cdn.inc');
-  if (!empty($provider) && ($data = bootstrap_cdn_provider($provider))) {
-    // Alter the assets based on provider.
-    $function = 'bootstrap_bootstrap_cdn_provider_' . $provider . '_assets_alter';
-    if (function_exists($function)) {
-      $function($data, $theme);
-    }
-    // Iterate over each type.
-    foreach ($types as $type) {
-      if (variable_get("preprocess_$type", FALSE) && !empty($data['min'][$type])) {
-        $assets[$type] = $data['min'][$type];
-      }
-      elseif (!empty($data[$type])) {
-        $assets[$type] = $data[$type];
-      }
-    }
+  // Immediately return if there's no provider set.
+  if (empty($provider)) {
+    return array();
   }
+
+  // Check if the backported 8.x-3.x jsDelivr code should be used.
+  if ($provider = _bootstrap_backport_cdn_provider($theme, $provider)) {
+    $framework = array();
+    $provider->alterFrameworkLibrary($framework);
+    $assets = array_map(function ($data) {
+      $assets = array();
+      foreach ($data as $info) {
+        if (isset($info['data'])) {
+          $assets[] = $info['data'];
+        }
+      }
+      return $assets;
+    }, array_intersect_key($framework, array_flip($types)));
+  }
+  // Otherwise, use the legacy CDN provider code.
+  else {
+    if (!empty($provider) && ($data = bootstrap_cdn_provider($provider))) {
+      // Alter the assets based on provider.
+      $function = 'bootstrap_bootstrap_cdn_provider_' . $provider . '_assets_alter';
+      if (function_exists($function)) {
+        $function($data, $theme);
+      }
+      // Iterate over each type.
+      foreach ($types as $type) {
+        if (variable_get("preprocess_$type", FALSE) && !empty($data['min'][$type])) {
+          $assets[$type] = $data['min'][$type];
+        }
+        elseif (!empty($data[$type])) {
+          $assets[$type] = $data[$type];
+        }
+      }
+    }  }
 
   return is_string($original_type) ? $assets[$original_type] : $assets;
 }
@@ -286,15 +347,30 @@ function bootstrap_get_theme_info($theme_key = NULL, $key = NULL, $base_themes =
  *   Name of the theme to use for base path.
  * @param string $path
  *   Path relative to $theme.
+ *
+ * @return string|false
+ *   The absolute path to the include file or FALSE if it doesn't exist.
  */
 function bootstrap_include($theme, $path) {
+  static $included = array();
   static $themes = array();
+
   if (!isset($themes[$theme])) {
     $themes[$theme] = drupal_get_path('theme', $theme);
   }
-  if ($themes[$theme] && ($file = DRUPAL_ROOT . '/' . $themes[$theme] . '/' . $path) && file_exists($file)) {
-    include_once $file;
+
+  if (!isset($included["$theme:$path"])) {
+    $file = DRUPAL_ROOT . '/' . $themes[$theme] . '/' . $path;
+    if (file_exists($file)) {
+      include_once $file;
+    }
+    else {
+      $file = FALSE;
+    }
+    $included["$theme:$path"] = $file;
   }
+
+  return $included["$theme:$path"];
 }
 
 /**
@@ -361,6 +437,40 @@ function bootstrap_setting($name, $theme = NULL, $prefix = 'bootstrap', $default
 
   }
   return isset($setting) ? $setting : $default;
+}
+
+/**
+ * Sets a theme setting.
+ *
+ * @param string $name
+ *   The name of the setting to set.
+ * @param mixed $value
+ *   The value of the setting to set.
+ * @param string $prefix
+ *   The prefix used on the $name of the setting, this will be appended with
+ *   "_" automatically if set.
+ * @param string $theme
+ *   The name of a given theme; defaults to the currently active theme.
+ */
+function _bootstrap_set_setting($name, $value, $prefix = 'bootstrap', $theme = NULL) {
+  // If no key is given, use the current theme if we can determine it.
+  if (!isset($theme)) {
+    $theme = !empty($GLOBALS['theme_key']) ? $GLOBALS['theme_key'] : '';
+  }
+
+  // Trigger at least once so it can populate defaults.
+  theme_get_setting('', $theme);
+
+  // Retrieve the cached settings.
+  $cache = &drupal_static('theme_get_setting', array());
+  $settings = $cache[$theme];
+
+  // Set the value.
+  $prefix = !empty($prefix) ? $prefix . '_' : '';
+  $settings["$prefix$name"] = $value;
+
+  // Set the settings.
+  variable_set('theme_' . $theme . '_settings', $settings);
 }
 
 /**
@@ -536,6 +646,24 @@ function _bootstrap_get_base_themes($theme_key = NULL, $include_theme_key = FALS
     $themes[$theme_key][] = $theme_key;
   }
   return $themes[$theme_key];
+}
+
+/**
+ * Retrieves the full base/sub-theme ancestry of a theme.
+ *
+ * @param string $theme_key
+ *   The machine name of the theme to check, if not set the active theme name
+ *   will be used.
+ * @param bool $reverse
+ *   Whether or not to return the array of themes in reverse order, where the
+ *   active theme is the first entry.
+ *
+ * @return string[]
+ *   An array of theme names.
+ */
+function _bootstrap_get_ancestry($theme_key = NULL, $reverse = FALSE) {
+  $ancestry = _bootstrap_get_base_themes($theme_key, TRUE);
+  return $reverse ? array_reverse($ancestry) : $ancestry;
 }
 
 /**
@@ -924,6 +1052,7 @@ function _bootstrap_glyphicons($version = NULL) {
     $versions['3.3.6'] = $versions['3.3.5'];
     $versions['3.3.7'] = $versions['3.3.6'];
     $versions['3.4.0'] = $versions['3.3.7'];
+    $versions['3.4.1'] = $versions['3.4.0'];
   }
 
   // Return a specific versions icon set.
@@ -1424,5 +1553,5 @@ function _bootstrap_use_path_breadcrumbs($theme = NULL) {
 }
 
 /**
- * @} End of "defgroup subtheme_helper_functions".
+ * @} End of "ingroup utility".
  */

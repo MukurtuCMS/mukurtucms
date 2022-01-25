@@ -26,6 +26,11 @@
     var selector = '.view-dom-id-' + settings.view_dom_id;
     this.$view = $(selector);
 
+    // If view is not present return to prevent errors.
+    if (!this.$view.length) {
+      return;
+    }
+
     // Retrieve the path to use for views' ajax.
     var ajax_path = Drupal.settings.views.ajax_path;
 
@@ -142,8 +147,11 @@
     // than the usual location.
     $.extend(viewData, Drupal.Views.parseViewArgs(href, this.settings.view_base_path));
 
-    this.element_settings.submit = viewData;
-    this.pagerAjax = new Drupal.ajax(false, $link, this.element_settings);
+    // Construct an object using the element settings defaults,
+    // then overriding submit with viewData.
+    var pager_settings = $.extend({}, this.element_settings);
+    pager_settings.submit = viewData;
+    this.pagerAjax = new Drupal.ajax(false, $link, pager_settings);
     this.links.push(this.pagerAjax);
   };
 

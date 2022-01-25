@@ -943,6 +943,10 @@ class view extends views_db_object {
       $this->base_database = $views_data['table']['base']['database'];
     }
 
+    if (empty($this->display_handler)) {
+      return FALSE;
+    }
+
     // Load the options.
     $query_options = $this->display_handler->get_option('query');
 

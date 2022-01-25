@@ -185,10 +185,10 @@ function date_views_set_timezone(&$date_handler, &$view, $field) {
  * @param array $extra_params
  *   An extra parameters.
  *
- * @return null/string
+ * @return null|string
  *   Return a query or NULL.
  */
-function date_views_querystring($view, $extra_params = array()) {
+function date_views_querystring($view, array $extra_params = array()) {
   $query_params = array_merge($_GET, $extra_params);
 
   // Allow NULL params to be removed from the query string.

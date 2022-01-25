@@ -146,5 +146,5 @@ class RulesTaxonomyEventHandler extends RulesEventHandlerEntityBundle {
 }
 
 /**
- * @}
+ * @} End of "addtogroup rules"
  */

@@ -148,5 +148,5 @@ function rules_path_clean_pathauto($path) {
 }
 
 /**
- * @}
+ * @} End of "addtogroup rules"
  */

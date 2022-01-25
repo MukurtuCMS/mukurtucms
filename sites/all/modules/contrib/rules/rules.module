@@ -229,7 +229,7 @@ function rules_log($msg, $args = array(), $priority = RulesLog::INFO, RulesPlugi
   if (!isset($settings)) {
     $settings['rules_log_errors'] = variable_get('rules_log_errors', RulesLog::WARN);
     $settings['rules_debug_log'] = variable_get('rules_debug_log', FALSE);
-    $settings['rules_debug'] = variable_get('rules_debug', FALSE);
+    $settings['rules_debug'] = variable_get('rules_debug', 0);
   }
 
   if ($priority >= $settings['rules_log_errors']) {
@@ -539,7 +539,7 @@ function rules_import($export, &$error_msg = '') {
  *
  * @see hook_rules_data_info()
  */
-function &rules_wrap_data($data = NULL, $info, $force = FALSE) {
+function &rules_wrap_data($data, $info, $force = FALSE) {
   // If the data is already wrapped, use the existing wrapper.
   if ($data instanceof EntityMetadataWrapper) {
     return $data;
@@ -877,9 +877,6 @@ function rules_hook_info() {
  * from the database. The entities are loaded into memory and will not require
  * database access if loaded again during the same page request.
  *
- * @see hook_entity_info()
- * @see RulesEntityController
- *
  * @param array|false $names
  *   An array of rules configuration names or FALSE to load all.
  * @param array $conditions
@@ -887,6 +884,9 @@ function rules_hook_info() {
  *
  * @return array
  *   An array of rule configurations indexed by their ids.
+ *
+ * @see hook_entity_info()
+ * @see RulesEntityController
  */
 function rules_config_load_multiple($names = array(), $conditions = array()) {
   return entity_load_multiple_by_name('rules_config', $names, $conditions);
@@ -970,14 +970,23 @@ function rules_config_update_dirty_flag($rules_config, $update = TRUE) {
     $rules_config->dirty = FALSE;
     $rules_config->integrityCheck();
     if ($was_dirty) {
-      $variables = array('%label' => $rules_config->label(), '%name' => $rules_config->name, '@plugin' => $rules_config->plugin());
+      $variables = array(
+        '%label' => $rules_config->label(),
+        '%name' => $rules_config->name,
+        '@plugin' => $rules_config->plugin(),
+      );
       watchdog('rules', 'The @plugin %label (%name) was marked dirty, but passes the integrity check now and is active again.', $variables, WATCHDOG_INFO);
     }
   }
   catch (RulesIntegrityException $e) {
     $rules_config->dirty = TRUE;
     if (!$was_dirty) {
-      $variables = array('%label' => $rules_config->label(), '%name' => $rules_config->name, '!message' => $e->getMessage(), '@plugin' => $rules_config->plugin());
+      $variables = array(
+        '%label' => $rules_config->label(),
+        '%name' => $rules_config->name,
+        '!message' => $e->getMessage(),
+        '@plugin' => $rules_config->plugin(),
+      );
       watchdog('rules', 'The @plugin %label (%name) fails the integrity check and cannot be executed. Error: !message', $variables, WATCHDOG_ERROR);
     }
   }
@@ -1061,7 +1070,7 @@ function rules_invoke_event() {
 /**
  * Invokes configured rules for the given event.
  *
- * @param $event_name
+ * @param string $event_name
  *   The event's name.
  * @param array $args
  *   An array of parameters for the variables provided by the event, as defined
@@ -1187,7 +1196,8 @@ function rules_array_key($array) {
  * Can be used as 'cleaning callback' for action or condition parameters.
  *
  * @param $replacements
- *   An array of token replacements that need to be "cleaned" for use in the URL.
+ *   An array of token replacements that need to be "cleaned"
+ *   for use in the URL.
  * @param array $data
  *   An array of objects used to generate the replacements.
  * @param array $options
@@ -1280,7 +1290,7 @@ function rules_permission() {
 }
 
 /**
- * Helper function to get all the permissions for components that have access exposed.
+ * Helper function return permissions for components that have access exposed.
  */
 function rules_permissions_by_component(array $components = array()) {
   $perms = array();
@@ -1677,7 +1687,15 @@ function rules_token_info() {
   $cache = rules_get_cache();
   $data_info = $cache['data_info'];
 
-  $types = array('text', 'integer', 'uri', 'token', 'decimal', 'date', 'duration');
+  $types = array(
+    'text',
+    'integer',
+    'uri',
+    'token',
+    'decimal',
+    'date',
+    'duration',
+  );
 
   foreach ($types as $type) {
     $token_type = $data_info[$type]['token type'];

@@ -120,7 +120,7 @@ function rules_action_data_calc_info_alter(&$element_info, RulesPlugin $element)
 /**
  * Action: Add a list item.
  */
-function rules_action_data_list_add($list, $item, $unique = FALSE, $pos = 'end', $settings, $state) {
+function rules_action_data_list_add($list, $item, $unique, $pos, $settings, $state) {
   // Optionally, only add the list item if it is not yet contained.
   if ($unique && rules_condition_data_list_contains($list, $item, $settings, $state)) {
     return;
@@ -337,7 +337,7 @@ function rules_action_data_create_info_alter(&$element_info, RulesAbstractPlugin
 /**
  * Creation callback for array structured data.
  */
-function rules_action_data_create_array($values = array(), $type) {
+function rules_action_data_create_array($values, $type) {
   // $values is an array already, so we can just pass it to the wrapper.
   return rules_wrap_data($values, array('type' => $type));
 }
@@ -406,7 +406,7 @@ function rules_condition_data_list_contains($list, $item, $settings, $state) {
 /**
  * Condition: List count comparison.
  */
-function rules_condition_data_list_count_is($list, $op = '==', $value) {
+function rules_condition_data_list_count_is($list, $op, $value) {
   switch ($op) {
     case '==':
       return count($list) == $value;
@@ -460,5 +460,5 @@ function rules_data_text_comparison($text, $text2, $op = 'contains') {
 }
 
 /**
- * @}
+ * @} End of "addtogroup rules"
  */

@@ -270,7 +270,7 @@ class backup_migrate_destination_filesource extends backup_migrate_source {
 
     // Alert the user to any errors there might have been.
     if ($errors) {
-      if (count($errors < 5)) {
+      if (count($errors) < 5) {
         $filesmsg = t('The following files: !files', array('!files' => theme('item_list', array('items' => $errors))));
       }
       else {

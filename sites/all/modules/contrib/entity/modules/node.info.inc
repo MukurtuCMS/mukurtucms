@@ -149,6 +149,7 @@ function entity_metadata_node_entity_property_info() {
 
 /**
  * Implements hook_entity_property_info_alter() on top of node module.
+ *
  * @see entity_metadata_entity_property_info_alter()
  */
 function entity_metadata_node_entity_property_info_alter(&$info) {

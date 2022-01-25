@@ -59,24 +59,24 @@
 function theme_date_display_combination($variables) {
   static $repeating_ids = array();
 
-  $entity_type = $variables['entity_type'];
-  $entity      = $variables['entity'];
-  $field       = $variables['field'];
-  $instance    = $variables['instance'];
-  $langcode    = $variables['langcode'];
-  $item        = $variables['item'];
-  $delta       = $variables['delta'];
-  $display     = $variables['display'];
-  $field_name  = $field['field_name'];
-  $formatter   = $display['type'];
-  $options     = $display['settings'];
-  $dates       = $variables['dates'];
-  $attributes  = $variables['attributes'];
-  $rdf_mapping = $variables['rdf_mapping'];
-  $add_rdf     = $variables['add_rdf'];
-  $microdata   = $variables['microdata'];
+  $entity_type   = $variables['entity_type'];
+  $entity        = $variables['entity'];
+  $field         = $variables['field'];
+  $instance      = $variables['instance'];
+  $langcode      = $variables['langcode'];
+  $item          = $variables['item'];
+  $delta         = $variables['delta'];
+  $display       = $variables['display'];
+  $field_name    = $field['field_name'];
+  $formatter     = $display['type'];
+  $options       = $display['settings'];
+  $dates         = $variables['dates'];
+  $attributes    = $variables['attributes'];
+  $rdf_mapping   = $variables['rdf_mapping'];
+  $add_rdf       = $variables['add_rdf'];
+  $microdata     = $variables['microdata'];
   $add_microdata = $variables['add_microdata'];
-  $precision   = date_granularity_precision($field['settings']['granularity']);
+  $precision     = date_granularity_precision($field['settings']['granularity']);
 
   $output = '';
 
@@ -129,8 +129,8 @@ function theme_date_display_combination($variables) {
   if (!isset($dates['value2']['formatted_time'])) {
     $dates['value2']['formatted_time'] = '';
   }
-  if (!isset($dates['value1']['formatted_timezone'])) {
-    $dates['value1']['formatted_timezone'] = '';
+  if (!isset($dates['value']['formatted_timezone'])) {
+    $dates['value']['formatted_timezone'] = '';
   }
   if (!isset($dates['value2']['formatted_timezone'])) {
     $dates['value2']['formatted_timezone'] = '';

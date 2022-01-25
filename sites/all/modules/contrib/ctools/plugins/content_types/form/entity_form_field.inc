@@ -162,6 +162,13 @@ function ctools_entity_form_field_content_type_admin_title($subtype, $conf, $con
 
   if (!empty($context->restrictions)) {
     $field = field_info_instance($entity_type, $field_name, $context->restrictions['type'][0]);
+
+    // Check for field groups.
+    if (empty($field) && module_exists('field_group')) {
+      $groups = field_group_info_groups($entity_type, $context->restrictions['type'][0], 'form');
+      $group = !empty($groups[$field_name]) ? $groups[$field_name] : NULL;
+      $field = array('label' => isset($group->label) ? $group->label : $subtype);
+    }
   }
   else {
     $field = array('label' => $subtype);

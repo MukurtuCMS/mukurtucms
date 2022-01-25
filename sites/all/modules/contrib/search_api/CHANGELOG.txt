@@ -1,3 +1,13 @@
+Search API 1.28 (2021-07-19):
+-----------------------------
+- #3208036 by DamienMcKenna, Taran2L, drunken monkey: Fixed PHP 8.0
+  compatibility.
+- #2159827 by mh86, drunken monkey, farse: Fixed wrong search base paths in
+  Facet API adapter.
+- #3154538 by isholgueras, drunken monkey: Fixed exception handling in
+  datasource tracking methods.
+- #2104623 by drunken monkey: Fixed facet filters for multi-valued date fields.
+
 Search API 1.27 (2021-02-01):
 -----------------------------
 - #3178035 by mvc, drunken monkey: Fixed OR facets for non-numeric hierarchical

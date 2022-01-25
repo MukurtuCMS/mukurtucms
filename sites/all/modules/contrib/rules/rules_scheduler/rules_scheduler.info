@@ -1,6 +1,6 @@
 name = Rules Scheduler
 description = Schedule the execution of Rules components using actions.
-dependencies[] = rules
+dependencies[] = rules:rules
 package = Rules
 core = 7.x
 files[] = includes/rules_scheduler.handler.inc
@@ -12,8 +12,8 @@ files[] = includes/rules_scheduler_views_filter.inc
 files[] = tests/rules_scheduler.test
 files[] = tests/rules_scheduler_test.inc
 
-; Information added by Drupal.org packaging script on 2019-01-24
-version = "7.x-2.12"
+; Information added by Drupal.org packaging script on 2021-12-02
+version = "7.x-2.13"
 core = "7.x"
 project = "rules"
-datestamp = "1548305586"
+datestamp = "1638479566"

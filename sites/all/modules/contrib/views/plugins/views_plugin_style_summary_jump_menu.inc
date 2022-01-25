@@ -79,7 +79,7 @@ class views_plugin_style_summary_jump_menu extends views_plugin_style {
       '#type' => 'textfield',
       '#title' => t('Selector label'),
       '#default_value' => $this->options['label'],
-      '#description' => t('The text that will appear as the the label of the selector element. If blank no label tag will be used.'),
+      '#description' => t('The text that will appear as the label of the selector element. If blank no label tag will be used.'),
     );
 
     $form['choose'] = array(

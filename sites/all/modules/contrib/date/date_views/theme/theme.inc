@@ -69,7 +69,12 @@ function template_preprocess_date_views_pager(&$vars) {
     $prev_date = $date_info->prev_date;
     $next_date = $date_info->next_date;
 
-    $format = array('year' => 'Y', 'month' => 'Y-m', 'day' => 'Y-m-d', 'hour' => 'Y-m-d\TH');
+    $format = array(
+      'year' => 'Y',
+      'month' => 'Y-m',
+      'day' => 'Y-m-d',
+      'hour' => 'Y-m-d\TH',
+    );
     if (!empty($prev_date)) {
       switch ($granularity) {
         case 'week':
@@ -175,7 +180,7 @@ function template_preprocess_date_views_pager(&$vars) {
  * Theme the calendar title.
  */
 function theme_date_nav_title($params) {
-  $title  = '';
+  $title = '';
   $granularity = $params['granularity'];
   $view = $params['view'];
   $date_info = $view->date_info;
