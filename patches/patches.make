@@ -24,6 +24,9 @@ projects[drupal][patch][] = core/multipatch-109315810-109315810-109315810.patch
 ; Redirect on empty database for Reclaim.
 projects[drupal][patch][] = https://www.drupal.org/files/issues/2019-12-19/3077423-11.patch
 
+; Patch for Drush.
+projects[drupal][patch][] = https://drupal.org/files/issues/2019-01-17/3026560-d7-20.patch
+
 ;;;;;;;;;;;;;;;;;;;
 ;; Core Projects ;;
 ;;;;;;;;;;;;;;;;;;;
