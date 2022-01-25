@@ -14,6 +14,7 @@ class backup_migrate_destination_s3 extends backup_migrate_destination_remote {
   public $supported_ops = array('scheduled backup', 'manual backup', 'remote backup', 'restore', 'list files', 'configure', 'delete');
   public $s3 = NULL;
   public $cache_files = TRUE;
+  public $got_library = FALSE;
 
   /**
    * Save to to the s3 destination.
@@ -81,7 +82,13 @@ class backup_migrate_destination_s3 extends backup_migrate_destination_remote {
    */
   public function edit_form() {
     // Check for the library.
+    // @todo Moe this to a constructor.
     $this->s3_object();
+
+    // Do not return the form if library is not found.
+    if (!$this->got_library) {
+      return array();
+    }
 
     $form = parent::edit_form();
     $form['scheme']['#type'] = 'value';
@@ -162,9 +169,19 @@ class backup_migrate_destination_s3 extends backup_migrate_destination_remote {
    *
    */
   public function s3_object() {
-    // Try to use libraries module if available to find the path.
+    $library_paths = array();
+
+    // Try to use the Libraries module if available to find the path.
     if (function_exists('libraries_get_path')) {
-      $library_paths[] = libraries_get_path('s3-php5-curl');
+      // @todo Defne this using hook_libraries().
+      $path = libraries_get_path('s3-php5-curl');
+      if (!empty($path)) {
+        $library_paths[] = $path;
+      }
+      // If the library isn't defined, fall back to the default.
+      else {
+        $library_paths[] = 'sites/all/libraries/s3-php5-curl';
+      }
     }
     else {
       $library_paths[] = 'sites/all/libraries/s3-php5-curl';
@@ -183,10 +200,11 @@ class backup_migrate_destination_s3 extends backup_migrate_destination_remote {
           }
           $this->s3 = new S3($this->dest_url['user'], $this->dest_url['pass'], FALSE, $host);
         }
+        $this->got_library = TRUE;
         return $this->s3;
       }
     }
-    drupal_set_message(t('Due to drupal.org code hosting policies, the S3 library needed to use an S3 destination is no longer distributed with this module. You must download the library from !link and place it in one of these locations: %locations.', array('%locations' => implode(', ', $library_paths), '!link' => l('http://undesigned.org.za/2007/10/22/amazon-s3-php-class', 'http://undesigned.org.za/2007/10/22/amazon-s3-php-class'))), 'error', FALSE);
+    drupal_set_message(t('A library is required to use an S3 destination. Please see <code>README.txt</code> for further instructions. The library could not be found in one of these locations: %locations.', array('%locations' => implode(', ', $library_paths))), 'error', FALSE);
     return NULL;
   }
 

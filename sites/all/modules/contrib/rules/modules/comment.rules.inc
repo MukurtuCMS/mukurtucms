@@ -98,5 +98,5 @@ class RulesCommentEventHandler extends RulesEventHandlerEntityBundle {
 }
 
 /**
- * @}
+ * @} End of "addtogroup rules"
  */

@@ -67,7 +67,7 @@ class CtoolsPluginsGetInfoTestCase extends DrupalWebTestCase {
       '@plugin' => $id,
       '@module' => $module,
       '@type' => $type,
-      '@function' => $func,
+      '@function' => (string) $func,
     )));
   }
 

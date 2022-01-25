@@ -50,7 +50,7 @@ class DateExampleMigration extends XMLMigration {
     $item_id_xpath = 'id';
     $items_class = new MigrateItemsXML($items_url, $item_xpath, $item_id_xpath);
     $this->source = new MigrateSourceMultiItems($items_class, $fields);
-    $this->destination = new MigrateDestinationNode('date_test_feature');
+    $this->destination = new MigrateDestinationNode('date_test');
 
     // Basic fields.
     $this->addFieldMapping('title', 'title')
@@ -93,7 +93,8 @@ class DateExampleMigration extends XMLMigration {
 
     // Unmapped destination fields.
     $this->addUnmigratedDestinations(array('is_new', 'status', 'promote',
-      'revision', 'language', 'sticky', 'created', 'changed', 'revision_uid'));
+      'revision', 'language', 'sticky', 'created', 'changed', 'revision_uid',
+    ));
   }
 
   /**

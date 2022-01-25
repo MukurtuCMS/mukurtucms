@@ -8,7 +8,7 @@
 /**
  * Defines the types of properties to be added as token.
  *
- * @return
+ * @return array
  *   An array mapping token types to the usual (entity) type names.
  */
 function entity_token_types() {
@@ -19,7 +19,7 @@ function entity_token_types() {
 /**
  * Defines a list of token types that need to be chained.
  *
- * @return
+ * @return bool|array
  *   If a (token) type is given, whether the given type needs to be chained.
  *   Else a full list of token types to be chained as returned by
  *   entity_token_token_types().
@@ -316,20 +316,25 @@ function _entity_token_get_token($wrapper, $options) {
   switch ($wrapper->type()) {
     case 'integer':
       return $wrapper->value();
+
     case 'decimal':
       return number_format($wrapper->value(), 2);
+
     case 'date':
       return format_date($wrapper->value(), 'medium', '', NULL, $langcode);
+
     case 'duration':
       return format_interval($wrapper->value(), 2, $langcode);
+
     case 'boolean':
       return $wrapper->value() ? t('true') : t('false');
+
     case 'uri':
     case 'text':
       return $wrapper->value($options);
   }
 
-  // Care for outputing list values.
+  // Care for outputting list values.
   if ($wrapper instanceof EntityListWrapper) {
     $output = array();
     foreach ($wrapper as $item) {

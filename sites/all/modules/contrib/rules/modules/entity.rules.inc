@@ -587,5 +587,5 @@ function rules_condition_entity_is_of_bundle_form_alter(&$form, &$form_state, $o
 }
 
 /**
- * @}
+ * @} End of "addtogroup rules"
  */

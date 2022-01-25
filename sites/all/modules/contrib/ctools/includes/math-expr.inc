@@ -305,7 +305,7 @@ class ctools_math_expr {
 
     // Strip possible semicolons at the end.
     if (substr($expr, -1, 1) == ';') {
-      $expr = substr($expr, 0, -1);
+      $expr = (string) substr($expr, 0, -1);
     }
 
     // Is it a variable assignment?
@@ -345,7 +345,7 @@ class ctools_math_expr {
 
       // Freeze the state of the non-argument variables.
       for ($i = 0; $i < count($stack); $i++) {
-        $token = $stack[$i];
+        $token = (string) $stack[$i];
         if (preg_match('/^[a-z]\w*$/', $token) and !in_array($token, $args)) {
           if (array_key_exists($token, $this->vars)) {
             $stack[$i] = $this->vars[$token];
@@ -432,7 +432,7 @@ class ctools_math_expr {
 
       // Find out if we're currently at the beginning of a number/variable/
       // function/parenthesis/operand.
-      $ex = preg_match('/^([a-z]\w*\(?|\d+(?:\.\d*)?|\.\d+|\()/', substr($expr, $index), $match);
+      $ex = preg_match('/^([a-z]\w*\(?|\d+(?:\.\d*)?|\.\d+|\()/', (string) substr($expr, $index), $match);
 
       // Is it a negation instead of a minus?
       if ($op === '-' and !$expecting_op) {
@@ -487,7 +487,7 @@ class ctools_math_expr {
         }
 
         // Did we just close a function?
-        if (preg_match("/^([a-z]\w*)\($/", $stack->last(2), $matches)) {
+        if (preg_match("/^([a-z]\w*)\($/", (string) $stack->last(2), $matches)) {
 
           // Get the function name.
           $fnn = $matches[1];
@@ -532,7 +532,7 @@ class ctools_math_expr {
       }
       elseif ($ex && !$expecting_op) {
         // Make sure there was a function.
-        if (preg_match("/^([a-z]\w*)\($/", $stack->last(3), $matches)) {
+        if (preg_match("/^([a-z]\w*)\($/", (string) $stack->last(3), $matches)) {
           // Pop the argument expression stuff and push onto the output:
           while (($o2 = $stack->pop()) !== '(') {
             // Oops, never had a '('.
@@ -552,7 +552,7 @@ class ctools_math_expr {
 
         // Do we now have a function/variable/number?
         $expecting_op = TRUE;
-        $val = $match[1];
+        $val = (string) $match[1];
         if (preg_match("/^([a-z]\w*)\($/", $val, $matches)) {
           // May be func, or variable w/ implicit multiplication against
           // parentheses...
@@ -584,7 +584,7 @@ class ctools_math_expr {
       }
       elseif ($op === '"') {
         // Fetch a quoted string.
-        $string = substr($expr, $index);
+        $string = (string) substr($expr, $index);
         if (preg_match('/"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"/s', $string, $matches)) {
           $string = $matches[0];
           // Trim the quotes off:
@@ -723,7 +723,7 @@ class ctools_math_expr {
       }
       // If the token is a function, pop arguments off the stack, hand them to
       // the function, and push the result back on again.
-      elseif (preg_match("/^([a-z]\w*)\($/", $token, $matches)) {
+      elseif (preg_match("/^([a-z]\w*)\($/", (string) $token, $matches)) {
         $fnn = $matches[1];
 
         // Check for a built-in function.

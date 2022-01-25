@@ -273,5 +273,5 @@ function rules_user_account_email_options_list() {
 }
 
 /**
- * @}
+ * @} End of "addtogroup rules"
  */

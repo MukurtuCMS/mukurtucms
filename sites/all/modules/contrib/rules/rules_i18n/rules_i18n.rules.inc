@@ -77,7 +77,10 @@ function rules_i18n_action_t($text) {
 }
 
 /**
- * Implements the form_alter callback for the "Translate a text" action to set a default selector.
+ * Implements hook_form_FORMID_alter() for the action_t form.
+ *
+ * Implements the form_alter callback for the "Translate a text" action
+ * to set a default selector.
  */
 function rules_i18n_action_t_form_alter(&$form, &$form_state, $options, $element) {
   if (isset($form['parameter']['language']['settings']['language:select']) && empty($element->settings['language:select'])) {
@@ -124,6 +127,9 @@ function rules_i18n_rules_evaluator_info() {
  */
 class RulesI18nStringEvaluator extends RulesDataInputEvaluator {
 
+  /**
+   * Access callback.
+   */
   public static function access() {
     return user_access('translate admin strings');
   }

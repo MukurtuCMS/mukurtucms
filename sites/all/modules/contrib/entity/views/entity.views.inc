@@ -123,7 +123,7 @@ function entity_views_data() {
  *   excluded. Defaults to TRUE, as they are available for all views tables for
  *   the entity type anyways.
  *
- * @return
+ * @return array
  *   An array containing the data selection Views table definition for the
  *   entity type.
  *
@@ -372,7 +372,7 @@ class EntityDefaultViewsController {
       $table = $this->info['base table'];
       // Define the base group of this table. Fields that don't
       // have a group defined will go into this field by default.
-      $data[$table]['table']['group']  = drupal_ucfirst($this->info['label']);
+      $data[$table]['table']['group'] = drupal_ucfirst($this->info['label']);
       $data[$table]['table']['entity type'] = $this->type;
 
       // If the plural label isn't available, use the regular label.
@@ -401,7 +401,7 @@ class EntityDefaultViewsController {
 
       // Define the base group of this table. Fields that don't
       // have a group defined will go into this field by default.
-      $data[$revision_table]['table']['group']  = drupal_ucfirst($this->info['label']) . ' ' . t('Revisions');
+      $data[$revision_table]['table']['group'] = drupal_ucfirst($this->info['label']) . ' ' . t('Revisions');
       $data[$revision_table]['table']['entity type'] = $this->type;
 
       // If the plural label isn't available, use the regular label.
@@ -495,7 +495,7 @@ class EntityDefaultViewsController {
       'help' => isset($property_info['description']) ? $property_info['description'] : NULL,
     );
 
-      // Add in relationships to related entities.
+    // Add in relationships to related entities.
     if (($info = entity_get_info($type)) && !empty($info['base table'])) {
 
       // Prepare reversed relationship data.
@@ -543,7 +543,7 @@ class EntityDefaultViewsController {
             'real field' => $views_field_name,
             'handler' => 'views_handler_field',
             'click sortable' => TRUE,
-           ),
+          ),
           'sort' => array(
             'real field' => $views_field_name,
             'handler' => 'views_handler_sort',
@@ -557,7 +557,7 @@ class EntityDefaultViewsController {
             'handler' => 'views_handler_argument_string',
           ),
         );
-      break;
+        break;
 
       case 'decimal':
       case 'integer':
@@ -567,7 +567,7 @@ class EntityDefaultViewsController {
             'handler' => 'views_handler_field_numeric',
             'click sortable' => TRUE,
             'float' => ($type == 'decimal'),
-           ),
+          ),
           'sort' => array(
             'real field' => $views_field_name,
             'handler' => 'views_handler_sort',
@@ -581,7 +581,7 @@ class EntityDefaultViewsController {
             'handler' => 'views_handler_argument_numeric',
           ),
         );
-      break;
+        break;
 
       case 'date':
         $return += $description + array(
@@ -589,7 +589,7 @@ class EntityDefaultViewsController {
             'real field' => $views_field_name,
             'handler' => 'views_handler_field_date',
             'click sortable' => TRUE,
-           ),
+          ),
           'sort' => array(
             'real field' => $views_field_name,
             'handler' => 'views_handler_sort_date',
@@ -603,7 +603,7 @@ class EntityDefaultViewsController {
             'handler' => 'views_handler_argument_date',
           ),
         );
-      break;
+        break;
 
       case 'duration':
         $return += $description + array(
@@ -611,7 +611,7 @@ class EntityDefaultViewsController {
             'real field' => $views_field_name,
             'handler' => 'entity_views_handler_field_duration',
             'click sortable' => TRUE,
-           ),
+          ),
           'sort' => array(
             'real field' => $views_field_name,
             'handler' => 'views_handler_sort',
@@ -625,7 +625,7 @@ class EntityDefaultViewsController {
             'handler' => 'views_handler_argument_numeric',
           ),
         );
-      break;
+        break;
 
       case 'uri':
         $return += $description + array(
@@ -633,7 +633,7 @@ class EntityDefaultViewsController {
             'real field' => $views_field_name,
             'handler' => 'views_handler_field_url',
             'click sortable' => TRUE,
-           ),
+          ),
           'sort' => array(
             'real field' => $views_field_name,
             'handler' => 'views_handler_sort',
@@ -647,7 +647,7 @@ class EntityDefaultViewsController {
             'handler' => 'views_handler_argument_string',
           ),
         );
-      break;
+        break;
 
       case 'boolean':
         $return += $description + array(
@@ -655,7 +655,7 @@ class EntityDefaultViewsController {
             'real field' => $views_field_name,
             'handler' => 'views_handler_field_boolean',
             'click sortable' => TRUE,
-           ),
+          ),
           'sort' => array(
             'real field' => $views_field_name,
             'handler' => 'views_handler_sort',
@@ -669,7 +669,7 @@ class EntityDefaultViewsController {
             'handler' => 'views_handler_argument_string',
           ),
         );
-      break;
+        break;
     }
 
     // If there is an options list callback, add to the filter and field.
@@ -678,7 +678,7 @@ class EntityDefaultViewsController {
       $return['filter']['options callback'] = array('EntityDefaultViewsController', 'optionsListCallback');
       $return['filter']['options arguments'] = array($this->type, $property_name, 'view');
     }
-    // @todo: This class_exists is needed until views 3.2.
+    // @todo This class_exists is needed until views 3.2.
     if (isset($return['field']) && !empty($property_info['options list']) && class_exists('views_handler_field_machine_name')) {
       $return['field']['handler'] = 'views_handler_field_machine_name';
       $return['field']['options callback'] = array('EntityDefaultViewsController', 'optionsListCallback');
@@ -695,7 +695,7 @@ class EntityDefaultViewsController {
    * @param $left_type
    *   The data type from which to join.
    */
-  function getRelationshipHandlerClass($entity_type, $left_type) {
+  public function getRelationshipHandlerClass($entity_type, $left_type) {
     // Look for an entity type which is used as bundle for the given entity
     // type. If there is one, allow filtering the relation by bundle by using
     // our own handler.
@@ -720,4 +720,5 @@ class EntityDefaultViewsController {
     }
     return $wrapper->optionsList($op);
   }
+
 }

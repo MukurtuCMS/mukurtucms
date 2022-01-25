@@ -74,6 +74,13 @@ class views_handler_field extends views_handler {
   public $additional_fields = array();
 
   /**
+   * Keeps track of the last render index.
+   *
+   * @var int|NULL
+   */
+  protected $last_render_index = NULL;
+
+  /**
    * Construct a new field handler.
    */
   public function construct() {
@@ -1072,6 +1079,11 @@ If you would like to have the characters \'[\' and \']\' please use the html ent
    * text-replacement rendering is necessary.
    */
   public function advanced_render($values) {
+    // Clean up values from previous render calls.
+    if ($this->last_render_index != $this->view->row_index) {
+      $this->last_render_text = '';
+    }
+
     if ($this->allow_advanced_render() && method_exists($this, 'render_item')) {
       $raw_items = $this->get_items($values);
       // If there are no items, set the original value to NULL.
@@ -1128,6 +1140,11 @@ If you would like to have the characters \'[\' and \']\' please use the html ent
         $alter['phase'] = VIEWS_HANDLER_RENDER_TEXT_PHASE_EMPTY;
         $this->last_render = $this->render_text($alter);
       }
+    }
+
+    // If we rendered something, update the last render index.
+    if ((string) $this->last_render !== '') {
+      $this->last_render_index = $this->view->row_index;
     }
 
     return $this->last_render;

@@ -180,5 +180,5 @@ function rules_php_eval_return($code, $arguments = array()) {
 }
 
 /**
- * @}
+ * @} End of "addtogroup rules"
  */

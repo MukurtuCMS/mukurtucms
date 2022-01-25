@@ -628,7 +628,22 @@ abstract class SearchApiAbstractDataSourceController implements SearchApiDataSou
           ));
         }
       }
-      $insert->execute();
+      try {
+        $insert->execute();
+      }
+      catch (Exception $e) {
+        $tmp = array_slice($item_ids, 0, 10);
+        $item_ids_string = '"' . implode('", "', $tmp) . '"';
+        $index_names = array();
+        foreach ($indexes as $index) {
+          $index_names[] = $index->name;
+        }
+        $vars = array(
+          '%indexes' => implode(', ', $index_names),
+          '@item_ids' => $item_ids_string,
+        );
+        watchdog_exception('search_api', $e, '%type while tracking item inserts (IDs: @item_ids) on index(es) %indexes: !message in %function (line %line of %file).', $vars);
+      }
     }
   }
 
@@ -652,8 +667,24 @@ abstract class SearchApiAbstractDataSourceController implements SearchApiDataSou
       if ($item_ids !== FALSE) {
         $update->condition($this->itemIdColumn, $item_ids, 'IN');
       }
-      $update->execute();
-      $indexes_by_id[$index->id] = $index;
+      try {
+        $update->execute();
+        $indexes_by_id[$index->id] = $index;
+      }
+      catch (Exception $e) {
+        if ($item_ids === FALSE) {
+          $item_ids_string = t('all');
+        }
+        else {
+          $tmp = array_slice($item_ids, 0, 10);
+          $item_ids_string = '"' . implode('", "', $tmp) . '"';
+        }
+        $vars = array(
+          '%index' => $index->name,
+          '@item_ids' => $item_ids_string,
+        );
+        watchdog_exception('search_api', $e, '%type while tracking item updates (IDs: @item_ids) on index %index: !message in %function (line %line of %file).', $vars);
+      }
     }
 
     // Determine and return the indexes with any changed items. If $item_ids is
@@ -701,13 +732,24 @@ abstract class SearchApiAbstractDataSourceController implements SearchApiDataSou
       return;
     }
     $this->checkIndex($index);
-    db_update($this->table)
-      ->fields(array(
-        $this->changedColumn => 0,
-      ))
-      ->condition($this->itemIdColumn, $item_ids, 'IN')
-      ->condition($this->indexIdColumn, $index->id)
-      ->execute();
+    try {
+      db_update($this->table)
+        ->fields(array(
+          $this->changedColumn => 0,
+        ))
+        ->condition($this->itemIdColumn, $item_ids, 'IN')
+        ->condition($this->indexIdColumn, $index->id)
+        ->execute();
+    }
+    catch (Exception $e) {
+      $tmp = array_slice($item_ids, 0, 10);
+      $item_ids_string = '"' . implode('", "', $tmp) . '"';
+      $vars = array(
+        '%index' => $index->name,
+        '@item_ids' => $item_ids_string,
+      );
+      watchdog_exception('search_api', $e, '%type while tracking indexed items (IDs: @item_ids) on index %index: !message in %function (line %line of %file).', $vars);
+    }
   }
 
   /**
@@ -725,8 +767,19 @@ abstract class SearchApiAbstractDataSourceController implements SearchApiDataSou
       $delete = db_delete($this->table)
         ->condition($this->indexIdColumn, $index->id)
         ->condition($this->itemIdColumn, $item_ids, 'IN');
-      if ($delete->execute()) {
-        $ret[] = $index;
+      try {
+        if ($delete->execute()) {
+          $ret[] = $index;
+        }
+      }
+      catch (Exception $e) {
+        $tmp = array_slice($item_ids, 0, 10);
+        $item_ids_string = '"' . implode('", "', $tmp) . '"';
+        $vars = array(
+          '%index' => $index->name,
+          '@item_ids' => $item_ids_string,
+        );
+        watchdog_exception('search_api', $e, '%type while tracking deleted items (IDs: @item_ids) on index %index: !message in %function (line %line of %file).', $vars);
       }
     }
 

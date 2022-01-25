@@ -4,10 +4,12 @@
  * @file
  * Views date pager test.
  */
+
 /**
- *
+ * Test Date views pager functions.
  */
 class ViewsPagerTestCase extends DrupalWebTestCase {
+
   /**
    * Test info.
    */

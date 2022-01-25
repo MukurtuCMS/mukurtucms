@@ -114,8 +114,8 @@ function file_entity_token_info() {
             $entity_type = 'term';
           }
           $info['tokens'][$entity_type][$field_name] = array(
-            'name' => $field_info['label'],
-            'description' => $field_info['description'],
+            'name' => ($field_info) ? $field_info['label'] : '',
+            'description' => ($field_info) ? $field_info['description'] : '',
             'type' => 'file_field',
             'module' => 'file_entity',
           );

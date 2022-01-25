@@ -54,7 +54,7 @@ function rules_system_event_info() {
 function rules_system_data_info() {
   return array(
     'log_entry' => array(
-      'label' => t('watchdog log entry'),
+      'label' => t('Watchdog log entry'),
       'wrap' => TRUE,
       'property info' => _rules_system_watchdog_log_entry_info(),
     ),
@@ -74,7 +74,7 @@ function _rules_system_watchdog_log_entry_info() {
     ),
     'message' => array(
       'type' => 'text',
-      'label' => ('Log message'),
+      'label' => t('Log message'),
       'getter callback' => 'rules_system_log_get_message',
       'sanitized' => TRUE,
     ),
@@ -126,6 +126,44 @@ function rules_system_action_info() {
         ),
       ),
       'base' => 'rules_action_drupal_message',
+      'access callback' => 'rules_system_integration_access',
+    ),
+    'drupal_watchdog' => array(
+      'label' => t('Logs a message to the system dblog'),
+      'group' => t('System'),
+      'parameter' => array(
+        'type' => array(
+          'type' => 'text',
+          'label' => t('Type'),
+          'description' => t('The category to which this message belongs, displayed in the first column of the dblog.'),
+        ),
+        'message' => array(
+          'type' => 'text',
+          'label' => t('Message'),
+          'description' => t('The text of the message.'),
+          'translatable' => TRUE,
+        ),
+        'severity' => array(
+          'type' => 'token',
+          'label' => t('Severity'),
+          'options list' => 'watchdog_severity_levels',
+          'default value' => WATCHDOG_NOTICE,
+          'optional' => TRUE,
+        ),
+        'link_text' => array(
+          'type' => 'text',
+          'label' => t('Link text'),
+          'description' => t('The text to display for the link (optional)'),
+          'optional' => TRUE,
+        ),
+        'link_path' => array(
+          'type' => 'uri',
+          'label' => t('Link path'),
+          'description' => t('A Drupal path or path alias. Enter (optional) queries after "?" and (optional) anchor after "#".'),
+          'optional' => TRUE,
+        ),
+      ),
+      'base' => 'rules_action_drupal_watchdog',
       'access callback' => 'rules_system_integration_access',
     ),
     'redirect' => array(
@@ -183,7 +221,7 @@ function rules_system_action_info() {
         'to' => array(
           'type' => 'text',
           'label' => t('To'),
-          'description' => t('The e-mail address or addresses where the message will be sent to. The formatting of this string must comply with RFC 2822.'),
+          'description' => t('The e-mail address or addresses where the message will be sent to. The formatting of this string must comply with <a href="http://www.faqs.org/rfcs/rfc2822.html">RFC 2822</a>. Some examples are:<ul><li>user@example.com</li><li>user@example.com, anotheruser@example.com</li><li>User &lt;user@example.com&gt;</li><li>User &lt;user@example.com&gt;, Another User &lt;anotheruser@example.com&gt;</li></ul>'),
         ),
         'subject' => array(
           'type' => 'text',
@@ -303,5 +341,5 @@ function rules_system_evaluator_info() {
 }
 
 /**
- * @}
+ * @} End of "addtogroup rules"
  */

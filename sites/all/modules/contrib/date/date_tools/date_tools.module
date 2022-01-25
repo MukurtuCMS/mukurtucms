@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Primary hook implementations for the Date Tools module
+ * Primary hook implementations for the Date Tools module.
  */
 
 /**
@@ -66,6 +66,7 @@ function date_tools_menu() {
     'file' => 'date_tools.wizard.inc',
   );
 
+  // @code
   // $items['admin/config/date/tools/change'] = array(
   //   'title' => 'Change type',
   //   'access arguments' => array('administer date tools'),
@@ -75,7 +76,7 @@ function date_tools_menu() {
   //   'weight' => 3,
   //   'file' => 'date_tools.change_type.inc',
   // );
-
+  // @endcode
   return $items;
 }
 

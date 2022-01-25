@@ -97,7 +97,7 @@ function date_field_widget_form(&$form, &$form_state, $field, $instance, $langco
   module_load_include('inc', 'date_api', 'date_api_elements');
   $timezone = date_get_timezone($field['settings']['tz_handling'], isset($items[$delta]['timezone']) ? $items[$delta]['timezone'] : date_default_timezone());
 
-  // TODO see if there's a way to keep the timezone element from ever being
+  // @todo See if there's a way to keep the timezone element from ever being
   // nested as array('timezone' => 'timezone' => value)). After struggling
   // with this a while, I can find no way to get it displayed in the form
   // correctly and get it to use the timezone element without ending up
@@ -413,17 +413,29 @@ function date_combo_element_process($element, &$form_state, $form) {
   // Create label for error messages that make sense in multiple values
   // and when the title field is left blank.
   if ($field['cardinality'] <> 1 && empty($field['settings']['repeat'])) {
-    $element[$from_field]['#date_title'] = t('@field_name Start date value #@delta', array('@field_name' => $instance['label'], '@delta' => $delta + 1));
+    $element[$from_field]['#date_title'] = t('@field_name Start date value #@delta', array(
+      '@field_name' => $instance['label'],
+      '@delta' => $delta + 1,
+    ));
     if (!empty($field['settings']['todate'])) {
-      $element[$to_field]['#date_title'] = t('@field_name End date value #@delta', array('@field_name' => $instance['label'], '@delta' => $delta + 1));
+      $element[$to_field]['#date_title'] = t('@field_name End date value #@delta', array(
+        '@field_name' => $instance['label'],
+        '@delta' => $delta + 1,
+      ));
     }
   }
   elseif (!empty($field['settings']['todate'])) {
-    $element[$from_field]['#date_title'] = t('@field_name Start date', array('@field_name' => $instance['label']));
-    $element[$to_field]['#date_title'] = t('@field_name End date', array('@field_name' => $instance['label']));
+    $element[$from_field]['#date_title'] = t('@field_name Start date', array(
+      '@field_name' => $instance['label'],
+    ));
+    $element[$to_field]['#date_title'] = t('@field_name End date', array(
+      '@field_name' => $instance['label'],
+    ));
   }
   else {
-    $element[$from_field]['#date_title'] = t('@field_name', array('@field_name' => $instance['label']));
+    $element[$from_field]['#date_title'] = t('@field_name', array(
+      '@field_name' => $instance['label'],
+    ));
   }
 
   // Make changes if instance is set to be rendered as a regular field.
@@ -439,6 +451,8 @@ function date_combo_element_process($element, &$form_state, $form) {
     'instance' => $instance,
     'form' => $form,
   );
+
+  // Trigger hook_date_combo_process_alter().
   drupal_alter('date_combo_process', $element, $form_state, $context);
 
   return $element;
@@ -507,6 +521,7 @@ function date_combo_validate($element, &$form_state) {
     'item' => $item,
   );
 
+  // Trigger hook_date_combo_pre_validate_alter().
   drupal_alter('date_combo_pre_validate', $element, $form_state, $context);
 
   $from_field = 'value';
@@ -535,13 +550,19 @@ function date_combo_validate($element, &$form_state) {
   // An 'End' date without a 'Start' date is a validation error.
   if ($empty && !empty($item[$to_field])) {
     if (!is_array($item[$to_field])) {
-      form_error($element, t("A 'Start date' date is required if an 'end date' is supplied for field %field #%delta.", array('%delta' => $field['cardinality'] ? intval($delta + 1) : '', '%field' => $instance['label'])));
+      form_error($element, t("A 'Start date' date is required if an 'end date' is supplied for field %field #%delta.", array(
+        '%delta' => $field['cardinality'] ? intval($delta + 1) : '',
+        '%field' => $instance['label'],
+      )));
       $empty = FALSE;
     }
     else {
       foreach ($item[$to_field] as $key => $value) {
         if (!empty($value)) {
-          form_error($element, t("A 'Start date' date is required if an 'End date' is supplied for field %field #%delta.", array('%delta' => $field['cardinality'] ? intval($delta + 1) : '', '%field' => $instance['label'])));
+          form_error($element, t("A 'Start date' date is required if an 'End date' is supplied for field %field #%delta.", array(
+            '%delta' => $field['cardinality'] ? intval($delta + 1) : '',
+            '%field' => $instance['label'],
+          )));
           $empty = FALSE;
           break;
         }
@@ -644,10 +665,15 @@ function date_combo_validate($element, &$form_state) {
   // we'll show errors on the nested elements more than once.
   if (!form_get_errors() && !empty($errors)) {
     if ($field['cardinality']) {
-      form_error($element, t('There are errors in @field_name value #@delta:', array('@field_name' => $instance['label'], '@delta' => $delta + 1)) . theme('item_list', array('items' => $errors)));
+      form_error($element, t('There are errors in @field_name value #@delta:', array(
+        '@field_name' => $instance['label'],
+        '@delta' => $delta + 1,
+      )) . theme('item_list', array('items' => $errors)));
     }
     else {
-      form_error($element, t('There are errors in @field_name:', array('@field_name' => $instance['label'])) . theme('item_list', array('items' => $errors)));
+      form_error($element, t('There are errors in @field_name:', array(
+        '@field_name' => $instance['label'],
+      )) . theme('item_list', array('items' => $errors)));
     }
   }
 }

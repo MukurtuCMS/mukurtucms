@@ -229,7 +229,7 @@ function image_imagemagick_imagecache_autorotate(stdClass $image) {
           break;
       }
     }
-    elseif ($exif === FALSE && $image->extension === 'jpg') {
+    elseif ($exif === FALSE && $image->info['extension'] === 'jpg') {
       watchdog('imagecache_actions', 'Image %file could not be auto-rotated: !message', array('%file' => $image->source, '!message' => t('The exif_read_data() function returned FALSE.')));
     }
   }

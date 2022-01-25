@@ -119,11 +119,11 @@ function entity_entitycache_uninstalled_modules($modules = NULL) {
  */
 function _entity_entitycache_get_module_info($modules) {
   // Prepare a keyed array of all modules with their entity types and infos.
-  // Structure: [module][entity][info]
+  // Structure: [module][entity][info].
   $entity_crud_info = entity_crud_get_info();
   $info = array();
   foreach ($entity_crud_info as $entity_name => $entity_info) {
-    // Make sure that the entity info specifies a module and supports entitycache.
+    // Make sure that entity_info specifies a module and supports entitycache.
     if (!isset($entity_info['module']) || empty($entity_info['entity cache'])) {
       continue;
     }

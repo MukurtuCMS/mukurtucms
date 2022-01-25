@@ -40,9 +40,10 @@ class RulesSchedulerTestCase extends DrupalWebTestCase {
     $set = rules_rule_set(array(
       'node1' => array('type' => 'node', 'label' => 'node'),
     ));
-    $set->rule(rule()->condition('node_is_published', array('node:select' => 'node1'))
-                     ->action('node_unpublish', array('node:select' => 'node1'))
-               );
+    $set->rule(
+      rule()->condition('node_is_published', array('node:select' => 'node1'))
+        ->action('node_unpublish', array('node:select' => 'node1'))
+    );
     $set->integrityCheck()->save('rules_test_set_2');
 
     // Use different names for the variables to ensure they are properly mapped.
@@ -74,9 +75,10 @@ class RulesSchedulerTestCase extends DrupalWebTestCase {
     $set = rules_rule_set(array(
       'node1' => array('type' => 'node', 'label' => 'node'),
     ));
-    $set->rule(rule()->condition('node_is_published', array('node:select' => 'node1'))
-                     ->action('node_unpublish', array('node:select' => 'node1'))
-               );
+    $set->rule(
+      rule()->condition('node_is_published', array('node:select' => 'node1'))
+        ->action('node_unpublish', array('node:select' => 'node1'))
+    );
     $set->integrityCheck()->save('rules_test_set_2');
 
     // Add an reaction rule that is triggered upon a node save. The scheduled

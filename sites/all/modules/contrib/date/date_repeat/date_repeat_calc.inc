@@ -92,7 +92,7 @@ function _date_repeat_calc($rrule, $start, $end, $exceptions, $timezone, $additi
     $rrule['FREQ'] = 'DAILY';
   }
 
-  // Make sure DAILY frequency isn't used in places it won't work;
+  // Make sure DAILY frequency isn't used in places it won't work.
   if (!empty($rrule['BYMONTHDAY']) &&
     !in_array($rrule['FREQ'], array('MONTHLY', 'YEARLY'))) {
     $rrule['FREQ'] = 'MONTHLY';
@@ -403,7 +403,7 @@ function _date_repeat_calc($rrule, $start, $end, $exceptions, $timezone, $additi
  * See if the RRULE needs some imputed values added to it.
  */
 function date_repeat_adjust_rrule($rrule, $start_date) {
-  // If this is not a valid value, do nothing;
+  // If this is not a valid value, do nothing.
   if (empty($rrule) || empty($rrule['FREQ'])) {
     return array();
   }

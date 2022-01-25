@@ -41,7 +41,7 @@ define('CKEDITOR_FORCE_SIMPLE_TOOLBAR_NAME', 'DrupalBasic');
 define('CKEDITOR_ENTERMODE_P', 1);
 define('CKEDITOR_ENTERMODE_BR', 2);
 define('CKEDITOR_ENTERMODE_DIV', 3);
-define('CKEDITOR_LATEST', '4.14.0');
+define('CKEDITOR_LATEST', '4.17.1');
 
 global $_ckeditor_configuration;
 global $_ckeditor_ids;
@@ -541,6 +541,78 @@ function ckeditor_plugins_path($mode = 'relative', $refresh = FALSE) {
 }
 
 /**
+ * Read the CKEditor skins path from the Global profile.
+ *
+ * @return string Path to CKEditor skins folder.
+ */
+function ckeditor_skins_path($mode = 'relative', $refresh = FALSE) {
+  static $cke_static;
+
+  if (!isset($cke_static)) {
+    $cke_static = array();
+  }
+
+  if ($refresh || !isset($cke_static[$mode])) {
+    $global_profile = ckeditor_profile_load('CKEditor Global Profile', $refresh);
+    if (!$global_profile) {
+      return '';
+    }
+
+    switch ($mode) {
+      default:
+      case 'relative':
+        if (empty($global_profile->settings['ckeditor_skins_path'])) {
+          return '';
+        }
+
+        $cke_skins_path = $global_profile->settings['ckeditor_skins_path'];
+        $cke_skins_path = strtr($cke_skins_path, array("%b" => ckeditor_base_path('relative'), "%m" => ckeditor_module_path('relative'), "%l" => ckeditor_library_path('relative')));
+        $cke_skins_path = str_replace('\\', '/', $cke_skins_path);
+        $cke_skins_path = str_replace('//', '/', $cke_skins_path);
+        $cke_skins_path = rtrim($cke_skins_path, ' \/');
+        return $cke_static[$mode] = $cke_skins_path;
+
+        break;
+
+      case 'local':
+        if (empty($global_profile->settings['ckeditor_skins_local_path']) && empty($global_profile->settings['ckeditor_skins_path'])) {
+          return '';
+        }
+
+        if (!empty($global_profile->settings['ckeditor_skins_local_path'])) {
+          return $cke_static[$mode] = $global_profile->settings['ckeditor_skins_local_path'];
+        }
+
+        if (!empty($global_profile->settings['ckeditor_skins_path'])) {
+          $cke_skins_local_path = $global_profile->settings['ckeditor_skins_path'];
+          $cke_skins_local_path = strtr($cke_skins_local_path, array("%b" => ckeditor_base_path('local'), "%m" => ckeditor_module_path('local'), "%l" => ckeditor_library_path('local')));
+          return $cke_static[$mode] = $cke_skins_local_path;
+        }
+
+        break;
+
+      case 'url':
+        if (empty($global_profile->settings['ckeditor_skins_path'])) {
+          return '';
+        }
+
+        $cke_skins_path = $global_profile->settings['ckeditor_skins_path'];
+        $cke_skins_path = strtr($cke_skins_path, array("%m" => ckeditor_module_path('url'), "%l" => ckeditor_library_path('url')));
+        $cke_skins_path = str_replace('\\', '/', $cke_skins_path);
+        $cke_skins_path = str_replace('//', '/', $cke_skins_path);
+        $cke_skins_path = rtrim($cke_skins_path, ' \/');
+        //In D7 base path in URL mode is not needed, so we need to remove it with trailing slash (if exists)
+        $cke_skins_path = str_replace(array("%b/", "%b"), '', $cke_skins_path);
+        return $cke_static[$mode] = $cke_skins_path;
+
+        break;
+    }
+  }
+
+  return isset($cke_static[$mode]) ? $cke_static[$mode] : '';
+}
+
+/**
  * Read the CKFinder path from the Global profile.
  *
  * @return
@@ -582,8 +654,8 @@ function ckfinder_path($mode = 'relative', $refresh = FALSE) {
         if ($global_profile && isset($global_profile->settings['ckfinder_path'])) {
           $ckfinder_path = $global_profile->settings['ckfinder_path'];
           $ckfinder_path = strtr($ckfinder_path, array("%m" => ckeditor_module_path('url'), "%l" => ckeditor_library_path('url')));
-          $ckfinder_path = str_replace('\\', '/', $cke_plugins_path);
-          $ckfinder_path = str_replace('//', '/', $cke_plugins_path);
+          $ckfinder_path = str_replace('\\', '/', $ckfinder_path);
+          $ckfinder_path = str_replace('//', '/', $ckfinder_path);
           //In D7 base path in URL mode is not needed, so we need to remove it with trailing slash (if exists)
           $ckfinder_path = str_replace(array("%b/", "%b"), '', $ckfinder_path);
           return $cke_static[$mode] = $ckfinder_path;
@@ -650,7 +722,7 @@ function ckeditor_file_download($uri) {
     //check if file can be served by comparing regex and path to file
     if (preg_match($regex, $path)) {
       $info = image_get_info($uri);
-      return array('Content-Type' => $info['mime_type']);
+      return !empty($info['mime_type']) ? array('Content-Type' => $info['mime_type']) : NULL;
     }
   }
 }
