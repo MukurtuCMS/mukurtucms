@@ -97,9 +97,9 @@ function ma_importexport_dc_feeds_importer_default() {
           'dc_hasformat' => array(
             'debug' => 0,
             'inner' => 0,
-            'name' => 'dc:hasformat',
+            'name' => 'dc:hasFormat',
             'raw' => 0,
-            'value' => 'dc:hasformat',
+            'value' => 'dc:hasFormat',
             'weight' => '15',
           ),
           'dc_hasversion' => array(
@@ -318,6 +318,7 @@ function ma_importexport_dc_feeds_importer_default() {
             'unique' => FALSE,
           ),
           16 => array(
+            'language' => 'und',
             'source' => 'dc_hasversion',
             'target' => 'field_external_links:url',
             'unique' => FALSE,
