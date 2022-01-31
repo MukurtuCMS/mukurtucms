@@ -889,7 +889,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
         $target_name = $mapping['target'];
       }
 
-      if (isset($result->input_fields) && in_array(strtolower($mapping['source']), $result->input_fields)) {
+      if (ma_importexport_dc_is_xml_importer($source->id) || isset($result->input_fields) && in_array(strtolower($mapping['source']), $result->input_fields)) {
       // If the target is a field empty the value for the targeted language
       // only.
       // In all other cases, just empty the target completely.

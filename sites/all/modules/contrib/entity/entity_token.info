@@ -1,13 +1,12 @@
 name = Entity tokens
 description = Provides token replacements for all properties that have no tokens and are known to the entity API.
+dependencies[] = entity:entity
 core = 7.x
-files[] = entity_token.tokens.inc
-files[] = entity_token.module
-dependencies[] = entity
 
-; Information added by Drupal.org packaging script on 2018-02-14
-version = "7.x-1.9"
+files[] = entity_token.tokens.inc
+
+; Information added by Drupal.org packaging script on 2021-11-20
+version = "7.x-1.10"
 core = "7.x"
 project = "entity"
-datestamp = "1518620551"
-
+datestamp = "1637434458"

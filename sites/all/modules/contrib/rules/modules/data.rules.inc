@@ -300,7 +300,7 @@ function rules_action_data_set_form_alter(&$form, &$form_state, $options, RulesA
     );
     $form_state['rules_element_step'] = 'data_value';
     // Clear the parameter mode for the value parameter, so its gets the proper
-    // default value based upon the type of the the selected data on rebuild.
+    // default value based upon the type of the selected data on rebuild.
     unset($form_state['parameter_mode']['value']);
   }
   else {
@@ -455,6 +455,8 @@ function rules_action_data_calc_operator_options(RulesPlugin $element, $param_na
   if (($info = $element->getArgumentInfo('input_1')) && $info['type'] == 'date') {
     unset($options['*']);
     unset($options['/']);
+    unset($options['min']);
+    unset($options['max']);
   }
   return $options;
 }
@@ -753,5 +755,5 @@ function rules_condition_data_list_count_is_operator_options() {
 }
 
 /**
- * @}
+ * @} End of "addtogroup rules"
  */

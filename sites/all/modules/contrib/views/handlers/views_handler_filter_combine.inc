@@ -194,6 +194,9 @@ class views_handler_filter_combine extends views_handler_filter_string {
    *
    */
   public function op_regex($field) {
+    if (empty($this->value)) {
+      return;
+    }
     $placeholder = $this->placeholder();
     $this->query->add_where_expression($this->options['group'], "$field RLIKE $placeholder", array($placeholder => $this->value));
   }

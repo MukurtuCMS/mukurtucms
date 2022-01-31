@@ -17,6 +17,20 @@ function rules_action_drupal_message($message, $status, $repeat) {
 }
 
 /**
+ * Action: Write a watchdog db log message.
+ */
+function rules_action_drupal_watchdog($type, $message, $severity, $link_text, $link_path) {
+  if (!empty($link_path)) {
+    // Use $link_path for the text if no specific text was supplied.
+    $link = l(!empty($link_text) ? $link_text : $link_path, url($link_path));
+  }
+  else {
+    $link = NULL;
+  }
+  watchdog($type, $message, array(), $severity, $link);
+}
+
+/**
  * Action: Page redirect.
  *
  * @see rules_page_build()
@@ -59,8 +73,7 @@ function rules_action_breadcrumb_set(array $titles, array $paths) {
   foreach ($titles as $i => $title) {
     // Skip empty titles.
     if ($title = trim($title)) {
-      // Output plaintext instead of a link if there is a title
-      // without a path.
+      // Output plaintext instead of a link if there is a title without a path.
       $path = trim($paths[$i]);
       if (!empty($paths[$i]) && $paths[$i] != '<none>') {
         $trail[] = l($title, trim($paths[$i]));
@@ -76,7 +89,7 @@ function rules_action_breadcrumb_set(array $titles, array $paths) {
 /**
  * Action Implementation: Send mail.
  */
-function rules_action_mail($to, $subject, $message, $from = NULL, $langcode, $settings, RulesState $state, RulesPlugin $element) {
+function rules_action_mail($to, $subject, $message, $from, $langcode, $settings, RulesState $state, RulesPlugin $element) {
   $to = str_replace(array("\r", "\n"), '', $to);
   $from = !empty($from) ? str_replace(array("\r", "\n"), '', $from) : NULL;
   $params = array(
@@ -99,7 +112,7 @@ function rules_action_mail($to, $subject, $message, $from = NULL, $langcode, $se
 /**
  * Action: Send mail to all users of a specific role group(s).
  */
-function rules_action_mail_to_users_of_role($roles, $subject, $message, $from = NULL, $settings, RulesState $state, RulesPlugin $element) {
+function rules_action_mail_to_users_of_role($roles, $subject, $message, $from, $settings, RulesState $state, RulesPlugin $element) {
   $from = !empty($from) ? str_replace(array("\r", "\n"), '', $from) : NULL;
 
   // All authenticated users, which is everybody.
@@ -118,7 +131,8 @@ function rules_action_mail_to_users_of_role($roles, $subject, $message, $from = 
   );
   // Set a unique key for this mail.
   $name = isset($element->root()->name) ? $element->root()->name : 'unnamed';
-  $key = 'rules_action_mail_to_users_of_role_' . $name . '_' . $element->elementId();  $languages = language_list();
+  $key = 'rules_action_mail_to_users_of_role_' . $name . '_' . $element->elementId();
+  $languages = language_list();
 
   $message = array('result' => TRUE);
   foreach ($result as $row) {
@@ -243,6 +257,7 @@ class RulesTokenEvaluator extends RulesDataInputEvaluator {
       '#description' => t('Note that token replacements containing chained objects – such as [node:author:uid] – are not listed here, but are still available. The <em>data selection</em> input mode may help you find more complex replacement patterns. See <a href="@url">the online documentation</a> for more information about complex replacement patterns.',
         array('@url' => rules_external_help('chained-tokens'))),
     );
+
     $token_info = token_info();
     foreach ($var_info as $name => $info) {
       $token_types[$name] = _rules_system_token_map_type($info['type']);
@@ -286,5 +301,5 @@ function _rules_system_token_map_type($type) {
 }
 
 /**
- * @}
+ * @} End of "addtogroup rules"
  */

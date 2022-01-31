@@ -242,7 +242,6 @@ function date_api_update_7000() {
   }
 }
 
-
 /**
  * Drop D6 timezone_name field on {users} after upgrading to D7.
  */

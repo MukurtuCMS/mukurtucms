@@ -17,7 +17,7 @@ class RulesUIController {
   /**
    * Generates menu items to manipulate rules configurations.
    *
-   * @param $base_path
+   * @param string $base_path
    *   The path to the overview page from where the configurations are edited.
    */
   public function config_menu($base_path) {
@@ -168,9 +168,9 @@ class RulesUIController {
    * RulesUIController::config_menu($base_path) to generate appropriate menu
    * items for the path at which the overview table is displayed.
    *
-   * @param $conditions
+   * @param array $conditions
    *   An array of conditions as needed by rules_config_load_multiple().
-   * @param $options
+   * @param array $options
    *   An array with optional options. Known keys are:
    *   - 'hide status op': If set to TRUE, enable/disable links are not added.
    *     Defaults to FALSE.
@@ -251,8 +251,22 @@ class RulesUIController {
   /**
    * Generates the row for a single rules config.
    *
-   * @param $additional_cols
-   *   Additional columns to be added after the entity label column.
+   * @param array $conditions
+   *   An array of conditions as needed by rules_config_load_multiple().
+   * @param array $options
+   *   An array with optional options. Known keys are:
+   *   - 'hide status op': If set to TRUE, enable/disable links are not added.
+   *     Defaults to FALSE.
+   *   - 'show plugin': If set to FALSE, the plugin is not shown. Defaults to
+   *     TRUE.
+   *   - 'show events': If set to TRUE, the event column is shown. Defaults to
+   *     TRUE if only reaction rules are listed.
+   *   - 'show execution op': If set to TRUE an operation for execution a
+   *     component is shown for components, as well as a link to schedule a
+   *     component if the rules scheduler module is enabled.
+   *   - 'base path': Optionally, a different base path to use instead of the
+   *     currently set RulesPluginUI::$basePath. If no base path has been set
+   *     yet, the current path is used by default.
    */
   protected function overviewTableRow($conditions, $name, $config, $options) {
     // Build content includes the label, as well as a short overview including

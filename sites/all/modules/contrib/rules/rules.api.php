@@ -1099,5 +1099,5 @@ function hook_rules_config_access($op, $rules_config = NULL, $account = NULL) {
 }
 
 /**
- * @}
+ * @} End of "defgroup rules_hooks"
  */

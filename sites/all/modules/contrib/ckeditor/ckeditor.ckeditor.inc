@@ -241,7 +241,11 @@ function ckeditor_ckeditor_plugin() {
     $plugins['drupalbreaks']['default'] = 't';
 
     // Remove the page break button if there is no module to handle it.
-    if (isset($plugins['drupalbreaks']['buttons']['DrupalPageBreak']) && !module_exists('paging') && !module_exists('pagebreak')) {
+    if (isset($plugins['drupalbreaks']['buttons']['DrupalPageBreak'])
+      && !module_exists('paging')
+      && !module_exists('pagebreak')
+      && !module_exists('smart_paging')
+    ) {
       unset($plugins['drupalbreaks']['buttons']['DrupalPageBreak']);
     }
   }

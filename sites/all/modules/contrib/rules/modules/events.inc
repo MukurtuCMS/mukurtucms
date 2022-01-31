@@ -221,5 +221,5 @@ function rules_get_entity_view_modes($name, $var_info) {
 }
 
 /**
- * @}
+ * @} End of "addtogroup rules"
  */

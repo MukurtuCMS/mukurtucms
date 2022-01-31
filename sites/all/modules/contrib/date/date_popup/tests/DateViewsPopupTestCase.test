@@ -9,6 +9,7 @@
  * Tests Date Popup in the Views interface.
  */
 class DatePopupWithViewsTestCase extends DateFieldTestBase {
+
   /**
    * Test info.
    */

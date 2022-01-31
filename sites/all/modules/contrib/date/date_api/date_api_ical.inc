@@ -80,9 +80,8 @@
  *   )
  * )
  *
- * @todo
- *   figure out how to handle this if subgroups are nested,
- *   like a VALARM nested inside a VEVENT.
+ * @todo Figure out how to handle this if subgroups are nested, like a VALARM
+ *   nested inside a VEVENT.
  *
  * @param string $filename
  *   Location (local or remote) of a valid iCalendar file.
@@ -376,7 +375,9 @@ function date_ical_parse_date($field, $data) {
   $data = trim($data);
 
   // Turn the properties into a nice indexed array of
+  // @code
   // array(PROPERTYNAME => PROPERTYVALUE);
+  // @endcode
   $field_parts = preg_split('/[;:]/', $field);
   $properties = array();
   foreach ($field_parts as $part) {

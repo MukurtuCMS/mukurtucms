@@ -9,10 +9,15 @@
  * Tests for Date Tools.
  */
 class DateToolsTestCase extends DrupalWebTestCase {
-  protected $privileged_user;
+  /**
+   * Drupal privileged users.
+   *
+   * @var object|false
+   */
+  protected $privilegedUser;
 
   /**
-   * @todo.
+   * Date Tools.
    */
   public static function getInfo() {
     return array(
@@ -42,8 +47,8 @@ class DateToolsTestCase extends DrupalWebTestCase {
       'administer date tools',
       'administer fields',
     );
-    $this->privileged_user = $this->drupalCreateUser($perms);
-    $this->drupalLogin($this->privileged_user);
+    $this->privilegedUser = $this->drupalCreateUser($perms);
+    $this->drupalLogin($this->privilegedUser);
 
     variable_set('date_format_long', 'D, m/d/Y - H:i');
   }
@@ -67,7 +72,7 @@ class DateToolsTestCase extends DrupalWebTestCase {
   /**
    * Tests that date field functions properly.
    */
-  function dateForm($options) {
+  public function dateForm($options) {
     $edit = array();
     $edit['title'] = $this->randomName(8);
     $edit['body[und][0][value]'] = $this->randomName(16);
@@ -90,9 +95,9 @@ class DateToolsTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * @todo
+   * Delete date field test.
    */
-  function deleteDateField() {
+  public function deleteDateField() {
     $this->drupalGet('admin/structure/types/manage/story/fields');
     $this->clickLink('delete');
     $this->drupalPost(NULL, NULL, t('Delete'));
@@ -102,7 +107,7 @@ class DateToolsTestCase extends DrupalWebTestCase {
   /**
    * Creates a date field using the Date Wizard.
    */
-  function createDateWizard($edit) {
+  public function createDateWizard($edit) {
     $edit += array(
       'bundle' => 'story',
       'name' => 'Story',

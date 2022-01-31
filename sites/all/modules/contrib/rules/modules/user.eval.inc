@@ -131,5 +131,5 @@ function rules_action_user_send_account_email($account, $email_type) {
 }
 
 /**
- * @}
+ * @} End of "addtogroup rules"
  */

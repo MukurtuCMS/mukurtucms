@@ -1,3 +1,12 @@
+Search API Database Search 1.8 (2021-01-11):
+--------------------------------------------
+- #3191489 by drunken monkey, borisson_, Amir Simantov: Fixed searches with
+  special characters in keywords.
+- #3142667 by drunken monkey, donquixote: Fixed reused variable name in
+  SearchApiDbService::indexItem().
+- #3119370 by drunken monkey: Fixed errors during indexing cause by
+  non-standard whitespace.
+
 Search API Database Search 1.7 (2018-09-17):
 --------------------------------------------
 - #2982443 by KarlShea, drunken monkey: Added support for the "(not) between"

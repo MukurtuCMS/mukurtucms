@@ -308,6 +308,10 @@ abstract class FacetapiAdapter {
 
       // Perform basic parsing of the filter.
       $parts = explode(':', $filter, 2);
+      // We need to filter out possible XSS attack function calls.
+      foreach ($parts as $id => $part) {
+        $parts[$id] = filter_xss($part);
+      }
       $field_alias = rawurldecode($parts[0]);
       if (isset($parts[1]) && isset($enabled_aliases[$field_alias])) {
         $filter = $field_alias . ':' . $parts[1]; // @see https://www.drupal.org/node/1884152
@@ -433,7 +437,9 @@ abstract class FacetapiAdapter {
    *   query types add the "start" and "end" values of the range.
    */
   public function getActiveItems(array $facet) {
-    return $this->activeItems['facet'][$facet['name']];
+    return isset($this->activeItems['facet'][$facet['name']])
+      ? $this->activeItems['facet'][$facet['name']]
+      : array();
   }
 
   /**
@@ -1327,10 +1333,13 @@ class FacetapiFacet implements ArrayAccess {
 
     // Add JavaScript settings by merging with the others already set.
     $merge_settings['facetapi']['facets'][] = $widget_plugin->getJavaScriptSettings();
-    $build[$this['field alias']]['#attached']['js'][] = array(
-      'data' => $merge_settings,
-      'type' => 'setting',
-    );
+
+    if (!empty($build[$this['field alias']])) {
+      $build[$this['field alias']]['#attached']['js'][] = array(
+        'data' => $merge_settings,
+        'type' => 'setting',
+      );
+    }
 
     // Return render array keyed by the FacetapiWidget::$key property.
     return array($widget_plugin->getKey() => $build);

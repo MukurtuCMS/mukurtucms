@@ -45,11 +45,7 @@ class SearchApiFacetapiAdapter extends FacetapiAdapter {
    * Overrides FacetapiAdapter::getSearchPath().
    */
   public function getSearchPath() {
-    $search = $this->getCurrentSearch();
-    if ($search && $search[0]->getOption('search_api_base_path')) {
-      return $search[0]->getOption('search_api_base_path');
-    }
-    return $_GET['q'];
+    return search_api_facetapi_current_search_path();
   }
 
   /**

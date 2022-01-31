@@ -173,7 +173,7 @@ function rules_scheduler_schedule_task($task) {
  * Queue tasks that are ready for execution.
  *
  * @return bool
- *   TRUE if any queue items where created, otherwise FALSE.
+ *   TRUE if any queue items were created, otherwise FALSE.
  */
 function rules_scheduler_queue_tasks() {
   $items_created = FALSE;

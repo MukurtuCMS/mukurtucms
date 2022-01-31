@@ -3,7 +3,7 @@
  * Attaches the calendar behavior to all required fields.
  */
 
-(function($) {
+(function ($) {
   function makeFocusHandler(e) {
     if (!$(this).hasClass('date-popup-init')) {
       var datePopup = e.data;
@@ -15,9 +15,9 @@
             .addClass('date-popup-init')
             .focus();
           if (datePopup.settings.syncEndDate) {
-            $('.start-date-wrapper').each(function(){
+            $('.start-date-wrapper').each(function () {
               var start_date_wrapper = this;
-              $(this).find('input:eq(0)').change(function(){
+              $(this).find('input:eq(0)').change(function () {
                 $(start_date_wrapper).next('.end-date-wrapper').find('input:eq(0)').val($(this).val());
               });
             });

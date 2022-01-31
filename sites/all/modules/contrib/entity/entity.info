@@ -1,15 +1,22 @@
 name = Entity API
 description = Enables modules to work with any entity type and to provide entities.
+test_dependencies[] = rules:rules
+test_dependencies[] = i18n:i18n_string
 core = 7.x
+
 files[] = entity.features.inc
 files[] = entity.i18n.inc
 files[] = entity.info.inc
 files[] = entity.rules.inc
-files[] = entity.test
 files[] = includes/entity.inc
 files[] = includes/entity.controller.inc
 files[] = includes/entity.ui.inc
 files[] = includes/entity.wrapper.inc
+
+; Test cases
+files[] = entity.test
+
+; Views handlers
 files[] = views/entity.views.inc
 files[] = views/handlers/entity_views_field_handler_helper.inc
 files[] = views/handlers/entity_views_handler_area_entity.inc
@@ -25,9 +32,9 @@ files[] = views/handlers/entity_views_handler_field_uri.inc
 files[] = views/handlers/entity_views_handler_relationship_by_bundle.inc
 files[] = views/handlers/entity_views_handler_relationship.inc
 files[] = views/plugins/entity_views_plugin_row_entity_view.inc
-; Information added by Drupal.org packaging script on 2018-02-14
-version = "7.x-1.9"
+
+; Information added by Drupal.org packaging script on 2021-11-20
+version = "7.x-1.10"
 core = "7.x"
 project = "entity"
-datestamp = "1518620551"
-
+datestamp = "1637434458"

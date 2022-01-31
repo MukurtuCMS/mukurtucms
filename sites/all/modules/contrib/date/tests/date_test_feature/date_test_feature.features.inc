@@ -10,7 +10,7 @@
  */
 function date_test_feature_node_info() {
   $items = array(
-    'date_test_feature' => array(
+    'date_test' => array(
       'name' => t('Date Test'),
       'base' => 'node_content',
       'description' => t('This content type is used for demonstrating and testing migration into Date fields.'),
@@ -19,6 +19,9 @@ function date_test_feature_node_info() {
       'help' => '',
     ),
   );
+
+  // Trigger hook_node_info_alter().
   drupal_alter('node_info', $items);
+
   return $items;
 }

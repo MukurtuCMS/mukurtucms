@@ -44,7 +44,7 @@ function mukurtu_batch_import_form() {
     '#type' => 'fieldset',
     '#title' => '<h3>' . t('1. Gather your files') . '</h3>',
     '#collapsible' => FALSE,
-    '#description' => '<p>For CSV imports, ' . l('download a sample Zip file', drupal_get_path('module', 'mukurtu_batch_import') . '/demo.zip') . '. This Zip file contains sample CSV files from a simple digital heritage export. You can also export your existing content in the proper format from the ' . l('digital heritage management page', '/manage/digital-heritage') . '.</p><p>For Dublin Core and MODS XML imports, export an XML file from your system and create a Zip archive including the XML file and media files. The media files should be prefixed in their media field in the XML with "[mukurtu:batch_import_temp_directory]/".</p><p>Information about CSV field formats can be found on the type specific ' . l("Mukurtu Import", 'import') . ' pages in the "Field Format Section" section. CSV files should be named to reflect their content type or match the corresponding importer name. For example, for a CSV file containing digital heritage items valid names would include "Node - Digital Heritage.csv" or "Digital Heritage.csv".</p>',
+    '#description' => '<p>For CSV imports, ' . l('download a sample Zip file', drupal_get_path('module', 'mukurtu_batch_import') . '/demo.zip') . '. This Zip file contains sample CSV files from a simple digital heritage export. You can also export your existing content in the proper format from the ' . l('digital heritage management page', '/manage/digital-heritage') . '.</p><p>For Dublin Core and MODS XML imports, export an XML file from your system and create a Zip archive including the XML file and media files. </p><p>Information about CSV field formats can be found on the type specific ' . l("Mukurtu Import", 'import') . ' pages in the "Field Format Section" section. CSV files should be named to reflect their content type or match the corresponding importer name. For example, for a CSV file containing digital heritage items valid names would include "Node - Digital Heritage.csv" or "Digital Heritage.csv".</p>',
     '#collapsed' => FALSE,
     '#tree' => TRUE,
   );
@@ -143,6 +143,7 @@ function mukurtu_batch_import_parse_zip($file) {
     $zip->extractTo($temp_extract_path);
     $zip->close();
     dsm('Zip file extracted');
+    $_SESSION['mukurtu_zip_import']['temp_extract_path'] = $temp_extract_path;
   } else {
     dsm('Zip file not extracted.');
   }

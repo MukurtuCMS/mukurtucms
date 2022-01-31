@@ -108,7 +108,8 @@ function entity_test_get_types($name = NULL) {
  *   An array of conditions to match against the {entity} table.
  * @param $reset
  *   A boolean indicating that the internal cache should be reset.
- * @return
+ *
+ * @return array
  *   An array of test entity objects, indexed by pid.
  */
 function entity_test_load_multiple($pids = array(), $conditions = array(), $reset = FALSE) {
@@ -125,7 +126,6 @@ function entity_test_delete_multiple(array $pids) {
   entity_get_controller('entity_test')->delete($pids);
 }
 
-
 /**
  * Main class for test entities.
  */
@@ -140,7 +140,7 @@ class EntityClass extends Entity {
    */
   public function buildContent($view_mode = 'full', $langcode = NULL) {
     $content['user'] = array(
-      '#markup' => "User: ". format_username(user_load($this->uid)),
+      '#markup' => "User: " . format_username(user_load($this->uid)),
     );
     return entity_get_controller($this->entityType)->buildContent($this, $view_mode, $langcode, $content);
   }
@@ -159,6 +159,7 @@ class EntityClass extends Entity {
   protected function defaultURI() {
     return array('path' => 'custom/' . $this->identifier());
   }
+
 }
 
 /**
@@ -173,13 +174,8 @@ class EntityClassRevision extends EntityClass {
 }
 
 /**
- *
- *
  * Some hook implementations used by the tests.
- *
- *
  */
-
 
 /**
  * Implements hook_entity_insert().

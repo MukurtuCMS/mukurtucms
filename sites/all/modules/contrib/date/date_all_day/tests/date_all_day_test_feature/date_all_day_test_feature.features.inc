@@ -19,6 +19,9 @@ function date_all_day_test_feature_node_info() {
       'help' => '',
     ),
   );
+
+  // Trigger hook_node_info_alter().
   drupal_alter('node_info', $items);
+
   return $items;
 }

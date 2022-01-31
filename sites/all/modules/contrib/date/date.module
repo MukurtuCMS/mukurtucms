@@ -170,9 +170,11 @@ function date_element_info() {
     '#process' => array('date_combo_element_process'),
     '#element_validate' => array('date_combo_validate'),
     '#theme_wrappers' => array('date_combo'),
-    '#attached' => array('css' => array(
-      drupal_get_path('module', 'date_api') . '/date.css',
-    )),
+    '#attached' => array(
+      'css' => array(
+        drupal_get_path('module', 'date_api') . '/date.css',
+      ),
+    ),
   );
   if (module_exists('ctools')) {
     $type['date_combo']['#pre_render'] = array('ctools_dependent_pre_render');
@@ -305,6 +307,8 @@ function date_formatter_process($formatter, $entity_type, $entity, array $field,
     'item' => $item,
     'display' => $display,
   );
+
+  // Trigger hook_date_formatter_dates_alter().
   drupal_alter('date_formatter_dates', $dates, $context);
 
   $dates['format'] = $format;
@@ -500,7 +504,7 @@ function date_format_type_format($format_type, $langcode = NULL) {
         // 'medium' type.
         case 'medium':
         default:
-          // @todo: If a non-core module provides a date type and does not
+          // @todo If a non-core module provides a date type and does not
           // variable_set() a default for it, the default assumed here may not
           // be correct (since the default format used by 'medium' may not even
           // be one of the allowed formats for the date type in question). To
@@ -657,12 +661,27 @@ function date_entity_metadata_field_getter($entity, array $options, $name, $enti
  * Getter callback to return date values as datestamp in UTC.
  */
 function date_entity_metadata_struct_getter($item, array $options, $name, $type, $info) {
+  // Return early if we don't have a value to work with.
+  if (!isset($item[$name])) {
+    return NULL;
+  }
   $value = trim($item[$name]);
   if (empty($value)) {
     return NULL;
   }
 
-  $timezone_db = date_get_timezone_db($info['field']['settings']['tz_handling']);
+  // Determine timezone data from the field if available.
+  if (isset($info['field']['settings']['tz_handling'])) {
+    $timezone_db = date_get_timezone_db($info['field']['settings']['tz_handling']);
+  }
+  elseif (!empty($item['timezone_db'])) {
+    $timezone_db = $item['timezone_db'];
+  }
+  // Fall back to UTC if we couldn't determine timezone data.
+  else {
+    $timezone_db = 'UTC';
+  }
+
   $date = new DateObject($value, $timezone_db);
   return !empty($date) ? date_format_date($date, 'custom', 'U') : NULL;
 }
@@ -688,7 +707,7 @@ function date_entity_metadata_field_setter(&$entity, $name, $value, $langcode, $
   $field = field_info_field($name);
   if (!isset($langcode)) {
     // Try to figure out the default language used by the entity.
-    // @todo: Update once http://drupal.org/node/1260640 has been fixed.
+    // @todo Update once http://drupal.org/node/1260640 has been fixed.
     $langcode = isset($entity->language) ? $entity->language : LANGUAGE_NONE;
   }
   $values = $field['cardinality'] == 1 ? array($value) : (array) $value;
@@ -788,7 +807,7 @@ function date_field_all_day($field, $instance, $date1, $date2 = NULL) {
  * @param string $compare_tz
  *   The timezone used for comparison values in the SQL.
  *
- * DEPRECATED!, will be removed at some time in the future.
+ * @deprecated Will be removed at some time in the future.
  */
 function date_field_get_sql_handler(array $field, $compare_tz = NULL) {
   module_load_include('inc', 'date_api', 'date_api_sql');

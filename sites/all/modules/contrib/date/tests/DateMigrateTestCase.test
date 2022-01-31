@@ -58,7 +58,7 @@ class DateMigrateTestCase extends DrupalWebTestCase {
     $migration = Migration::getInstance('DateExample');
     $result = $migration->processImport();
     $this->assertEqual($result, Migration::RESULT_COMPLETED, t('Variety term import returned RESULT_COMPLETED'));
-    $rawnodes = node_load_multiple(FALSE, array('type' => 'date_test_feature'), TRUE);
+    $rawnodes = node_load_multiple(FALSE, array('type' => 'date_test'), TRUE);
     $this->assertEqual(count($rawnodes), 2, t('Two sample nodes created'));
 
     // Test the first imported node.

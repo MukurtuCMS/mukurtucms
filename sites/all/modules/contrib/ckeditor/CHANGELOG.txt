@@ -1,14 +1,49 @@
 7.x-1.x-dev
 Development snapshot
 
+2021-11-22
+New stable release: 7.x-1.22
+
+[#3236569] by VladimirAus, vokiel: Error during updb: "Error: Call to undefined function ckeditor_module_path() in ckeditor_update_7006()"
+[#3250088] by hargobind: UI Color Picker broken with custom skins path
+[#3243038] by Pavel_SPN: Notice on ckeditor_load_by_field() after switching to PHP7.4
+[#3250036] by vokiel: Upgrade CKEditor to 4.17.1 (CVE-2021-41165 & CVE-2021-41164)
+
+2021-08-30
+New stable release: 7.x-1.21
+Reverted [#2648232] by vokiel, jordisan: Drupal is not defined
+
+2021-08-27
+New stable release: 7.x-1.20
+
+[#2648232] by vokiel, jordisan: Drupal is not defined
+[#2330515] by jwilson3, vokiel, alcroito: Cache-bust CKEditor Styles and Config files
+[#2710817] by slpearce, kaloyan.damyanov, vokiel: Errors after update from 7.x-1.16 to 7.x-1.17
+by Vokiel: Update COPY_HERE.txt download link
+[#764100] by izmeez: Enable browser native spell checker by default (Backport for D7)
+[#764100] by izmeez: Enable browser native spell checker by default (Backport for D7)
+[#3216026] by generalredneck, mcdruid, jcisio: Update the CKEditor library to 4.16.2 - Hai-Nam Nguyen
+[#3134399] by vokiel: PDOException with CKEditor enabled
+[#3120705] by vokiel, jwilson3, Mile23: Valid JS configurations in js_conf break parser
+[#1635788] by wiifm, jddh, rakenodiax, vokiel: Media embed is stripping width and height from embedding media
+[#3043966] by asierrajr, vokiel: DrupalPageBreak button not visible with Smart Paging module
+[#2671786] by ron_s, aritrika.d: ckfinder_path function typos - aritrika.d
+[#1507852] by vokiel, solideogloria, dczepierga: [D7] 'drush ckeditor-download' fails if svn not installed
+[#2973080] by tristangraves, vokiel: Add field for setting ckeditor.config.js path manually
+[#3185298] by vokiel, joelpittet: Notice: Trying to access array offset on value of type bool in ckeditor_file_download()
+[#2976408] by tristangraves: ajax_html_ids sent during ajax request hits server limit
+[#3132694] by vokiel Unknown PHP function causes errors: rtrimtrim
+[#2671806] by ron_s, vokiel: Add custom skin support
+[#3127108] by vokiel Remove security.drupal.org issue IDs from changelog
+[#3120684] by darrell_ulm, vokiel: Fix resolving default skin when using the CDN version of CKEditor
+
 2020-03-17
 New stable release: 7.x-1.19
 
 [#2349885] by hass, Dieter Geiling: Add config.smiley_path for relative image urls
 [#2993053] by stefan.korn: DocBlock missing for hook_user_presave()
 [#2211217] by bwaindwain, gifad: Using "theme css", CKEditor fails to translate URI to valid URL
-[#172229] by vokiel: Update CKEditor to 4.14.0
-[#169464] by vokiel: Fix (remove) the eval() usage inside JavaScript files.
+[#3120618] by vokiel: Fix (remove) the eval() usage inside JavaScript files. SA-CONTRIB-2020-007 - Cross site scripting
 [#2679179] by Dave Reid, ron_s: CKEditor uses separate cache-busting query string from Drupal's
 [#2795603] by hgoto: drush ckeditor-download command raises warning with undefined offset
 [#2947109] by jstoller: New default CKEditor skin not recognized

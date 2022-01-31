@@ -1609,8 +1609,8 @@ function backup_migrate_perform_backup(&$settings) {
     // Convert the Backup Migrate memory limit to bytes.
     $backup_migrate_memory_limit_bytes = backup_migrate_to_bytes($backup_migrate_memory_limit);
 
-    // If not in 'safe mode', increase the memory limit.
-    if (!ini_get('safe_mode') && $php_memory_limit_bytes < $backup_migrate_memory_limit_bytes) {
+    // Increase the memory limit.
+    if ($php_memory_limit_bytes < $backup_migrate_memory_limit_bytes) {
       // Ensure ini_set() is not disabled.
       if (!strpos(ini_get('disable_functions'), 'ini_set')) {
         // Convert bytes to megabytes, add the 'M' unit.
@@ -1986,9 +1986,9 @@ function _backup_migrate_message_callback($callback = NULL) {
  * Increase the execution timeout, and also the database connection timeout.
  */
 function _backup_migrate_set_timeout() {
-  // If not in 'safe mode', increase the maximum execution time:
+  // Increase the maximum execution time:
   $backup_max_time = variable_get('backup_migrate_backup_max_time', BACKUP_MIGRATE_BACKUP_MAX_TIME);
-  if (!ini_get('safe_mode') && ini_get('max_execution_time') < $backup_max_time) {
+  if (ini_get('max_execution_time') < $backup_max_time) {
     drupal_set_time_limit($backup_max_time);
   }
 
@@ -2048,7 +2048,7 @@ function _backup_migrate_array_to_ini($data, $prefix = '') {
  *   Returns FALSE if the function failed.
  */
 function backup_migrate_exec($command, $args = array()) {
-  if (!function_exists('exec') || ini_get('safe_mode')) {
+  if (!function_exists('exec')) {
     return FALSE;
   }
 

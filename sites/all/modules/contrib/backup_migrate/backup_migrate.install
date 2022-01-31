@@ -457,6 +457,9 @@ function backup_migrate_uninstall() {
   variable_del('backup_migrate_profile_id');
   variable_del('backup_migrate_schedule_buffer');
   variable_del('backup_migrate_schedule_last_run_');
+  variable_del('backup_migrate_smart_keep_daily');
+  variable_del('backup_migrate_smart_keep_hourly');
+  variable_del('backup_migrate_smart_keep_weekly');
   variable_del('backup_migrate_source_id');
   variable_del('backup_migrate_timeout_buffer');
   variable_del('backup_migrate_verbose');
@@ -1014,7 +1017,7 @@ function backup_migrate_update_7310() {
     // Disable the relevant schedules.
     if (count($schedules) > 0) {
       $email_schedules = array_keys($schedules);
-      $names = array_column($schedules, 'name');
+      $names = array_map(function($name){ return $name['name'];}, $schedules);
       $replacements = array('@schedules' => '<ul><li>' . implode('</li><li>', $names) . '</li></ul>');
       db_update('backup_migrate_schedules')
         ->fields(['enabled' => '0'])

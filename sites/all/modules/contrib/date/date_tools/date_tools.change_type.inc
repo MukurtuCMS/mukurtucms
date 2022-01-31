@@ -114,9 +114,10 @@ function date_tools_change_type_form_submit($form, &$form_state) {
   // If there's no data to update, we're finished.
   if (!$has_data) {
     drupal_set_message(t('The field @field_name has been changed from @old_type to @new_type.', array(
-    '@field_name' => $field['widget']['label'],
-    '@old_type' => $labels[$old_type],
-    '@new_type' => $labels[$new_type])));
+      '@field_name' => $field['widget']['label'],
+      '@old_type' => $labels[$old_type],
+      '@new_type' => $labels[$new_type],
+    )));
     return;
   }
 

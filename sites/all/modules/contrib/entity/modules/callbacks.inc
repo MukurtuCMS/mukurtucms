@@ -17,6 +17,7 @@ function entity_metadata_entity_get_properties($entity, array $options, $name, $
 
 /**
  * Callback for getting book node properties.
+ *
  * @see entity_metadata_book_entity_info_alter()
  */
 function entity_metadata_book_get_properties($node, array $options, $name, $entity_type) {
@@ -40,6 +41,7 @@ function entity_metadata_book_get_properties($node, array $options, $name, $enti
 
 /**
  * Callback for getting comment properties.
+ *
  * @see entity_metadata_comment_entity_info_alter()
  */
 function entity_metadata_comment_get_properties($comment, array $options, $name) {
@@ -68,6 +70,7 @@ function entity_metadata_comment_get_properties($comment, array $options, $name)
 
 /**
  * Callback for setting comment properties.
+ *
  * @see entity_metadata_comment_entity_info_alter()
  */
 function entity_metadata_comment_setter($comment, $name, $value) {
@@ -83,6 +86,7 @@ function entity_metadata_comment_setter($comment, $name, $value) {
 
 /**
  * Callback for getting comment related node properties.
+ *
  * @see entity_metadata_comment_entity_info_alter()
  */
 function entity_metadata_comment_get_node_properties($node, array $options, $name, $entity_type) {
@@ -150,7 +154,7 @@ function entity_metadata_node_get_properties($node, array $options, $name, $enti
 }
 
 /**
- * Callback for determing access for node revision related properties.
+ * Callback for determining access for node revision related properties.
  */
 function entity_metadata_node_revision_access($op, $name, $entity = NULL, $account = NULL) {
   return $op == 'view' ? user_access('view revisions', $account) : user_access('administer nodes', $account);
@@ -158,6 +162,7 @@ function entity_metadata_node_revision_access($op, $name, $entity = NULL, $accou
 
 /**
  * Callback for getting poll properties.
+ *
  * @see entity_metadata_poll_entity_info_alter()
  */
 function entity_metadata_poll_node_get_properties($node, array $options, $name) {
@@ -182,18 +187,19 @@ function entity_metadata_poll_node_get_properties($node, array $options, $name) 
   }
   switch ($name) {
     case 'poll_winner_votes':
-        return $winner['chvotes'];
+      return $winner['chvotes'];
 
     case 'poll_winner':
-        return $winner['chtext'];
+      return $winner['chtext'];
 
     case 'poll_winner_percent':
-        return ($winner['chvotes'] / $total_votes) * 100;
+      return ($winner['chvotes'] / $total_votes) * 100;
   }
 }
 
 /**
  * Callback for getting statistics properties.
+ *
  * @see entity_metadata_statistics_entity_info_alter()
  */
 function entity_metadata_statistics_node_get_properties($node, array $options, $name) {
@@ -224,9 +230,10 @@ function entity_metadata_statistics_properties_access($op, $property, $entity = 
 
 /**
  * Callback for getting site-wide properties.
+ *
  * @see entity_metadata_system_entity_info_alter()
  */
-function entity_metadata_system_get_properties($data = FALSE, array $options, $name) {
+function entity_metadata_system_get_properties($data, array $options, $name) {
   switch ($name) {
     case 'name':
       return variable_get('site_name', 'Drupal');
@@ -254,9 +261,10 @@ function entity_metadata_system_get_properties($data = FALSE, array $options, $n
 
 /**
  * Callback for getting properties for the current page request.
+ *
  * @see entity_metadata_system_entity_info_alter()
  */
-function entity_metadata_system_get_page_properties($data = array(), array $options, $name) {
+function entity_metadata_system_get_page_properties($data, array $options, $name) {
   switch ($name) {
     case 'url':
       return $GLOBALS['base_root'] . request_uri();
@@ -265,6 +273,7 @@ function entity_metadata_system_get_page_properties($data = array(), array $opti
 
 /**
  * Callback for getting file properties.
+ *
  * @see entity_metadata_system_entity_info_alter()
  */
 function entity_metadata_system_get_file_properties($file, array $options, $name) {
@@ -328,6 +337,7 @@ function entity_metadata_taxonomy_term_setter($term, $name, $value) {
       $vocabulary = is_numeric($value) ? taxonomy_vocabulary_load($value) : taxonomy_vocabulary_machine_name_load($value);
       $term->vocabulary_machine_name = $vocabulary->machine_name;
       return $term->vid = $vocabulary->vid;
+
     case 'parent':
       return $term->parent = $value;
   }
@@ -335,6 +345,7 @@ function entity_metadata_taxonomy_term_setter($term, $name, $value) {
 
 /**
  * Callback for getting vocabulary properties.
+ *
  * @see entity_metadata_taxonomy_entity_info_alter()
  */
 function entity_metadata_taxonomy_vocabulary_get_properties($vocabulary, array $options, $name) {
@@ -347,6 +358,7 @@ function entity_metadata_taxonomy_vocabulary_get_properties($vocabulary, array $
 
 /**
  * Callback for getting user properties.
+ *
  * @see entity_metadata_user_entity_info_alter()
  */
 function entity_metadata_user_get_properties($account, array $options, $name, $entity_type) {
@@ -381,6 +393,7 @@ function entity_metadata_user_get_properties($account, array $options, $name, $e
 
 /**
  * Callback for setting user properties.
+ *
  * @see entity_metadata_user_entity_info_alter()
  */
 function entity_metadata_user_set_properties($account, $name, $value) {
@@ -546,7 +559,7 @@ function entity_metadata_field_verbatim_set($entity, $name, $items, $langcode, $
  *   (optional) Whether to fall back to the entity default language, if no
  *   value is available for the given language code yet.
  *
- * @return
+ * @return string
  *   The language code to use.
  */
 function entity_metadata_field_get_language($entity_type, $entity, $field, $langcode = LANGUAGE_NONE, $fallback = FALSE) {
@@ -651,8 +664,6 @@ function entity_metadata_field_file_validate_item($items, $context) {
  * This function does not implement hook_node_access(), thus it may not be
  * called entity_metadata_node_access().
  *
- * @see entity_access()
- *
  * @param $op
  *   The operation being performed. One of 'view', 'update', 'create' or
  *   'delete'.
@@ -664,8 +675,10 @@ function entity_metadata_field_file_validate_item($items, $context) {
  *
  * @throws EntityMalformedException
  *
- * @return boolean
+ * @return bool
  *   TRUE if access is allowed, FALSE otherwise.
+ *
+ * @see entity_access()
  */
 function entity_metadata_no_hook_node_access($op, $node = NULL, $account = NULL) {
   // First deal with the case where a $node is provided.
@@ -736,9 +749,11 @@ function entity_metadata_user_properties_access($op, $property, $entity = NULL, 
       }
       // Allow edit access for own user name if the permission is satisfied.
       return $is_own_account && user_access('change own username', $account);
+
     case 'mail':
       // Allow access to own mail address.
       return $is_own_account;
+
     case 'roles':
       // Allow view access for own roles.
       return ($op == 'view' && $is_own_account);
@@ -808,11 +823,13 @@ function entity_metadata_taxonomy_access($op, $entity = NULL, $account = NULL, $
         return TRUE;
       }
       break;
+
     case "update":
       if ($entity_type == 'taxonomy_term') {
         return user_access("edit terms in $entity->vid", $account);
       }
       break;
+
     case "create":
       if ($entity_type == 'taxonomy_term') {
         // Check for taxonomy_access_fix contrib module which adds additional
@@ -822,19 +839,21 @@ function entity_metadata_taxonomy_access($op, $entity = NULL, $account = NULL, $
         }
       }
       break;
+
     case "delete":
       if ($entity_type == 'taxonomy_term') {
         return user_access("delete terms in $entity->vid", $account);
       }
       break;
   }
+
   return FALSE;
 }
 
 /**
  * Access callback for file entities.
  */
-function entity_metadata_file_access($op, $file = NULL, $account = NULL, $entity_type) {
+function entity_metadata_file_access($op, $file, $account, $entity_type) {
   // We can only check access for the current user, so return FALSE on other accounts.
   global $user;
   if ($op == 'view' && isset($file) && (!isset($account) || $user->uid == $account->uid)) {
@@ -850,11 +869,10 @@ function entity_metadata_file_access($op, $file = NULL, $account = NULL, $entity
   return FALSE;
 }
 
-
 /**
  * Callback to determine access for properties which are fields.
  */
-function entity_metadata_field_access_callback($op, $name, $entity = NULL, $account = NULL, $entity_type) {
+function entity_metadata_field_access_callback($op, $name, $entity, $account, $entity_type) {
   $field = field_info_field($name);
   return field_access($op, $field, $entity_type, $entity, $account);
 }
@@ -862,7 +880,7 @@ function entity_metadata_field_access_callback($op, $name, $entity = NULL, $acco
 /**
  * Callback to create entity objects.
  */
-function entity_metadata_create_object($values = array(), $entity_type) {
+function entity_metadata_create_object($values, $entity_type) {
   $info = entity_get_info($entity_type);
   // Make sure at least the bundle and label properties are set.
   if (isset($info['entity keys']['bundle']) && $key = $info['entity keys']['bundle']) {
@@ -968,7 +986,7 @@ function entity_metadata_view_comment($entities, $view_mode = 'full', $langcode 
 /**
  * Callback to view an entity, for which just ENTITYTYPE_view() is available.
  */
-function entity_metadata_view_single($entities, $view_mode = 'full', $langcode = NULL, $entity_type) {
+function entity_metadata_view_single($entities, $view_mode, $langcode, $entity_type) {
   $function = $entity_type . '_view';
   $build = array();
   foreach ($entities as $key => $entity) {
@@ -1064,8 +1082,8 @@ function entity_metadata_table_query($entity_type, $property, $value, $limit) {
 
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', $entity_type, '=')
-        ->propertyCondition($info['schema field'], $value, is_array($value) ? 'IN' : '=')
-        ->range(0, $limit);
+    ->propertyCondition($info['schema field'], $value, is_array($value) ? 'IN' : '=')
+    ->range(0, $limit);
 
   $result = $query->execute();
   return !empty($result[$entity_type]) ? array_keys($result[$entity_type]) : array();
@@ -1082,8 +1100,8 @@ function entity_metadata_field_query($entity_type, $property, $value, $limit) {
   $columns = array_keys($field['columns']);
 
   $query->entityCondition('entity_type', $entity_type, '=')
-        ->fieldCondition($field, $columns[0], $value, is_array($value) ? 'IN' : '=')
-        ->range(0, $limit);
+    ->fieldCondition($field, $columns[0], $value, is_array($value) ? 'IN' : '=')
+    ->range(0, $limit);
 
   $result = $query->execute();
   return !empty($result[$entity_type]) ? array_keys($result[$entity_type]) : array();

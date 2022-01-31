@@ -159,5 +159,5 @@ class RulesNodeEventHandler extends RulesEventHandlerEntityBundle {
 }
 
 /**
- * @}
+ * @} End of "addtogroup rules"
  */
