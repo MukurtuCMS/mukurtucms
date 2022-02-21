@@ -32,7 +32,17 @@ Drupal.behaviors.initColorbox = {
 
     $('.colorbox', context)
       .once('init-colorbox').each(function(){
-        $(this).colorbox(settings.colorbox);
+        // Only images are supported for the "colorbox" class.
+        // The "photo" setting forces the href attribute to be treated as an image.
+        var extendParams = {
+          photo: true
+        };
+        // If a title attribute is supplied, sanitize it.
+        var title = $(this).attr('title');
+        if (title) {
+          extendParams.title = Drupal.checkPlain(title);
+        }
+        $(this).colorbox($.extend({}, settings.colorbox, extendParams));
       });
 
     $(context).bind('cbox_complete', function () {

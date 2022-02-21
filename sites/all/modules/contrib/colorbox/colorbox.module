@@ -209,6 +209,10 @@ function _colorbox_doheader() {
     );
   }
 
+  // Determine URL path to public files.
+  $js_settings['file_public_path'] = base_path() .
+    variable_get('file_public_path', conf_path() . '/files');
+
   $js_settings['specificPagesDefaultValue'] = "admin*\nimagebrowser*\nimg_assist*\nimce*\nnode/add/*\nnode/*/edit\nprint/*\nprintpdf/*\nsystem/ajax\nsystem/ajax/*";
 
   $path = drupal_get_path('module', 'colorbox');
