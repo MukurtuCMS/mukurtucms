@@ -9,7 +9,10 @@
  * General configuration form for controlling the colorbox behaviour.
  */
 function colorbox_admin_settings() {
-  drupal_add_js(drupal_get_path('module', 'colorbox') . '/js/colorbox_admin_settings.js', array('preprocess' => FALSE));
+  global $base_url;
+  $module_path = drupal_get_path('module', 'colorbox');
+  $img_folder_path = $base_url . '/' . $module_path . '/images/admin';
+  drupal_add_js($module_path . '/js/colorbox_admin_settings.js', array('preprocess' => FALSE));
 
   $library = libraries_detect('colorbox');
 
@@ -73,7 +76,7 @@ function colorbox_admin_settings() {
     '#title' => t('Style'),
     '#options' => $colorbox_styles,
     '#default_value' => variable_get('colorbox_style', 'default'),
-    '#description' => t('Select the style to use for the Colorbox. The example styles are the ones that come with the Colorbox plugin. Select "None" if you have added Colorbox styles to your theme. <br> <strong>Examples</strong>: <ul><li><a href="/sites/all/modules/colorbox/images/admin/example_default.png" target="blank">Default</a></li><li><a href="/sites/all/modules/colorbox/images/admin/example_plain.png" target="blank">Plain</a></li><li><a href="/sites/all/modules/colorbox/images/admin/example_stockholm_syndrome.png" target="blank">Stockholm Syndrome</a></li><li><a href="/sites/all/modules/colorbox/images/admin/colorbox_example_1.png" target="blank">Example 1</a></li><li><a href="/sites/all/modules/colorbox/images/admin/colorbox_example_2.png" target="blank">Example 2</a></li><li><a href="/sites/all/modules/colorbox/images/admin/colorbox_example_3.png" target="blank">Example 3</a></li><li><a href="/sites/all/modules/colorbox/images/admin/colorbox_example_4.png" target="blank">Example 4</a></li><li><a href="/sites/all/modules/colorbox/images/admin/colorbox_example_5.png" target="blank">Example 5</a></li><li><a href="/sites/all/modules/colorbox/images/admin/example_none.png" target="blank">None</a></li></ul>'),
+    '#description' => t('Select the style to use for the Colorbox. The example styles are the ones that come with the Colorbox plugin. Select "None" if you have added Colorbox styles to your theme. <br> <strong>Examples</strong>: <ul><li><a href="@img_folder_path/example_default.png" target="blank">Default</a></li><li><a href="@img_folder_path/example_plain.png" target="blank">Plain</a></li><li><a href="@img_folder_path/example_stockholm_syndrome.png" target="blank">Stockholm Syndrome</a></li><li><a href="@img_folder_path/colorbox_example_1.png" target="blank">Example 1</a></li><li><a href="@img_folder_path/colorbox_example_2.png" target="blank">Example 2</a></li><li><a href="@img_folder_path/colorbox_example_3.png" target="blank">Example 3</a></li><li><a href="@img_folder_path/colorbox_example_4.png" target="blank">Example 4</a></li><li><a href="@img_folder_path/colorbox_example_5.png" target="blank">Example 5</a></li><li><a href="@img_folder_path/example_none.png" target="blank">None</a></li></ul>', array('@img_folder_path' => $img_folder_path)),
   );
   $form['colorbox_custom_settings']['colorbox_custom_settings_activate'] = array(
     '#type' => 'radios',

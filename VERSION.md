@@ -1,3 +1,10 @@
+## Mukurtu 3.0.2
+- Updated to Drupal 7.88
+- Updated Colorbox
+
+#### Manual Upgrade Steps
+This version does not require any database updates.
+
 ## Mukurtu 3.0.1
 - Updated to Drupal 7.87
 - Change default permissions for 'delete all items' option in feeds
