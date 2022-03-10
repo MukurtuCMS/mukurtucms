@@ -239,7 +239,7 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
   // Media source radio.
   $description = 'Select which attribute contains the reference to media for the Digital Heritage item.';
   if (!$mods_file) {
-    $description .= ' This is typically "dc:hasformat" or "dc:relation".';
+    $description .= ' This is typically "dc:hasFormat" or "dc:relation".';
   }
   else {
     $description .= ' This is typically "location/url" or "relateditem".';
@@ -254,7 +254,7 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
     '#description' => $description,
     '#options' => array_merge($options, $nested_attributes),
   );
-  $typical_media_values = ['dc:hasformat', 'dc:relation', 'location/url', 'relatedItem'];
+  $typical_media_values = ['dc:hasFormat', 'dc:relation', 'location/url', 'relatedItem'];
   foreach ($typical_media_values as $typical_media_value) {
     if (isset($nested_attributes[$typical_media_value])) {
       $form['media']['#default_value'] = $typical_media_value;
@@ -354,6 +354,14 @@ function ma_importexport_dc_import_form_options_submit(&$form, &$form_state) {
   // Set the fetcher source and file.
   $source = feeds_source($importer_name);
   $fetcher_config = $source->getConfigFor($source->importer->fetcher);
+
+  // Nasty hack to save the initiating user's UID before
+  // feeds switches to UID 1 to do the import.
+  if ($importer_name == 'digital_heritage_dc') {
+    global $user;
+    $fetcher_config['mukurtu_uid'] = $user->uid;
+  }
+
   $file = file_load (variable_get('dh_xml_import_fid'));
   $fetcher_config['source'] = $file->uri;
   $fetcher_config['file'] = $file;
@@ -443,7 +451,7 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
       $media_value = '';
       if ($import_options['media'] <> 'none') {
         if ($import_options['media'] == 'rdf_about') {
-          $media_value = $item['rdf_about'][$item_index]; // unable to create xpath query for this to just select the child. It selects all children, so we grab the value based on the item index.
+          $media_value = is_array($item['rdf_about']) ? $item['rdf_about'][$item_index] : $item['rdf_about']; // unable to create xpath query for this to just select the child. It selects all children, so we grab the value based on the item index.
         }
         else {
           $media_value = $item[$xpath_mapping[$import_options['media']]];
@@ -451,7 +459,11 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
       }
       // If the media file path is not an absolute URL, try to grab it from the extraction of the zip.
       if (substr( $media_value, 0, 4 ) <> "http") {
-        $media_value = drupal_realpath($_SESSION['mukurtu_zip_import']['temp_extract_path'] . $media_value);
+        $relative_path = is_array($media_value) ? reset($media_value) : $media_value;
+        if (substr($relative_path, 0, 1) != DIRECTORY_SEPARATOR) {
+          $relative_path = DIRECTORY_SEPARATOR . $relative_path;
+        }
+        $media_value = drupal_realpath($_SESSION['mukurtu_zip_import']['temp_extract_path'] . $relative_path);
       }
       $item['dc_hasformat'] = $media_value;
 
@@ -514,8 +526,10 @@ function ma_importexport_dc_feeds_presave(FeedsSource $source, $entity, $item) {
 
     // Set the author to the importing user (on the non-MODS import only, as the MODS import includes a username mapping)
     if ($source->id == 'digital_heritage_dc') {
-      global $user;
-      $entity->uid = $user->uid;
+      $config = $source->getConfigFor($source->importer->fetcher);
+      if ($config && !empty($config['mukurtu_uid'])) {
+        $entity->uid = $config['mukurtu_uid'];
+      }
     }
 
     // Set the protocol(s) (the community(s) gets added in mukurtu_protocol_field_node_presave()).

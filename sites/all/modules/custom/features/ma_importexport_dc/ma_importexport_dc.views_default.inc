@@ -417,7 +417,7 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['fields']['field_media_asset']['id'] = 'field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['table'] = 'field_data_field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['field'] = 'field_media_asset';
-  $handler->display->display_options['fields']['field_media_asset']['label'] = 'dc:hasformat';
+  $handler->display->display_options['fields']['field_media_asset']['label'] = 'dc:hasFormat';
   $handler->display->display_options['fields']['field_media_asset']['hide_empty'] = TRUE;
   $handler->display->display_options['fields']['field_media_asset']['click_sort_column'] = 'sid';
   $handler->display->display_options['fields']['field_media_asset']['type'] = 'file_representation';
@@ -825,7 +825,7 @@ ma_importexport_dc_get_relation_field($data->_field_data["nid"]["entity"]);
     t('dc:location'),
     t('dcterms:spatial'),
     t('dc:rights'),
-    t('dc:hasformat'),
+    t('dc:hasFormat'),
     t('dcterms:relation'),
     t('dc:hasVersion'),
     t('Title'),

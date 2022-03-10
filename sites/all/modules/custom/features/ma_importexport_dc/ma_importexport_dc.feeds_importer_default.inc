@@ -97,9 +97,9 @@ function ma_importexport_dc_feeds_importer_default() {
           'dc_hasformat' => array(
             'debug' => 0,
             'inner' => 0,
-            'name' => 'dc:hasformat',
+            'name' => 'dc:hasFormat',
             'raw' => 0,
-            'value' => 'dc:hasformat',
+            'value' => 'dc:hasFormat',
             'weight' => '15',
           ),
           'dc_hasversion' => array(
@@ -181,6 +181,22 @@ function ma_importexport_dc_feeds_importer_default() {
             'raw' => 0,
             'value' => 'dc:type',
             'weight' => '9',
+          ),
+          'dcterms_spatial' => array(
+            'debug' => 0,
+            'inner' => 0,
+            'name' => 'dcterms:spatial',
+            'raw' => 0,
+            'value' => 'dcterms:spatial',
+            'weight' => '18',
+          ),
+          'dcterms_temporal' => array(
+            'debug' => 0,
+            'inner' => 0,
+            'name' => 'dcterms:temporal',
+            'raw' => 0,
+            'value' => 'dcterms:temporal',
+            'weight' => '19',
           ),
           'guid' => array(
             'debug' => 0,
@@ -318,8 +334,20 @@ function ma_importexport_dc_feeds_importer_default() {
             'unique' => FALSE,
           ),
           16 => array(
+            'language' => 'und',
             'source' => 'dc_hasversion',
             'target' => 'field_external_links:url',
+            'unique' => FALSE,
+          ),
+          17 => array(
+            'language' => 'und',
+            'source' => 'dcterms_spatial',
+            'target' => 'field_coverage_description',
+            'unique' => FALSE,
+          ),
+          18 => array(
+            'source' => 'dcterms_temporal',
+            'target' => 'field_date',
             'unique' => FALSE,
           ),
         ),
