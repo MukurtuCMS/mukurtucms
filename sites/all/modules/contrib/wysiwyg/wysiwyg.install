@@ -55,7 +55,7 @@ function wysiwyg_schema() {
         'description' => 'The {filter_format}.format of the text format.',
         'type' => 'varchar',
         'length' => 255,
-        'not null' => FALSE,
+        'not null' => TRUE,
       ),
       'status' => array(
         'description' => 'Boolean indicating whether the format is enabled by default.',
@@ -66,9 +66,9 @@ function wysiwyg_schema() {
         'size' => 'tiny',
       ),
     ),
+    'primary key' => array('uid', 'format'),
     'indexes' => array(
       'uid' => array('uid'),
-      'format' => array('format'),
     ),
     'foreign keys' => array(
       'uid' => array(
@@ -200,12 +200,32 @@ function wysiwyg_update_7200() {
     ));
   }
   else {
-    db_change_field('wysiwyg_user', 'format', 'format', array(
-      'description' => 'The {filter_format}.format of the text format.',
-      'type' => 'varchar',
-      'length' => 255,
-      'not null' => FALSE,
-    ));
+    db_drop_primary_key('wysiwyg_user');
+    db_drop_index('wysiwyg_user', 'uid');
+    db_change_field('wysiwyg_user', 'format', 'format',
+      array(
+        'description' => 'The {filter_format}.format of the text format.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      ),
+      array(
+        'indexes' => array(
+          'uid' => array('uid'),
+          'format' => array('format'),
+        ),
+        'foreign keys' => array(
+          'uid' => array(
+            'table' => 'users',
+            'columns' => array('uid' => 'uid'),
+          ),
+          'format' => array(
+            'table' => 'filter_format',
+            'columns' => array('format' => 'format'),
+          ),
+        ),
+      )
+    );
   }
 }
 
@@ -349,6 +369,104 @@ function wysiwyg_update_7202() {
           'settings' => serialize($settings),
         ))
         ->execute();
+    }
+  }
+}
+
+/**
+ * Add primary index to {wysiwyg_user}.
+ */
+function wysiwyg_update_7203() {
+  db_drop_index('wysiwyg_user', 'uid');
+  db_drop_index('wysiwyg_user', 'format');
+  db_drop_primary_key('wysiwyg_user');
+  db_change_field('wysiwyg_user', 'format', 'format',
+    array(
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => TRUE,
+    ),
+    array(
+      'primary key' => array('uid', 'format'),
+      'indexes' => array(
+        'uid' => array('uid'),
+      ),
+    )
+  );
+}
+
+/**
+ * Remove empty editor profiles and update existing profiles.
+ */
+function wysiwyg_update_7204() {
+  // Remove unused profiles.
+  $query = db_delete('wysiwyg')
+    ->condition('editor', '')
+    ->execute();
+  $query = db_select('wysiwyg', 'w')
+    ->fields('w', array('format', 'editor', 'settings'));
+  drupal_load('module', 'wysiwyg');
+  if (module_exists('ctools')) {
+    drupal_load('module', 'ctools');
+  }
+  foreach ($query->execute() as $profile) {
+    // Clear the editing caches.
+    if (module_exists('ctools')) {
+      ctools_include('object-cache');
+      ctools_object_cache_clear_all('wysiwyg_profile', 'format' . $profile->format);
+    }
+    cache_clear_all('wysiwyg_profile:format' . $profile->format, 'cache');
+    // Move profile state to its own section.
+    $settings = unserialize($profile->settings);
+    if (!empty($settings['_profile_preferences'])) {
+      // Skip in case of re-run.
+      continue;
+    }
+    $preferences = array(
+      'add_to_summaries' => !empty($settings['add_to_summaries']),
+      'default' => $settings['default'],
+      'show_toggle' => $settings['show_toggle'],
+      'user_choose' => $settings['user_choose'],
+      'version' => NULL,
+    );
+    unset($settings['add_to_summaries'], $settings['default'], $settings['show_toggle'], $settings['user_choose']);
+    if (!empty($settings['library'])) {
+      $prefereces['library'] = $settings['library'];
+      unset($settings['library']);
+    }
+    $editor = wysiwyg_get_editor($profile->editor);
+    if ($editor['installed']) {
+      $preferences['version'] = $editor['installed version'];
+    }
+    $settings['_profile_preferences'] = $preferences;
+    db_update('wysiwyg')
+      ->condition('format', $profile->format)
+      ->fields(array(
+        'settings' => serialize($settings),
+      ))
+      ->execute();
+  }
+  wysiwyg_profile_cache_clear();
+}
+
+/**
+ * Check for profiles without add_to_summaries settings.
+ */
+function wysiwyg_update_7205() {
+  $query = db_select('wysiwyg', 'w');
+  $query->join('filter_format', 'f', 'w.format = f.format');
+  $query->fields('w', array('format', 'editor', 'settings'));
+  $query->fields('f', array('name'));
+
+  foreach ($query->execute() as $profile) {
+    $settings = unserialize($profile->settings);
+
+    if (!isset($settings['_profile_preferences']['add_to_summaries'])) {
+      $values = array(
+        '@format' => $profile->name,
+        '!url' => 'https://www.drupal.org/node/2851313',
+      );
+      drupal_set_message(t('You may need to manually resave the Wysiwyg profile configuration tied to the @format text format. See !url', $values), 'warning');
     }
   }
 }

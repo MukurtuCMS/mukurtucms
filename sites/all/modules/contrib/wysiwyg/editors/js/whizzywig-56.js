@@ -72,50 +72,52 @@ Drupal.wysiwyg.editor.attach.whizzywig = function(context, params, settings) {
   wysiwygWhizzywig.currentField = params.field;
   wysiwygWhizzywig.fields[wysiwygWhizzywig.currentField] = '';
   // Whizzywig needs to have the width set 'inline'.
-  var $field = $('#' + params.field);
-  var originalValues = Drupal.wysiwyg.instances[params.field];
-  originalValues.originalStyle = $field.attr('style');
+  var $field = this.$field;
+  this.originalStyle = $field.attr('style');
   $field.css('width', $field.width() + 'px');
+  // Whizzywig uses defaultValue instead of value.
+  $field.attr('defaultValue', $field.val());
 
   // Attach editor.
   makeWhizzyWig(params.field, (settings.buttons ? settings.buttons : 'all'));
-  // Whizzywig fails to detect and set initial textarea contents.
-  $('#whizzy' + params.field).contents().find('body').html(tidyD($field.val()));
+  var wysiwygInstance = this;
+  setTimeout(function () {
+    // Whizzywig moves the field around, breaking event handlers and references.
+    $field = $('#' + params.field);
+    wysiwygInstance.startWatching($field, {textarea: $field}, function (context) {
+      return context.textarea.css('display') === 'block';
+    });
+  }, 100);
+  this.startWatching($('#whizzy' + params.field).contents().find('body'), {textarea: $field}, function (context) {
+    return context.textarea.css('display') !== 'block';
+  });
+
 };
 
 /**
  * Detach a single or all editors.
  */
 Drupal.wysiwyg.editor.detach.whizzywig = function (context, params, trigger) {
-  var detach = function (index) {
-    var id = whizzies[index], $field = $('#' + id), instance = Drupal.wysiwyg.instances[id];
-
+  for (var index = 0; index < whizzies.length; index++) {
+    if (whizzies[index] !== this.field) {
+      continue;
+    }
+    var $field = this.$field;
     // Save contents of editor back into textarea.
-    $field.val(instance.getContent());
+    $field.val(this.getContent());
     // If the editor is just being serialized (not detached), our work is done.
     if (trigger == 'serialize') {
       return;
     }
     // Remove editor instance.
-    $('#' + id + '-whizzywig').remove();
+    $('#' + this.field + '-whizzywig').remove();
     whizzies.splice(index, 1);
 
     // Restore original textarea styling.
-    $field.removeAttr('style').attr('style', instance.originalStyle);
-  };
-
-  if (typeof params != 'undefined') {
-    for (var i = 0; i < whizzies.length; i++) {
-      if (whizzies[i] == params.field) {
-        detach(i);
-        break;
-      }
+    if ('originalStyle' in this) {
+      $field.removeAttr('style').attr('style', this.originalStyle);
     }
-  }
-  else {
-    while (whizzies.length > 0) {
-      detach(0);
-    }
+    break;
   }
 };
 
@@ -129,6 +131,7 @@ Drupal.wysiwyg.editor.instance.whizzywig = {
   },
 
   setContent: function (content) {
+    var $field = $('#' + this.field);
     // Whizzywig shows the original textarea in source mode.
     if ($field.css('display') == 'block') {
       $('#' + this.field).val(content);

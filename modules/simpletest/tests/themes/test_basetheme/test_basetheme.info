@@ -6,7 +6,7 @@ hidden = TRUE
 settings[basetheme_only] = base theme value
 settings[subtheme_override] = base theme value
 
-; Information added by Drupal.org packaging script on 2022-01-19
-version = "7.87"
+; Information added by Drupal.org packaging script on 2022-02-16
+version = "7.88"
 project = "drupal"
-datestamp = "1642633901"
+datestamp = "1645030312"
