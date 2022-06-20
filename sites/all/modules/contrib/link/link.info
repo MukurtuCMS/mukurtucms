@@ -34,8 +34,8 @@ test_dependencies[] = token:token
 ; Standalone unit tests.
 files[] = tests/LinkUnitTestCase.test
 
-; Information added by Drupal.org packaging script on 2021-04-19
-version = "7.x-1.9"
+; Information added by Drupal.org packaging script on 2022-05-04
+version = "7.x-1.11"
 core = "7.x"
 project = "link"
-datestamp = "1618831239"
+datestamp = "1651671649"

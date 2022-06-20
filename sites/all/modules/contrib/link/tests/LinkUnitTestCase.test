@@ -46,6 +46,13 @@ class LinkUnitTestCase extends DrupalUnitTestCase {
           'page' => 42,
         ),
       ),
+      'https://www.drupal.org/?page=42&mango=thebest' => array(
+        'url' => 'https://www.drupal.org/',
+        'query' => array(
+          'page' => 42,
+          'mango' => 'thebest',
+        ),
+      ),
       'https://www.drupal.org/#footer' => array(
         'url' => 'https://www.drupal.org/',
         'fragment' => 'footer',
@@ -69,6 +76,10 @@ class LinkUnitTestCase extends DrupalUnitTestCase {
         $this->assertTrue(isset($actual_parts['query']));
         $this->assertTrue(is_array($actual_parts['query']));
         $this->assertEqual(count($expected_parts['query']), count($actual_parts['query']));
+        foreach ($expected_parts['query'] as $key => $val) {
+          $this->assertTrue(isset($actual_parts['query'][$key]));
+          $this->assertEqual($val, $actual_parts['query'][$key]);
+        }
       }
       // If it was not expected, make sure it wasn't added anyway.
       else {

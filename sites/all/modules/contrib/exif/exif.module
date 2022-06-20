@@ -67,8 +67,9 @@ function exif_help($path, $arg) {
 function exif_permission() {
   return array(
     'administer image metadata' => array(
-      'title' => t('Administer image metadata'),
-  ),
+      'title' => t('Administer image metadata (EXIF)'),
+      'restrict access' => TRUE,
+    ),
   );
 }
 

@@ -221,6 +221,7 @@ class LinkValidationApiTest extends LinkBaseTestClass {
     foreach ($allowed_protocols as $protocol) {
       if ($protocol !== 'news' && $protocol !== 'mailto') {
         $links[] = $protocol . '://www.example.com';
+        $links[] = $protocol . '://www.example.com/resource';
       }
     }
     foreach ($links as $link) {

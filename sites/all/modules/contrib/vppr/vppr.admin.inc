@@ -18,7 +18,7 @@ function vppr_taxonomy_overview_vocabularies() {
   $vocabularies = taxonomy_get_vocabularies();
   $rows = array();
   foreach ($vocabularies as $vocabulary) {
-    if (user_access('administer ' . $vocabulary->machine_name . ' vocabulary terms')) {
+    if (user_access('administer terms in all vocabularies') || user_access('administer ' . $vocabulary->machine_name . ' vocabulary terms')) {
       $row = array();
       $row[] = check_plain($vocabulary->name);
       $row[] = l(t('list terms'), "admin/structure/taxonomy/$vocabulary->machine_name");
