@@ -532,6 +532,9 @@ class LinkFieldCrudTest extends LinkBaseTestClass {
         'href' => 'http://example.com/' . $this->randomName() . '?property=value',
       ),
       array(
+        'href' => 'http://example.com/' . $this->randomName() . '?property=value&mango=thebest',
+      ),
+      array(
         'href' => 'http://example.com/' . $this->randomName() . '#position',
       ),
       array(
@@ -565,7 +568,9 @@ class LinkFieldCrudTest extends LinkBaseTestClass {
     // Loop over the nodes, confirm each URL is rendered correctly.
     foreach ($link_title_tests as $input) {
       $this->drupalGet($input['url']);
-      $this->assertRaw(l($input['href'], $input['href']), "Test that the link title has been set to " . $input['href']);
+      // This is precarious. It isn't possible to compare the link as-is because
+      // it is already filtered via check_plain().
+      $this->assertRaw(l($input['href'], $input['href'], array('html' => TRUE)), "Test that the link title has been set to " . $input['href']);
     }
   }
 

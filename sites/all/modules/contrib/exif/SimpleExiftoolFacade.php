@@ -93,19 +93,23 @@ class SimpleExifToolFacade implements ExifInterface {
   }
 
   function runTool($file,$enable_sections = true,$enable_markerNote = false,$enable_non_supported_tags = false) {
-    $params="";
+    $params = ' -E -n -json ';
     if ($enable_sections) {
-      $params="-g -struct ";
+      $params .= '-g -struct ';
     }
     if ($enable_markerNote) {
-      $params=$params."-fast ";
-    } else {
-      $params=$params."-fast2 ";
+      $params .= '-fast ';
+    }
+    else {
+      $params .= '-fast2 ';
     }
     if ($enable_non_supported_tags) {
-      $params=$params." -u -U";
+      $params .= '-u -U ';
     }
-    $commandline = "exiftool -E -n -json ".$params."\"".$file."\"";
+    // Escape all of the arguments passed to the function.
+    // Note: If params is expanded so it is customizable, make sure that each
+    // piece is passed through escapeshellarg().
+    $commandline = escapeshellcmd('exiftool' . $params . escapeshellarg($file));
     $output = array();
     $returnCode = 0;
     exec($commandline,$output,$returnCode);

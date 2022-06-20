@@ -118,7 +118,8 @@ class LinkFieldAttributesTest extends LinkBaseTestClass {
 
     // Now that we have a new content type, create a user that has privileges
     // on the content type.
-    $permissions = array_merge($this->permissions, array($permission));
+    $permissions = $this->permissions;
+    $permissions[$permission] = $permission;
     $this->web_user = $this->drupalCreateUser($permissions);
     $this->drupalLogin($this->web_user);
 
@@ -196,7 +197,8 @@ class LinkFieldAttributesTest extends LinkBaseTestClass {
 
     // Now that we have a new content type, create a user that has privileges
     // on the content type.
-    $permissions = array_merge($this->permissions, array($permission));
+    $permissions = $this->permissions;
+    $permissions[$permission] = $permission;
     $this->web_user = $this->drupalCreateUser($permissions);
     $this->drupalLogin($this->web_user);
   }

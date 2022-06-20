@@ -579,7 +579,7 @@ function _link_validate(&$item, $delta, $field, $entity, $instance, $langcode, &
     }
   }
   // Require a link if we have a title.
-  if ($instance['settings']['url'] !== 'optional' && strlen(isset($item['title']) ? $item['title'] : NULL) > 0 && strlen(trim($item['url'])) == 0) {
+  if ($instance['settings']['url'] !== 'optional' && strlen(isset($item['title']) ? $item['title'] : '') > 0 && strlen(trim($item['url'])) == 0) {
     $errors[$field['field_name']][$langcode][$delta][] = array(
       'error' => 'link_required',
       'message' => t('You cannot enter a title without a link url.'),
@@ -762,7 +762,7 @@ function _link_sanitize(&$item, $delta, &$field, $instance, &$entity) {
   }
 
   // Replace title tokens.
-  if ($title && $instance['settings']['enable_tokens']) {
+  if ($title !== '' && $instance['settings']['enable_tokens']) {
     $text_tokens = token_scan($title);
     if (!empty($text_tokens)) {
       // Load the entity if necessary for entities in views.
@@ -776,24 +776,32 @@ function _link_sanitize(&$item, $delta, &$field, $instance, &$entity) {
       $title = token_replace($title, array($entity_token_type => $entity_loaded));
     }
   }
-  if ($title && ($instance['settings']['title'] == 'value' || $instance['settings']['enable_tokens'])) {
-    $title = filter_xss($title, array(
-      'b',
-      'br',
-      'code',
-      'em',
-      'i',
-      'img',
-      'span',
-      'strong',
-      'sub',
-      'sup',
-      'tt',
-      'u',
-    ));
-    $item['html'] = TRUE;
+  if ($title !== '') {
+    // if title may potentially use tokens, assume that they may contain HTML
+    if ($instance['settings']['title'] == 'value' || $instance['settings']['enable_tokens']) {
+      $item['html'] = TRUE;
+    }
+    if (!empty($item['html'])) {
+      $title = filter_xss($title, array(
+        'b',
+        'br',
+        'code',
+        'em',
+        'i',
+        'img',
+        'span',
+        'strong',
+        'sub',
+        'sup',
+        'tt',
+        'u',
+      ));
+    }
+    $item['title'] = $title;
   }
-  $item['title'] = empty($title) && $title !== '0' ? $item['display_url'] : $title;
+  else {
+    $item['title'] = $item['display_url'];
+  }
 
   if (!isset($item['attributes'])) {
     $item['attributes'] = array();
@@ -955,7 +963,7 @@ function link_menu() {
     'description' => 'Settings for the link module.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('link_admin_settings'),
-    'access arguments' => array('access administration pages'),
+    'access arguments' => array('administer site configuration'),
     'file' => 'link.admin.inc',
   );
   return $items;
@@ -1449,6 +1457,12 @@ function theme_link_formatter_link_url($vars) {
   }
   unset($link_options['title']);
   unset($link_options['url']);
+
+  if (!isset($vars['element']['display_url'])) {
+    // Display suite sometimes does not set 'display_url'.
+    $vars['element']['display_url'] = $vars['element']['url'];
+  }
+
   return l($vars['element']['display_url'], $vars['element']['url'], $link_options);
 }
 
@@ -1623,6 +1637,16 @@ function link_validate_url($text, $langcode = NULL) {
   $text = _link_clean_relative($text);
   $text = link_cleanup_url($text);
   $type = link_url_type($text);
+
+  if ($type == LINK_EXTERNAL) {
+    $scheme = parse_url($text, PHP_URL_SCHEME);
+    if ($scheme && !in_array(strtolower($scheme), array('http', 'https', 'ftp', 'feed'))) {
+      // valid_url() cannot validate this scheme (which can be anything, if
+      // filter_allowed_protocols was changed). The exact syntax is likely
+      // unknown, so skip the next block and accept anything.
+      $type = $scheme;
+    }
+  }
 
   if ($type && ($type == LINK_INTERNAL || $type == LINK_EXTERNAL)) {
     $flag = valid_url($text, $type == LINK_EXTERNAL);

@@ -1,3 +1,24 @@
+Link 7.x-1.11, 2022-05-04
+-------------------------
+By brad.bulger, DamienMcKenna, greggles: Improved output w/o token handling.
+
+
+Link 7.x-1.10, 2022-05-04
+-------------------------
+#3210438 by DamienMcKenna: Test coverage - URLs with multiple query parameters.
+#3230624 by DamienMcKenna: Change test permission handling.
+#2209995 by jenlampton, RenatoG: formatter "URL, as link" throws error when
+  displayed via Display Suite.
+#3230730 by DamienMcKenna, clemens.tolboom, jvogt, RenatoG: Wrong permission
+  used for the settings page.
+#3254549 by DamienMcKenna, RenatoG: Tidy variable assertion logic in
+  _link_sanitize().
+#3269635 by marciaibanez, DamienMcKenna, poker10, RenatoG: PHP 8.1: strlen()
+  parameter change.
+#3268969 by roderik, RenatoG: Non-standard URL schemes with more than just
+  hostname fail validation.
+
+
 Link 7.x-1.9, 2021-04-19
 ------------------------
 #3209434 by DamienMcKenna, tiziano.sartori: Syntax error, unexpected '(' after

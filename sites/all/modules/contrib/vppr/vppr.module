@@ -50,7 +50,7 @@ function vppr_access_taxonomy() {
  * VPPR's access callback for terms list.
  */
 function vppr_access_vocabulary_terms($vocabulary) {
-  if (user_access('administer taxonomy') || user_access('administer ' . $vocabulary->machine_name . ' vocabulary terms')) {
+  if (user_access('administer taxonomy') || user_access('administer terms in all vocabularies') || user_access('administer ' . $vocabulary->machine_name . ' vocabulary terms')) {
     return TRUE;
   }
   return FALSE;
@@ -60,7 +60,7 @@ function vppr_access_vocabulary_terms($vocabulary) {
  * Return edit access for a given term.
  */
 function vppr_access_term_edit($term) {
-  if (taxonomy_term_edit_access($term) || user_access('administer ' . $term->vocabulary_machine_name . ' vocabulary terms')) {
+  if (taxonomy_term_edit_access($term) || user_access('administer terms in all vocabularies') || user_access('administer ' . $term->vocabulary_machine_name . ' vocabulary terms')) {
     return TRUE;
   }
   return FALSE;
@@ -70,7 +70,7 @@ function vppr_access_term_edit($term) {
  * Return delete access for a given term.
  */
 function vppr_access_term_delete($term) {
-  if (user_access('administer taxonomy') || user_access("delete terms in $term->vid") || user_access('administer ' . $term->vocabulary_machine_name . ' vocabulary terms')) {
+  if (user_access('administer taxonomy') || user_access('administer terms in all vocabularies') || user_access("delete terms in $term->vid") || user_access('administer ' . $term->vocabulary_machine_name . ' vocabulary terms')) {
     return TRUE;
   }
   return FALSE;
@@ -89,7 +89,9 @@ function vppr_form_taxonomy_form_term_alter(&$form, &$form_state) {
  * Implements hook_permission().
  */
 function vppr_permission() {
-  $perms = array();
+  $perms['administer terms in all vocabularies'] = array(
+    'title' => t('Administer terms in all vocabularies'),
+  );
   $vocabularies = taxonomy_get_vocabularies();
   foreach ($vocabularies as $vocabulary) {
     $perms['administer ' . $vocabulary->machine_name . ' vocabulary terms'] = array(

@@ -3,9 +3,9 @@ description = "Allow adding to/editing terms of/removing terms from vocabularies
 core = 7.x
 dependencies[] = taxonomy
 
-; Information added by drupal.org packaging script on 2012-10-06
-version = "7.x-1.0"
+; Information added by Drupal.org packaging script on 2017-05-19
+version = "7.x-1.0+1-dev"
 core = "7.x"
 project = "vppr"
-datestamp = "1349514718"
+datestamp = "1495190445"
 
