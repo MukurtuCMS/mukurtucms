@@ -564,6 +564,7 @@ fieldset .fieldset-legend {
   padding-left: 15px; /* LTR */
   position: absolute;
   text-transform: uppercase;
+  z-index: 1;
 }
 fieldset .fieldset-wrapper {
   padding: 0 13px 13px 15px; /* LTR */

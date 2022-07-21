@@ -30,6 +30,9 @@ projects[drupal][patch][] = https://www.drupal.org/files/issues/2022-02-07/insta
 ; Patch for Drush.
 projects[drupal][patch][] = https://drupal.org/files/issues/2019-01-17/3026560-d7-20.patch
 
+; Patch fieldsets in Seven.
+projects[drupal][patch][] = https://www.drupal.org/files/issues/2022-06-23/update_fieldset-legend__collapsable-3292211-3.patch
+
 ;;;;;;;;;;;;;;;;;;;
 ;; Core Projects ;;
 ;;;;;;;;;;;;;;;;;;;
