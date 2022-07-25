@@ -105,15 +105,21 @@ Class ExifPHPExtension implements ExifInterface {
           $value=trim($value);
         }
         if (!drupal_validate_utf8($value)) {
-            $value=utf8_encode($value);
+          $value = utf8_encode($value);
         }
         switch ($key) {
           // String values.
           case 'usercomment':
-			if ($this->startswith($value,'UNICODE')) {
-				$value=substr($value,8);
-        	}
-        	break;
+          case 'title':
+          case 'comment':
+          case 'author':
+          case 'subject':
+            if ($this->startswith($value, 'UNICODE')) {
+              $value = substr($value, 8);
+            }
+            $value = $this->_exif_reencode_to_utf8($value);
+            break;
+
           // Date values.
           case 'filedatetime':
           	$value=date('c',$value);
@@ -121,8 +127,9 @@ Class ExifPHPExtension implements ExifInterface {
           case 'datetimeoriginal':
           case 'datetime':
           case 'datetimedigitized':
-            // In case we get a datefield, we need to reformat it to the ISO 8601 standard:
-            // which will look something like 2004-02-12T15:19:21
+            // In case we get a datefield, we need to reformat it
+            // to the ISO 8601 standard which will look something
+            // like '2004-02-12T15:19:21'.
             $date_time = explode(" ", $value);
             $date_time[0] = str_replace(":", "-", $date_time[0]);
             if (variable_get('exif_granularity', 0) == 1) {
@@ -271,12 +278,7 @@ Class ExifPHPExtension implements ExifInterface {
     }
     $data1 = $this->readExifTags($file, $enable_sections);
     $data2 = $this->readIPTCTags($file, $enable_sections);
-    if (class_exists('SXMPFiles')) {
-      $data3 = $this->readXMPTags($file, $enable_sections);
-      $data = array_merge($data1, $data2, $data3);
-    } else {
-      $data = array_merge($data1, $data2);
-    }
+    $data = array_merge($data1, $data2);
 
     if (is_array($data)) {
       foreach ($data as $section => $section_data) {
@@ -311,8 +313,9 @@ Class ExifPHPExtension implements ExifInterface {
     }
     $exif = array();
     try {
-      $exif = exif_read_data($file, 0,$enable_sections);
-    }  catch (Exception $e) {
+      $exif = @exif_read_data($file, 0, $enable_sections);
+    }
+    catch (Exception $e) {
       watchdog('exif', 'Error while reading EXIF tags from image: !message', array('!message' => $e->getMessage()), WATCHDOG_WARNING);
     }
     $arSmallExif = array();
@@ -376,116 +379,6 @@ Class ExifPHPExtension implements ExifInterface {
     }
   }
 
-  /**
-   * Read XMP data from an image file.
-   *
-   * @param string $file File path.
-   *
-   * @param boolean $enable_sections Available metadata fields.
-   *
-   * @return array XMP image metadata.
-   *
-   */
-  public function readXMPTags($file, $enable_sections = TRUE) {
-    SXMPFiles::Initialize();
-
-    // Get all available XMP tags and XMP data provided by current file
-    $xmpTags = $this->getXMPFields();
-    $xmp = $this->openXMP($file);
-
-    $info = array();
-
-    if ($xmp != FALSE) {
-      // Iterate over XMP fields defined by CCK.
-      foreach ($xmpTags as $tagName => $tag) {
-        // Get XMP field.
-        $config = $tag;
-        $field = $this->readXMPItem($xmp, $config);
-        $info[$tagName] = $field;
-      }
-
-      $this->closeXMP($xmp);
-    }
-    SXMPFiles::Terminate();
-
-    if ($enable_sections) {
-      return array('xmp' => $info);
-    }
-    else {
-      return $info;
-    }
-  }
-
-  /**
-   * Open an image file for XMP data extraction.
-   *
-   * @param string $file File path.
-   *
-   * @return array XMP file and metadata.
-   */
-  function openXMP($file) {
-    // Setup.
-    $xmpfiles = new SXMPFiles();
-    $xmpmeta = new SXMPMeta();
-
-    // Open.
-    $xmpfiles->OpenFile($file);
-    // Get XMP metadata into the object.
-    if ($xmpfiles->GetXMP($xmpmeta)) {
-      // Sort metadata.
-      $xmpmeta->Sort();
-      return array('files' => $xmpfiles, 'meta' => $xmpmeta);
-    }
-    // No XMP data available.
-    return FALSE;
-  }
-
-  /**
-   * Close a file opened for XMP data extraction.
-   *
-   * @param $xmp
-   *   XMP array as returned from openXMP().
-   */
-  function closeXMP($xmp) {
-    $xmp['files']->CloseFile();
-  }
-
-  /**
-   * Read a single item from an image file.
-   *
-   * @param $xmp
-   *   XMP array as returned from openXMP().
-   *
-   * @param $config
-   *   XMP field configuration.
-   *
-   * @param $key
-   *   In case of array field type, the numeric field key.
-   *
-   * @return object Field value.
-   */
-  public function readXMPItem($xmp, $config, $key = 0) {
-    // Setup.
-    $xmpfiles = $xmp['files'];
-    $xmpmeta = $xmp['meta'];
-    $value = '';
-
-
-    // Try to read XMP data if the namespace is available.
-    if (@$xmpmeta->GetNamespacePrefix($config['ns'])) {
-      if ($config['type'] == 'property') {
-        $value = @$xmpmeta->GetProperty($config['ns'], $config['name']);
-      }
-      elseif ($config['type'] == 'array') {
-        $value = @$xmpmeta->GetArrayItem($config['ns'], $config['name'], $key);
-      }
-      elseif ($config['type'] == 'struct') {
-        $value = @$xmpmeta->GetStructField($config['ns'], $config['struct'], $config['ns'], $config['name']);
-      }
-    }
-
-    return $value;
-  }
 
   public function getHumanReadableExifKeys() {
     return array(
@@ -923,115 +816,6 @@ Class ExifPHPExtension implements ExifInterface {
     );
   }
 
-  /**
-   * XMP fields mapper. As we're dealing with a mapper between RDF
-   * elements and CCK fields, we have to define custom keys that
-   * both on the field name and the namespace used.
-   *
-   * And, as the XMP specs also defines some datatypes like properties,
-   * arrays and structures, we have to deal with those as well.
-   *
-   * @return array
-   *   Mapping between CCK and XMP fields.
-   */
-  public function getXMPFields() {
-    return array(
-      'headline' => array(
-        'name' => 'Headline',
-        'ns' => 'http://ns.adobe.com/photoshop/1.0/',
-        'type' => 'property',
-      ),
-      'authorsposition' => array(
-        'name' => 'AuthorsPosition',
-        'ns' => 'http://ns.adobe.com/photoshop/1.0/',
-        'type' => 'property',
-      ),
-      'source' => array(
-        'name' => 'Source',
-        'ns' => 'http://ns.adobe.com/photoshop/1.0/',
-        'type' => 'property',
-      ),
-      'instructions' => array(
-        'name' => 'Instructions',
-        'ns' => 'http://ns.adobe.com/photoshop/1.0/',
-        'type' => 'property',
-      ),
-      'subject' => array(
-        'name' => 'subject',
-        'ns' => 'http://purl.org/dc/elements/1.1/',
-        'type' => 'array',
-      ),
-      'description' => array(
-        'name' => 'description',
-        'ns' => 'http://purl.org/dc/elements/1.1/',
-        'type' => 'array',
-      ),
-      'creator' => array(
-        'name' => 'creator',
-        'ns' => 'http://purl.org/dc/elements/1.1/',
-        'type' => 'array',
-      ),
-      'rights' => array(
-        'name' => 'rights',
-        'ns' => 'http://purl.org/dc/elements/1.1/',
-        'type' => 'array',
-      ),
-      'title' => array(
-        'name' => 'title',
-        'ns' => 'http://purl.org/dc/elements/1.1/',
-        'type' => 'array',
-      ),
-      'ciadrextadr' => array(
-        'name' => 'CiAdrExtadr',
-        'ns' => 'http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/',
-        'type' => 'struct',
-        'struct' => 'CreatorContactInfo',
-      ),
-      'ciemailwork' => array(
-        'name' => 'CiEmailWork',
-        'ns' => 'http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/',
-        'type' => 'struct',
-        'struct' => 'CreatorContactInfo',
-      ),
-      'ciurlwork' => array(
-        'name' => 'CiUrlWork',
-        'ns' => 'http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/',
-        'type' => 'struct',
-        'struct' => 'CreatorContactInfo',
-      ),
-      'scene' => array(
-        'name' => 'Scene',
-        'ns' => 'http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/',
-        'type' => 'array',
-      ),
-      'subjectcode' => array(
-        'name' => 'SubjectCode',
-        'ns' => 'http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/',
-        'type' => 'array',
-      ),
-      'hierarchicalsubject' => array(
-        'name' => 'hierarchicalSubject',
-        'ns' => 'http://ns.adobe.com/lightroom/1.0/',
-        'type' => 'array',
-      ),
-      'location' => array(
-        'name' => 'Location',
-        'ns' => 'http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/',
-        'type' => 'property',
-      ),
-      'credit' => array(
-        'name' => 'Credit',
-        'ns' => 'http://ns.adobe.com/photoshop/1.0/',
-        'type' => 'property',
-      ),
-      'countrycode' => array(
-        'name' => 'CountryCode',
-        'ns' => 'http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/',
-        'type' => 'property',
-      ),
-    );
-  }
-
   public function getFieldKeys() {
     $exif_keys_temp = $this->getHumanReadableExifKeys();
     $exif_keys = array();
@@ -1044,13 +828,7 @@ Class ExifPHPExtension implements ExifInterface {
       $current_value = "iptc_" . $value;
       $iptc_keys[$current_value] = $current_value;
     }
-    $xmp_keys = array();
-    $xmp_keys_temp = array_keys($this->getXMPFields());
-    foreach ($xmp_keys_temp as $value) {
-      $current_value = "xmp_" . $value;
-      $xmp_keys[$current_value] = $current_value;
-    }
-    $fields = array_merge($exif_keys, $iptc_keys, $xmp_keys);
+    $fields = array_merge($exif_keys, $iptc_keys);
     ksort($fields);
     return $fields;
   }

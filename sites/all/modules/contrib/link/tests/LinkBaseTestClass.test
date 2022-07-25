@@ -16,15 +16,15 @@ class LinkBaseTestClass extends DrupalWebTestCase {
    * @var array
    */
   protected $permissions = array(
-    'access content',
-    'administer content types',
-    'administer fields',
-    'administer nodes',
-    'administer filters',
-    'access comments',
-    'post comments',
-    'access administration pages',
-    'create page content',
+    'access content' => 'access content',
+    'administer content types' => 'administer content types',
+    'administer fields' => 'administer fields',
+    'administer nodes' => 'administer nodes',
+    'administer filters' => 'administer filters',
+    'access comments' => 'access comments',
+    'post comments' => 'post comments',
+    'access administration pages' => 'access administration pages',
+    'create page content' => 'create page content',
   );
 
   /**

@@ -25,10 +25,8 @@ class LinkPathPrefixesTest extends LinkBaseTestClass {
    * {@inheritdoc}
    */
   public function setUp(array $modules = array()) {
-    $this->permissions = array_merge($this->permissions, array(
-      'administer site configuration',
-      'administer languages',
-    ));
+    $this->permissions['administer site configuration'] = 'administer site configuration';
+    $this->permissions['administer languages'] = 'administer languages';
     $modules[] = 'locale';
     $modules[] = 'locale_test';
     $modules[] = 'translation';
