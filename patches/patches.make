@@ -24,6 +24,9 @@ projects[drupal][patch][] = core/multipatch-109315810-109315810-109315810.patch
 ; Redirect on empty database for Reclaim.
 projects[drupal][patch][] = core/install_redirect_on_empty_database-728702-17.patch
 
+; Chrome collapsible fieldset bug (https://www.drupal.org/project/drupal/issues/3243853).
+projects[drupal][patch][] = core/seven-collapsible-fieldset-chrome-fix.patch
+
 ;;;;;;;;;;;;;;;;;;;
 ;; Core Projects ;;
 ;;;;;;;;;;;;;;;;;;;
