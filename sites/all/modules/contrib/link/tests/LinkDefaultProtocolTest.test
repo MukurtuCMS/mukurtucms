@@ -24,6 +24,15 @@ class LinkDefaultProtocolTest extends LinkBaseTestClass {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    // This extra permission is required for the settings page.
+    $this->permissions['administer site configuration'] = 'administer site configuration';
+    parent::setUp($modules);
+  }
+
+  /**
    * A link without a default protocol uses the default (HTTP).
    */
   public function testHttpDefaultProtocolOnUrlWithoutDefinedProtocol() {

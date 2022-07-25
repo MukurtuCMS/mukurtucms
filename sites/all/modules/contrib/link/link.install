@@ -143,3 +143,10 @@ function link_update_7001() {
     }
   }
 }
+
+/**
+ * Rebuild the menu cache to make the settings page use the correct permission.
+ */
+function link_update_7100() {
+  variable_set('menu_rebuild_needed', TRUE);
+}
