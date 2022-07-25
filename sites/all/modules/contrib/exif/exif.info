@@ -15,9 +15,8 @@ files[]=exif_functionaltests_with_locale.test
 files[]=exif_unittests.test
 configure = admin/config/media/exif
 
-; Information added by Drupal.org packaging script on 2018-03-21
-version = "7.x-1.9"
+; Information added by Drupal.org packaging script on 2022-04-06
+version = "7.x-1.10"
 core = "7.x"
 project = "exif"
-datestamp = "1521668884"
-
+datestamp = "1649271394"

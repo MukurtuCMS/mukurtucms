@@ -57,19 +57,6 @@ function exif_requirements($phase) {
         'severity' => REQUIREMENT_ERROR,
       );
     }
-    if (!class_exists('SXMPFiles')) {
-      $requirements['SXMPFiles'] = array(
-        'title' => $t('XMP library is not available'),
-        'description' => $t('Functions SXMP are not available on the system. XMP metadata will not be extracted.'),
-        'value' => $t('SXMP library is not available'),        
-        'severity' => REQUIREMENT_WARNING,
-      );
-      // Do not show the warning during install.
-      // It leads to an unnecessary click in the install process.
-      if ($phase == 'install') {
-        $requirements['SXMPFiles']['severity'] = REQUIREMENT_INFO;
-      }
-    }
   }
   return $requirements;
 }
