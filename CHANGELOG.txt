@@ -1,3 +1,19 @@
+Drupal 7.91, 2022-07-20
+-----------------------
+- Fixed security issues:
+   - SA-CORE-2022-012
+
+Drupal 7.90, 2022-06-01
+-----------------------
+- Improved support for PHP 8.1
+- Improved support for PostgreSQL
+- Various bug fixes, optimizations and improvements
+
+Drupal 7.89, 2022-03-02
+-----------------------
+- Bug fixes for PHP 8.1
+- Fix tests for PostgreSQL
+
 Drupal 7.88, 2022-02-15
 -----------------------
 - Fixed security issues:
