@@ -158,10 +158,6 @@ projects[owlcarousel][patch][] = contrib/0001-Add-ID-to-handle-multiple-carousel
 ; This is from https://www.drupal.org/files/issues/quicktabs-tab-history-1454486-35.patch with a very minor edit to the JS to only remember tab history for the CP quicktabs (otherwise it remembers tab history for Community Records as well, which we don't want).
 projects[quicktabs][patch][] = contrib/remember_cp_collab_tab.patch
 
-;;; Resumable Downloads
-; Fix for module creating an invalid header.
-projects[resumable_download][patch][] = https://www.drupal.org/files/issues/invalid_header_generated-2362393.patch
-
 ;;; Scald
 ; Use simple dewplayer for audio
 projects[scald][patch][] = contrib/use_simple_dewplayer_for_audio.patch
