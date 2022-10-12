@@ -51,6 +51,10 @@ projects[seven][patch][] = core/use_mukurtu_logo_during_install.patch
 ;; Contrib ;;
 ;;;;;;;;;;;;;
 
+;;; Argument Filters
+; Make arg filters compatible with PHP 8
+projects[argfilters][patch][] = contrib/make_arg_filters_module_php8_compatible.patch
+
 ;;; Bootstrap (theme)
 ; Add First and Last Classes to Lists
 projects[bootstrap][patch][] = contrib/150281138-add-first-last-classes-to-lists.patch
