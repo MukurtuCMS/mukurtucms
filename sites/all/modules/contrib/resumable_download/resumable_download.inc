@@ -1,10 +1,7 @@
 <?php
-DEFINE('RESUMABLE_DOWNLOAD_KB_PER_READ', 2);    // min = 1, max = 8
-// don't touch the defines below, they are automatically calculated:
-DEFINE('RESUMABLE_DOWNLOAD_SLEEP_NUMERATOR', RESUMABLE_DOWNLOAD_KB_PER_READ * 1000000);
-DEFINE('RESUMABLE_DOWNLOAD_MINIMUM_SLEEP_TIME', RESUMABLE_DOWNLOAD_KB_PER_READ * 100);
-DEFINE('RESUMABLE_DOWNLOAD_BYTES_PER_READ', RESUMABLE_DOWNLOAD_KB_PER_READ * 1024);
-
+/**
+* @todo file_exists is case sensitive but the other part for download is not, it may cause problem
+*/
 function _resumable_download_download() {
   // Merge remainder of arguments from GET['q'], into relative file path.
   $args = func_get_args();
@@ -22,10 +19,42 @@ function _resumable_download_download() {
   $filepath = drupal_realpath($uri);
 
   if (file_exists($filepath)) {
-    $headers = module_invoke_all('file_download', $uri);
-    if (in_array(-1, $headers)) {
+    $headers = file_download_headers($uri);
+    if (empty($headers)) {
       return drupal_access_denied();
     }
+
+	// Check for modification of the file, first we need to know: does the browser request include modification check?
+	if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
+      // Read timestamp the browser tell us
+      $ifs = strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']);
+      // Get timestamp of the file on our server
+      $modified = filemtime($filepath);
+      if ($modified == $ifs) {
+        // Check E-TAG too, when the request contains it
+        if (isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
+          $ifsn = ($_SERVER['HTTP_IF_NONE_MATCH']);
+          $filesizeb = filesize($filepath);
+          $eetag = (dechex(fileinode($filepath)) . '-' . dechex($modified) . '-' . dechex($filesizeb));
+          // Compare E-TAG sent by browser with E-TAG generated with the file
+          if ($ifsn == $eetag) {
+            // Set header to 304 and exit
+            header('HTTP/1.1 304 Not Modified');
+            resumable_download_drupal_add_http_header('Last-Modified', gmdate('D, d M Y H:i:s', $modified) . ' GMT');
+            resumable_download_drupal_add_http_header('ETag', dechex(fileinode($filepath)) . '-' . dechex($modified) . '-' . dechex($filesizeb));
+            drupal_exit();
+          }
+        } else {
+          $filesizeb = filesize($filepath);
+          // Set header to 304 and exit
+          header('HTTP/1.1 304 Not Modified');
+          resumable_download_drupal_add_http_header('Last-Modified', gmdate('D, d M Y H:i:s', $modified) . ' GMT');
+          resumable_download_drupal_add_http_header('ETag', dechex(fileinode($filepath)) . '-' . dechex($modified) . '-' . dechex($filesizeb));
+          drupal_exit();
+        }
+      }
+    }
+
     if (count($headers)) {
 	  $max_speed = variable_get('resumable_download_max_speed', NULL);
 	  if (user_access('bypass download speed limit')) {
@@ -41,7 +70,7 @@ function _resumable_download($source, $headers, $max_speed = NULL) {
   if (ob_get_level()) {
     ob_end_clean();
   }
-  
+
   // IE cannot download private files because it cannot store files downloaded
   // over https in the browser cache. The problem can be solved by sending
   // custom headers to IE. See http://support.microsoft.com/kb/323308/en-us
@@ -194,6 +223,11 @@ function _resumable_download($source, $headers, $max_speed = NULL) {
  * @param $max_speed Download speed in byte
  */
 function resumable_download_transfer_range($fd, $length, $byte = 0, $max_speed = NULL) {
+  $max_kb_per_read = variable_get('resumable_download_max_kb_per_read', 2);
+  $sleep_numerator = $max_kb_per_read * 1000000;
+  $min_sleep_time = $max_kb_per_read * 100;
+  $bytes_per_read = $max_kb_per_read * 1024;
+
   /*
    * The following code attempts to balance the needs of:
    * - large files don't overly degrade server performance (max flush once per second)
@@ -205,12 +239,12 @@ function resumable_download_transfer_range($fd, $length, $byte = 0, $max_speed =
   }
   
   if (!is_null($max_speed)) {
-    $sleepTime = RESUMABLE_DOWNLOAD_SLEEP_NUMERATOR / $max_speed;
-    $sleepTime = max($sleepTime, RESUMABLE_DOWNLOAD_MINIMUM_SLEEP_TIME);    // limit stress on server
+    $sleepTime = $sleep_numerator / $max_speed;
+    $sleepTime = max($sleepTime, $min_sleep_time);    // limit stress on server
    
-    $expectedreads = ceil($length / RESUMABLE_DOWNLOAD_BYTES_PER_READ);
+    $expectedreads = ceil($length / $bytes_per_read);
 
-    $reads_per_second = $max_speed / RESUMABLE_DOWNLOAD_KB_PER_READ;
+    $reads_per_second = $max_speed / $max_kb_per_read;
     $reads_until_flush = $reads_per_second;
     set_time_limit(0);                // we do not want to time out from our end
    
@@ -222,7 +256,7 @@ function resumable_download_transfer_range($fd, $length, $byte = 0, $max_speed =
     !(connection_aborted() || connection_status() == 1) && ($numreads>0);
     --$numreads)
     {
-      print(fread($fd, RESUMABLE_DOWNLOAD_BYTES_PER_READ));    // transfer chunk of data (note: fread max is 8k)
+      print(fread($fd, $bytes_per_read));    // transfer chunk of data (note: fread max is 8k)
       usleep($sleepTime);                    // limit the output rate (give the web server a rest)
       --$reads_until_flush;
       if ($reads_until_flush <= 0) {
