@@ -80,6 +80,8 @@ projects[dummyimage][patch][] = https://www.drupal.org/files/issues/dummyimage_m
 ;;; Entity
 ; Prevent error from workflow (https://www.drupal.org/project/entity/issues/2289693)
 projects[entity][patch][] = contrib/entity_undefined_entity_get_info-2289693-2.patch
+; Multiple EMW failures of unknown data property after PHP8 update resolved by this patch
+projects[entity][patch][] = https://www.drupal.org/files/issues/entity-metadata-wrapper-exception-11768576-4_0.patch
 
 ;;; Entity Reference
 ; Forbid to use duplicate entities in entityreference field
