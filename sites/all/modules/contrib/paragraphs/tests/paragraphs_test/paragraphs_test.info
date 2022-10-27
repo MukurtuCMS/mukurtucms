@@ -40,9 +40,8 @@ features[variable][] = panelizer_defaults_paragraphs_item_ptest
 features[variable][] = panelizer_paragraphs_item:ptest:default_selection
 hidden = 1
 
-; Information added by Drupal.org packaging script on 2017-02-16
-version = "7.x-1.0-rc5"
+; Information added by Drupal.org packaging script on 2020-05-25
+version = "7.x-1.0-rc5+37-dev"
 core = "7.x"
 project = "paragraphs"
-datestamp = "1487261293"
-
+datestamp = "1590430493"

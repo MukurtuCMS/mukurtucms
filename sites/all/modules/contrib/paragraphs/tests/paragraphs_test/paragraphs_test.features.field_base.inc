@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * paragraphs_test.features.field_base.inc
@@ -10,7 +11,7 @@
 function paragraphs_test_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'field_paragraphs'
+  // Exported field_base: 'field_paragraphs'.
   $field_bases['field_paragraphs'] = array(
     'active' => 1,
     'cardinality' => -1,
@@ -26,7 +27,7 @@ function paragraphs_test_field_default_field_bases() {
     'type' => 'paragraphs',
   );
 
-  // Exported field_base: 'field_ptest_text'
+  // Exported field_base: 'field_ptest_text'.
   $field_bases['field_ptest_text'] = array(
     'active' => 1,
     'cardinality' => 1,

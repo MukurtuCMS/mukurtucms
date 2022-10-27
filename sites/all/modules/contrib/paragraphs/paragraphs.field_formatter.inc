@@ -13,7 +13,7 @@ function paragraphs_field_formatter_info() {
     'paragraphs_view' => array(
       'label' => t('Paragraphs items'),
       'field types' => array('paragraphs'),
-      'settings' =>  array(
+      'settings' => array(
         'view_mode' => 'full',
       ),
     ),
@@ -56,11 +56,10 @@ function paragraphs_field_formatter_settings_summary($field, $instance, $view_mo
   $settings = $display['settings'];
   $output = array();
 
-
   if ($display['type'] == 'paragraphs_view') {
     $entity_type = entity_get_info('paragraphs_item');
     if (!empty($entity_type['view modes'][$settings['view_mode']]['label'])) {
-      $output[] =  t('View mode: @mode', array('@mode' => $entity_type['view modes'][$settings['view_mode']]['label']));
+      $output[] = t('View mode: @mode', array('@mode' => $entity_type['view modes'][$settings['view_mode']]['label']));
     }
     else {
       $output[] = ' ';
@@ -75,7 +74,6 @@ function paragraphs_field_formatter_settings_summary($field, $instance, $view_mo
  */
 function paragraphs_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
-  $settings = $display['settings'];
 
   switch ($display['type']) {
     case 'paragraphs_view':
@@ -92,13 +90,13 @@ function paragraphs_field_formatter_view($entity_type, $entity, $field, $instanc
       $element['#attributes']['class'][] = drupal_clean_css_identifier('paragraphs-items');
       $element['#attributes']['class'][] = drupal_clean_css_identifier('paragraphs-items-view-mode-' . $view_mode);
       $element['#attributes']['class'][] = drupal_clean_css_identifier('paragraphs-items-field-' . $instance['field_name']);
-      $element['#view_mode'] = $view_mode;
+      $element['#paragraphs_items_view_mode'] = $view_mode;
 
       foreach ($items as $delta => $item) {
         if ($paragraph = paragraphs_field_get_entity($item)) {
           $paragraph->setHostEntity($entity_type, $entity, $langcode);
           if (entity_access('view', 'paragraphs_item', $paragraph)) {
-            $element[$delta]['entity'] = $paragraph->view($view_mode);
+            $element[$delta]['entity'] = $paragraph->view($view_mode, $langcode);
           }
         }
       }

@@ -27,6 +27,21 @@ function paragraphs_schema() {
         'default' => '',
         'translatable' => TRUE,
       ),
+      'label' => array(
+        'description' => 'A user-facing label for this bundle.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'translatable' => TRUE,
+      ),
+      'description' => array(
+        'description' => 'A brief description of this bundle.',
+        'type' => 'text',
+        'not null' => FALSE,
+        'size' => 'medium',
+        'translatable' => TRUE,
+      ),
       'locked' => array(
         'description' => 'A boolean indicating whether the administrator can change the machine name of this bundle.',
         'type' => 'int',
@@ -126,6 +141,24 @@ function paragraphs_field_schema($field) {
 }
 
 /**
+ * Implements hook_install().
+ */
+function paragraphs_install() {
+  paragraphs_ensure_entitycache_table();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function paragraphs_uninstall() {
+  // We can't use paragraphs_remove_entitycache_table() here.
+  // The module isn't loaded here.
+  if (db_table_exists('cache_entity_paragraphs_item')) {
+    db_drop_table('cache_entity_paragraphs_item');
+  }
+}
+
+/**
  * Make sure all paragraph fields have the new index on revision_id.
  */
 function paragraphs_update_7100() {
@@ -136,13 +169,48 @@ function paragraphs_update_7100() {
 }
 
 /**
- * Make sure the entitycache table exists.
+ * Deprecated. Functionality is now in 7102.
  */
 function paragraphs_update_7101() {
-  if (module_exists('entitycache') && !db_table_exists("cache_entity_paragraphs_item")) {
-    drupal_load('module', 'entitycache');
-    $cache_schema = drupal_get_schema_unprocessed('system', 'cache');
-    $cache_schema['description'] = "Cache table used to store paragraphs_item entity records.";
-    db_create_table("cache_entity_paragraphs_item", $cache_schema);
+}
+
+/**
+ * Make sure the entitycache table exists.
+ */
+function paragraphs_update_7102() {
+  module_load_include('module', 'paragraphs');
+  paragraphs_ensure_entitycache_table();
+}
+
+/**
+ * Update {paragraphs_bundle} schema to include label and description fields.
+ */
+function paragraphs_update_7103() {
+  $fields = array(
+    'label' => array(
+      'description' => 'A user-facing label for this bundle.',
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => TRUE,
+      'default' => '',
+    ),
+    'description' => array(
+      'description' => 'A brief description of this bundle.',
+      'type' => 'text',
+      'not null' => FALSE,
+      'size' => 'medium',
+      'default' => NULL,
+    ),
+  );
+
+  foreach ($fields as $key => $field) {
+    if (!db_field_exists('paragraphs_bundle', $key)) {
+      db_add_field('paragraphs_bundle', $key, $field);
+    }
   }
+
+  // Set initial label value equal to name.
+  db_update('paragraphs_bundle')
+    ->expression('label', 'name')
+    ->execute();
 }
