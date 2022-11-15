@@ -89,7 +89,6 @@ return substr($path, strripos($path, \'/\') + 1);';
   $handler->display->display_options['fields']['field_thumbnail_image']['alter']['path'] = '/digital-heritage/category/[php]';
   $handler->display->display_options['fields']['field_thumbnail_image']['alter']['replace_spaces'] = TRUE;
   $handler->display->display_options['fields']['field_thumbnail_image']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['field_thumbnail_image']['empty'] = '<a href="/digital-heritage/category/[php]"><img src="/sites/all/modules/custom/features/ma_digitalheritage/images/no_media_available.jpg"/></a>';
   $handler->display->display_options['fields']['field_thumbnail_image']['click_sort_column'] = 'sid';
   $handler->display->display_options['fields']['field_thumbnail_image']['type'] = 'mukurtu_browse_by_grid_7_4';
   $handler->display->display_options['fields']['field_thumbnail_image']['settings'] = array(
@@ -142,7 +141,6 @@ return substr($path, strripos($path, \'/\') + 1);';
     t('.'),
     t(','),
     t('Edit Taxonomy Term'),
-    t('<a href="/digital-heritage/category/[php]"><img src="/sites/all/modules/custom/features/ma_digitalheritage/images/no_media_available.jpg"/></a>'),
     t('[name]'),
     t('Block'),
     t('Page'),
