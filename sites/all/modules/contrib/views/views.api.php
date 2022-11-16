@@ -1241,6 +1241,43 @@ function hook_views_ui_display_top_links_alter(&$links, $view, $display_id) {
 }
 
 /**
+ * This hooks allows you to alter the ajax form definitions for the sub-forms
+ * that handle the editing of the different pieces of a view, for example
+ * adding or editing fields or filters.
+ *
+ * Other modules may want to change existing form callbacks or add their own
+ * new forms.
+ *
+ * @param array $forms
+ *   An array of forms where the keys are keys, that are passed in via the url
+ *   and are used to identify the forms, and the values are arrays of
+ *   information defining the form, including the form id and the arguments.
+ *
+ * @see views_ui_ajax_forms()
+ */
+function hook_views_ui_ajax_forms_alter(&$forms) {
+  // Add a new custom form for categorizing fields, filters, etc. attached to
+  // the view. You would then implement the form function
+  // mymodule_views_categorize_fields_form($form, &$form_state) and $form_state
+  // would contain $form_state['type'] and $form_state['id'].
+  // The urls that would call this form would be (both nojs and ajax versions):
+  // admin/structure/views/nojs/categorise-item/<view_name>/<display_name>/<type>/<id>
+  // admin/structure/views/ajax/categorise-item/<view_name>/<display_name>/<type>/<id>
+  $forms['categorise-item'] = array(
+    'form_id' => 'mymodule_views_categorize_fields_form',
+    'args' => array('type', 'id'),
+  );
+
+  // Modify the add-item form callback.
+  // You would then implement the form function
+  // mymodule_add_item_form_custom(), which would override the existing
+  // views_ui_add_item_form().
+  // Note that you would likely use hook_form_alter() in this case instead of
+  // doing this, this is just an example.
+  $forms['add-item']['form_id'] = 'mymodule_add_item_form_custom';
+}
+
+/**
  * Allows altering the commands which are used on a views AJAX request.
  *
  * @param array $commands

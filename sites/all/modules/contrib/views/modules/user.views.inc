@@ -292,6 +292,27 @@ function user_views_data() {
     ),
   );
 
+  // Changed column was added in Drupal 7.83.
+  if (db_field_exists('users', 'changed')) {
+    // Changed field.
+    $data['users']['changed'] = array(
+      // The item it appears as on the UI,
+      'title' => t('Changed date'),
+      // The help that appears on the UI,
+      'help' => t('The date the user was changed.'),
+      'field' => array(
+        'handler' => 'views_handler_field_date',
+        'click sortable' => TRUE,
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort_date',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_date',
+      ),
+    );
+  }
+
   // Access field.
   $data['users']['access'] = array(
     // The item it appears as on the UI,

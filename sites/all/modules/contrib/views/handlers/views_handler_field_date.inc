@@ -206,7 +206,7 @@ class views_handler_field_date extends views_handler_field {
           if ($custom_format == 'r') {
             return format_date($value, $format, $custom_format, $timezone, 'en');
           }
-          return format_date($value, $format, $custom_format, $timezone);
+          return format_date($value, $format, t($custom_format), $timezone);
 
         default:
           // The custom format is not used in this scenario.

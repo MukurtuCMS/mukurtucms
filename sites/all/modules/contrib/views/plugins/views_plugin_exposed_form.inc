@@ -249,34 +249,49 @@ class views_plugin_exposed_form extends views_plugin {
     }
 
     if (count($exposed_sorts)) {
+      if (isset($form_state['input']['sort_by'])) {
+        $sort_by = $form_state['input']['sort_by'];
+      }
+      else {
+        $keys = array_keys($exposed_sorts);
+        $sort_by = array_shift($keys);
+      }
+
+      if (isset($form_state['input']['sort_order'])) {
+        $sort_order = $form_state['input']['sort_order'];
+      }
+      elseif (isset($this->view->sort[$sort_by])) {
+        $sort_order = $this->view->sort[$sort_by]->options['order'];
+      }
+      else {
+        $first_sort = reset($this->view->sort);
+        $sort_order = $first_sort->options['order'];
+      }
+
+      if (!isset($form_state['input']['sort_by'])) {
+        $form_state['input']['sort_by'] = $sort_by;
+      }
+
+      if (!isset($form_state['input']['sort_order'])) {
+        $form_state['input']['sort_order'] = $sort_order;
+      }
       $form['sort_by'] = array(
         '#type' => 'select',
         '#options' => $exposed_sorts,
         '#title' => $this->options['exposed_sorts_label'],
+        '#default_value' => $sort_by,
       );
-      $sort_order = array(
+      $sort_options = array(
         'ASC' => $this->options['sort_asc_label'],
         'DESC' => $this->options['sort_desc_label'],
       );
-      if (isset($form_state['input']['sort_by']) && isset($this->view->sort[$form_state['input']['sort_by']])) {
-        $default_sort_order = $this->view->sort[$form_state['input']['sort_by']]->options['order'];
-      }
-      else {
-        $first_sort = reset($this->view->sort);
-        $default_sort_order = $first_sort->options['order'];
-      }
-
-      if (!isset($form_state['input']['sort_by'])) {
-        $keys = array_keys($exposed_sorts);
-        $form_state['input']['sort_by'] = array_shift($keys);
-      }
 
       if ($this->options['expose_sort_order']) {
         $form['sort_order'] = array(
           '#type' => 'select',
-          '#options' => $sort_order,
+          '#options' => $sort_options,
           '#title' => t('Order', array(), array('context' => 'Sort order')),
-          '#default_value' => $default_sort_order,
+          '#default_value' => $sort_order,
         );
       }
       $form['submit']['#weight'] = 10;

@@ -328,22 +328,24 @@ class views_handler extends views_object {
    *   Returns the safe value.
    */
   public function sanitize_value($value, $type = NULL) {
-    switch ($type) {
-      case 'xss':
-        $value = filter_xss($value);
-        break;
+    if (strlen($value) > 0) {
+      switch ($type) {
+        case 'xss':
+          $value = filter_xss($value);
+          break;
 
-      case 'xss_admin':
-        $value = filter_xss_admin($value);
-        break;
+        case 'xss_admin':
+          $value = filter_xss_admin($value);
+          break;
 
-      case 'url':
-        $value = check_url($value);
-        break;
+        case 'url':
+          $value = check_url($value);
+          break;
 
-      default:
-        $value = check_plain($value);
-        break;
+        default:
+          $value = check_plain($value);
+          break;
+      }
     }
     return $value;
   }
@@ -1075,7 +1077,7 @@ class views_many_to_one_helper {
     // should be added via an db_or()/db_and() (TRUE).
     $add_condition = TRUE;
     if ($operator == 'or' && empty($options['reduce_duplicates'])) {
-      if (count($value) > 1) {
+      if (is_array($value) && count($value) > 1) {
         $operator = 'IN';
       }
       else {
@@ -1083,7 +1085,8 @@ class views_many_to_one_helper {
         if (is_array($value) && count($value) > 1) {
           $operator = 'IN';
         }
-        else {
+	else {
+          $value = is_array($value) ? array_pop($value) : $value;
           $operator = '=';
         }
       }
@@ -1246,7 +1249,7 @@ function views_break_phrase($str, &$handler = NULL) {
  */
 function views_get_timezone() {
   global $user;
-  if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
+  if (variable_get('configurable_timezones', 1) && $user->uid && isset($user->timezone) && strlen($user->timezone)) {
     $timezone = $user->timezone;
   }
   else {

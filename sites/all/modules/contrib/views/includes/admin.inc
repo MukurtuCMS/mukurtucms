@@ -200,7 +200,7 @@ function views_ui_preview($view, $display_id, $args = array()) {
           // Only the SQL default class has a method getArguments.
           $quoted = array();
 
-          if (get_class($view->query) == 'views_plugin_query_default') {
+          if ($view->query instanceof views_plugin_query_default) {
             $quoted = $query->getArguments();
             $connection = Database::getConnection();
             foreach ($quoted as $key => $val) {
@@ -1641,6 +1641,20 @@ function views_ui_get_display_tab_details($view, $display) {
     $item_element = 'li';
   }
 
+  // Display warning if argument handler has exception overriding validation.
+  foreach ($display->handler->get_handlers('argument') as $arg => $handler) {
+    if (!empty($handler->options['exception']['value']) && $handler->options['specify_validation'] && !empty($handler->options['validate_options'])) {
+      $build['message']['validation_warning'] = array(
+        '#theme_wrappers' => array('container'),
+        '#attributes' => array(
+          'class' => array('messages', 'warning'),
+        ),
+        '#markup' => t('The view display has a contextual filter exception that overrides the validation criterion.'),
+      );
+      break;
+    }
+  }
+
   if ($display->id != 'default') {
     $build['top']['#theme_wrappers'] = array('container');
     $build['top']['#attributes']['id'] = 'edit-display-settings-top';
@@ -2926,6 +2940,9 @@ function views_ui_ajax_forms($key = NULL) {
       'args' => array(),
     ),
   );
+
+  // Allow other modules to add their own forms or modify existing ones.
+  drupal_alter('views_ui_ajax_forms', $forms);
 
   if ($key) {
     return !empty($forms[$key]) ? $forms[$key] : NULL;
