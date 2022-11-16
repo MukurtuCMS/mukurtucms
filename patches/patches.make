@@ -110,6 +110,10 @@ projects[feeds][patch][] = contrib/0001-Mukurtu-language-handling-for-taxonomy-i
 ; Change language handling for text import
 projects[feeds][patch][] = contrib/0001-Use-new-field-language-handling-in-feeds.patch
 
+;;; Feeds Comment Processor
+; Make feeds_comment_processor compatible with PHP8
+projects[feeds_comment_processor][patch][] = https://www.drupal.org/files/issues/2020-09-28/compatibility_with_feeds_processor-3171586.patch
+
 ;;; Feeds Files
 ; Change entityValidate definition
 projects[feeds_file][patch][] = contrib/0001-Add-parameter-to-entityValidate-to-stop-warning.patch
