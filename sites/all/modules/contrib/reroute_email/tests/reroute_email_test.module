@@ -1,0 +1,70 @@
+<?php
+
+/**
+ * @file
+ * Provides Mail hook implementations for testing the Reroute Email module.
+ */
+
+/**
+ * Implements hook_module_implements_alter().
+ *
+ * Ensure reroute_email_test runs last when hook_mail_alter is invoked.
+ */
+function reroute_email_test_module_implements_alter(&$implementations, $hook) {
+  // Testing with isset is only necessary if module doesn't implement the hook.
+  if ($hook == 'mail_alter') {
+    // Move our hook implementation to the bottom.
+    $group = $implementations['reroute_email_test'];
+    unset($implementations['reroute_email_test']);
+    $implementations['reroute_email_test'] = $group;
+  }
+}
+
+/**
+ * Implements hook_mail().
+ *
+ * This function allows testing Reroute Email's handling of a string passed for
+ * message's body instead of an Array as required by drupal_mail. It also
+ * allows testing the robustness of the handling of Cc and Bcc header keys.
+ * Body, Cc and Bcc values are initialized from test case through $params.
+ */
+function reroute_email_test_mail($key, &$message, $params) {
+  if ($key != 'test_reroute_email') {
+    return;
+  }
+  $message['subject'] = 'Reroute Email Test: Message body is a string, Cc and Bcc header keys have a special case';
+
+  // Body is provided as a string.
+  if (!empty($params['body'])) {
+    $message['body'] = $params['body'];
+  }
+  // Provide Cc and Bcc headers with an unexpected case.
+  if (!empty($params['headers']['test_cc_key']) && !empty($params['headers'][$params['headers']['test_cc_key']])) {
+    $message['headers'][$params['headers']['test_cc_key']] = $params['headers'][$params['headers']['test_cc_key']];
+  }
+  if (!empty($params['headers']['test_bcc_key']) && !empty($params['headers'][$params['headers']['test_bcc_key']])) {
+    $message['headers'][$params['headers']['test_bcc_key']] = $params['headers'][$params['headers']['test_bcc_key']];
+  }
+}
+
+/**
+ * Implements hook_mail_alter().
+ *
+ * This helper function is necessary to catch message's body if it is a string
+ * to make it an array to be compliant with drupal_mail and prevent a Warning:
+ * implode(): Invalid arguments passed in DefaultMailSystem->format().
+ */
+function reroute_email_test_mail_alter(&$message) {
+  // Only alter the email for the key test_reroute_email.
+  if ($message['key'] != 'test_reroute_email') {
+    return;
+  }
+  // Prevent Warning from drupal_mail because body is not an array, only if
+  // message has already been processed by reroute_email.
+  if (is_string($message['body']) && isset($message['headers']['X-Rerouted-Mail-Key'])) {
+    // Record to be checked in test in the log entries.
+    watchdog('reroute_email_test', 'A String was detected in the body: <pre>!body</pre>', array('!body' => $message['body']), WATCHDOG_NOTICE);
+    // Convert body to an Array.
+    $message['body'] = array($message['body']);
+  }
+}
