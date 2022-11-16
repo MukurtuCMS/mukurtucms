@@ -221,8 +221,8 @@ projects[services][patch][] = contrib/custom_validation_on_paragraph_fields.patc
 projects[services_field_collection][patch][] = contrib/fix_services_field_collection_create.patch
 
 ;;; Tree (treeable)
-; Skip treeable field formatter patch
-projects[tree][patch][] = contrib/skip_treeable_field_formatter.patch
+; Make treeable compatible with PHP8
+projects[tree][patch][] = contrib/make_treeable_php8_compatible.patch
 
 ;;; Views
 ; Change delimiter from coma to semi-colon
