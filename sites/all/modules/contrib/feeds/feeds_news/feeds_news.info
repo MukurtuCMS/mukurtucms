@@ -18,8 +18,8 @@ features[node][] = feed_item
 features[views_view][] = feeds_defaults_feed_items
 files[] = feeds_news.test
 
-; Information added by Drupal.org packaging script on 2020-08-13
-version = "7.x-2.0-beta5"
+; Information added by Drupal.org packaging script on 2022-10-21
+version = "7.x-2.0-beta6"
 core = "7.x"
 project = "feeds"
-datestamp = "1597331284"
+datestamp = "1666326463"

@@ -48,6 +48,7 @@ class ParserCSVIterator implements Iterator {
   /**
    * {@inheritdoc}
    */
+  #[\ReturnTypeWillChange]
   public function rewind($pos = 0) {
     if ($this->handle) {
       fseek($this->handle, $pos);
@@ -58,6 +59,7 @@ class ParserCSVIterator implements Iterator {
   /**
    * {@inheritdoc}
    */
+  #[\ReturnTypeWillChange]
   public function next() {
     if ($this->handle) {
       $this->currentLine = feof($this->handle) ? NULL : fgets($this->handle);
@@ -69,6 +71,7 @@ class ParserCSVIterator implements Iterator {
   /**
    * {@inheritdoc}
    */
+  #[\ReturnTypeWillChange]
   public function valid() {
     return isset($this->currentLine);
   }
@@ -76,6 +79,7 @@ class ParserCSVIterator implements Iterator {
   /**
    * {@inheritdoc}
    */
+  #[\ReturnTypeWillChange]
   public function current() {
     return $this->currentLine;
   }
@@ -90,6 +94,7 @@ class ParserCSVIterator implements Iterator {
   /**
    * {@inheritdoc}
    */
+  #[\ReturnTypeWillChange]
   public function key() {
     return 'line';
   }
@@ -126,7 +131,6 @@ class ParserCSV {
     $this->startByte = 0;
     $this->lineLimit = 0;
     $this->lastLinePos = 0;
-    ini_set('auto_detect_line_endings', TRUE);
     if (extension_loaded('mbstring') && variable_get('feeds_use_mbstring', TRUE)) {
       $this->useMbString = TRUE;
     }

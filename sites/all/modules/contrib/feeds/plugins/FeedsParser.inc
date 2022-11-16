@@ -785,6 +785,7 @@ class FeedsDateTime extends DateTime {
   /**
    * Upon unserializing, we must re-build ourselves using local variables.
    */
+  #[\ReturnTypeWillChange]
   public function __wakeup() {
     $this->__construct($this->_serialized_time, new DateTimeZone($this->_serialized_timezone));
   }
@@ -842,6 +843,7 @@ class FeedsDateTime extends DateTime {
    * In order to set a timezone for a datetime that doesn't have such
    * granularity, merge() it with one that does.
    */
+  #[\ReturnTypeWillChange]
   public function setTimezone($tz, $force = FALSE) {
     // PHP 5.2.6 has a fatal error when setting a date's timezone to itself.
     // http://bugs.php.net/bug.php?id=45038
