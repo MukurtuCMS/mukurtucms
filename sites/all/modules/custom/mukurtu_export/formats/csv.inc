@@ -238,7 +238,9 @@ function mukurtu_export_csv_export_to_zip($encoded_export) {
   // These are raw files that we want to include in the Zip
   if(isset($encoded_export['__files'])) {
     foreach($encoded_export['__files'] as $binary_file) {
-      $zip->addFile(drupal_realpath($binary_file['uri']), $binary_file['filename']);
+      if (!empty(drupal_realpath($binary_file['uri']))) {
+        $zip->addFile(drupal_realpath($binary_file['uri']), $binary_file['filename']);
+      }
     }
 
     // Unset this, so we don't try to further process them
