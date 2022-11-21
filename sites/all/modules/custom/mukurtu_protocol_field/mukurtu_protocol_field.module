@@ -526,7 +526,7 @@ function mukurtu_protocol_field_node_access_records($node) {
       $cp_nids = array_values($cps['node']);
       foreach ($cp_nids as $cp_nid) {
         $cp_emw = entity_metadata_wrapper('node', $cp_nid);
-        if ($cp_emw->group_access->value() == 0) { // Open group
+        if (isset($cp_emw->group_access) AND $cp_emw->group_access->value() == 0) { // Open CP
           $grants = array();
           $grants[] = array(
             'realm' => 'mukurtu_nodes_in_cp_any_public_group',
