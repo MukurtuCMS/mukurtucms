@@ -6,6 +6,9 @@ core = 7.x
 ;; Core ;;
 ;;;;;;;;;;
 
+; Fix a PHP8 fatal error issue with the Batch API sending the key of the redirect path when it should not. This occurs at the end of a Mukurtu CSV batch export.
+projects[drupal][patch][] = core/drop_path_key_from_batch_redirect.patch
+
 ; Custom logo and favicon stored in private filesystem if it is the default.
 projects[drupal][patch][] = https://www.drupal.org/files/issues/1087250.logo-public-filesystem.057.patch
 

@@ -466,6 +466,8 @@ function _batch_finished() {
     }
 
     // Use drupal_redirect_form() to handle the redirection logic.
+    array_unshift($_batch['form_state']['redirect'], $_batch['form_state']['redirect']['path']);
+    unset($_batch['form_state']['redirect']['path']);
     drupal_redirect_form($_batch['form_state']);
 
     // If no redirection happened, redirect to the originating page. In case the
