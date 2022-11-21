@@ -479,7 +479,7 @@ function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, 
 
             // Load entity.
             $referenced_entity_object = mukurtu_export_entity_load_wrapper($referenced_entity_type, array($r_id));
-            if (empty($referenced_entity_object)) {
+            if (empty($referenced_entity_object) OR !$referenced_entity_object[$r_id]) {
               continue;
             }
 
