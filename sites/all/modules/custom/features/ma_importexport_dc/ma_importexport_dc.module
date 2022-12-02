@@ -146,7 +146,7 @@ function ma_importexport_dc_import_form_context($form, $form_state) {
       $available_typical_context_values[] = $typical_context_value;
     }
   }
-  if (count($available_typical_context_values)) {
+  if (isset($available_typical_context_values)) {
     $form['context']['#default_value'] = $available_typical_context_values;
   }
 
@@ -416,7 +416,7 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
     }
     foreach ($result->items as $i => $item) {
       foreach ($singleval_fields as $singleval_field) {
-        if (count($item[$singleval_field]) > 1) {
+        if (isset($item[$singleval_field]) AND is_array($item[$singleval_field]) AND count($item[$singleval_field]) > 1) {
           $result->items[$i][$singleval_field] = implode("\n\n", $item[$singleval_field]); // Results in a paragraph break for long text fields and a single space for short text fields, which is what we want.
         }
       }
@@ -551,7 +551,7 @@ function ma_importexport_dc_feeds_presave(FeedsSource $source, $entity, $item) {
     foreach ($import_options['category'] as $category) {
       $categories[]['tid'] = $category;
     }
-    if (count($categories)) {
+    if (isset($categories)) {
       $entity->field_category[LANGUAGE_NONE] = $categories;
     }
 
@@ -560,7 +560,7 @@ function ma_importexport_dc_feeds_presave(FeedsSource $source, $entity, $item) {
     foreach ($import_options['tk_label'] as $tk_label) {
       $tk_labels[]['value'] = $tk_label;
     }
-    if (count($tk_labels)) {
+    if (isset($tk_labels)) {
       $entity->field_licence_trad[LANGUAGE_NONE] = $tk_labels;
     }
 
@@ -640,7 +640,7 @@ function ma_importexport_nested_xml_from_structure($element, $contexts) {
     if (!in_array($element_name, $contexts)) {
       $attributes_parts[$nest_level] = $element_name;
     }
-    if (count($child->children)) {
+    if (isset($child->children)) {
       $nest_level++;
       ma_importexport_nested_xml_from_structure($child, $contexts);
       $nest_level--;
