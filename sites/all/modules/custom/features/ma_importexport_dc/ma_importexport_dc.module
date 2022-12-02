@@ -454,7 +454,7 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
           $media_value = is_array($item['rdf_about']) ? $item['rdf_about'][$item_index] : $item['rdf_about']; // unable to create xpath query for this to just select the child. It selects all children, so we grab the value based on the item index.
         }
         else {
-          $media_value = $item[$xpath_mapping[$import_options['media']]];
+          $media_value = is_array($item[$xpath_mapping[$import_options['media']]]) ? $item[$xpath_mapping[$import_options['media']]][$item_index] : $item[$xpath_mapping[$import_options['media']]];
         }
       }
       // If the media file path is not an absolute URL, try to grab it from the extraction of the zip.
