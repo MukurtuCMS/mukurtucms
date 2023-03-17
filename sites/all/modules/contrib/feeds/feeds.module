@@ -269,7 +269,10 @@ function feeds_push_unsubscribe($job) {
  *
  * @see FeedsSource::startBatchAPIJob()
  */
-function feeds_batch($method, $importer_id, $feed_nid = 0, &$context) {
+function feeds_batch($method, $importer_id, $feed_nid, &$context) {
+  if (!isset($feed_nid)) {
+    $feed_nid = 0;
+  }
   $context['finished'] = FEEDS_BATCH_COMPLETE;
   try {
     $context['finished'] = feeds_source($importer_id, $feed_nid)->$method();
@@ -1408,9 +1411,7 @@ function feeds_library_exists($file, $library) {
 function feeds_simplepie_exists() {
   return (
     feeds_library_exists('autoloader.php', 'simplepie') ||
-    feeds_library_exists('simplepie.compiled.php', 'simplepie') ||
-    feeds_library_exists('simplepie.mini.php', 'simplepie') ||
-    feeds_library_exists('simplepie.inc', 'simplepie')
+    feeds_library_exists('library/SimplePie.php', 'simplepie')
   );
 }
 
@@ -1420,9 +1421,7 @@ function feeds_simplepie_exists() {
 function feeds_include_simplepie() {
   $files = array(
     'autoloader.php',
-    'simplepie.mini.php',
-    'simplepie.compiled.php',
-    'simplepie.inc',
+    'library/SimplePie.php',
   );
 
   foreach ($files as $file) {

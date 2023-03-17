@@ -704,7 +704,7 @@ class RESTServer {
     );
     drupal_alter('rest_server_execute_errors', $error_alter_array, $controller, $arguments);
 
-    drupal_add_http_header('Status', strip_tags(str_replace(PHP_EOL, '', $error_header_status_message)));
+    drupal_add_http_header('Status', strip_tags(str_replace(array("\r", "\n"), '', $error_header_status_message)));
 
     return $error_data;
   }

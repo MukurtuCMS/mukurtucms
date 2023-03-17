@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * paragraphs_test.features.inc
@@ -42,6 +43,8 @@ function paragraphs_test_paragraphs_info() {
     'ptest' => array(
       'name' => 'PTest',
       'bundle' => 'ptest',
+      'label' => 'PTest',
+      'description' => 'This is the PTest item.',
       'locked' => '1',
     ),
   );

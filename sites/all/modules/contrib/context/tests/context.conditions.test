@@ -49,6 +49,44 @@ class ContextConditionUserTest extends DrupalWebTestCase {
   }
 }
 
+class ContextConditionNagateUserTest extends DrupalWebTestCase {
+  protected $profile = 'testing';
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Condition: nagate user',
+      'description' => 'Test nagate user condition.',
+      'group' => 'Context',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('context', 'ctools');
+    $this->user1 = $this->drupalCreateUser(array('access content', 'administer site configuration'));
+
+    // Create test context.
+    ctools_include('export');
+    $this->context = ctools_export_new_object('context');
+    $this->context->name = 'testcontext';
+    $this->context->conditions = array('user' => array('values' => array('authenticated user' => 'authenticated user'), 'options' => array('negate_role' => 1)));
+    $this->context->reactions = array('debug' => array('debug' => TRUE));
+    $saved = context_save($this->context);
+    $this->assertTrue($saved, "Context 'testcontext' saved.");
+  }
+
+  function test() {
+    // User 1 does not trigger the context.
+    $this->drupalLogin($this->user1);
+    $this->drupalGet('node');
+    $this->assertNoText('Active context: testcontext');
+
+    // Anonymous triggers the context.
+    $this->drupalLogout();
+    $this->drupalGet('');
+    $this->assertText('Active context: testcontext');
+  }
+}
+
 class ContextConditionUserPageTest extends DrupalWebTestCase {
   protected $profile = 'testing';
 

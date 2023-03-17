@@ -516,9 +516,7 @@ function template_preprocess_views_view_table(&$vars) {
   $order    = !empty($handler->order) ? $handler->order : 'asc';
 
   $query    = tablesort_get_query_parameters();
-  if (isset($view->exposed_raw_input)) {
-    $query += $view->exposed_raw_input;
-  }
+  $query    += $view->get_exposed_input();
 
   // Fields must be rendered in order as of Views 2.3, so we will pre-render
   // everything.

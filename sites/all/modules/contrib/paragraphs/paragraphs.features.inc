@@ -11,9 +11,11 @@
 function paragraphs_features_export_options() {
   $bundles = paragraphs_bundle_load();
   $names = array();
+
   foreach ($bundles as $key => $value) {
     $names[$key] = $value->name;
   }
+
   return $names;
 }
 
@@ -22,23 +24,21 @@ function paragraphs_features_export_options() {
  */
 function paragraphs_features_export($data, &$export, $module_name = '') {
   $pipe = array();
-  $map = features_get_default_map('paragraphs');
 
   foreach ($data as $type) {
-    if ($info = paragraphs_bundle_load($type)) {
+    if (paragraphs_bundle_load($type)) {
       $export['features']['paragraphs'][$type] = $type;
       $export['dependencies']['paragraphs'] = 'paragraphs';
       $export['dependencies']['features'] = 'features';
 
       $fields = field_info_instances('paragraphs_item', $type);
-      foreach ($fields as $name => $field) {
+      foreach ($fields as $field) {
         $pipe['field_instance'][] = "paragraphs_item-{$field['bundle']}-{$field['field_name']}";
       }
     }
   }
 
   return $pipe;
-
 }
 
 /**
@@ -48,10 +48,13 @@ function paragraphs_features_export_render($module, $data, $export = NULL) {
   $elements = array(
     'name' => FALSE,
     'bundle' => FALSE,
+    'label' => FALSE,
+    'description' => FALSE,
     'locked' => FALSE,
   );
   $output = array();
   $output[] = '  $items = array(';
+
   foreach ($data as $type) {
     if ($info = paragraphs_bundle_load($type)) {
       $output[] = "    '{$type}' => array(";
@@ -68,17 +71,16 @@ function paragraphs_features_export_render($module, $data, $export = NULL) {
       $output[] = "    ),";
     }
   }
+
   $output[] = '  );';
   $output[] = '  return $items;';
   $output = implode("\n", $output);
+
   return array('paragraphs_info' => $output);
 }
 
 /**
  * Implements hook_features_revert().
- *
- * @param $module
- * name of module to revert content for
  */
 function paragraphs_features_revert($module = NULL) {
   if ($default_types = features_get_default('paragraphs', $module)) {
@@ -90,6 +92,8 @@ function paragraphs_features_revert($module = NULL) {
       $bundle->bundle = $type_info['bundle'];
       $bundle->locked = $type_info['locked'];
       $bundle->name = $type_info['name'];
+      $bundle->label = $type_info['label'];
+      $bundle->description = $type_info['description'];
       paragraphs_bundle_save($bundle);
     }
     paragraphs_bundle_load(NULL, TRUE);

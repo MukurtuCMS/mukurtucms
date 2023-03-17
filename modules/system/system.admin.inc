@@ -2391,7 +2391,7 @@ function system_run_cron() {
  * Menu callback: return information about PHP.
  */
 function system_php() {
-  phpinfo();
+  phpinfo(~ (INFO_VARIABLES | INFO_ENVIRONMENT));
   drupal_exit();
 }
 
@@ -2404,6 +2404,7 @@ function system_batch_page() {
 
   if ($output === FALSE) {
     drupal_access_denied();
+    drupal_exit();
   }
   elseif (isset($output)) {
     // Force a page without blocks or messages to

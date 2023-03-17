@@ -5,7 +5,7 @@ core = 7.x
 dependencies[] = ctools
 dependencies[] = job_scheduler
 
-test_dependencies[] = ctools:ctools (<= 7.x-1.12)
+test_dependencies[] = ctools:ctools
 test_dependencies[] = date:date
 test_dependencies[] = entity_translation:entity_translation
 test_dependencies[] = feeds_xpathparser:feeds_xpathparser
@@ -101,8 +101,8 @@ files[] = views/feeds_views_handler_field_source.inc
 files[] = views/feeds_views_handler_filter_severity.inc
 files[] = views/feeds_views_plugin_argument_validate_feed_nid.inc
 
-; Information added by Drupal.org packaging script on 2020-08-13
-version = "7.x-2.0-beta5"
+; Information added by Drupal.org packaging script on 2022-10-21
+version = "7.x-2.0-beta6"
 core = "7.x"
 project = "feeds"
-datestamp = "1597331284"
+datestamp = "1666326463"

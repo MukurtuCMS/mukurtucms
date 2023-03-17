@@ -105,7 +105,7 @@ function facetapi_block_view($delta = '') {
 
   // Test block visibility if not already tested.
   if (!isset($parsed[$delta]) && !facetapi_check_block_visibility($delta)) {
-    return;
+    return array();
   }
 
   list($searcher, $realm_name, $facet_name) = $parsed[$delta];

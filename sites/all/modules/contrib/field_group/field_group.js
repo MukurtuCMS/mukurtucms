@@ -50,7 +50,8 @@ Drupal.FieldGroup.Effects.processAccordion = {
       });
 
       wrapper.accordion({
-        heightStyle: "content",
+        heightStyle: "content", // jQuery UI >= v1.9
+        autoHeight: false,      // jQuery UI < v1.9
         active: active_index,
         collapsible: true,
         changestart: function(event, ui) {
@@ -76,7 +77,7 @@ Drupal.FieldGroup.Effects.processAccordion = {
           if ($('.error', $(this)).length) {
             // Save first error item, for focussing it.
             if (!$firstErrorItem) {
-              $firstErrorItem = $(this).parent().accordion("activate" , i);
+              $firstErrorItem = $(this).parent().accordion("option", "active", i);
             }
             $('h3.ui-accordion-header').eq(i).addClass('error');
           }
@@ -176,14 +177,17 @@ Drupal.FieldGroup.Effects.processDiv = {
           var speed = $wrapper.hasClass('speed-fast') ? 300 : 1000;
           if ($wrapper.hasClass('effect-none') && $wrapper.hasClass('speed-none')) {
             $('> .field-group-format-wrapper', wrapper).toggle();
+            wrapper.animating = false;
           }
           else if ($wrapper.hasClass('effect-blind')) {
             $('> .field-group-format-wrapper', wrapper).toggle('blind', {}, speed);
+            wrapper.animating = false;
           }
           else {
-            $('> .field-group-format-wrapper', wrapper).toggle(speed);
+            $('> .field-group-format-wrapper', wrapper).toggle(speed, function() {
+              wrapper.animating = false;
+            });
           }
-          wrapper.animating = false;
         }
         $wrapper.toggleClass('collapsed');
         return false;

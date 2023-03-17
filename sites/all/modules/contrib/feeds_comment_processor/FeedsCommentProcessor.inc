@@ -52,7 +52,7 @@ class FeedsCommentProcessor extends FeedsProcessor {
   /**
    * {@inheritdoc}
    */
-  protected function entityValidate($comment) {
+  protected function entityValidate($comment, FeedsSource $source = NULL) {
     if (!$comment->nid) {
       throw new FeedsValidationException(t('Unable to create comment with empty NID.'));
     }

@@ -452,6 +452,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
             $entity->og_group_ref[LANGUAGE_NONE][$delta]['field_mode'] = 'mukurtu_import';
           }
         }
+        // end Mukurtu patch.
 
         // Allow modules to alter the entity before validating.
         module_invoke_all('feeds_prevalidate', $source, $entity, $item, $entity_id);

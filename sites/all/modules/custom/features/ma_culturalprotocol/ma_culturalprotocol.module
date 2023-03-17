@@ -387,8 +387,10 @@ function ma_culturalprotocol_node_validate($node, $form, &$form_state) {
     $missing = FALSE;
     // Don't allow empty protocol fields for items that require protocols.
     if (empty($node->og_group_ref[LANGUAGE_NONE])) {
-      form_set_error('og_group_ref', 'You must specify a protocol for this item.');
-      $missing = TRUE;
+      if (!in_array($node->type, ma_culturalprotocol_collab_child_node_types())) { // Special handling for collaboration child node types done in ma_collaboration_tools_form_alter() and function ma_collaboration_tools_node_presave(), so skip validating their og_group_ref fields here.
+        form_set_error('og_group_ref', 'You must specify a protocol for this item.');
+        $missing = TRUE;
+      }
     }
 
     // Don't allow empty privacy setting for items that require protocols.

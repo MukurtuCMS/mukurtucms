@@ -202,7 +202,7 @@ function ma_collaboration_tools_add_content_to_section_link($entity) {
   $child_type = ma_collaboration_tools_get_child_from_parent($entity->type);
   $node_disp_name = node_type_get_names()[$child_type];
   $pronoun = 'a';
-  if (in_array(strtolower($node_disp_name{0}), ['a','e','i','o','u'])) {
+  if (in_array(strtolower($node_disp_name[0]), ['a','e','i','o','u'])) {
     $pronoun = 'an';
   }
   $child_type_path = str_replace('_', '-', $child_type);
