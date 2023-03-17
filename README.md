@@ -1,4 +1,4 @@
-# Mukurtu CMS 3.0.3
+# Mukurtu CMS 3.0.4
 ### [Release Notes](VERSION.md)
 
 ## Contents

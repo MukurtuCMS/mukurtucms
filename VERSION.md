@@ -1,3 +1,11 @@
+## Mukurtu 3.0.4
+- Updated to Drupal 7.95
+- Contrib module security updates
+
+#### Manual Upgrade Steps
+This version requires a database update.
+- database update: `drush updb`
+
 ## Mukurtu 3.0.3
 - Updated to Drupal 7.91
 - Contrib module security updates
