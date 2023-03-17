@@ -1,6 +1,7 @@
 ## Mukurtu 3.0.4
 - Updated to Drupal 7.95
 - Contrib module security updates
+- Add support for PHP 8
 
 #### Manual Upgrade Steps
 This version requires a database update.
