@@ -7,3 +7,4 @@ sites/*/private
 
 .ddev/*
 private:/*
+sites/default/drushrc.php
