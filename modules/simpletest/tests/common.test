@@ -91,6 +91,26 @@ class CommonURLUnitTest extends DrupalWebTestCase {
     $link = l($text, $path);
     $sanitized_path = check_url(url($path));
     $this->assertTrue(strpos($link, $sanitized_path) !== FALSE, format_string('XSS attack @path was filtered', array('@path' => $path)));
+
+    // Verify that a dangerous protocol is sanitized.
+    $text = $this->randomName();
+    $path = "javascript:alert('XSS')";
+    $link = l($text, $path, array('external' => TRUE));
+    $this->assertTrue(strpos($link, 'javascript:') === FALSE, 'Dangerous protocol javascript: was sanitized.');
+
+    // Verify that these harmless javascript paths are left intact for BC.
+    $special_case_js_paths = array(
+      'javascript:void()',
+      'javascript:void();',
+      'javascript:void(0)',
+      'javascript:void(0);',
+      'JavaScript:Void(0)'
+    );
+    foreach ($special_case_js_paths as $path) {
+      $text = $this->randomName();
+      $link = l($text, $path, array('external' => TRUE));
+      $this->assertTrue(strpos($link, $path) !== FALSE, format_string('Harmless @path was not sanitized.', array('@path' => $path)));
+    }
   }
 
   /*
@@ -1191,6 +1211,10 @@ class DrupalHTTPRequestTestCase extends DrupalWebTestCase {
     $redirect_301 = drupal_http_request(url('system-test/redirect/301', array('absolute' => TRUE)), array('max_redirects' => 0));
     $this->assertFalse(isset($redirect_301->redirect_code), 'drupal_http_request does not follow 301 redirect if max_redirects = 0.');
 
+    $redirect_invalid = drupal_http_request(url('system-test/redirect-protocol-relative', array('absolute' => TRUE)), array('max_redirects' => 1));
+    $this->assertEqual($redirect_invalid->code, -1002, format_string('301 redirect to protocol-relative URL returned with error code !error.', array('!error' => $redirect_invalid->error)));
+    $this->assertEqual($redirect_invalid->error, 'missing schema', format_string('301 redirect to protocol-relative URL returned with error message "!error".', array('!error' => $redirect_invalid->error)));
+
     $redirect_invalid = drupal_http_request(url('system-test/redirect-noscheme', array('absolute' => TRUE)), array('max_redirects' => 1));
     $this->assertEqual($redirect_invalid->code, -1002, format_string('301 redirect to invalid URL returned with error code !error.', array('!error' => $redirect_invalid->error)));
     $this->assertEqual($redirect_invalid->error, 'missing schema', format_string('301 redirect to invalid URL returned with error message "!error".', array('!error' => $redirect_invalid->error)));
@@ -1237,6 +1261,44 @@ class DrupalHTTPRequestTestCase extends DrupalWebTestCase {
     // Request front page and check for matching Content-Language.
     $request = drupal_http_request(url('<front>', array('absolute' => TRUE)));
     $this->assertEqual($request->headers['content-language'], 'de', 'Content-Language HTTP header is German.');
+  }
+}
+
+/**
+ * Unit tests for processing of http redirects.
+ */
+class DrupalHTTPRedirectTest extends DrupalUnitTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Drupal HTTP redirect processing',
+      'description' => 'Perform unit tests on processing of http redirects.',
+      'group' => 'System',
+    );
+  }
+
+  public function testHttpsDowngrade() {
+    $url = 'https://example.com/foo';
+    $location = 'http://example.com/bar';
+    $this->assertTrue(_drupal_should_strip_sensitive_headers_on_http_redirect($url, $location), 'Sensitive headers are stripped on HTTPS downgrade.');
+  }
+
+  public function testNoHttpsDowngrade() {
+    $url = 'https://example.com/foo';
+    $location = 'https://example.com/bar';
+    $this->assertFalse(_drupal_should_strip_sensitive_headers_on_http_redirect($url, $location), 'Sensitive headers are not stripped without HTTPS downgrade.');
+  }
+
+  public function testHostChange() {
+    $url = 'https://example.com/foo';
+    $location = 'https://www.example.com/bar';
+    $this->assertTrue(_drupal_should_strip_sensitive_headers_on_http_redirect($url, $location), 'Sensitive headers are stripped on change of host.');
+  }
+
+  public function testNoHostChange() {
+    $url = 'http://example.com/foo';
+    $location = 'http://example.com/bar';
+    $this->assertFalse(_drupal_should_strip_sensitive_headers_on_http_redirect($url, $location), 'Sensitive headers are not stripped without change of host.');
   }
 }
 
@@ -1987,6 +2049,11 @@ class DrupalRenderTestCase extends DrupalWebTestCase {
       array(
         'name' => 'empty string',
         'value' => '',
+        'expected' => '',
+      ),
+      array(
+        'name' => 'not a render array',
+        'value' => 'this is not an array',
         'expected' => '',
       ),
       array(
@@ -2797,6 +2864,7 @@ class DrupalSystemListingTestCase extends DrupalWebTestCase {
  * Tests for the format_date() function.
  */
 class FormatDateUnitTest extends DrupalWebTestCase {
+  protected $admin_user;
 
   /**
    * Arbitrary langcode for a custom language.
@@ -3263,58 +3331,6 @@ class DrupalGetQueryArrayTestCase extends DrupalWebTestCase {
     $parsed = parse_url($url);
     $result = drupal_get_query_array($parsed['query']);
     $this->assertEqual($result['foo'], "/content/folder[@name='foo']/folder[@name='bar']", 'drupal_get_query_array() should only explode parameters on the first equals sign.');
-  }
-
-}
-
-/**
- * Test for block_interest_cohort.
- */
-class BlockInterestCohortTest extends DrupalWebTestCase {
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Block Interest Cohort',
-      'description' => 'Check Permissions-Policy header to disable Google FLoC',
-      'group' => 'System',
-    );
-  }
-
-  function setUp() {
-    parent::setUp('common_test');
-  }
-
-  /**
-   * Tests that FLoC is blocked by default.
-   */
-  function testDefaultBlocking() {
-    $this->drupalGet('node');
-    $this->assertEqual($this->drupalGetHeader('Permissions-Policy'), 'interest-cohort=()', 'FLoC is blocked by default.');
-  }
-
-  /**
-   * Tests that an existing interest-cohort policy is not overwritten.
-   */
-  function testExistingInterestCohortPolicy() {
-    $this->drupalGet('common-test/existing_interest_cohort_policy');
-    $this->assertEqual($this->drupalGetHeader('Permissions-Policy'), 'interest-cohort=*', 'Existing interest-cohort policy is not overwritten.');
-  }
-
-  /**
-   * Tests that an existing header is appended to correctly.
-   */
-  function testExistingPolicyHeader() {
-    $this->drupalGet('common-test/existing_permissions_policy_header');
-    $this->assertTrue((strpos($this->drupalGetHeader('Permissions-Policy'), 'geolocation=(),interest-cohort=()') !== FALSE), 'The existing header is appended to.');
-  }
-
-  /**
-   * Tests that FLoC blocking can be disabled.
-   */
-  function testDisableBlocking() {
-    variable_set('block_interest_cohort', FALSE);
-    $this->drupalGet('node');
-    $this->assertFalse($this->drupalGetHeader('Permissions-Policy'), 'FLoC blocking can be disabled.');
   }
 
 }
