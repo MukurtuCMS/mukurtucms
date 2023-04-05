@@ -43,8 +43,8 @@ if ($args['clean']) {
   echo "\nEnvironment cleaned.\n";
 
   // Get the status messages and print them.
-  $messages = array_pop(drupal_get_messages('status'));
-  foreach ($messages as $text) {
+  $messages = drupal_get_messages('status');
+  foreach ($messages['status'] as $text) {
     echo " - " . $text . "\n";
   }
   exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
@@ -328,7 +328,11 @@ function simpletest_script_init($server_software) {
   if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
     // Ensure that any and all environment variables are changed to https://.
     foreach ($_SERVER as $key => $value) {
-      $_SERVER[$key] = str_replace('http://', 'https://', $_SERVER[$key]);
+      // The first time this script runs $_SERVER['SERVER_SOFTWARE'] will be
+      // NULL, so avoid errors from str_replace().
+      if (!empty($_SERVER[$key])) {
+        $_SERVER[$key] = str_replace('http://', 'https://', $_SERVER[$key]);
+      }
     }
   }
 

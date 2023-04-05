@@ -1104,6 +1104,14 @@ function drupal_http_request($url, array $options = array()) {
         // Redirect to the new location.
         $options['max_redirects']--;
 
+        // Check if we need to remove any potentially sensitive headers before
+        // following the redirect.
+        // @see https://www.rfc-editor.org/rfc/rfc9110.html#name-redirection-3xx
+        if (_drupal_should_strip_sensitive_headers_on_http_redirect($url, $location)) {
+          unset($options['headers']['Cookie']);
+          unset($options['headers']['Authorization']);
+        }
+
         // We need to unset the 'Host' header
         // as we are redirecting to a new location.
         unset($options['headers']['Host']);
@@ -1120,6 +1128,36 @@ function drupal_http_request($url, array $options = array()) {
   }
 
   return $result;
+}
+
+/**
+ * Determine whether to strip sensitive headers from a request when redirected.
+ *
+ * @param string $url
+ *   The url from the original outbound http request.
+ *
+ * @param string $location
+ *   The location to which the request has been redirected.
+ *
+ * @return boolean
+ *   Whether sensitive headers should be stripped from the request before
+ *   following the redirect.
+ */
+function _drupal_should_strip_sensitive_headers_on_http_redirect($url, $location) {
+  $url_parsed = parse_url($url);
+  $location_parsed = parse_url($location);
+  if (!isset($location_parsed['host'])) {
+    return FALSE;
+  }
+  $strip_on_host_change = variable_get('drupal_http_request_strip_sensitive_headers_on_host_change', TRUE);
+  $strip_on_https_downgrade = variable_get('drupal_http_request_strip_sensitive_headers_on_https_downgrade', TRUE);
+  if ($strip_on_host_change && strcasecmp($url_parsed['host'], $location_parsed['host']) !== 0) {
+    return TRUE;
+  }
+  if ($strip_on_https_downgrade && $url_parsed['scheme'] !== $location_parsed['scheme'] && 'https' !== $location_parsed['scheme']) {
+    return TRUE;
+  }
+  return FALSE;
 }
 
 /**
@@ -1240,6 +1278,10 @@ function fix_gpc_magic() {
  *
  * This uses the
  * @link http://php.net/manual/filter.filters.validate.php PHP e-mail validation filter. @endlink
+ * However, a module may override this by implementing
+ * hook_valid_email_address_alter(&$valid, $mail).
+ *
+ * @see hook_valid_email_address_alter()
  *
  * @param $mail
  *   A string containing an e-mail address.
@@ -1248,7 +1290,9 @@ function fix_gpc_magic() {
  *   TRUE if the address is in a valid format.
  */
 function valid_email_address($mail) {
-  return (bool)filter_var($mail, FILTER_VALIDATE_EMAIL);
+  $valid = (bool) filter_var($mail, FILTER_VALIDATE_EMAIL);
+  drupal_alter('valid_email_address', $valid, $mail);
+  return $valid;
 }
 
 /**
@@ -2570,6 +2614,14 @@ function l($text, $path, array $options = array()) {
       $use_theme = FALSE;
     }
   }
+  $path = (string) $path;
+  // For backwards compatibility, do not strip a couple of specific javascript
+  // paths that are harmless.
+  // @see https://www.drupal.org/project/drupal/issues/3310081
+  $skip_js_paths = array('javascript:void()', 'javascript:void();', 'javascript:void(0)', 'javascript:void(0);');
+  if (!in_array(strtolower($path), $skip_js_paths)) {
+    $path = drupal_strip_dangerous_protocols($path);
+  }
   if ($use_theme) {
     return theme('link', array('text' => $text, 'path' => $path, 'options' => $options));
   }
@@ -2697,19 +2749,6 @@ function drupal_deliver_html_page($page_callback_result) {
     drupal_add_http_header('X-Frame-Options', $frame_options);
   }
   drupal_add_http_header('X-Content-Type-Options', 'nosniff');
-
-  if (variable_get('block_interest_cohort', TRUE)) {
-    $permissions_policy = drupal_get_http_header('Permissions-Policy');
-    if (is_null($permissions_policy)) {
-      drupal_add_http_header('Permissions-Policy', 'interest-cohort=()');
-    }
-    else {
-      // Only add interest-cohort if the header does not contain it already.
-      if (strpos($permissions_policy, 'interest-cohort') === FALSE) {
-        drupal_add_http_header('Permissions-Policy', 'interest-cohort=()', TRUE);
-      }
-    }
-  }
 
   // Menu status constants are integers; page content is a string or array.
   if (is_int($page_callback_result)) {
@@ -5493,7 +5532,8 @@ function drupal_cron_run() {
   drupal_alter('cron_queue_info', $queues);
 
   // Try to acquire cron lock.
-  if (!lock_acquire('cron', 240.0)) {
+  $cron_lock_expiration_timeout = variable_get('cron_lock_expiration_timeout', 900.0);
+  if (!lock_acquire('cron', $cron_lock_expiration_timeout)) {
     // Cron is still running normally.
     watchdog('cron', 'Attempting to re-run cron while it is already running.', array(), WATCHDOG_WARNING);
   }
@@ -6088,7 +6128,7 @@ function drupal_render_page($page) {
  */
 function drupal_render(&$elements) {
   // Early-return nothing if user does not have access.
-  if (empty($elements) || (isset($elements['#access']) && !$elements['#access'])) {
+  if (empty($elements) || !is_array($elements) || (isset($elements['#access']) && !$elements['#access'])) {
     return '';
   }
 
