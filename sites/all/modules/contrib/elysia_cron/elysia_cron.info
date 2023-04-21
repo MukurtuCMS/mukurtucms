@@ -4,8 +4,8 @@ core = 7.x
 
 configure = admin/config/system/cron
 
-; Information added by Drupal.org packaging script on 2018-08-18
-version = "7.x-2.6"
+; Information added by Drupal.org packaging script on 2022-08-01
+version = "7.x-2.9"
 core = "7.x"
 project = "elysia_cron"
-datestamp = "1534576086"
+datestamp = "1659341804"

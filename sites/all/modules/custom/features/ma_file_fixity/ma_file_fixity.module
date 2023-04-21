@@ -215,13 +215,19 @@ function ma_file_fixity_run_fixity_check($job) {
     $algo_fail = 0;
     foreach ($hashes_to_check_against as $algo) {
       $saved_hash =  $file->filehash[$algo];
-      $checked_hash = hash_file($algo, $file->uri);
-      if ($saved_hash <> $checked_hash) {
-        $algo_comp_text .= '<li><span class="fail"><i>' . $algo . '</i> does not match.</span> Saved as ' . $saved_hash . '. Check returned ' . $checked_hash . '.</li>';
-        $algo_fail = 1;
+      if (!file_exists($file->uri)) {
+        $algo_comp_text .= '<li><span class="fail"><i>' . $algo . '</i> does not match.</span> Saved as ' . $saved_hash . '. File is missing.</li>';
+        $algo_fail = 1; // Comment this out if we do not want to show these in the fixity log.
       }
       else {
-        $algo_comp_text .= '<li class="pass"><i>' . $algo . '</i> matches.</li>';
+        $checked_hash = hash_file($algo, $file->uri);
+        if ($saved_hash <> $checked_hash) {
+          $algo_comp_text .= '<li><span class="fail"><i>' . $algo . '</i> does not match.</span> Saved as ' . $saved_hash . '. Check returned ' . $checked_hash . '.</li>';
+          $algo_fail = 1;
+        }
+        else {
+          $algo_comp_text .= '<li class="pass"><i>' . $algo . '</i> matches.</li>';
+        }
       }
     }
     if ($algo_fail) {

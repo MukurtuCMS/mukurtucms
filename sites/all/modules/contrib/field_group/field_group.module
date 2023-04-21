@@ -4,7 +4,7 @@
  * @file
  * Fieldgroup module.
  *
- * For an overview of all php and javascript hooks, see field_group.api.php.
+ * For an overview of all php and JavaScript hooks, see field_group.api.php.
  *
  */
 
@@ -108,14 +108,14 @@ function field_group_permission() {
  */
 function field_group_menu_load($group_name, $entity_type, $bundle_name, $bundle_pos, $map) {
 
+  $args = func_get_args();
+  $args_pop = array_pop($args);
+  $mode = array_pop($args_pop);
+
   if ($bundle_pos > 0) {
     $bundle = $map[$bundle_pos];
     $bundle_name = field_extract_bundle($entity_type, $bundle);
   }
-
-  $args = func_get_args();
-  $args_pop = array_pop($args);
-  $mode = array_pop($args_pop);
 
   $group = field_group_load_field_group($group_name, $entity_type, $bundle_name, $mode);
 
@@ -245,7 +245,7 @@ function field_group_field_attach_delete_bundle($entity_type, $bundle) {
   // Delete the entity's entry from field_group of all entities.
   // We fetch the field groups first to assign the removal task to ctools.
   if (isset($list[$entity_type], $list[$entity_type][$bundle])) {
-    foreach ($list[$entity_type][$bundle] as $group_mode => $groups) {
+    foreach ($list[$entity_type][$bundle] as $groups) {
       foreach ($groups as $group) {
         ctools_export_crud_delete('field_group', $group);
       }
@@ -1066,7 +1066,8 @@ function field_group_pre_render_tab(&$element, $group, &$form) {
     // Create the fieldgroup element.
     $add['#parents'] = array('additional_settings');
     $add['#group'] = 'additional_settings';
-    $add['#weight'] = -30 + $group->weight; // hardcoded to bring our extra additional vtabs on top.
+    // Hardcoded to bring our extra additional vtabs on top.
+    $add['#weight'] = -30 + $group->weight;
 
     // Check if the additional_settings exist for this type of form.
     if (isset($form['additional_settings']['group']['#groups']['additional_settings'])) {
@@ -1128,15 +1129,13 @@ function field_group_field_group_build_pre_render_alter(&$element) {
     field_group_remove_empty_form_groups('form', $element, $groups, $element['#groups'], $element['#entity_type']);
   }
 
-  // Add the default field_group javascript and stylesheet.
+  // Add the default field_group JavaScript and stylesheet.
   $element['#attached']['js'][] = drupal_get_path('module', 'field_group') . '/field_group.js';
 
   // Move additional settings to the last multipage pane if configured that way.
   // Note that multipages MUST be in the root of the form.
   foreach (element_children($element) as $name) {
     if (isset($element[$name]['#type']) && $element[$name]['#type'] == 'multipage' && isset($element['additional_settings'])) {
-      $parent_group = $element['#groups'][$name];
-      $move_additional = isset($parent_group->format_settings['instance_settings']['move_additional']) ? $parent_group->format_settings['instance_settings']['move_additional'] : 1;
       $last_pane = NULL;
       foreach (element_children($element[$name], TRUE) as $pane) {
         $last_pane = $pane;
@@ -1292,7 +1291,7 @@ function field_group_field_group_format_summary($group) {
 
       if (isset($group_form['instance_settings'], $group_form['instance_settings'][$key]['#options'])) {
         if (is_array($value)) {
-          $value = implode(array_filter($value), ', ');
+          $value = implode(', ', array_filter($value));
         }
         else {
           $value = $group_form['instance_settings'][$key]['#options'][$value];
@@ -1621,7 +1620,7 @@ function theme_multipage_pane($variables) {
   // Add a page counter if needed.
   // counter array(0 => t('No'), 1 => t('Format 1 / 10'), 2 => t('The count number only'));
   $page_counter_format = isset($parent_group->format_settings['instance_settings']['page_counter']) ? $parent_group->format_settings['instance_settings']['page_counter'] : 1;
-  $multipage_element['#page_counter_rendered'] = '';
+
   if ($page_counter_format == 1) {
     $output .= t('<span class="multipage-counter">%count / %total</span>', array('%count' => $multipages[$parent_group->group_name], '%total' => count($parent_group->children)));
   }
@@ -2143,11 +2142,11 @@ function _field_group_element_children_recursive_ref(&$element) {
  * @param $group Object with the group information.
  * @param $form The form object itself.
  */
-function field_group_pre_render(& $element, $group, & $form) {
-
-  // Only run the pre_render function if the group has elements.
-  // $group->group_name
-  if ($element == array()) {
+function field_group_pre_render(&$element, $group, &$form) {
+  // Only run the pre_render function if the group has elements. All groups
+  // have #array_parents & #field_parents set by field_group_fields_nest()
+  // regardless of emptiness.
+  if ($element == array() || !array_diff(array_keys($element), array('#array_parents', '#field_parents'))) {
     return;
   }
 
@@ -2291,7 +2290,7 @@ function field_group_field_group_to_hook_code($data, $module) {
   $export = $schema['export'];
 
   $translatables = array();
-  $objects = ctools_export_load_object('field_group', 'names', array_values($data));
+  $objects = empty($data) ? array() : ctools_export_load_object('field_group', 'names', array_values($data));
   $code = "/**\n";
   $code .= " * Implements hook_{$export['default hook']}()\n";
   $code .= " */\n";
@@ -2308,7 +2307,8 @@ function field_group_field_group_to_hook_code($data, $module) {
     }
   }
 
-  if (!empty($translatables)) {
+  if (!empty($translatables) && module_exists('features')) {
+    module_load_include('inc', 'features', 'features.export');
     $code .= features_translatables_export($translatables, '  ') . "\n";
   }
 

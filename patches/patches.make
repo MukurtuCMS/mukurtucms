@@ -6,6 +6,12 @@ core = 7.x
 ;; Core ;;
 ;;;;;;;;;;
 
+; Fix a PHP8 fatal error issue with the Batch API sending the key of the redirect path when it should not. This occurs at the end of a Mukurtu CSV batch export.
+projects[drupal][patch][] = core/drop_path_key_from_batch_redirect.patch
+
+; During feeds imports, do not fail fatally if field_comm_records_mm $items is an empty string instead of an array.
+projects[drupal][patch][] = core/check_items_is_array_in_field_filter_items.patch
+
 ; Custom logo and favicon stored in private filesystem if it is the default.
 projects[drupal][patch][] = https://www.drupal.org/files/issues/1087250.logo-public-filesystem.057.patch
 
@@ -33,6 +39,9 @@ projects[drupal][patch][] = https://drupal.org/files/issues/2019-01-17/3026560-d
 ; Patch fieldsets in Seven.
 projects[drupal][patch][] = https://www.drupal.org/files/issues/2022-06-23/update_fieldset-legend__collapsable-3292211-3.patch
 
+; Chrome collapsible fieldset bug (https://www.drupal.org/project/drupal/issues/3243853).
+projects[drupal][patch][] = core/seven-collapsible-fieldset-chrome-fix.patch
+
 ;;;;;;;;;;;;;;;;;;;
 ;; Core Projects ;;
 ;;;;;;;;;;;;;;;;;;;
@@ -56,6 +65,10 @@ projects[seven][patch][] = core/use_mukurtu_logo_during_install.patch
 ;;;;;;;;;;;;;
 ;; Contrib ;;
 ;;;;;;;;;;;;;
+
+;;; Argument Filters
+; Make arg filters compatible with PHP 8
+projects[argfilters][patch][] = contrib/make_arg_filters_module_php8_compatible.patch
 
 ;;; Bootstrap (theme)
 ; Add First and Last Classes to Lists
@@ -82,6 +95,8 @@ projects[dummyimage][patch][] = https://www.drupal.org/files/issues/dummyimage_m
 ;;; Entity
 ; Prevent error from workflow (https://www.drupal.org/project/entity/issues/2289693)
 projects[entity][patch][] = contrib/entity_undefined_entity_get_info-2289693-2.patch
+; Multiple EMW failures of unknown data property after PHP8 update resolved by this patch
+projects[entity][patch][] = https://www.drupal.org/files/issues/entity-metadata-wrapper-exception-11768576-4_0.patch
 
 ;;; Entity Reference
 ; Forbid to use duplicate entities in entityreference field
@@ -109,6 +124,10 @@ projects[feeds][patch][] = contrib/0001-Skip-protocol-field-OG-validation-during
 projects[feeds][patch][] = contrib/0001-Mukurtu-language-handling-for-taxonomy-import.patch
 ; Change language handling for text import
 projects[feeds][patch][] = contrib/0001-Use-new-field-language-handling-in-feeds.patch
+
+;;; Feeds Comment Processor
+; Make feeds_comment_processor compatible with PHP8
+projects[feeds_comment_processor][patch][] = https://www.drupal.org/files/issues/2020-09-28/compatibility_with_feeds_processor-3171586.patch
 
 ;;; Feeds Files
 ; Change entityValidate definition
@@ -221,8 +240,8 @@ projects[services][patch][] = contrib/custom_validation_on_paragraph_fields.patc
 projects[services_field_collection][patch][] = contrib/fix_services_field_collection_create.patch
 
 ;;; Tree (treeable)
-; Skip treeable field formatter patch
-projects[tree][patch][] = contrib/skip_treeable_field_formatter.patch
+; Make treeable compatible with PHP8
+projects[tree][patch][] = contrib/make_treeable_php8_compatible.patch
 
 ;;; Views
 ; Change delimiter from coma to semi-colon

@@ -1453,7 +1453,7 @@ function features_admin_components_review(&$form, &$form_state) {
   $module = $form_state['values']['module'];
   $revert = array();
   foreach (array_filter($form_state['values']['revert']) as $component => $status) {
-    features_set_signature($module, $component);
+    features_set_signature($module, $component, NULL, 'review');
     drupal_set_message(t('All <strong>@component</strong> components for <strong>@module</strong> reviewed.', array('@component' => $component, '@module' => $module)));
   }
   $form_state['redirect'] = 'admin/structure/features/' . $module;

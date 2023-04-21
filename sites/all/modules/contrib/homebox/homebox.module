@@ -411,6 +411,9 @@ function homebox_build($page) {
     }
   }
 
+  // Allow other module to alter allowed blocks.
+  drupal_alter('homebox_allowed_blocks', $allowed_blocks, $page);
+
   // Sort each region/column based on key value
   // Also separate the regions into rows based on the region widths
   $sum_width = 0;

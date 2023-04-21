@@ -1,0 +1,732 @@
+<?php
+
+/**
+ * @file
+ * Test the Reroute Email module.
+ */
+
+/**
+ * Provides common functionality for the Reroute Email test classes.
+ */
+class RerouteEmailTestCase extends DrupalWebTestCase {
+
+  /**
+   * User object to perform site browsing.
+   *
+   * @var object
+   */
+  protected $adminUser;
+
+  /**
+   * Reroute email destination address used for the tests.
+   *
+   * @var string
+   */
+  protected $rerouteDestination = "rerouted@example.com";
+
+  /**
+   * Original email address used for the tests.
+   *
+   * @var string
+   */
+  protected $originalDestination = "original@example.com";
+
+  /**
+   * Whitelisted domain destination address used for the tests.
+   *
+   * @var string
+   */
+  protected $whitelistedDomain = '*@example.com';
+
+  /**
+   * Permissions required by the user to perform the tests.
+   *
+   * @var array
+   */
+  protected $permissions = array(
+    'administer reroute email',
+  );
+
+  /**
+   * Enable modules and create user with specific permissions.
+   */
+  public function setUp() {
+    // Merge inherited classes modules, see FieldUITestCase for an example.
+    $modules = func_get_args();
+    if (isset($modules[0]) && is_array($modules[0])) {
+      $modules = $modules[0];
+    }
+    $modules[] = 'reroute_email';
+    parent::setUp($modules);
+
+    // Authenticate test user.
+    $this->adminUser = $this->drupalCreateUser($this->permissions);
+    $this->drupalLogin($this->adminUser);
+  }
+
+  /**
+   * Helper function to configure Reroute Email Settings.
+   *
+   * @param string $destination
+   *   (optional) The email address to which emails should be rerouted.
+   *   Defaults to $this->rerouteDestination if set to NULL.
+   * @param string $whitelisted
+   *   (optional) The whitelisted email addresses.
+   * @param bool $enable
+   *   (optional) Set to TRUE to enable email Rerouting, defaults to TRUE.
+   * @param bool $enable_message
+   *   (optional) Set to TRUE to show rerouting description, defaults to TRUE.
+   * @param bool $enable_dsm
+   *   (optional) Set to TRUE to display a Drupal status message after rerouting
+   *   submitted email, defaults to TRUE.
+   * @param string $mail_keys
+   *   (optional) A list of modules or mail keys should be rerouted, defaults to
+   *   empty string (all outgoing emails are rerouted).
+   */
+  public function configureRerouteEmail($destination = NULL, $whitelisted = NULL, $enable = NULL, $enable_message = NULL, $enable_dsm = NULL, $mail_keys = NULL) {
+    $current_values = $install_values = array(
+      REROUTE_EMAIL_ENABLE => TRUE,
+      REROUTE_EMAIL_ADDRESS => '',
+      REROUTE_EMAIL_WHITELIST => '',
+      REROUTE_EMAIL_ENABLE_MESSAGE => TRUE,
+      REROUTE_EMAIL_ENABLE_DSM => TRUE,
+      REROUTE_EMAIL_MAIL_KEYS => '',
+    );
+
+    foreach ($install_values as $key => $value) {
+      $current_values[$key] = variable_get($key, $value);
+    }
+
+    // Configure to Reroute Email settings form.
+    $post = array(
+      REROUTE_EMAIL_ENABLE => NULL === $enable ? $current_values[REROUTE_EMAIL_ENABLE] : $enable,
+      REROUTE_EMAIL_ADDRESS => NULL === $destination ? $current_values[REROUTE_EMAIL_ADDRESS] : $destination,
+      REROUTE_EMAIL_WHITELIST => NULL === $whitelisted ? $current_values[REROUTE_EMAIL_WHITELIST] : $whitelisted,
+      REROUTE_EMAIL_ENABLE_MESSAGE => NULL === $enable_message ? $current_values[REROUTE_EMAIL_ENABLE_MESSAGE] : $enable_message,
+      REROUTE_EMAIL_ENABLE_DSM => NULL === $enable_dsm ? $current_values[REROUTE_EMAIL_ENABLE_DSM] : $enable_dsm,
+      REROUTE_EMAIL_MAIL_KEYS => NULL === $mail_keys ? $current_values[REROUTE_EMAIL_MAIL_KEYS] : $mail_keys,
+    );
+
+    // Submit Reroute Email Settings form and check if it was successful.
+    $this->drupalPost('admin/config/development/reroute_email', $post, t('Save configuration'));
+    $this->assertText(t('The configuration options have been saved.'));
+  }
+
+  /**
+   * Assert whether the text "Originally to: @to_email" is found in email body.
+   *
+   * @param bool $original_destination
+   *   (optional) The original email address to be found in rerouted email
+   *   body. Defaults to $this->originalDestination if set to NULL.
+   */
+  public function assertEmailOriginallyTo($original_destination = NULL) {
+    // Check most recent email.
+    $mails = $this->drupalGetMails();
+    if (empty($mails)) {
+      $this->assert(FALSE, 'Email was not sent.');
+      return;
+    }
+    $mail = end($mails);
+
+    // Initialize $original_destination by default if no value is provided.
+    if (NULL === $original_destination) {
+      $original_destination = $this->originalDestination;
+    }
+
+    // Search in $mailbody for "Originally to: $original_destination".
+    $search_for = t('Originally to: @to', array('@to' => $original_destination));
+    $has_info = preg_match("/{$search_for}/", $mail['body']);
+
+    // Asserts whether searched text was found.
+    $this->assertTrue($has_info, t('Found the correct "Originally to" line in the body.'));
+    $this->verbose(t('Email body was: <pre>@mail_body</pre>', array('@mail_body' => $mail['body'])));
+  }
+
+}
+
+/**
+ * Tests email rerouting for the site-wide Core Contact form.
+ */
+class RerouteEmailContactTestCase extends RerouteEmailTestCase {
+
+  /**
+   * Implements DrupalWebTestCase::getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Site-wide Core Contact form email rerouting',
+      'description' => "Test Reroute Email module's ability to reroute mail sent from the Core Contact module forms.",
+      'group' => 'Reroute Email',
+    );
+  }
+
+  /**
+   * Enable modules and create user with specific permissions.
+   */
+  public function setUp() {
+    // Add more permissions to be able to manipulate the contact forms.
+    $this->permissions[] = 'administer contact forms';
+    $this->permissions[] = 'access site-wide contact form';
+    // Include Core Contact module.
+    parent::setUp('contact');
+  }
+
+  /**
+   * Basic tests of email rerouting for emails sent through the Contact forms.
+   *
+   * The Core Contact email form is submitted several times with different
+   * Email Rerouting settings: Rerouting enabled or disabled, Body injection
+   * enabled or disabled, several recipients with or without whitelist.
+   */
+  public function testBasicNotification() {
+    // Additional destination email address used for testing the whitelist.
+    $additional_destination = "additional@example.com";
+
+    // Configure to reroute normally to {$this->rerouteDestination}.
+    $this->configureRerouteEmail($this->rerouteDestination);
+
+    // Configure the contact settings to send to $original_destination.
+    $this->drupalPost('admin/structure/contact/edit/1', array('recipients' => $this->originalDestination), t('Save'));
+
+    // Go to the contact page and send an email.
+    $post = array('subject' => "Test test test", 'message' => 'This is a test');
+    $this->drupalPost("contact", $post, t("Send message"));
+    $this->assertText(t("Your message has been sent"));
+    $mails = $this->drupalGetMails();
+    $mail = end($mails);
+    // Check status message is displayed to let users know email was rerouted.
+    $this->assertRaw(t('Submitted email, with ID: <em>@message_id</em>, was rerouted to configured address: <em>@reroute_target</em>. For more details please refer to Reroute Email settings.', array(
+      '@message_id' => $mail['id'],
+      '@reroute_target' => $this->rerouteDestination,
+    )));
+    $this->assertMail('to', $this->rerouteDestination, format_string("Email was rerouted to @address", array('@address' => $this->rerouteDestination)));
+    // Check if original destination email address is in rerouted email body.
+    $this->assertEmailOriginallyTo();
+    $this->assertTrue(strpos($mail['body'], 'Originally to') !== FALSE, 'Body does contain "Originally to"');
+
+    // Now try sending to one of the additional email addresses that should
+    // not be rerouted. Configure two email addresses in reroute form.
+    // Body injection is still turned on.
+    $this->configureRerouteEmail($this->rerouteDestination, $additional_destination);
+
+    // Configure the contact settings to point to the additional recipient.
+    $this->drupalPost('admin/structure/contact/edit/1', array('recipients' => $additional_destination), t('Save'));
+
+    // Go to the contact page and send an email.
+    $post = array('subject' => "Test test test", 'message' => 'This is a test');
+    $this->drupalPost("contact", $post, t("Send message"));
+    $this->assertText(t("Your message has been sent"));
+    $this->assertMail('to', $additional_destination, 'Email was not rerouted because destination was in whitelist');
+
+    // Now change the configuration to disable reroute and set the original
+    // email recipients.
+    $this->configureRerouteEmail(NULL, NULL, FALSE);
+
+    // Set the contact form to send to original_destination.
+    $this->drupalPost('admin/structure/contact/edit/1', array('recipients' => $this->originalDestination), t('Save'));
+    // Go to the contact page and send an email.
+    $post = array('subject' => "Test test test", 'message' => 'This is a test');
+    $this->drupalPost("contact", $post, t("Send message"));
+    $this->assertText(t("Your message has been sent"));
+    $mails = $this->drupalGetMails();
+    $mail = end($mails);
+    // Check status message is not displayed because email was not rerouted.
+    $this->assertNoRaw(t('Submitted email, with ID: <em>@message_id</em>, was rerouted to configured address: <em>@reroute_target</em>. For more details please refer to Reroute Email settings.', array(
+      '@message_id' => $mail['id'],
+      '@reroute_target' => $this->rerouteDestination,
+    )));
+    // Mail should not be rerouted - should go to $original_destination.
+    $this->assertMail('to', $this->originalDestination, 'Mail not rerouted - sent to original destination.');
+    $this->verbose(t("Email 'to' was: <pre>@mail_to</pre>", array('@mail_to' => $mail['to'])));
+
+    // Configure to reroute without body injection and without status message.
+    $this->configureRerouteEmail(NULL, NULL, TRUE, FALSE, FALSE);
+
+    // Go to the contact page and send an email.
+    $post = array('subject' => "Test test test", 'message' => 'This is a test');
+    $this->drupalPost("contact", $post, t("Send message"));
+    $this->assertText(t("Your message has been sent"));
+    $mails = $this->drupalGetMails();
+    $mail = end($mails);
+    // Check status message is not displayed because it is disabled.
+    $this->assertNoRaw(t('Submitted email, with ID: <em>@message_id</em>, was rerouted to configured address: <em>@reroute_target</em>. For more details please refer to Reroute Email settings.', array(
+      '@message_id' => $mail['id'],
+      '@reroute_target' => $this->rerouteDestination,
+    )));
+    // There should be nothing in the body except the contact message - no
+    // body injection like 'Originally to'.
+    $this->assertTrue(strpos($mail['body'], 'Originally to') === FALSE, 'Body does not contain "Originally to"');
+    $this->assertTrue($mail['headers']['X-Rerouted-Original-To'] == $this->originalDestination, 'X-Rerouted-Original-To is correctly set to the original destination email');
+  }
+
+}
+
+/**
+ * Tests email rerouting for the Test Email form.
+ */
+class RerouteEmailTestEmailTestCase extends RerouteEmailTestCase {
+
+  /**
+   * Implements DrupalWebTestCase::getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Test Email form',
+      'description' => "Test Reroute Email's form for sending a test email.",
+      'group' => 'Reroute Email',
+    );
+  }
+
+  /**
+   * Basic tests for reroute_email Test Email form.
+   *
+   * Check if submitted form values are properly submitted and rerouted.
+   * Test Subject, To, Cc, Bcc and Body submitted values, form validation,
+   * default values, and submission with invalid email addresses.
+   */
+  public function testFormTestEmail() {
+
+    // Configure to reroute normally to {$this->rerouteDestination}.
+    $this->configureRerouteEmail($this->rerouteDestination);
+
+    // Check Subject field default value.
+    $this->drupalGet("admin/config/development/reroute_email/test");
+    $this->assertFieldByName('subject', t("Reroute Email Test"), 'The expected default value was found for the Subject field.');
+
+    // Submit the Test Email form to send an email to be rerouted.
+    $post = array(
+      'to' => "to@example.com",
+      'cc' => "cc@example.com",
+      'bcc' => "bcc@example.com",
+      'subject' => "Test Reroute Email Test Email Form",
+      'body' => 'Testing email rerouting and the Test Email form',
+    );
+    $this->drupalPost("admin/config/development/reroute_email/test", $post, t("Send email"));
+    $this->assertText(t("Test email submitted for delivery."));
+    $mails = $this->drupalGetMails();
+    $mail = end($mails);
+    // Check rerouted email to.
+    $this->assertMail('to', $this->rerouteDestination, format_string('To email address was rerouted to @address.', array('@address' => $this->rerouteDestination)));
+
+    // Check the To passed through the Test Email Form.
+    $this->assertEmailOriginallyTo($post['to']);
+
+    // Check the Cc and Bcc headers are the ones submitted through the form.
+    $this->assertTrue($mail['headers']['X-Rerouted-Original-Cc'] == $post['cc'], format_string('X-Rerouted-Original-Cc is correctly set to submitted value: @address', array('@address' => $post['cc'])));
+    $this->assertTrue($mail['headers']['X-Rerouted-Original-Bcc'] == $post['bcc'], format_string('X-Rerouted-Original-Cc is correctly set to submitted value: @address', array('@address' => $post['bcc'])));
+
+    // Check that Cc and Bcc headers were added to the message body.
+    $copy_headers = array(
+      'cc' => t('Originally cc: @cc', array('@cc' => $mail['headers']['X-Rerouted-Original-Cc'])),
+      'bcc' => t('Originally bcc: @bcc', array('@bcc' => $mail['headers']['X-Rerouted-Original-Bcc'])),
+    );
+    foreach ($copy_headers as $header => $message_line) {
+      $has_header = preg_match("/{$message_line}/", $mail['body']);
+      $this->assertTrue($has_header, format_string('Found the correct "@header" line in the body.', array('@header' => $header)));
+    }
+
+    // Check the Subject and Body field values can be found in rerouted email.
+    $this->assertMail('subject', $post['subject'], format_string('Subject is correctly set to submitted value: @subject', array('@subject' => $post['subject'])));
+    $this->assertFalse(strpos($mail['body'], $post['body']) === FALSE, 'Body contains the value submitted through the form');
+
+    // Check required To field.
+    $this->drupalPost("admin/config/development/reroute_email/test", array('to' => ''), t("Send email"));
+    $this->assertText(t("To field is required."));
+
+    // Test form submission with email rerouting and invalid email addresses.
+    $post = array(
+      'to' => "To address invalid format",
+      'cc' => "Cc address invalid format",
+      'bcc' => "Bcc address invalid format",
+    );
+    $this->drupalPost("admin/config/development/reroute_email/test", $post, t("Send email"));
+    // Successful submission with email rerouting enabled.
+    $this->assertText(t("Test email submitted for delivery."));
+    $mails = $this->drupalGetMails();
+    $mail = end($mails);
+    // Check rerouted email to.
+    $this->assertMail('to', $this->rerouteDestination, format_string('To email address was rerouted to @address.', array('@address' => $this->rerouteDestination)));
+
+    // Check the To passed through the Test Email Form.
+    $this->assertEmailOriginallyTo($post['to']);
+
+    // Check the Cc and Bcc headers are the ones submitted through the form.
+    $this->assertTrue($mail['headers']['X-Rerouted-Original-Cc'] == $post['cc'], format_string('X-Rerouted-Original-Cc is correctly set to submitted value: @address', array('@address' => $post['cc'])));
+    $this->assertTrue($mail['headers']['X-Rerouted-Original-Bcc'] == $post['bcc'], format_string('X-Rerouted-Original-Cc is correctly set to submitted value: @address', array('@address' => $post['bcc'])));
+
+    // Now change the configuration to disable reroute and submit the Test
+    // Email form with the same invalid email address values.
+    $this->configureRerouteEmail(NULL, NULL, FALSE);
+
+    // Submit the test email form again with previously used invalid addresses.
+    $this->drupalPost("admin/config/development/reroute_email/test", $post, t("Send email"));
+    // Check invalid email addresses are still passed to the mail system.
+    $mails = $this->drupalGetMails();
+    $mail = end($mails);
+    // Check rerouted email to.
+    $this->assertMail('to', $post['to'], format_string('To email address is correctly set to submitted value: @address.', array('@address' => $post['to'])));
+    $this->verbose(t('Sent email values: <pre>@mail</pre>', array('@mail' => var_export($mail, TRUE))));
+    // Check the Cc and Bcc headers are the ones submitted through the form.
+    $this->assertTrue($mail['headers']['Cc'] == $post['cc'], format_string('Cc is correctly set to submitted value: @address', array('@address' => $post['cc'])));
+    $this->assertTrue($mail['headers']['Bcc'] == $post['bcc'], format_string('Bcc is correctly set to submitted value: @address', array('@address' => $post['bcc'])));
+  }
+
+}
+
+/**
+ * Test handling of special cases for body as a string and Cc/Bcc robustness.
+ */
+class RerouteEmailSpecialTestCase extends RerouteEmailTestCase {
+
+  /**
+   * Implements DrupalWebTestCase::getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Body as a string and robust headers',
+      'description' => "Support message's body passed as a string and Cc/Bcc header keys with an unexpected case.",
+      'group' => 'Reroute Email',
+    );
+  }
+
+  /**
+   * Enable modules and create user with specific permissions.
+   */
+  public function setUp() {
+    // Add more permissions to access recent log messages in test.
+    $this->permissions[] = 'access site reports';
+    // Include hidden test helper sub-module.
+    parent::setUp('reroute_email_test');
+  }
+
+  /**
+   * Test handling of message body as a string and header keys' robustness.
+   *
+   * A test email is sent by the reroute_email_test module with a string for
+   * the body of the email message and Cc/Bcc header keys with an unexpected
+   * case. Test if Reroute Email handles message's body properly when it is a
+   * string and captures all Cc/Bcc header keys independently of the case.
+   */
+  public function testBodyStringRobustHeaders() {
+    // Initialize Cc and Bcc keys with a special case.
+    $test_cc_key = 'cC';
+    $test_bcc_key = 'bCc';
+
+    // Configure to reroute normally to {$this->rerouteDestination}.
+    $this->configureRerouteEmail($this->rerouteDestination);
+
+    // Print test email values for comparing values on test results page.
+    $test_message = array(
+      'to' => $this->originalDestination,
+      'params' => array(
+        'body' => "Test Message body is a string.",
+        'headers' => array(
+          'test_cc_key' => $test_cc_key,
+          'test_bcc_key' => $test_bcc_key,
+          $test_cc_key => "test_cc_key@example.com",
+          $test_bcc_key => "test_bcc_key@example.com",
+        ),
+      ),
+    );
+    // Send test helper sub-module's email.
+    drupal_mail('reroute_email_test', 'test_reroute_email', $test_message['to'], language_default(), $test_message['params']);
+    $this->verbose(t('Test email message values: <pre>@test_message</pre>', array('@test_message' => var_export($test_message, TRUE))));
+
+    $mails = $this->drupalGetMails();
+    $mail = end($mails);
+    // Check rerouted email to.
+    $this->assertMail('to', $this->rerouteDestination, format_string('To email address was rerouted to @address.', array('@address' => $this->rerouteDestination)));
+
+    // Check if original destination email address is in rerouted email body.
+    $this->assertEmailOriginallyTo();
+
+    // Check if test message body is found although provided as a string.
+    $this->assertTrue(strpos($mail['body'], $test_message['params']['body']) !== FALSE, 'Email body contains original message body although it was provided as a string.');
+
+    // Check the watchdog entry logged by reroute_email_test_mail_alter.
+    $this->drupalGet('admin/reports/dblog');
+    $this->assertRaw(t('A String was detected in the body'), 'Recorded in recent log messages: a String was detected in the body.');
+
+    // Test the robustness of the CC and BCC keys in headers.
+    $this->assertTrue($mail['headers']['X-Rerouted-Original-Cc'] == $test_message['params']['headers'][$test_cc_key], format_string('X-Rerouted-Original-Cc is correctly set to @test_cc_address, although Cc header message key provided was: @test_cc_key', array('@test_cc_address' => $test_message['params']['headers'][$test_cc_key], '@test_cc_key' => $test_cc_key)));
+    $this->assertTrue($mail['headers']['X-Rerouted-Original-Bcc'] == $test_message['params']['headers'][$test_bcc_key], format_string('X-Rerouted-Original-Bcc is correctly set to @test_bcc_address, although Bcc header message key provided was: @test_bcc_key', array('@test_bcc_address' => $test_message['params']['headers'][$test_bcc_key], '@test_bcc_key' => $test_bcc_key)));
+  }
+
+}
+
+/**
+ * Test default reroute destination email address when it is empty or unset.
+ */
+class RerouteEmailDefaultAddressTestCase extends RerouteEmailTestCase {
+
+  /**
+   * Implements DrupalWebTestCase::getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Default or empty reroute destination email address',
+      'description' => "When reroute email addresses field is not configured, attempt to use the site email address, otherwise use sendmail_from system variable.",
+      'group' => 'Reroute Email',
+    );
+  }
+
+  /**
+   * Enable modules and create user with specific permissions.
+   */
+  public function setUp() {
+    // Add more permissions to access recent log messages in test.
+    $this->permissions[] = 'access site reports';
+    parent::setUp();
+  }
+
+  /**
+   * Test reroute email address is set to site_mail, sendmail_from or empty.
+   *
+   * When reroute email addresses field is not configured and settings haven't
+   * been configured yet, check if the site email address or the sendmail_from
+   * system variable are properly used as fallbacks. Additionally, check that
+   * emails are aborted and a watchdog entry logged if reroute email address is
+   * set to an empty string.
+   */
+  public function testRerouteDefaultAddress() {
+    // Check default value for reroute_email_address when not configured.
+    // If Site email is not empty, it should be the default value.
+    $default_destination = variable_get('site_mail', NULL);
+    $this->assertTrue(isset($default_destination), format_string('Site mail is not empty: @default_destination.', array('@default_destination' => $default_destination)));
+
+    // Programmatically enable email rerouting.
+    variable_set(REROUTE_EMAIL_ENABLE, TRUE);
+
+    // Load the Reroute Email Settings form page. Ensure rerouting is enabled.
+    $this->drupalGet("admin/config/development/reroute_email/reroute_email");
+    $this->assertFieldByName(REROUTE_EMAIL_ENABLE, TRUE, 'Email rerouting was programmatically successfully enabled.');
+
+    // Check Email addresses field default value should be site_mail.
+    $this->assertFieldByName(REROUTE_EMAIL_ADDRESS, $default_destination, format_string('Site email address is configured and is the default value of the Email addresses field: @default_destination.', array('@default_destination' => $default_destination)));
+
+    // Ensure reroute_email_address is not set yet.
+    $reroute_email_address = variable_get(REROUTE_EMAIL_ADDRESS, NULL);
+    $this->assertFalse(isset($reroute_email_address), 'Reroute email destination address is not configured.');
+
+    // Submit a test email and check if it is rerouted to site_mail address.
+    $this->drupalPost("admin/config/development/reroute_email/test", array('to' => "to@example.com"), t("Send email"));
+    $this->assertText(t("Test email submitted for delivery."));
+    $mails = $this->drupalGetMails();
+    $mail = end($mails);
+
+    // Check rerouted email is the site email address.
+    $this->assertMail('to', $default_destination, format_string('Email was properly rerouted to site email address: @default_destination.', array('@default_destination' => $default_destination)));
+
+    // Now unset site_mail to check if system sendmail_from is properly used.
+    variable_del('site_mail');
+    // If it is defined, try to test the default sendmail_from system variable.
+    $system_email = ini_get('sendmail_from');
+    // Fallback to default placeholder if no system variable configured.
+    $default_destination = empty($system_email) ? REROUTE_EMAIL_ADDRESS_EMPTY_PLACEHOLDER : $system_email;
+
+    // Reload the Reroute Email Settings form page.
+    $this->drupalGet("admin/config/development/reroute_email/reroute_email");
+    // Check Email addresses field default value should be system default.
+    $this->assertFieldByName(REROUTE_EMAIL_ADDRESS, $system_email, format_string('Site email address is not configured, Email addresses field defaults to system sendmail_from: <em>@default_destination</em>.', array('@default_destination' => $system_email)));
+
+    // Submit a test email to check if it is rerouted to sendmail_from address.
+    $this->drupalPost("admin/config/development/reroute_email/test", array('to' => "to@example.com"), t("Send email"));
+
+    // Depends on environment settings.
+    if (!empty($system_email)) {
+      $this->assertText(t("Test email submitted for delivery."));
+      $this->assertMail('to', $default_destination, format_string('Email was properly rerouted to system sendmail_from email address: @default_destination.', array('@default_destination' => $default_destination)));
+    }
+    else {
+      $this->assertRaw(t('<em>@message_id</em> was aborted by reroute email; site administrators can check the recent log entries for complete details on the rerouted email.', array('@message_id' => $mail['id'])), format_string('Status message displayed as expected to the user with the mail ID <em>(@message_id)</em>.', array('@message_id' => $mail['id'])));
+    }
+
+    // Configure reroute email address to be empty: ensure emails are aborted.
+    $this->configureRerouteEmail('', '');
+
+    // Make sure reroute_email_address variable is an empty string.
+    $reroute_email_address = variable_get(REROUTE_EMAIL_ADDRESS, NULL);
+    $this->assertTrue(is_string($reroute_email_address), 'Reroute email destination address is configured to be an empty string.');
+
+    // Flush the Test Mail collector to ensure it is empty for this tests.
+    variable_set('drupal_test_email_collector', array());
+
+    // Submit a test email to check if it is aborted.
+    $this->drupalPost("admin/config/development/reroute_email/test", array('to' => "to@example.com"), t("Send email"));
+    $mails = $this->drupalGetMails();
+    $mail_aborted = end($mails);
+    $this->assertFalse($mail_aborted, 'Email sending was properly aborted because rerouting email address is an empty string.');
+    // Check status message is not displayed because email was aborted.
+    $this->assertNoRaw(t('Submitted email, with ID: <em>@message_id</em>, was rerouted to configured address: <em>@reroute_target</em>. For more details please refer to Reroute Email settings.', array(
+      '@message_id' => $mail['id'],
+      '@reroute_target' => $this->rerouteDestination,
+    )));
+
+    // Check status message is displayed properly after email form submission.
+    $this->assertRaw(t('<em>@message_id</em> was aborted by reroute email; site administrators can check the recent log entries for complete details on the rerouted email.', array('@message_id' => $mail['id'])), format_string('Status message displayed as expected to the user with the mail ID <em>(@message_id)</em>.', array('@message_id' => $mail['id'])));
+
+    // Check the watchdog entry logged with aborted email message.
+    $this->drupalGet('admin/reports/dblog');
+    // Check the link to the watchdog detailed message.
+    $watchdog_link = $this->xpath('//table[@id="admin-dblog"]/tbody/tr[contains(@class,"dblog-reroute-email")][1]/td[text()="reroute_email"]/following-sibling::td/a[contains(text(),"reroute_email")]');
+    $link_label = (string) $watchdog_link[0];
+    $this->assertTrue(isset($watchdog_link[0]), format_string("Recorded successfully a watchdog log entry in recent log messages: <em>@link</em>.", array('@link' => $link_label)));
+    // Open the full view page of the log message found for reroute_email.
+    $this->clickLink($link_label);
+
+    // Recreate expected logged message based on email submitted previously.
+    $mail['send'] = FALSE;
+    $mail['body'] = array($mail['body'], NULL);
+
+    // Ensure the correct email is logged with default 'to' placeholder.
+    $this->assertRaw(t('Aborted email sending for <em>@message_id</em>.<br />Detailed email data: Array $message <pre>', array('@message_id' => $mail['id'])), format_string('The log entry recorded by Reroute Email contains a full dump of the aborted email message <em>@message_id</em> and is formatted as expected.', array('@message_id' => $mail['id'])));
+    $this->assertRaw(REROUTE_EMAIL_ADDRESS_EMPTY_PLACEHOLDER);
+  }
+
+}
+
+/**
+ * Test Reroute Email's with a domain whitelisted.
+ */
+class RerouteEmailDomainWhitelistedTestCase extends RerouteEmailTestCase {
+
+  /**
+   * Implements DrupalWebTestCase::getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Domain Whitelisted',
+      'description' => "Test Reroute Email's with a domain whitelisted.",
+      'group' => 'Reroute Email',
+    );
+  }
+
+  /**
+   * Basic tests for the domain whitelisted addresses.
+   */
+  public function testDomainWhitelistedEmail() {
+    // Set rerouting email and whitelisted domain.
+    $this->configureRerouteEmail($this->rerouteDestination, $this->whitelistedDomain);
+
+    // Make sure configured emails were set.
+    $this->assertEqual(variable_get(REROUTE_EMAIL_ADDRESS), $this->rerouteDestination, 'Reroute email address was set.');
+    $this->assertEqual(variable_get(REROUTE_EMAIL_WHITELIST), $this->whitelistedDomain, 'Whitelisted value was set.');
+
+    // Submit a test email (should be rerouted).
+    $to = 'some@not-exist.domain';
+    $this->drupalPost('admin/config/development/reroute_email/test', array('to' => $to), t('Send email'));
+
+    // Check if the email was rerouted properly.
+    $this->assertEmailOriginallyTo($to);
+    $this->assertMail('to', $this->rerouteDestination, format_string('Email was properly rerouted to the email address: @destination.', array('@destination' => $this->rerouteDestination)));
+
+    // Submit a test email (should not be rerouted).
+    $this->drupalPost('admin/config/development/reroute_email/test', array('to' => $this->originalDestination), t('Send email'));
+
+    // Check if the email was rerouted properly.
+    $this->assertMail('to', $this->originalDestination, format_string('Email was properly sent the email address: @destination.', array('@destination' => $this->originalDestination)));
+  }
+
+}
+
+/**
+ * Test Reroute Email with multiple recipients.
+ */
+class RerouteEmailMultipleRecipientsTest extends RerouteEmailTestCase {
+
+  /**
+   * Implements DrupalWebTestCase::getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Multiple Recipients',
+      'description' => 'Test Reroute Email with multiple recipients',
+      'group' => 'Reroute Email',
+    );
+  }
+
+  /**
+   * Test Reroute Email with multiple recipients.
+   */
+  public function testMultipleRecipients() {
+    // Set multiple whitelisted domain and rerouting emails. Multiple commas and
+    // semicolons are added for validation tests.
+    $this->configureRerouteEmail('user1@example.com, user2@example.com,;;,,user@example.com', $this->whitelistedDomain);
+
+    // Make sure configured emails were set properly.
+    $reroute_to = 'user1@example.com,user2@example.com,user@example.com';
+    $this->assertEqual(variable_get(REROUTE_EMAIL_ADDRESS), $reroute_to, 'Reroute email address was set.');
+    $this->assertEqual(variable_get(REROUTE_EMAIL_WHITELIST), $this->whitelistedDomain, 'Whitelisted value was set.');
+
+    // Submit a test email (should be rerouted).
+    $to = 'some@not-exist.domain, whitelisted@example.com';
+    $this->drupalPost('admin/config/development/reroute_email/test', array('to' => $to), t('Send email'));
+
+    // Check if the email was rerouted properly.
+    $this->assertEmailOriginallyTo($to);
+    $this->assertMail('to', $reroute_to, format_string('Email was properly rerouted to the email address: @destination.', array('@destination' => $reroute_to)));
+
+    // Submit a test email (should not be rerouted).
+    $to = 'whitelisted@example.com, user2@example.com, allowed@example.com';
+    $this->drupalPost('admin/config/development/reroute_email/test', array('to' => $to), t('Send email'));
+
+    // Check if the email was not rerouted.
+    $this->assertMail('to', $to, format_string('Email was properly sent the email addresses: @destination.', array('@destination' => $to)));
+  }
+
+}
+
+/**
+ * Test Reroute Email with mail keys filter.
+ */
+class RerouteEmailMailKeysTest extends RerouteEmailTestCase {
+
+  /**
+   * Implements DrupalWebTestCase::getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Mail keys filter',
+      'description' => 'Test Reroute Email with mail keys filter.',
+      'group' => 'Reroute Email',
+    );
+  }
+
+  /**
+   * Test Reroute Email with mail keys filter.
+   */
+  public function testMailKeysFilter() {
+    // Configure to reroute all outgoing emails.
+    $this->configureRerouteEmail($this->rerouteDestination);
+
+    // Submit a test email (should be rerouted).
+    $this->drupalPost('admin/config/development/reroute_email/test', array('to' => $this->originalDestination), t('Send email'));
+
+    // Check if the email was rerouted properly.
+    $this->assertEmailOriginallyTo($this->originalDestination);
+    $this->assertMail('to', $this->rerouteDestination, format_string('Email was properly rerouted to the email address: @destination.', array('@destination' => $this->rerouteDestination)));
+
+    // Configure to reroute outgoing emails only from our test module.
+    $this->configureRerouteEmail(NULL, NULL, NULL, NULL, NULL, 'not_existed_module');
+
+    // Submit a test email (should not be rerouted).
+    $this->drupalPost('admin/config/development/reroute_email/test', array('to' => $this->originalDestination), t('Send email'));
+
+    // Check if the email was not rerouted.
+    $this->assertMail('to', $this->originalDestination, format_string('Email was properly sent the email addresses: @destination.', array('@destination' => $this->originalDestination)));
+
+    // Configure to reroute only outgoing emails from our test form.
+    $this->configureRerouteEmail(NULL, NULL, NULL, NULL, NULL, 'reroute_email_test_email_form');
+
+    // Submit a test email (should be rerouted).
+    $this->drupalPost('admin/config/development/reroute_email/test', array('to' => $this->originalDestination), t('Send email'));
+
+    // Check if the email was rerouted properly.
+    $this->assertEmailOriginallyTo($this->originalDestination);
+    $this->assertMail('to', $this->rerouteDestination, format_string('Email was properly rerouted to the email address: @destination.', array('@destination' => $this->rerouteDestination)));
+
+    // Configure to reroute outgoing emails only from our test module.
+    $this->configureRerouteEmail(NULL, NULL, NULL, NULL, NULL, 'reroute_email_test');
+  }
+
+}

@@ -220,8 +220,7 @@ function features_menu() {
     'file' => 'features.admin.inc',
   );
   $items['features/ajaxcallback/%'] = array(
-    /* @see \features_get_feature_components() */
-    'title callback' => 'features_get_feature_components',
+    'title' => 'AJAX callback',
     'description' => 'Return components of a feature.',
     /* @see \features_export_components_json() */
     'page callback' => 'features_export_components_json',
@@ -1236,7 +1235,7 @@ function _features_restore($op, $items = array()) {
         // If the script completes, remove the semaphore and set the code
         // signature.
         features_semaphore('del', $component);
-        features_set_signature($module_name, $component);
+        features_set_signature($module_name, $component, NULL, __FUNCTION__ . '(' . $log_action . ')');
         watchdog('features', '@action completed for @module_name / @component.', array('@action' => $log_action, '@component' => $component, '@module_name' => $module_name));
       }
 

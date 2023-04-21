@@ -6,9 +6,8 @@ package = Homebox
 core = 7.x
 configure = admin/config/group/homebox
 
-; Information added by Drupal.org packaging script on 2017-12-18
-version = "7.x-2.0"
+; Information added by Drupal.org packaging script on 2021-11-01
+version = "7.x-2.0+2-dev"
 core = "7.x"
 project = "homebox"
-datestamp = "1513567387"
-
+datestamp = "1635806804"

@@ -159,7 +159,7 @@ function treeable_form_field_ui_field_edit_form_alter(&$form, $form_state) {
   );
 
   if (field_behaviors_widget('multiple values', $instance) != FIELD_BEHAVIOR_DEFAULT) {
-    $form['instance']['widget']['settings']['treeable']['#description'] += '<br/>' . t('The currently active widget handles multiple value by itself. The hierarchical edit form cannot be enabled.');
+    $form['instance']['widget']['settings']['treeable']['#description'] .= '<br/>' . t('The currently active widget handles multiple value by itself. The hierarchical edit form cannot be enabled.');
     $form['instance']['widget']['settings']['treeable']['#value'] = 0;
     $form['instance']['widget']['settings']['treeable']['#disabled'] = TRUE;
   }
@@ -548,12 +548,6 @@ function treeable_field_formatter_view($entity_type, $entity, $field, $instance,
  * Implements hook_preprocess_HOOK() where HOOK is "field".
  */
 function treeable_preprocess_field(&$variables) {
-  // Mukurtu patch. We are not using this formatter, and it returns PHP notices, so get out of here.
-  return;
-
-  // Mukurtu patch. We are not using this formatter, and it returns PHP notices, so get out of here.
-  return;
-
   $element = $variables['element'];
 
   if ($element['#formatter'] == 'treeable_list') {

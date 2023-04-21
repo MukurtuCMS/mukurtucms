@@ -153,6 +153,8 @@ Options:
                                            --verbose, but without enabling drush
                                            verbose mode)
  --ignore-disable                          run channels/tasks even if disabled
+ --ignore-maintenance                      run channels/tasks even if
+                                           maintenance mode is enabled
  --ignore-running                          run channels/tasks even
                                            if already running
  --ignore-time                             run channels/tasks even if not ready

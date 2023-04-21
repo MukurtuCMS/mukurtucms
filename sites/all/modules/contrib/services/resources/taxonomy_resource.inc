@@ -373,9 +373,10 @@ function _taxonomy_resource_definition() {
  */
 function _taxonomy_term_resource_retrieve($tid) {
   $term = taxonomy_term_load($tid);
-  //Lets check field_permissions
-  $term = services_field_permissions_clean('view', 'taxonomy_term', $term);
-  return $term;
+  // Let's check field_permissions and return term object
+  return $term ?
+    services_field_permissions_clean('view', 'taxonomy_term', $term) :
+    services_error(t('Term @tid not found', array('@tid' => $tid)), 404);
 }
 
 /**

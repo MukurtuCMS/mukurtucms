@@ -775,14 +775,14 @@ Drupal.behaviors.viewsFilterConfigSelectAll.attach = function(context) {
       var checked = $(this).is(':checked');
       // Update all checkbox beside the select all checkbox.
       $(this).parents('.form-checkboxes').find('input[type=checkbox]').each(function() {
-        $(this).attr('checked', checked);
+        $(this).get(0).checked = true;
       });
     });
   // Uncheck the select all checkbox if any of the others are unchecked.
   $('#views-ui-config-item-form div.form-type-checkbox').not($('.form-item-options-value-all')).find('input[type=checkbox]').each(function() {
     $(this).click(function() {
-      if ($(this).is('checked') == 0) {
-        $('#edit-options-value-all').removeAttr('checked');
+      if ($(this).is('checked') == 0 && $('#edit-options-value-all').length) {
+        $('#edit-options-value-all').get(0).checked = false;
       }
     });
   });
@@ -866,7 +866,7 @@ Drupal.behaviors.viewsUiChangeDefaultWidget.attach = function (context, settings
   }
   // Update on widget change.
   $('input[name="options[group_info][multiple]"]').change(function() {
-    change_default_widget($(this).attr("checked"));
+    change_default_widget($(this).get(0).checked);
   });
   // Update the first time the form is rendered.
   $('input[name="options[group_info][multiple]"]').trigger('change');

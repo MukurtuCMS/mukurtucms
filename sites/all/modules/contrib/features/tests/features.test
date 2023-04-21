@@ -191,6 +191,12 @@ class FeaturesUserTestCase extends DrupalWebTestCase {
         $style = image_style_save($style);
         foreach ($style['effects'] as $effect) {
           $effect['data']['width'] = '120';
+          // The image style id needs to be explicitly set on the image effect,
+          // if the effect is not coming from the database already.
+          // See https://www.drupal.org/project/features/issues/3256494.
+          /* @see \image_default_style_save() */
+          /* @see \image_effect_form_submit() */
+          $effect['isid'] = $style['isid'];
           image_effect_save($effect);
         }
         break;

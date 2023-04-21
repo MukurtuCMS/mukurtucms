@@ -55,7 +55,7 @@ SimplePie Installation
 
 - To install the SimplePie parser plugin, complete the following steps:
   1. Download SimplePie from http://simplepie.org/downloads. The recommended
-     version is: 1.3.
+     version is: 1.5.6.
   2. Decompress the downloaded zip file.
   3. Rename the uncompressed folder to 'simplepie'.
      For example rename 'simplepie-simplepie-e9472a1' to 'simplepie'.

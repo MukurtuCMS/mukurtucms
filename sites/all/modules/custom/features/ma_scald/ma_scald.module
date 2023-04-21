@@ -713,10 +713,11 @@ function ma_scald_create_basic_atom($filepath, &$atom, $type = 'video') {
 
       // Copy file to permanent location.
       $location = $directory . $file_object->filename;
-      $file = file_copy($file_object, $location, FILE_EXISTS_RENAME);
-      $file->status = FILE_STATUS_PERMANENT;
-      file_save($file);
-      $form_state['values']['file'] = $file->fid;
+      if ($file = file_copy($file_object, $location, FILE_EXISTS_RENAME)) {
+        $file->status = FILE_STATUS_PERMANENT;
+        file_save($file);
+        $form_state['values']['file'] = $file->fid;
+      }
   }
 
   // Options.

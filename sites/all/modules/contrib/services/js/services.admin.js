@@ -4,8 +4,7 @@
    */
   Drupal.behaviors.resourceMenuCollapse = {
     attach: function (context, settings) {
-      var timeout = null,
-        arrowImageHTML = function(collapsed) {
+      var arrowImageHTML = function(collapsed) {
           return settings.services.images[collapsed ? 'collapsed' : 'expanded'];
         },
         setRowsCollapsedState = function(toggle, $rows, collapsed) {
@@ -18,7 +17,7 @@
           $(toggle).html(arrowImageHTML(collapsed));
         };
 
-      $('td.resource-select-all').each(function() {
+      $('td.resource-select-all').once('resource-menu-collapse').each(function() {
         var resourceName = this.id,
           resource = settings.services.resources[this.id],
           $rowElements = $('.' + resourceName + '-method'),
@@ -43,7 +42,7 @@
    */
   Drupal.behaviors.resourceSelectAll = {
     attach: function (context, settings) {
-      $('td.resource-select-all').each(function () {
+      $('td.resource-select-all').once('resource-select-all').each(function () {
         var resourceName = this.id,
           methodCheckboxes = $('.' + resourceName + '-method .resource-method-select input[type=checkbox]'),
           groupCheckbox = $('<input type="checkbox" class="form-checkbox" />').attr('id', this.id + '-select-all'),
