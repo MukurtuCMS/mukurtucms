@@ -238,7 +238,9 @@ function mukurtu_export_csv_export_to_zip($encoded_export) {
   // These are raw files that we want to include in the Zip
   if(isset($encoded_export['__files'])) {
     foreach($encoded_export['__files'] as $binary_file) {
-      $zip->addFile(drupal_realpath($binary_file['uri']), $binary_file['filename']);
+      if (!empty(drupal_realpath($binary_file['uri']))) {
+        $zip->addFile(drupal_realpath($binary_file['uri']), $binary_file['filename']);
+      }
     }
 
     // Unset this, so we don't try to further process them
@@ -479,7 +481,7 @@ function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, 
 
             // Load entity.
             $referenced_entity_object = mukurtu_export_entity_load_wrapper($referenced_entity_type, array($r_id));
-            if (empty($referenced_entity_object)) {
+            if (empty($referenced_entity_object) OR !$referenced_entity_object[$r_id]) {
               continue;
             }
 

@@ -325,11 +325,7 @@ function _node_resource_create($node) {
   // but always make the node author default to the current user (if the user
   // has permission to change it, $form_state['values'] will override this
   // default when the form is submitted).
-
-  //Patched to support multi value fields (e.g. field_ media_asset "sid") - Dario 20150726
-  //based on proposed fix in comment https://www.drupal.org/node/2224803#comment-8844431
-  //$stub_node = (object) array_intersect_key($node, array_flip(array('type', 'language', 'tnid')));
-  $stub_node = $node;
+  $stub_node = (object) array_intersect_key($node, array_flip(array('type', 'language', 'tnid')));
   $stub_node->name = $user->name;
 
   // Contributed modules may check the triggering element in the form state.
@@ -348,7 +344,7 @@ function _node_resource_create($node) {
   drupal_form_submit($node_type . '_node_form', $form_state, $node);
 
   // Mukurtu patch - check for our custom paragraph validation errors.
-  if (count($_SESSION['paragraph validation errors'])) {
+  if (isset($_SESSION['paragraph validation errors']) AND count($_SESSION['paragraph validation errors'])) {
     $paragraph_validation_errors = $_SESSION['paragraph validation errors'];
     unset ($_SESSION['paragraph validation errors']);
     return services_error(implode(" ", $paragraph_validation_errors), 406, array('form_errors' => $paragraph_validation_errors));

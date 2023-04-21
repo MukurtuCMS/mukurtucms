@@ -10,6 +10,9 @@
  *
  * @return array
  *   Renderable array.
+ *
+ * @throws Exception
+ *   Exceptions from theme().
  */
 function elysia_cron_admin_page() {
   $aoutput = array();
@@ -365,14 +368,12 @@ EOT
     '#description' => t("If you don't specify a rule for a process, and if it has not a module specified one, this rule will apply"),
   );
 
-  if (!ini_get('safe_mode')) {
-    $form['installation']['elysia_cron_time_limit'] = array(
-      '#title' => t('Time limit'),
-      '#type' => 'textfield',
-      '#default_value' => variable_get('elysia_cron_time_limit', 240),
-      '#description' => t('Set the number of seconds a channel is allowed to run. If you have some jobs that needs more time to execute increase it or set to 0 to disable the limit (WARN: that way a stuck job will block the channel forever!).'),
-    );
-  }
+  $form['installation']['elysia_cron_time_limit'] = array(
+    '#title' => t('Time limit'),
+    '#type' => 'textfield',
+    '#default_value' => variable_get('elysia_cron_time_limit', 240),
+    '#description' => t('Set the number of seconds a channel is allowed to run. If you have some jobs that needs more time to execute increase it or set to 0 to disable the limit (WARN: that way a stuck job will block the channel forever!).'),
+  );
 
   $form['installation']['elysia_cron_stuck_time'] = array(
     '#title' => t('Stuck time'),
@@ -444,14 +445,6 @@ EOT
     . '<b>' . t('Channel') . '</b>: ' . t('Specify a channel for the job (create the channel if not exists)') . '<br /><br />',
     '#type' => 'fieldset',
     '#collapsible' => TRUE,
-  );
-
-  $jobchannels = array(
-    '#title' => t('Job channel associations'),
-    '#description' => t('Leave empty for default channel'),
-    '#type' => 'fieldset',
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
   );
 
   foreach ($_elysia_cron_settings_by_channel as $channel => $cconf) {

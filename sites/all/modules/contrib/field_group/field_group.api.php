@@ -28,7 +28,7 @@
 
 
 /**
- * Javascript hooks
+ * JavaScript hooks
  *
  * Drupal.FieldGroup.Effects.processHook.execute()
  * See field_group.js for the examples for all implemented formatters.
@@ -302,7 +302,7 @@ function hook_field_group_build_pre_render_alter(&$element) {
     }
   }
 
-  // You might include additional javascript files and stylesheets.
+  // You might include additional JavaScript files and stylesheets.
   $element['#attached']['js'][] = drupal_get_path('module', 'field_group') . '/field_group.js';
   $element['#attached']['css'][] = drupal_get_path('module', 'field_group') . '/field_group.css';
 

@@ -45,7 +45,7 @@ function feeds_requirements($phase) {
     $args = array(
       '!url' => 'http://simplepie.org/downloads/',
       '%folder' => $folder,
-      '%file' => 'simplepie.compiled.php',
+      '%file' => 'library/SimplePie.php',
     );
     $requirements['simplepie']['description'] .= $t('<br />Download the compiled, single-file version of the library from the <a href="!url">SimplePie download page</a>, place it into %folder and rename it to %file.', $args);
     $requirements['simplepie']['severity'] = REQUIREMENT_ERROR;

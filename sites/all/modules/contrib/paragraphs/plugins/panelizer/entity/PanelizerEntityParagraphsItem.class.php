@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Class for the Panelizer paragraphs item entity plugin.
- */
 
 /**
  * Panelizer Entity paragraphs item plugin class.
@@ -13,10 +9,30 @@ class PanelizerEntityParagraphsItem extends PanelizerEntityDefault {
 
   /**
    * True if the entity supports revisions.
+   *
+   * @var bool
    */
   public $supports_revisions = TRUE;
+
+  /**
+   * Path to the admin page for this entity.
+   *
+   * @var string
+   */
   public $entity_admin_root = 'admin/structure/paragraphs/%paragraphs_panelizer_bundle_name';
+
+  /**
+   * Menu depth to the admin page.
+   *
+   * @var int
+   */
   public $entity_admin_bundle = 3;
+
+  /**
+   * The name of the database table storing paragraphs items.
+   *
+   * @var string
+   */
   public $views_table = 'paragraphs_item';
 
   /**
@@ -62,7 +78,7 @@ class PanelizerEntityParagraphsItem extends PanelizerEntityDefault {
   /**
    * {@inheritdoc}
    */
-  function get_default_display($bundle, $view_mode) {
+  public function get_default_display($bundle, $view_mode) {
     // For now we just go with the empty display.
     // @todo come up with a better default display.
     return parent::get_default_display($bundle, $view_mode);

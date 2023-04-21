@@ -1,3 +1,20 @@
+## Mukurtu 3.0.4
+- Updated to Drupal 7.95
+- Contrib module security updates
+- Add support for PHP 8
+
+#### Manual Upgrade Steps
+This version requires a database update.
+- database update: `drush updb`
+
+## Mukurtu 3.0.3
+- Updated to Drupal 7.91
+- Contrib module security updates
+- Fixed a bug where newer versions of Chrome could not open collapsible fieldsets.
+
+#### Manual Upgrade Steps
+This version does not require any database updates.
+
 ## Mukurtu 3.0.2
 - Updated to Drupal 7.88
 - Updated Colorbox

@@ -531,9 +531,11 @@ class ViewsHandlerManyToOneTest extends ViewsSqlTest {
       'field_tags_tid' => '4',
     ));
     $this->executeView($view);
+    $this->verbose(isset($view->result) ? $view->result : NULL);
 
     // Assert correct result set.
     $result_count = isset($view->result) && is_array($view->result) ? count($view->result) : 0;
+    $this->assertEqual($result_count, 4, 'Option 4: View has four results.');
     $nid = isset($view->result[0]->nid) ? (int) $view->result[0]->nid : 0;
     $result1 = ($nid === (int) $this->nodes[0]->nid);
     $nid = isset($view->result[1]->nid) ? (int) $view->result[1]->nid : 0;
@@ -543,23 +545,22 @@ class ViewsHandlerManyToOneTest extends ViewsSqlTest {
     $nid = isset($view->result[3]->nid) ? (int) $view->result[3]->nid : 0;
     $result4 = ($nid === (int) $this->nodes[2]->nid);
     $this->assertTrue($result1 && $result2 && $result3 && $result4, 'Option 4: View result has correct node ID.');
-    $this->verbose($view->result);
-    $this->assertEqual($result_count, 4, 'Option 4: View has four results.');
 
-    /* @todo: Fix and uncomment in issue #3045168.
-     * // Option 5: Is all of 1 and 2.
-     * $view = $this->getTermIdExposedGroupedOptionsTestView();
-     * $view->set_exposed_input(array(
-     *   'field_tags_tid' => '5',
-     * ));
-     * $this->executeView($view);
-     *
-     * // Assert correct result set.
-     * $result_count = isset($view->result) && is_array($view->result) ? count($view->result) : 0;
-     * $nid = isset($view->result[0]->nid) ? (int) $view->result[0]->nid : 0;
-     * $this->assertIdentical($nid, (int) $this->nodes[2]->nid, 'Option 5: View result has correct node ID.');
-     * $this->assertIdentical($result_count, 1, 'Option 5: View has one result.');
-     */
+    // @todo: Fix and uncomment in issue #3045168.
+    // Option 5: Is all of 1 and 2.
+    // @code
+    // $view = $this->getTermIdExposedGroupedOptionsTestView();
+    // $view->set_exposed_input(array(
+    //   'field_tags_tid' => '5',
+    // ));
+    // $this->executeView($view);
+    //
+    // // Assert correct result set.
+    // $result_count = isset($view->result) && is_array($view->result) ? count($view->result) : 0;
+    // $nid = isset($view->result[0]->nid) ? (int) $view->result[0]->nid : 0;
+    // $this->assertIdentical($nid, (int) $this->nodes[2]->nid, 'Option 5: View result has correct node ID.');
+    // $this->assertIdentical($result_count, 1, 'Option 5: View has one result.');
+    // @endcode
 
     // Option 6: Is empty.
     $view = $this->getTermIdExposedGroupedOptionsTestView();

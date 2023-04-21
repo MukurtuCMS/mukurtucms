@@ -107,7 +107,7 @@ class views_handler_argument_term_node_tid_depth extends views_handler_argument 
         return FALSE;
       }
 
-      if (count($tids->value) > 1) {
+      if (is_array($tids->value) && count($tids->value) > 1) {
         $operator = 'IN';
       }
       else {

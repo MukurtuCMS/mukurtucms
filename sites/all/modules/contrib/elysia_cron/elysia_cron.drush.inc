@@ -65,6 +65,7 @@ function elysia_cron_drush_command() {
       'elysia-cron-verbose' => 'enable extended output (the same as --verbose, but without enabling drush verbose mode)',
       'force' => 'run channels/tasks even if it disabled/not ready for execution/already running',
       'ignore-disable' => 'run channels/tasks even if disabled',
+      'ignore-maintenance' => 'run channels/tasks even if maintenance mode is enabled',
       'ignore-time' => 'run channels/tasks even if not ready for execution',
       'ignore-running' => 'run channels/tasks even if already running',
     ),
@@ -80,8 +81,10 @@ function elysia_cron_drush_command() {
 function drush_elysia_cron_run_wrapper($op = FALSE, $target = FALSE) {
   global $_elysia_cron_drush;
 
+  $force = drush_get_option('force', FALSE);
   if (variable_get('maintenance_mode', FALSE)) {
-    if (!variable_get('elysia_cron_run_maintenance', FALSE)) {
+    $ignore_maintenance = $force || drush_get_option('ignore-maintenance', FALSE);
+    if (!$ignore_maintenance && !variable_get('elysia_cron_run_maintenance', FALSE)) {
       drush_set_error('Cron run is not allowed in maintenance mode');
       return;
     }
@@ -125,7 +128,7 @@ function drush_elysia_cron_run_wrapper($op = FALSE, $target = FALSE) {
             $line[] = dt('Last run: !time', array('!time' => elysia_cron_date(_ec_variable_get('elysia_cron_last_run', 0))));
           }
         }
-        drush_print(implode($line, ', '));
+        drush_print(implode(', ', $line));
 
         foreach ($jobs as $job => $conf) {
           $line = array();
@@ -151,8 +154,6 @@ function drush_elysia_cron_run_wrapper($op = FALSE, $target = FALSE) {
 
     case 'run':
       // Collect options.
-      $force = drush_get_option('force', FALSE);
-
       $ignore_disable = $force || drush_get_option('ignore-disable', FALSE);
       $ignore_time = $force || drush_get_option('ignore-time', FALSE);
       $ignore_running = $force || drush_get_option('ignore-running', FALSE);

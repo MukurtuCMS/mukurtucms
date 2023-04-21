@@ -894,24 +894,55 @@ function features_get_storage($module_name) {
  * @return string|false
  *   An md5 signature, or FALSE if not found.
  */
-function features_get_signature($state = 'default', $module_name, $component, $reset = FALSE) {
+function features_get_signature($state, $module_name, $component, $reset = FALSE) {
   switch ($state) {
     case 'cache':
-      $cache = cache_get('features_codecache', 'cache_featurestate');
-      if (!empty($cache->data)) {
-        $codecache = $cache->data;
+      // Load the last known stored signature from the database.
+      switch (_features_get_signature_storage_type()) {
+        case 'table':
+          // The database is fully updated.
+          // All signatures are stored in a dedicated database table.
+          $qr = db_select('features_signature', 'fs')
+            ->fields('fs', array('signature'))
+            ->condition('module', $module_name)
+            ->condition('component', $component)
+            ->execute();
+          return $qr ? $qr->fetchField() : FALSE;
+
+        case 'cache':
+          // The database is not fully updated, only to schema version 7201.
+          // Signatures are stored in a cache table.
+          $cache = cache_get('features_codecache', 'cache_featurestate');
+          if (isset($cache->data[$module_name][$component])) {
+            return $cache->data[$module_name][$component];
+          }
+          // No stored signature for this component.
+          return FALSE;
+
+        case 'variable':
+        default:
+          // The database is not fully updated, schema version before 7201.
+          // Signatures are stored in a variable.
+          $signaturess = variable_get('features_codecache', array());
+          if (isset($signaturess[$module_name][$component])) {
+            return $signaturess[$module_name][$component];
+          }
+          // No stored signature for this component.
+          return FALSE;
       }
-      return isset($codecache[$module_name][$component]) ? $codecache[$module_name][$component] : FALSE;
 
     case 'default':
+      // Get the component data as currently in code.
       $objects = features_get_default($component, $module_name, TRUE, $reset);
       break;
 
     case 'normal':
+      // Get the component data as currently in the database.
       $objects = features_get_normal($component, $module_name, $reset);
       break;
   }
   if (!empty($objects)) {
+    // Build a signature hash from the component data.
     features_sanitize($objects, $component);
     return md5(_features_linetrim(features_var_export($objects)));
   }
@@ -919,23 +950,112 @@ function features_get_signature($state = 'default', $module_name, $component, $r
 }
 
 /**
- * Set the signature of a module/component pair in the codecache.
+ * Updates a module/component signature in the database.
+ *
+ * The signature stored in the database reflects the last known state of the
+ * component in code.
  *
  * @param string $module
- *   A module name.
+ *   A feature module name.
  * @param string $component
  *   A component name, e.g. 'field_instance'.
- * @param string|null $signature
- *   An md5 signature, or NULL to auto-generate one.
+ * @param string|null|false $signature
+ *   An md5 signature, or NULL to generate one from the current state in code,
+ *   or FALSE to delete the signature.
+ * @param string|null $message
+ *   (optional) Message to store along with the updated signature.
  */
-function features_set_signature($module, $component, $signature = NULL) {
-  $cache = cache_get('features_codecache', 'cache_featurestate');
-  if (!empty($cache->data)) {
-    $codecache = $cache->data;
+function features_set_signature($module, $component, $signature = NULL, $message = NULL) {
+
+  if ($signature === NULL) {
+    // Build signature from current state in code.
+    $signature = features_get_signature('default', $module, $component, TRUE);
   }
-  $signature = isset($signature) ? $signature : features_get_signature('default', $module, $component, TRUE);
-  $codecache[$module][$component] = $signature;
-  cache_set('features_codecache', $codecache, 'cache_featurestate');
+
+  // Support un-updated databases.
+  switch (_features_get_signature_storage_type()) {
+    case 'table':
+      // The database is fully updated.
+      // All signatures are stored in a dedicated database table.
+      if ($signature === FALSE) {
+        // Delete the signature.
+        db_delete('features_signature')
+          ->condition('module', $module)
+          ->condition('component', $component)
+          ->execute();
+      }
+      else {
+        // Insert or update the signature.
+        db_merge('features_signature')
+          ->key(array(
+            'module' => $module,
+            'component' => $component,
+          ))
+          ->fields(array(
+            'signature' => $signature,
+            'updated' => time(),
+            'message' => $message,
+          ))
+          ->execute();
+      }
+      break;
+
+    case 'cache':
+      // The database is not fully updated, only to schema version 7201.
+      // Signatures are stored in a cache table.
+      $cache = cache_get('features_codecache', 'cache_featurestate');
+      if (!empty($cache->data)) {
+        $signaturess = $cache->data;
+      }
+      $signaturess[$module][$component] = $signature;
+      cache_set('features_codecache', $signaturess, 'cache_featurestate');
+      break;
+
+    case 'variable':
+    default:
+      // The database is not fully updated, schema version before 7201.
+      // Signatures are stored in a variable.
+      $signaturess = variable_get('features_codecache', array());
+      $signaturess[$module][$component] = $signature;
+      variable_set('features_codecache', $signaturess);
+      break;
+  }
+}
+
+/**
+ * Gets the current storage type for features component signatures.
+ *
+ * This is needed to prevent breakage in a database that is not fully updated
+ * yet, e.g. in deployment operations that run before the database update.
+ *
+ * The signatures used to be stored in a variable.
+ * Since #1325288, it was stored in a cache table. This only applies to projects
+ * that were using a -dev branch after 7.x-2.11.
+ * Since #3162854, it is stored in a dedicated non-cache table.
+ *
+ * @return string
+ *   One of 'table', 'cache' or 'type'.
+ *   On a fully updated database, this value will be 'table'.
+ *
+ * @see \features_get_signature()
+ * @see \features_set_signature()
+ * @see \features_update_7202()
+ */
+function _features_get_signature_storage_type() {
+  $type = &drupal_static(__FUNCTION__);
+  if ($type !== NULL) {
+    return $type;
+  }
+  if (db_table_exists('features_signature')) {
+    $type = 'table';
+  }
+  elseif (db_table_exists('cache_featurestate')) {
+    $type = 'cache';
+  }
+  else {
+    $type = 'variable';
+  }
+  return $type;
 }
 
 /**
@@ -1256,7 +1376,7 @@ function features_get_component_states($features = array(), $rebuild_only = TRUE
             // Update code cache if it is stale, clear out semaphore if it is
             // stale.
             if ($default != $codecache) {
-              features_set_signature($feature, $component, $default);
+              features_set_signature($feature, $component, $default, __FUNCTION__ . '(): $normal === $default');
             }
           }
           // Component properly implements exportables.

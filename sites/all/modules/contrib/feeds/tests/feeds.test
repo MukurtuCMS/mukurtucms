@@ -12,6 +12,13 @@ class FeedsWebTestCase extends DrupalWebTestCase {
   protected $profile = 'testing';
 
   /**
+   * A user with permission to bypass node access and administer nodes.
+   *
+   * @var object
+   */
+  protected $admin_user;
+
+  /**
    * {@inheritdoc}
    */
   public function setUp() {
@@ -97,6 +104,12 @@ class FeedsWebTestCase extends DrupalWebTestCase {
 
     // Create an admin user and log in.
     $this->admin_user = $this->drupalCreateUser($permissions);
+    // Track down which modules are not enabled.
+    if (!$this->admin_user) {
+      $enabled_modules = array_keys(system_list('module_enabled'));
+      $result = array_intersect($modules, $enabled_modules);
+      $this->assertEqual($modules, $result);
+    }
     $this->drupalLogin($this->admin_user);
 
     // Create two content types if they don't exist yet.
@@ -659,11 +672,15 @@ class FeedsWebTestCase extends DrupalWebTestCase {
    */
   public function getNid($url) {
     $matches = array();
-    preg_match('/node\/(\d+?)$/', $url, $matches);
-    $nid = $matches[1];
-
-    // Test for actual integerness.
-    $this->assertTrue($nid === (string) (int) $nid, 'Node id is an integer.');
+    $nid = NULL;
+    if (preg_match('/node\/(\d+?)$/', $url, $matches)) {
+      $nid = $matches[1];
+      // Test for actual integerness.
+      $this->assertIdentical($nid, (string) (int) $nid);
+    }
+    else {
+      $this->fail(t('URL did not contain nid: @url', array('@url' => $url)));
+    }
 
     return $nid;
   }

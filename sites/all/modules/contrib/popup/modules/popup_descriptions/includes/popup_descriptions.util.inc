@@ -173,6 +173,9 @@ function _popup_descriptions_enabled($element){
  *  Tests whether an element's description should pop up based on its id
  */
 function _popup_descriptions_enabled_id($element){
+  if (!isset($element['#id'])) {
+    return FALSE;
+  }
 
   if (!variable_get('description-popup-id')){
     return FALSE;
@@ -197,14 +200,12 @@ function _popup_descriptions_enabled_path($path = FALSE){
     return FALSE;
   }
 
-  $path = $path ? $path : $_GET['q'];
-
-  static $paths = FALSE;
-  if (!$paths) {
-    $paths = preg_split('/[\n\r]+/', variable_get('description-popup-paths'));
+  $path = $path ? $path : current_path();
+  $path_alias = drupal_lookup_path('alias', $path);
+  $patterns = variable_get('description-popup-paths');
+  if (drupal_match_path($path, $patterns) || drupal_match_path($path_alias, $patterns)){
+    return TRUE;
   }
-
-  return in_array($path, $paths);
 }
 
 

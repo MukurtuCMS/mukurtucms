@@ -1,20 +1,17 @@
 <?php
 
 /**
- * @file
  * Provide relationship handler for paragraphs fields.
- */
-
-/**
- * Class paragraphs_handler_relationship
  */
 class paragraphs_handler_relationship extends views_handler_relationship {
 
   /**
    * Returns extra option definitions for the form.
+   *
    * @return array
+   *   An array of option definitions.
    */
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $options['delta'] = array('default' => -1);
 
@@ -23,8 +20,13 @@ class paragraphs_handler_relationship extends views_handler_relationship {
 
   /**
    * Add a delta selector for multiple fields.
+   *
+   * @param $form
+   *   The form structure array.
+   * @param $form_state
+   *   An associative array containing the current state of the form.
    */
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
 
     $field = field_info_field($this->definition['field_name']);
@@ -49,9 +51,11 @@ class paragraphs_handler_relationship extends views_handler_relationship {
 
   /**
    * Makes sure our table is added to the join.
+   *
    * @return mixed
+   *   The alias of the table of this handler which is used in the query.
    */
-  function ensure_my_table() {
+  public function ensure_my_table() {
     $field = field_info_field($this->definition['field_name']);
 
     if (!isset($this->table_alias)) {
@@ -67,4 +71,5 @@ class paragraphs_handler_relationship extends views_handler_relationship {
     }
     return $this->table_alias;
   }
+
 }

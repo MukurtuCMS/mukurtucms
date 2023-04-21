@@ -20,27 +20,25 @@
       $('a.views-remove-link').once('views-processed').click(function(event) {
         var id = $(this).attr('id').replace('views-remove-link-', '');
         $('#views-row-' + id).hide();
-        $('#views-removed-' + id).attr('checked', true);
+        $('#views-removed-' + id).get(0).checked = true;
         event.preventDefault();
       });
-      /**
-    * Here is to handle display deletion
-    * (checking in the hidden checkbox and hiding out the row).
-    */
+      // Here is to handle display deletion
+      // (checking in the hidden checkbox and hiding out the row).
       $('a.display-remove-link')
         .addClass('display-processed')
         .click(function() {
           var id = $(this).attr('id').replace('display-remove-link-', '');
           $('#display-row-' + id).hide();
-          $('#display-removed-' + id).attr('checked', true);
+          $('#display-removed-' + id).get(0).checked = true;
           return false;
         });
     }
   };
 
   /**
- * Helper function to parse a querystring.
- */
+   * Helper function to parse a querystring.
+   */
   Drupal.Views.parseQueryString = function (query) {
     var args = {};
     var pos = query.indexOf('?');
@@ -61,17 +59,16 @@
   };
 
   /**
- * Helper function to return a view's arguments based on a path.
- */
+   * Helper function to return a view's arguments based on a path.
+   */
   Drupal.Views.parseViewArgs = function (href, viewPath) {
-
     // Provide language prefix.
     if (Drupal.settings.pathPrefix) {
       var viewPath = Drupal.settings.pathPrefix + viewPath;
     }
     var returnObj = {};
     var path = Drupal.Views.getPath(href);
-    // Ensure we have a correct path.
+    // Ensure there is a correct path.
     if (viewPath && path.substring(0, viewPath.length + 1) == viewPath + '/') {
       var args = decodeURIComponent(path.substring(viewPath.length + 1, path.length));
       returnObj.view_args = args;
@@ -81,8 +78,8 @@
   };
 
   /**
- * Strip off the protocol plus domain from an href.
- */
+   * Strip off the protocol plus domain from an href.
+   */
   Drupal.Views.pathPortion = function (href) {
     // Remove e.g. http://example.com if present.
     var protocol = window.location.protocol;
@@ -94,12 +91,12 @@
   };
 
   /**
- * Return the Drupal path portion of an href.
- */
+   * Return the Drupal path portion of an href.
+   */
   Drupal.Views.getPath = function (href) {
     href = Drupal.Views.pathPortion(href);
     href = href.substring(Drupal.settings.basePath.length, href.length);
-    // 3 is the length of the '?q=' added to the url without clean urls.
+    // 3 is the length of the '?q=' added to the URL without clean URLs.
     if (href.substring(0, 3) == '?q=') {
       href = href.substring(3, href.length);
     }
