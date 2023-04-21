@@ -6,7 +6,7 @@ core = 7.x
 hidden = TRUE
 dependencies[] = _missing_dependency
 
-; Information added by Drupal.org packaging script on 2023-03-15
-version = "7.95"
+; Information added by Drupal.org packaging script on 2023-04-19
+version = "7.96"
 project = "drupal"
-datestamp = "1678902530"
+datestamp = "1681921915"
