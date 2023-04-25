@@ -102,6 +102,8 @@ projects[entityreference_prepopulate][patch][] = https://www.drupal.org/files/is
 ;;; Features extras
 ; Default param patch
 projects[fe_block][patch][] = contrib/0001-Remove-default-parameter-value-for-PHP-8.patch
+; Another default param
+projects[fe_block][patch][] = contrib/0001-Remove-another-default-argument.patch
 
 ;;; Feeds
 ; These four patches all support feeds import using a subset of fields (not touching existing data for missing fields)
