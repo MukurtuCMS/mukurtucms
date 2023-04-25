@@ -513,7 +513,7 @@ function owlcarousel_create_instance_settings($instance, $variables) {
 /** 
  * Menu callback, delete Owl Carousel instance settings.
  */
-function owlcarousel_delete_instance_settings($id = NULL, $js) {
+function owlcarousel_delete_instance_settings($id = NULL, $js = NULL) {
   $message = t('Settings group @id could not be found.', array('@id' => $id));
 
   if ($id) {
