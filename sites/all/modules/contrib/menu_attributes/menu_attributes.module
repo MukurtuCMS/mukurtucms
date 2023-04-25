@@ -168,7 +168,7 @@ function menu_attributes_form_node_form_alter(&$form, $form_state) {
  * @param $item
  *   The optional existing menu item for context.
  */
-function _menu_attributes_form_alter(array &$form, array $item = array(), array &$complete_form) {
+function _menu_attributes_form_alter(array &$form, array $item, array &$complete_form) {
   $form['options']['#tree'] = TRUE;
   $form['options']['#weight'] = 50;
 
