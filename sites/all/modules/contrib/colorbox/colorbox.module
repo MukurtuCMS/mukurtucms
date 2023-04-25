@@ -11,6 +11,11 @@
 define('COLORBOX_MIN_PLUGIN_VERSION', '1.6.1');
 
 /**
+ * The minimum required version of the DOMPurify plugin, if installed.
+ */
+define('COLORBOX_DOMPURIFY_MIN_PLUGIN_VERSION', '2.3.6');
+
+/**
  * Implements hook_theme().
  */
 function colorbox_theme() {
@@ -101,6 +106,37 @@ function colorbox_libraries_info() {
         'files' => array(
           'js' => array(
             'jquery.colorbox.js',
+          ),
+        ),
+      ),
+    ),
+  );
+  $libraries['DOMPurify'] = array(
+    'name' => 'DOMPurify',
+    'vendor url' => 'https://github.com/cure53/DOMPurify',
+    'download url' => 'https://github.com/cure53/DOMPurify/releases/latest',
+    'version arguments' => array(
+      'file' => 'purify.min.js',
+      'pattern' => '@(?i:DOMPurify)\s+([0-9a-zA-Z\.-]+)@',
+      'lines' => 5,
+    ),
+    'files' => array(
+      'js' => array(
+        'purify.min.js',
+      ),
+    ),
+    'variants' => array(
+      'minified' => array(
+        'files' => array(
+          'js' => array(
+            'purify.min.js',
+          ),
+        ),
+      ),
+      'source' => array(
+        'files' => array(
+          'js' => array(
+            'purify.js',
           ),
         ),
       ),
@@ -224,10 +260,19 @@ function _colorbox_doheader() {
 
   drupal_add_js(array('colorbox' => $js_settings), array('type' => 'setting', 'scope' => JS_DEFAULT));
 
-  // Add and initialise the Colorbox plugin.
+  // Add and initialize the Colorbox and DOMPurify libraries.
   $variant = variable_get('colorbox_compression_type', 'minified');
   if (module_exists('libraries')) {
-    libraries_load('colorbox', $variant);
+    $colorbox_library = libraries_detect('colorbox');
+    $dompurify_library = libraries_detect('DOMPurify');
+    if ($colorbox_library['installed'] &&
+      version_compare($colorbox_library['version'], COLORBOX_MIN_PLUGIN_VERSION, '>=')) {
+      libraries_load('colorbox', $variant);
+    }
+    if ($dompurify_library['installed'] &&
+      version_compare($dompurify_library['version'], COLORBOX_DOMPURIFY_MIN_PLUGIN_VERSION, '>=')) {
+      libraries_load('DOMPurify', 'minified');
+    }
   }
   drupal_add_js($path . '/js/colorbox.js');
 
