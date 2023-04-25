@@ -15,19 +15,18 @@ function googleanalytics_admin_settings_form($form_state) {
   );
 
   $form['account']['googleanalytics_account'] = array(
-    '#title' => t('Web Property ID'),
+    '#title' => t('Web Property ID(s)'),
     '#type' => 'textfield',
-    '#default_value' => variable_get('googleanalytics_account', 'UA-'),
+    '#default_value' => variable_get('googleanalytics_account', 'G-'),
     '#size' => 20,
-    '#maxlength' => 20,
     '#required' => TRUE,
-    '#description' => t('This ID is unique to each site you want to track separately, and is in the form of UA-xxxxxxx-yy. To get a Web Property ID, <a href="@analytics">register your site with Google Analytics</a>, or if you already have registered your site, go to your Google Analytics Settings page to see the ID next to every site profile. <a href="@webpropertyid">Find more information in the documentation</a>.', array('@analytics' => 'https://marketingplatform.google.com/about/analytics/', '@webpropertyid' => url('https://developers.google.com/analytics/resources/concepts/gaConceptsAccounts', array('fragment' => 'webProperty')))),
+    '#description' => t('This ID is unique to each site you want to track separately, and is in the form G-XXXXXXX, UA-xxxxxxx-yy, DC-XXXXXXX, or AW-XXXXXXX. To get a Web Property ID, <a href="@analytics">register your site with Google Analytics</a>, or if you already have registered your site, go to your Google Analytics Settings page to see the ID next to every site profile. <a href="@webpropertyid">Find more information in the documentation</a>. If you want to track with multiple IDs (for example, using both GA4 and UA for legacy tracking) seperate them with commas.', array('@analytics' => 'https://marketingplatform.google.com/about/analytics/', '@webpropertyid' => url('https://support.google.com/analytics/answer/10089681', array('fragment' => 'webProperty')))),
   );
 
   $form['account']['googleanalytics_premium'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Premium account'),
-    '#description' => t('If you are a Google Analytics Premium customer, you can use up to 200 instead of 20 custom dimensions and metrics.'),
+    '#title' => t('Analytics 360 (Premium) account'),
+    '#description' => t('If you are a Google Analytics 360 (Premium) customer, you can use up to 200 instead of 20 custom dimensions and metrics.'),
     '#default_value' => variable_get('googleanalytics_premium', FALSE),
   );
 
@@ -87,7 +86,7 @@ function googleanalytics_admin_settings_form($form_state) {
     '#title' => t('List of top-level domains'),
     '#type' => 'textarea',
     '#default_value' => variable_get('googleanalytics_cross_domains', ''),
-    '#description' => t('If you selected "Multiple top-level domains" above, enter all related top-level domains. Add one domain per line. By default, the data in your reports only includes the path and name of the page, and not the domain name. For more information see section <em>Show separate domain names</em> in <a href="@url">Tracking Multiple Domains</a>.', array('@url' => 'https://support.google.com/analytics/answer/1034342')),
+    '#description' => t('If you selected "Multiple top-level domains" above, enter all related top-level domains. Add one domain per line. By default, the data in your reports only includes the path and name of the page, and not the domain name. For more information see section <em>Show separate domain names</em> in <a href="@url">Tracking Multiple Domains</a>.', array('@url' => 'https://support.google.com/analytics/answer/10071811')),
     '#states' => array(
       'enabled' => array(
         ':input[name="googleanalytics_domain_mode"]' => array('value' => '2'),
@@ -191,7 +190,7 @@ function googleanalytics_admin_settings_form($form_state) {
     '#type' => 'checkbox',
     '#title' => t('Track User ID'),
     '#default_value' => variable_get('googleanalytics_trackuserid', 0),
-    '#description' => t('User ID enables the analysis of groups of sessions, across devices, using a unique, persistent, and non-personally identifiable ID string representing a user. <a href="@url">Learn more about the benefits of using User ID</a>.', array('@url' => 'https://support.google.com/analytics/answer/3123663')),
+    '#description' => t('User ID enables the analysis of groups of sessions, across devices, using a unique, persistent, and non-personally identifiable ID string representing a user. <a href="@url">Learn more about the benefits of using User ID</a>.', array('@url' => 'https://support.google.com/analytics/answer/9213390')),
   );
 
   // Link specific configurations.
@@ -285,7 +284,7 @@ function googleanalytics_admin_settings_form($form_state) {
   $form['tracking']['search_and_advertising']['googleanalytics_site_search'] = array(
     '#type' => 'checkbox',
     '#title' => t('Track internal search'),
-    '#description' => t('If checked, internal search keywords are tracked. You must configure your Google account to use the internal query parameter <strong>search</strong>. For more information see <a href="@url">Setting Up Site Search for a Profile</a>.', array('@url' => 'https://support.google.com/analytics/answer/1012264')) . $site_search_dependencies,
+    '#description' => t('If checked, internal search keywords are tracked. You must configure your Google account to use the internal query parameter <strong>search</strong>. For more information see <a href="@url">Setting Up Site Search for a Profile</a>.', array('@url' => 'https://support.google.com/analytics/answer/9216061')) . $site_search_dependencies,
     '#default_value' => variable_get('googleanalytics_site_search', FALSE),
     '#disabled' => (module_exists('search') ? FALSE : TRUE),
   );
@@ -309,8 +308,8 @@ function googleanalytics_admin_settings_form($form_state) {
   );
   $form['tracking']['privacy']['googleanalytics_tracker_anonymizeip'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Anonymize visitors IP address'),
-    '#description' => t('Tell Google Analytics to anonymize the information sent by the tracker objects by removing the last octet of the IP address prior to its storage. Note that this will slightly reduce the accuracy of geographic reporting. In some countries it is not allowed to collect personally identifying information for privacy reasons and this setting may help you to comply with the local laws.'),
+    '#title' => t('Anonymize visitors IP address (UA only)'),
+    '#description' => t('Tell Google Analytics to anonymize the information sent by the tracker objects by removing the last octet of the IP address prior to its storage. This option has no effect in GA4, as all data is anonymized. Note that this will slightly reduce the accuracy of geographic reporting. In some countries it is not allowed to collect personally identifying information for privacy reasons and this setting may help you to comply with the local laws.'),
     '#default_value' => variable_get('googleanalytics_tracker_anonymizeip', 1),
   );
   $form['tracking']['privacy']['googleanalytics_privacy_donottrack'] = array(
@@ -346,6 +345,14 @@ function googleanalytics_admin_settings_form($form_state) {
       '#title_display' => 'invisible',
       '#type' => 'textfield',
     );
+    $form['googleanalytics_custom_dimension']['indexes'][$i]['name'] = array(
+      '#default_value' => isset($googleanalytics_custom_dimension[$i]['name']) ? $googleanalytics_custom_dimension[$i]['name'] : '',
+      '#description' => t('The custom dimension name.'),
+      '#maxlength' => 255,
+      '#title' => t('Custom dimension name #@index', array('@index' => $i)),
+      '#title_display' => 'invisible',
+      '#type' => 'textfield',
+    );
     $form['googleanalytics_custom_dimension']['indexes'][$i]['value'] = array(
       '#default_value' => isset($googleanalytics_custom_dimension[$i]['value']) ? $googleanalytics_custom_dimension[$i]['value'] : '',
       '#description' => t('The custom dimension value.'),
@@ -377,7 +384,7 @@ function googleanalytics_admin_settings_form($form_state) {
   $form['googleanalytics_custom_metric'] = array(
     '#collapsed' => TRUE,
     '#collapsible' => TRUE,
-    '#description' => t('You can add Google Analytics <a href="@custom_var_documentation">Custom Metrics</a> here. You must have already configured your custom metrics in the <a href="@setup_documentation">Google Analytics Management Interface</a>. You may use tokens. Global and user tokens are always available; on node pages, node tokens are also available.', array('@custom_var_documentation' => 'https://developers.google.com/analytics/devguides/collection/analyticsjs/custom-dims-mets', '@setup_documentation' => 'https://support.google.com/analytics/answer/2709829')),
+    '#description' => t('You can add Google Analytics <a href="@custom_var_documentation">Custom Metrics</a> here. You must have already configured your custom metrics in the <a href="@setup_documentation">Google Analytics Management Interface</a>. You may use tokens. Global and user tokens are always available; on node pages, node tokens are also available.', array('@custom_var_documentation' => 'https://support.google.com/analytics/answer/9216061', '@setup_documentation' => 'https://support.google.com/analytics/answer/12229021?hl=en&ref_topic=9756175')),
     '#theme' => 'googleanalytics_admin_custom_var_table',
     '#title' => t('Custom metrics'),
     '#tree' => TRUE,
@@ -395,6 +402,14 @@ function googleanalytics_admin_settings_form($form_state) {
       '#disabled' => TRUE,
       '#size' => 1,
       '#title' => t('Custom metric index #@index', array('@index' => $i)),
+      '#title_display' => 'invisible',
+      '#type' => 'textfield',
+    );
+    $form['googleanalytics_custom_metric']['indexes'][$i]['name'] = array(
+      '#default_value' => isset($googleanalytics_custom_metric[$i]['name']) ? $googleanalytics_custom_metric[$i]['name'] : '',
+      '#description' => t('The custom metric name.'),
+      '#maxlength' => 255,
+      '#title' => t('Custom metric name #@index', array('@index' => $i)),
       '#title_display' => 'invisible',
       '#type' => 'textfield',
     );
@@ -464,7 +479,7 @@ function googleanalytics_admin_settings_form($form_state) {
     '#title' => t('Create only fields'),
     '#default_value' => _googleanalytics_get_name_value_string(variable_get('googleanalytics_codesnippet_create', array())),
     '#rows' => 5,
-    '#description' => t('Enter one value per line, in the format name|value. Settings in this textarea will be added to <code>ga("create", "UA-XXXX-Y", {"name":"value"});</code>. For more information, read <a href="@url">create only fields</a> documentation in the Analytics.js field reference.', array('@url' => 'https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#create')),
+    '#description' => t('Enter one value per line, in the format name|value. Settings in this textarea will be added to <code>gtag("config", "G-XXXX-Y", {"name":"value"});</code>. For more information, read <a href="@url">create only fields</a> documentation in the Analytics.js field reference.', array('@url' => 'https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#create')),
     '#element_validate' => array('googleanalytics_validate_create_field_values'),
   );
   $form['advanced']['codesnippet']['googleanalytics_codesnippet_before'] = array(
@@ -473,7 +488,7 @@ function googleanalytics_admin_settings_form($form_state) {
     '#default_value' => variable_get('googleanalytics_codesnippet_before', ''),
     '#disabled' => $user_access_add_js_snippets,
     '#rows' => 5,
-    '#description' => t('Code in this textarea will be added <strong>before</strong> <code>ga("send", "pageview");</code>.') . $user_access_add_js_snippets_permission_warning,
+    '#description' => t('Code in this textarea will be added <strong>before</strong> <code>gtag("event", "page_view");</code>.') . $user_access_add_js_snippets_permission_warning,
   );
   $form['advanced']['codesnippet']['googleanalytics_codesnippet_after'] = array(
     '#type' => 'textarea',
@@ -481,7 +496,7 @@ function googleanalytics_admin_settings_form($form_state) {
     '#default_value' => variable_get('googleanalytics_codesnippet_after', ''),
     '#disabled' => $user_access_add_js_snippets,
     '#rows' => 5,
-    '#description' => t('Code in this textarea will be added <strong>after</strong> <code>ga("send", "pageview");</code>. This is useful if you\'d like to track a site in two accounts.') . $user_access_add_js_snippets_permission_warning,
+    '#description' => t('Code in this textarea will be added <strong>after</strong> <code>gtag("event", "page_view");</code>. This is useful if you\'d like to track a site in two accounts.') . $user_access_add_js_snippets_permission_warning,
   );
 
   $form['advanced']['googleanalytics_debug'] = array(
@@ -500,6 +515,7 @@ function googleanalytics_admin_settings_form($form_state) {
 function googleanalytics_admin_settings_form_validate($form, &$form_state) {
   // Trim custom dimensions and metrics.
   foreach ($form_state['values']['googleanalytics_custom_dimension']['indexes'] as $dimension) {
+    $form_state['values']['googleanalytics_custom_dimension']['indexes'][$dimension['index']]['name'] = trim($dimension['name']);
     $form_state['values']['googleanalytics_custom_dimension']['indexes'][$dimension['index']]['value'] = trim($dimension['value']);
     // Remove empty values from the array.
     if (!drupal_strlen($form_state['values']['googleanalytics_custom_dimension']['indexes'][$dimension['index']]['value'])) {
@@ -509,6 +525,7 @@ function googleanalytics_admin_settings_form_validate($form, &$form_state) {
   $form_state['values']['googleanalytics_custom_dimension'] = $form_state['values']['googleanalytics_custom_dimension']['indexes'];
 
   foreach ($form_state['values']['googleanalytics_custom_metric']['indexes'] as $metric) {
+    $form_state['values']['googleanalytics_custom_metric']['indexes'][$metric['index']]['name'] = trim($metric['name']);
     $form_state['values']['googleanalytics_custom_metric']['indexes'][$metric['index']]['value'] = trim($metric['value']);
     // Remove empty values from the array.
     if (!drupal_strlen($form_state['values']['googleanalytics_custom_metric']['indexes'][$metric['index']]['value'])) {
@@ -528,8 +545,11 @@ function googleanalytics_admin_settings_form_validate($form, &$form_state) {
   // Replace all type of dashes (n-dash, m-dash, minus) with the normal dashes.
   $form_state['values']['googleanalytics_account'] = str_replace(array('–', '—', '−'), '-', $form_state['values']['googleanalytics_account']);
 
-  if (!preg_match('/^UA-\d+-\d+$/', $form_state['values']['googleanalytics_account'])) {
-    form_set_error('googleanalytics_account', t('A valid Google Analytics Web Property ID is case sensitive and formatted like UA-xxxxxxx-yy.'));
+  $account_parts = array_filter(array_map("trim", explode(",", $form_state['values']['googleanalytics_account'])));
+  foreach ($account_parts as $account) {
+    if (!_google_analytics_valid_property_id($account)) {
+      form_set_error('googleanalytics_account', t('A valid Web Property ID is case sensitive and formatted like UA-xxxxxxx-yy, G-XXXXXXX, DC-XXXXXXX, or AW-XXXXXXX.'));
+    }
   }
 
   // If multiple top-level domains has been selected, a domain names list is required.
@@ -579,6 +599,7 @@ function theme_googleanalytics_admin_custom_var_table($variables) {
 
   $header = array(
     array('data' => t('Index')),
+    array('data' => t('Name')),
     array('data' => t('Value')),
   );
 
@@ -587,6 +608,7 @@ function theme_googleanalytics_admin_custom_var_table($variables) {
     $rows[] = array(
       'data' => array(
         drupal_render($form['indexes'][$id]['index']),
+        drupal_render($form['indexes'][$id]['name']),
         drupal_render($form['indexes'][$id]['value']),
       ),
     );

@@ -21,43 +21,40 @@ $(document).ready(function() {
         // Is download tracking activated and the file extension configured for download tracking?
         else if (Drupal.settings.googleanalytics.trackDownload && Drupal.googleanalytics.isDownload(this.href)) {
           // Download link clicked.
-          ga("send", {
-            "hitType": "event",
-            "eventCategory": "Downloads",
-            "eventAction": Drupal.googleanalytics.getDownloadExtension(this.href).toUpperCase(),
-            "eventLabel": Drupal.googleanalytics.getPageUrl(this.href),
-            "transport": "beacon"
+          gtag('event', Drupal.googleanalytics.getDownloadExtension(this.href).toUpperCase(), {
+            event_category: 'Downloads',
+            event_label: Drupal.googleanalytics.getPageUrl(this.href),
+            transport_type: 'beacon'
           });
         }
         else if (Drupal.googleanalytics.isInternalSpecial(this.href)) {
           // Keep the internal URL for Google Analytics website overlay intact.
-          ga("send", {
-            "hitType": "pageview",
-            "page": Drupal.googleanalytics.getPageUrl(this.href),
-            "transport": "beacon"
+          // @todo: May require tracking ID
+          var target = this;
+          $.each(Drupal.settings.googleanalytics.account, function () {
+            gtag('config', this, {
+              page_path: Drupal.googleanalytics.getPageUrl(target.href),
+              transport_type: 'beacon'
+            });
           });
         }
       }
       else {
         if (Drupal.settings.googleanalytics.trackMailto && $(this).is("a[href^='mailto:'],area[href^='mailto:']")) {
           // Mailto link clicked.
-          ga("send", {
-            "hitType": "event",
-            "eventCategory": "Mails",
-            "eventAction": "Click",
-            "eventLabel": this.href.substring(7),
-            "transport": "beacon"
+          gtag('event', 'Click', {
+            event_category: 'Mails',
+            event_label: this.href.substring(7),
+            transport_type: 'beacon'
           });
         }
         else if (Drupal.settings.googleanalytics.trackOutbound && this.href.match(/^\w+:\/\//i)) {
           if (Drupal.settings.googleanalytics.trackDomainMode !== 2 || (Drupal.settings.googleanalytics.trackDomainMode === 2 && !Drupal.googleanalytics.isCrossDomain(this.hostname, Drupal.settings.googleanalytics.trackCrossDomains))) {
             // External link clicked / No top-level cross domain clicked.
-            ga("send", {
-              "hitType": "event",
-              "eventCategory": "Outbound links",
-              "eventAction": "Click",
-              "eventLabel": this.href,
-              "transport": "beacon"
+            gtag('event', 'Click', {
+              event_category: 'Outbound links',
+              event_label: this.href,
+              transport_type: 'beacon'
             });
           }
         }
@@ -68,9 +65,10 @@ $(document).ready(function() {
   // Track hash changes as unique pageviews, if this option has been enabled.
   if (Drupal.settings.googleanalytics.trackUrlFragments) {
     window.onhashchange = function() {
-      ga("send", {
-        "hitType": "pageview",
-        "page": location.pathname + location.search + location.hash
+      $.each(Drupal.settings.googleanalytics.account, function () {
+        gtag('config', this, {
+          page_path: location.pathname + location.search + location.hash
+        });
       });
     };
   }
@@ -81,9 +79,10 @@ $(document).ready(function() {
     $(document).bind("cbox_complete", function () {
       var href = $.colorbox.element().attr("href");
       if (href) {
-        ga("send", {
-          "hitType": "pageview",
-          "page": Drupal.googleanalytics.getPageUrl(href)
+        $.each(Drupal.settings.googleanalytics.account, function () {
+          gtag('config', this, {
+            page_path: Drupal.googleanalytics.getPageUrl(href)
+          });
         });
       }
     });

@@ -65,7 +65,7 @@ function googleanalytics_requirements($phase) {
 
   if ($phase == 'runtime') {
     // Raise warning if Google user account has not been set yet.
-    if (!preg_match('/^UA-\d+-\d+$/', variable_get('googleanalytics_account', 'UA-'))) {
+    if (!_google_analytics_valid_property_id(variable_get('googleanalytics_account', 'UA-'))) {
       $requirements['googleanalytics_account'] = array(
         'title' => $t('Google Analytics module'),
         'description' => $t('Google Analytics module has not been configured yet. Please configure its settings from the <a href="@url">Google Analytics settings page</a>.', array('@url' => url('admin/config/system/googleanalytics'))),
