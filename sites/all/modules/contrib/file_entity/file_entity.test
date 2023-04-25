@@ -642,6 +642,12 @@ class FileEntityUploadWizardTestCase extends FileEntityTestHelper {
  * Test file administration page functionality.
  */
 class FileEntityAdminTestCase extends FileEntityTestHelper {
+  protected $admin_user = NULL;
+  protected $base_user_1 = NULL;
+  protected $base_user_2 = NULL;
+  protected $base_user_3 = NULL;
+  protected $base_user_4 = NULL;
+
   public static function getInfo() {
     return array(
       'name' => 'File administration',
