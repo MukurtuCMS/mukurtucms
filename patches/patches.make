@@ -176,6 +176,8 @@ projects[partial_date][patch][] = https://www.drupal.org/files/issues/2020-01-16
 ;;; Owl Carousel
 ; Add ID to handle multiple carousels
 projects[owlcarousel][patch][] = contrib/0001-Add-ID-to-handle-multiple-carousels.patch
+; PHP 8 deprecation fix
+projects[owlcarousel][patch][] = contrib/0001-PHP-8-deprecation-fix.patch
 
 ;;; Quicktabs
 ; Remember collaboration parent page tab on CP, so that when a child page is added, it will return to the parent tab.
