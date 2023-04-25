@@ -236,7 +236,7 @@ function scald_image_scald_prerender($atom, $context, $options, $mode) {
 
     $preset = image_style_load($style_name);
 
-    if (!empty($atom->file_source)) {
+    if (!empty($atom->file_source) && is_array($preset)) {
       $atom->file_transcoded = image_style_path($preset['name'], $atom->file_source);
       $atom->rendered->file_transcoded_url = image_style_url($preset['name'], $atom->file_source);
     }

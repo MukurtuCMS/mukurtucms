@@ -9,8 +9,8 @@ core = 7.x
 
 stylesheets[all][] = css/editor-global.css
 
-; Information added by Drupal.org packaging script on 2019-03-31
-version = "7.x-1.12"
+; Information added by Drupal.org packaging script on 2022-01-24
+version = "7.x-1.13"
 core = "7.x"
 project = "scald"
-datestamp = "1554028687"
+datestamp = "1643054108"
