@@ -47,7 +47,7 @@ class views_php_handler_field extends views_handler_field {
       array('$view', '$handler', '$static', '$row', '$data')
     );
     $form += views_php_form_element($this,
-      array('use_php_click_sortable', t('Enable click sort'), t('If checked, you can use PHP code to enable click sort on the field.')),
+      array('use_php_click_sortable', t('Enable click sort'), t('If checked, you can use PHP code to enable click sort on the field. This may have a large performance impact as all results will be loaded from the database, and pager limits will only be applied in PHP.')),
       array('php_click_sortable', t('Click sort code'), t('The comparison code must return an integer less than, equal to, or greater than zero if the first row should respectively appear before, stay where it was compared to, or appear after the second row.'), FALSE),
       array(
         '$view', '$handler', '$static',
@@ -88,6 +88,9 @@ class views_php_handler_field extends views_handler_field {
     $this->field_alias = 'views_php_' . $this->position;
     // Inform views_php_views_pre_execute() to seize control over the query.
     $this->view->views_php = TRUE;
+    if ($this->click_sortable()) {
+      $this->view->views_php_query_all = TRUE;
+    }
   }
 
   /**
