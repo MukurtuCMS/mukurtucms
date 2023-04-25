@@ -5,7 +5,7 @@ version = VERSION
 core = 7.x
 files[] = blog.test
 
-; Information added by Drupal.org packaging script on 2023-03-15
-version = "7.95"
+; Information added by Drupal.org packaging script on 2023-04-21
+version = "7.97"
 project = "drupal"
-datestamp = "1678902530"
+datestamp = "1682075566"
