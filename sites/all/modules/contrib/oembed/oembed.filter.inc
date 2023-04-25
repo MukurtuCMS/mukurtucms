@@ -5,7 +5,20 @@
  * Input filter that enhances oEmbed enabled URLs with extra content
  */
 
-define('OEMBED_PATTERN_AUTOEMBED', '|^(\s*)(https?://[^\s"]+)(\s*)$|im');
+define('OEMBED_AUTOEMBED', 1);
+define('OEMBED_AUTOEMBED_UNWRAP', 2);
+define('OEMBED_AUTOEMBED_DISABLED', 0);
+define('OEMBED_PATTERN_AUTOEMBED', '|^\s*(https?://[^\s"]+)\s*$|im');
+define('OEMBED_PATTERN_AUTOEMBED_UNWRAP', serialize(array(
+  OEMBED_PATTERN_AUTOEMBED,
+  '|<[a-z0-9]*[^>]*?>(https?://[^\s"]+?)</[a-z0-9]*>|i',
+  '|<span[^>]*?>(https?://[^\s"]+?)</span>|i',
+  '|<a[^>]*?>(https?://[^\s"]+?)</a>|i',
+  '|^(https?:\/\/[^\s"]+?)\s|i',
+  '|\s(https?:\/\/[^\s"]+?)$|i',
+  '|\s(https?:\/\/[^\s"]+?)\s|i',
+  '|^(https?:\/\/[^\s"]+?)$|i',
+)));
 define('OEMBED_PATTERN_EMBED_SHORTCODE', '/(.?)\[embed\b(.*?)\](.+?)\[\/embed\](.?)/s');
 define('OEMBED_PATTERN_EMBED_UNWRAP', '/<p>\s*+(\[embed\b.*?\].+?\[\/embed\])\s*+<\/p>/s');
 
@@ -23,7 +36,7 @@ function oembed_filter_info() {
     'tips callback' => 'oembed_filter_oembed_tips',
     'default settings' => array(
       'options' => '',
-      'autoembed' => TRUE,
+      'autoembed' => OEMBED_AUTOEMBED,
     ),
   );
   $filters['oembed_legacy'] = array(
@@ -69,11 +82,16 @@ function oembed_filter_oembed_settings($form, &$form_state, $filter, $format, $d
     '#description' => t('A series of attribute value pairs for the default request options. For example, <em>maxwidth="500"</em>.'),
   );
   $settings['autoembed'] = array(
-    '#type' => 'checkbox',
+    '#type' => 'radios',
     '#title' => t('Automatically embed URLs'),
     '#default_value' => $filter->settings['autoembed'],
-    '#description' => t('When possible, embed the media content from a URL directly in the input.'),
-  );
+    '#options' => array(
+      OEMBED_AUTOEMBED => t('Embed URL that are on its own line.'),
+      OEMBED_AUTOEMBED_UNWRAP => t('Embed URL on its own line ignoring any &lt;p&gt; tags that may have been inserted by a WYSIWYG editor.'),
+      OEMBED_AUTOEMBED_DISABLED => t('Disabled'),
+    ),
+     '#description' => t('When possible, embed the media content from a URL directly in the input.'),
+   );
   return $settings;
 }
 
@@ -81,8 +99,11 @@ function oembed_filter_oembed_settings($form, &$form_state, $filter, $format, $d
  * Implements hook_filter_FILTER_process().
  */
 function oembed_filter_oembed_prepare($text, $filter, $format, $langcode, $cache, $cache_id) {
-  if ($filter->settings['autoembed']) {
+  if (OEMBED_AUTOEMBED == $filter->settings['autoembed']) {
     $text = preg_replace_callback(OEMBED_PATTERN_AUTOEMBED, 'oembed_preg_auto_replace', $text);
+  }
+  elseif (OEMBED_AUTOEMBED_UNWRAP == $filter->settings['autoembed']) {
+    $text = preg_replace_callback(unserialize(OEMBED_PATTERN_AUTOEMBED_UNWRAP), 'oembed_preg_auto_replace', $text);
   }
   return $text;
 }
@@ -96,7 +117,7 @@ function oembed_filter_oembed_process($text, $filter, $format, $langcode, $cache
   $_oembed_filter_settings = !empty($filter->settings['options']) ? oembed_parse_attr($filter->settings['options']) : array();
 
   // Undo auto paragraph around oEmbed shortcodes.
-  $text = preg_replace(OEMBED_PATTERN_EMBED_UNWRAP, '$1', $text);
+  $text = preg_replace(OEMBED_PATTERN_EMBED_UNWRAP, '$1 ', $text);
 
   $text = preg_replace_callback(OEMBED_PATTERN_EMBED_SHORTCODE, 'oembed_preg_tag_replace', $text);
 
@@ -145,7 +166,7 @@ function oembed_preg_tag_replace($match) {
  * PREG replace callback finds URLs
  */
 function oembed_preg_auto_replace($match) {
-  return $match[1].'[embed]'. $match[2] .'[/embed]'.$match[3];
+  return '[embed]'. $match[1] ."[/embed] ";
 }
 
 /**
@@ -261,8 +282,11 @@ function _oembed_field_extract_urls($entity_type, $entity) {
                 $text = $item[$column];
 
                 // copied from oembed_filter_oembed_prepare().
-                if ($filter_settings[$item['format']]['autoembed']) {
+                if (OEMBED_AUTOEMBED == $filter_settings[$item['format']]['autoembed']) {
                   $text = preg_replace_callback(OEMBED_PATTERN_AUTOEMBED, 'oembed_preg_auto_replace', $text);
+                }
+                elseif (OEMBED_AUTOEMBED_UNWRAP == $filter_settings[$item['format']]['autoembed']) {
+                  $text = preg_replace_callback(unserialize(OEMBED_PATTERN_AUTOEMBED_UNWRAP), 'oembed_preg_auto_replace', $text);
                 }
 
                 // copied from oembed_filter_oembed_process().
