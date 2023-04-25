@@ -191,6 +191,8 @@ projects[scald][patch][] = contrib/uploaded_video_do_not_fill_dimenions_on_uploa
 projects[scald][patch][] = contrib/scald_atom_access_account_parameter.patch
 ; PHP 7.4 patch
 projects[scald][patch][] = contrib/issue-3248924.patch
+; Operation Link order
+projects[scald][patch][] = contrib/0001-Switch-order-of-the-atom-links.patch
 
 ;;; Scald Feeds
 ; Add scald feeds metadata support
