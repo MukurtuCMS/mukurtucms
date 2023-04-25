@@ -2,13 +2,13 @@
 
 /**
  * @file
- * date_all_day_test_feature.features.field_base.inc
+ * date_repeat_test_feature.features.field_base.inc
  */
 
 /**
  * Implements hook_field_default_field_bases().
  */
-function date_all_day_test_feature_field_default_field_bases() {
+function date_repeat_test_feature_field_default_field_bases() {
   $field_bases = array();
 
   // Exported field_base: 'body'.
@@ -32,13 +32,13 @@ function date_all_day_test_feature_field_default_field_bases() {
     'type' => 'text_with_summary',
   );
 
-  // Exported field_base: 'field_date_all_day'.
-  $field_bases['field_date_all_day'] = array(
+  // Exported field_base: 'field_date_repeat'.
+  $field_bases['field_date_repeat'] = array(
     'active' => 1,
-    'cardinality' => 1,
+    'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
-    'field_name' => 'field_date_all_day',
+    'field_name' => 'field_date_repeat',
     'indexes' => array(
       'value' => array(
         0 => 'value',
@@ -55,13 +55,13 @@ function date_all_day_test_feature_field_default_field_bases() {
         'second' => 0,
         'year' => 'year',
       ),
-      'repeat' => 0,
+      'repeat' => 1,
       'timezone_db' => '',
       'todate' => '',
       'tz_handling' => 'none',
     ),
-    'translatable' => 0,
-    'type' => 'datetime',
+    'translatable' => 1,
+    'type' => 'date',
   );
 
   return $field_bases;

@@ -17,7 +17,10 @@ function theme_date_timezone($variables) {
   if (isset($element['#children'])) {
     $element['#children'] = '<div id="' . $element['#id'] . '" ' . drupal_attributes($wrapper_attributes) . '>' . $element['#children'] . '</div>';
   }
-  return '<div ' . drupal_attributes($attributes) . '>' . theme('form_element', $element) . '</div>';
+  // Theme the element before calling drupal_attributes(), which modifies
+  // $element['#wrapper_attributes'].
+  $return = theme('form_element', $element);
+  return '<div ' . drupal_attributes($attributes) . '>' . $return . '</div>';
 }
 
 /**
@@ -34,7 +37,10 @@ function theme_date_select($variables) {
   if (isset($element['#children'])) {
     $element['#children'] = '<div id="' . $element['#id'] . '" ' . drupal_attributes($wrapper_attributes) . '>' . $element['#children'] . '</div>';
   }
-  return '<div ' . drupal_attributes($attributes) . '>' . theme('form_element', $element) . '</div>';
+  // Theme the element before calling drupal_attributes(), which modifies
+  // $element['#wrapper_attributes'].
+  $return = theme('form_element', $element);
+  return '<div ' . drupal_attributes($attributes) . '>' . $return . '</div>';
 }
 
 /**
@@ -55,7 +61,10 @@ function theme_date_text($variables) {
   if (isset($element['#children'])) {
     $element['#children'] = '<div id="' . $element['#id'] . '" ' . drupal_attributes($wrapper_attributes) . '>' . $element['#children'] . '</div>';
   }
-  return '<div ' . drupal_attributes($attributes) . '>' . theme('form_element', $element) . '</div>';
+  // Theme the element before calling drupal_attributes(), which modifies
+  // $element['#wrapper_attributes'].
+  $return = theme('form_element', $element);
+  return '<div ' . drupal_attributes($attributes) . '>' . $return . '</div>';
 }
 
 /**

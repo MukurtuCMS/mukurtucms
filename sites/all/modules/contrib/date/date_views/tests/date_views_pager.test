@@ -17,7 +17,7 @@ class ViewsPagerTestCase extends DrupalWebTestCase {
     return array(
       'name' => 'Date views pager skipping test',
       'description' => "Views date pager, option to skip empty pages test",
-      'group' => 'Date',
+      'group' => 'date',
       'dependencies' => array('ctools', 'views'),
     );
   }

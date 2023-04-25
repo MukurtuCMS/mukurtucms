@@ -50,8 +50,6 @@ function date_test_feature_field_default_field_bases() {
     'locked' => 0,
     'module' => 'date',
     'settings' => array(
-      'cache_count' => 4,
-      'cache_enabled' => 0,
       'granularity' => array(
         'day' => 'day',
         'hour' => 'hour',

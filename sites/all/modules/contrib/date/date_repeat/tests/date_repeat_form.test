@@ -24,7 +24,7 @@ class DateRepeatFormTestCase extends DrupalWebTestCase {
     return array(
       'name' => t('Date Repeat Form'),
       'description' => t('Test Date Repeat form.'),
-      'group' => t('Date'),
+      'group' => 'date',
     );
   }
 

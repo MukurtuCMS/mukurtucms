@@ -17,7 +17,7 @@ class DateNowUnitTestCase extends DrupalUnitTestCase {
     return array(
       'name' => t('Date Now'),
       'description' => t('Test Date Now function.'),
-      'group' => t('Date'),
+      'group' => 'date',
     );
   }
 
