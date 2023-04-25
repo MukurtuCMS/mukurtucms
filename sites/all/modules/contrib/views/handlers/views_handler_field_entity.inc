@@ -12,7 +12,9 @@
  * used by the query backend have an 'entity type' specified. In order to
  * make fields based upon this handler automatically available to all compatible
  * query backends, the views field can be defined in the table.
- * @code views_entity_{ENTITY_TYPE} @endcode.
+ * @code
+ * views_entity_{ENTITY_TYPE}
+ * @endcode
  *
  * @ingroup views_field_handlers
  */

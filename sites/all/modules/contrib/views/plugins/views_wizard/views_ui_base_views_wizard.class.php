@@ -683,6 +683,9 @@ class ViewsUiBaseViewsWizard implements ViewsWizardInterface {
       }
       else {
         foreach ($fields as $field_name => $value) {
+          if (!isset($field_name)) {
+            $field_name = '';
+          }
           if ($pos = strpos($field_name, '.' . $bundle_key)) {
             $table = substr($field_name, 0, $pos);
             break;

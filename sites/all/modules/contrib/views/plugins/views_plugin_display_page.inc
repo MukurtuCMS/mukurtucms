@@ -10,6 +10,7 @@
  *
  * @ingroup views_display_plugins
  */
+#[\AllowDynamicProperties]
 class views_plugin_display_page extends views_plugin_display {
 
   /**
@@ -525,11 +526,15 @@ class views_plugin_display_page extends views_plugin_display {
     parent::options_validate($form, $form_state);
     switch ($form_state['section']) {
       case 'path':
-        if (strpos($form_state['values']['path'], '$arg') !== FALSE) {
+        $skip = FALSE;
+        if (!isset($form_state['values']['path'])) {
+          $skip = TRUE;
+        }
+        if (!$skip && strpos($form_state['values']['path'], '$arg') !== FALSE) {
           form_error($form['path'], t('"$arg" is no longer supported. Use % instead.'));
         }
 
-        if (strpos($form_state['values']['path'], '%') === 0) {
+        if (!$skip && strpos($form_state['values']['path'], '%') === 0) {
           form_error($form['path'], t('"%" may not be used for the first segment of a path.'));
         }
 
@@ -538,8 +543,12 @@ class views_plugin_display_page extends views_plugin_display {
         break;
 
       case 'menu':
+        $skip = FALSE;
         $path = $this->get_option('path');
-        if ($form_state['values']['menu']['type'] == 'normal' && strpos($path, '%') !== FALSE) {
+        if (!isset($path)) {
+          $skip = TRUE;
+        }
+        if (!$skip && $form_state['values']['menu']['type'] == 'normal' && strpos($path, '%') !== FALSE) {
           form_error($form['menu']['type'], t('Views cannot create normal menu items for paths with a % in them.'));
         }
 

@@ -330,8 +330,8 @@ files[] = tests/views_clone.test
 files[] = tests/views_view.test
 files[] = tests/views_ui.test
 
-; Information added by Drupal.org packaging script on 2022-09-26
-version = "7.x-3.27"
+; Information added by Drupal.org packaging script on 2023-03-13
+version = "7.x-3.29"
 core = "7.x"
 project = "views"
-datestamp = "1664210561"
+datestamp = "1678722019"
