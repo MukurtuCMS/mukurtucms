@@ -61,6 +61,7 @@ class views_bulk_operations_handler_field_operations extends views_handler_field
       'contains' => array(
         'display_type' => array('default' => 0),
         'enable_select_all_pages' => array('default' => TRUE),
+        'enable_select_this_page' => array('default' => TRUE),
         'row_clickable' => array('default' => TRUE),
         'force_single' => array('default' => FALSE),
         'entity_load_capacity' => array('default' => 10),
@@ -129,6 +130,12 @@ class views_bulk_operations_handler_field_operations extends views_handler_field
       '#title' => t('Enable "Select all items on all pages"'),
       '#default_value' => $this->options['vbo_settings']['enable_select_all_pages'],
       '#description' => t('Check this box to enable the ability to select all items on all pages.'),
+    );
+    $form['vbo_settings']['enable_select_this_page'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable "Select all items on this page"'),
+      '#default_value' => $this->options['vbo_settings']['enable_select_this_page'],
+      '#description' => t('Check this box to enable the ability to select all items on current page.'),
     );
     $form['vbo_settings']['row_clickable'] = array(
       '#type' => 'checkbox',
