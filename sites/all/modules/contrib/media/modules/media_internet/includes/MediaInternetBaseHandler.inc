@@ -14,6 +14,8 @@
  */
 abstract class MediaInternetBaseHandler {
 
+  protected $embedCode = '';
+
   /**
    * The constructor for the MediaInternetBaseHandler class. This method is also called
    * from the classes that extend this class and override this method.

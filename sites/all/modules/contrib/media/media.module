@@ -371,7 +371,7 @@ function media_form_field_ui_field_edit_form_alter(&$form, &$form_state) {
   // Add a validation function to any field instance which uses the media widget
   // to ensure that the upload destination scheme is one of the allowed schemes
   // if any defined by settings.
-  if (isset($form['instance']['widget']) && $form['instance']['widget']['type']['#value'] == 'media_generic' && isset($form['#field']['settings']['uri_scheme'])) {
+  if (isset($form['instance']['widget']) && isset($form['instance']['widget']['type']) && $form['instance']['widget']['type']['#value'] == 'media_generic' && isset($form['#field']['settings']['uri_scheme'])) {
     $form['#validate'][] = 'media_field_instance_validate';
   }
 }
@@ -381,11 +381,21 @@ function media_form_field_ui_field_edit_form_alter(&$form, &$form_state) {
  * allowed schemes.
  */
 function media_field_instance_validate($form, &$form_state) {
-  $allowed_schemes = array_filter($form_state['values']['instance']['widget']['settings']['allowed_schemes']);
+  $widget_settings = $form_state['values']['instance']['widget']['settings'];
+  $browser_plugins = array();
+  if (isset($widget_settings['browser_plugins'])) {
+    $browser_plugins = array_filter($widget_settings['browser_plugins']);
+  }
+  $allowed_schemes = array();
+  if (isset($widget_settings['allowed_schemes'])) {
+    $allowed_schemes = array_filter($widget_settings['allowed_schemes']);
+  }
   $upload_destination = $form_state['values']['field']['settings']['uri_scheme'];
 
-  if (!empty($allowed_schemes) && !in_array($upload_destination, $allowed_schemes)) {
-    form_set_error('allowed_schemes', t('The upload destination must be one of the allowed schemes.'));
+  $is_upload_enabled = (empty($browser_plugins) || in_array('upload', $browser_plugins));
+
+  if ($is_upload_enabled && !empty($allowed_schemes) && !in_array($upload_destination, $allowed_schemes)) {
+    form_set_error('allowed_schemes', t('When upload is enabled, the upload destination must be one of the allowed schemes.'));
   }
 }
 
