@@ -150,6 +150,8 @@ projects[og][patch][] = https://www.drupal.org/files/1298238-feeds-og-audience-m
 projects[og][patch][] = contrib/132925713-Apply-Mukurtu-og-patches.patch
 ; Second part of patch to skip OG field validation for admins during feeds import
 projects[og][patch][] = contrib/0002-Skip-protocol-field-OG-validation-during-import-for-.patch
+; OG Contexts PHP 8 patch
+projects[og][patch][] = contrib/og-3306532-5-php8-comp.patch
 
 ;;; Organic groups invite
 ; Comment out view modification for group members admin view
