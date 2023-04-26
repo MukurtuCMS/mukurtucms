@@ -237,6 +237,8 @@ projects[select2][patch][] = contrib/allow-drag-and-dropg-on-select2-fields-even
 projects[services][patch][] = https://www.drupal.org/files/issues/2019-05-09/services-multivalue_fields_fix-2224803-78.patch
 ; Custom validation on paragraph fields.
 projects[services][patch][] = contrib/custom_validation_on_paragraph_fields.patch
+; PHP 8 fix
+projects[services][patch][] = contrib/0001-Function-signature-change-for-PHP-8.patch
 
 ;;; Services Field Collection
 ; Fix the sandbox project services_field_collection so that field collections can be created.
