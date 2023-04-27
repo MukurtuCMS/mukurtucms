@@ -67,6 +67,12 @@ projects[bootstrap][patch][] = contrib/150281138-add-first-last-classes-to-lists
 ; Do not skip over text format fields
 projects[bootstrap][patch][] = contrib/150281089-Dont-skip-over-text_format-fields.patch
 
+;;; Cer
+; PHP 8 deprecation warnings
+projects[cer][patch][] = contrib/0001-Suppress-deprecation-warnings-for-PHP-8.patch
+; More PHP 8 deprecation warnings
+projects[cer][patch][] = contrib/0002-Suppress-deprecation-warnings-for-PHP-8.patch
+
 ;;; Colorbox
 ; Enable Jack Moore's Zoom library to work on top of the Colorbox images
 projects[colorbox][patch][] = contrib/zoom_on_colorbox.patch
@@ -83,6 +89,10 @@ projects[ctools][patch][] = https://www.drupal.org/files/issues/2021-02-03/ctool
 ; The 'For missing images' option will always fail
 projects[dummyimage][patch][] = https://www.drupal.org/files/issues/dummyimage_missing_1728026-5.patch
 
+;;; ECK
+; PHP 8 deprecation warnings
+projects[eck][patch][] = contrib/0001-Suppress-ECK-PHP-8-deprecation-warnings.patch
+
 ;;; Entity
 ; Prevent error from workflow (https://www.drupal.org/project/entity/issues/2289693)
 projects[entity][patch][] = contrib/entity_undefined_entity_get_info-2289693-2.patch
@@ -98,6 +108,10 @@ projects[entityreference][patch][] = contrib/Add-quicker-method-to-load-titles-f
 ;;; Entity Reference Prepopulate
 ; Entity Reference Prepopulate PHP 7.4 patch
 projects[entityreference_prepopulate][patch][] = https://www.drupal.org/files/issues/2020-06-10/3115641-unparenthesized-ternary-deprecated.patch
+
+;;; Facet API
+; PHP 8 deprecation warnings
+projects[facetapi][patch][] = contrib/0001-Facet-API-Suppress-PHP-8-deprecation-warnings.patch
 
 ;;; Features extras
 ; Default param patch
@@ -158,6 +172,8 @@ projects[og][patch][] = contrib/132925713-Apply-Mukurtu-og-patches.patch
 projects[og][patch][] = contrib/0002-Skip-protocol-field-OG-validation-during-import-for-.patch
 ; OG Contexts PHP 8 patch
 projects[og][patch][] = contrib/og-3306532-5-php8-comp.patch
+; Array to bool conversion fix
+projects[og][patch][] = contrib/0001-Array-to-bool-conversion-not-supported-in-PHP-8.patch
 
 ;;; Organic groups invite
 ; Comment out view modification for group members admin view
