@@ -265,6 +265,8 @@ projects[services_field_collection][patch][] = contrib/fix_services_field_collec
 projects[tree][patch][] = contrib/make_treeable_php8_compatible.patch
 
 ;;; Views
+; Handle array in view definition
+projects[views][patch][] = contrib/0001-Handle-array-type-for-view-definition.patch
 ; Change delimiter from coma to semi-colon
 ;projects[views][patch][] = contrib/109315810-Views-Change-delimiter-from-comma-to-semi-colon.patch
 
