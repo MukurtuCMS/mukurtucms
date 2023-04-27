@@ -17,6 +17,11 @@ function _views_create_handler($definition, $type = 'handler', $handler_type = N
     return;
   }
 
+  // Mukurtu patch. Somehow (PHP 8 specific?) arrays are getting in here and crashing sites.
+  if (is_array($definition['handler'])) {
+    return;
+  }
+
   // class_exists will automatically load the code file.
   if (!empty($definition['override handler']) &&
       !class_exists($definition['override handler'])) {
