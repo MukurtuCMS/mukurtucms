@@ -35,6 +35,7 @@ abstract class DateFieldTestBase extends DrupalWebTestCase {
       'bypass node access',
       'administer date tools',
       'administer fields',
+      'administer site configuration',
     );
     $this->privilegedUser = $this->drupalCreateUser($perms);
     $this->drupalLogin($this->privilegedUser);
@@ -82,8 +83,6 @@ abstract class DateFieldTestBase extends DrupalWebTestCase {
     $default_value_code = !empty($default_value_code) ? $default_value_code : NULL;
     $default_value2 = !empty($default_value2) ? $default_value2 : 'blank';
     $default_format = !empty($default_format) ? $default_format : 'long';
-    $cache_enabled = !empty($cache_enabled);
-    $cache_count = !empty($cache_count) ? $cache_count : 4;
 
     $field = array(
       'field_name' => $field_name,
@@ -95,8 +94,6 @@ abstract class DateFieldTestBase extends DrupalWebTestCase {
         'timezone_db' => date_get_timezone_db($tz_handling),
         'repeat' => $repeat,
         'todate' => $todate,
-        'cache_enabled' => $cache_enabled,
-        'cache_count' => $cache_count,
       ),
     );
     $instance = array(
@@ -193,8 +190,12 @@ abstract class DateFieldTestBase extends DrupalWebTestCase {
     $widget_type = !empty($widget_type) ? $widget_type : 'date_select';
     $this->verbose(!empty($tz_handling));
     $tz_handling = !empty($tz_handling) ? $tz_handling : 'site';
-    $granularity = !empty($granularity) ? $granularity : array('year', 'month',
-      'day', 'hour', 'minute',
+    $granularity = !empty($granularity) ? $granularity : array(
+      'year',
+      'month',
+      'day',
+      'hour',
+      'minute',
     );
     $year_range = !empty($year_range) ? $year_range : '2010:+1';
     $input_format = !empty($input_format) ? $input_format : date_default_format($widget_type);
@@ -204,8 +205,6 @@ abstract class DateFieldTestBase extends DrupalWebTestCase {
     $default_value = !empty($default_value) ? $default_value : 'now';
     $default_value2 = !empty($default_value2) ? $default_value2 : 'blank';
     $default_format = !empty($default_format) ? $default_format : 'long';
-    $cache_enabled = !empty($cache_enabled);
-    $cache_count = !empty($cache_count) ? $cache_count : 4;
     $cardinality = !empty($cardinality) ? $cardinality : 1;
 
     $field = array(
@@ -218,8 +217,6 @@ abstract class DateFieldTestBase extends DrupalWebTestCase {
         'timezone_db' => date_get_timezone_db($tz_handling),
         'repeat' => $repeat,
         'todate' => $todate,
-        'cache_enabled' => $cache_enabled,
-        'cache_count' => $cache_count,
       ),
     );
     $instance = array(

@@ -1,7 +1,8 @@
 <?php
+
 /**
  * @file
- *  This provides UUID support for node and user references
+ * This provides UUID support for node and user references.
  */
 
 /**

@@ -10,6 +10,7 @@
 /**
  * CTools Export UI class handler for Views UI.
  */
+#[\AllowDynamicProperties]
 class views_ui extends ctools_export_ui {
 
   /**
@@ -185,7 +186,15 @@ class views_ui extends ctools_export_ui {
       }
       else {
         // Check whether the tag can be found in the views tag.
-        return strpos($view->tag, $form_state['values']['tag']) === FALSE;
+        $tag = '';
+        if (isset($view->tag)) {
+          $tag = $view->tag;
+        }
+        $form_state_tag = '';
+        if (isset($form_state['values']['tag'])) {
+          $form_state_tag = $form_state['values']['tag'];
+        }
+        return strpos($tag, $form_state_tag) === FALSE;
       }
     }
     if ($form_state['values']['base'] != 'all' && $form_state['values']['base'] != $view->base_table) {

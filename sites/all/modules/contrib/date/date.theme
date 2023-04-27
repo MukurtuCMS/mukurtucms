@@ -299,10 +299,11 @@ function theme_date_display_single($variables) {
   $date = $variables['date'];
   $timezone = $variables['timezone'];
   $attributes = $variables['attributes'];
+  $attributes['class'][] = 'date-display-single';
   $show_remaining_days = isset($variables['show_remaining_days']) ? $variables['show_remaining_days'] : '';
 
   // Wrap the result with the attributes.
-  $output = '<span class="date-display-single"' . drupal_attributes($attributes) . '>' . $date . $timezone . '</span>';
+  $output = '<span ' . drupal_attributes($attributes) . '>' . $date . $timezone . '</span>';
 
   if (!empty($variables['add_microdata'])) {
     $output .= '<meta' . drupal_attributes($variables['microdata']['value']['#attributes']) . '/>';
@@ -356,12 +357,16 @@ function theme_date_display_range($variables) {
   $date1 = $variables['date1'];
   $date2 = $variables['date2'];
   $timezone = $variables['timezone'];
+  $attributes = $variables['attributes'];
+  $attributes['class'][] = 'date-display-range';
   $attributes_start = $variables['attributes_start'];
+  $attributes_start['class'][] = 'date-display-start';
   $attributes_end = $variables['attributes_end'];
+  $attributes_end['class'][] = 'date-display-end';
   $show_remaining_days = isset($variables['show_remaining_days']) ? $variables['show_remaining_days'] : '';
 
-  $start_date = '<span class="date-display-start"' . drupal_attributes($attributes_start) . '>' . $date1 . '</span>';
-  $end_date = '<span class="date-display-end"' . drupal_attributes($attributes_end) . '>' . $date2 . $timezone . '</span>';
+  $start_date = '<span ' . drupal_attributes($attributes_start) . '>' . $date1 . '</span>';
+  $end_date = '<span ' . drupal_attributes($attributes_end) . '>' . $date2 . $timezone . '</span>';
 
   // If microdata attributes for the start date property have been passed in,
   // add the microdata in meta tags.
@@ -371,7 +376,7 @@ function theme_date_display_range($variables) {
   }
 
   // Wrap the result with the attributes.
-  $output = '<span class="date-display-range">' . t('!start-date to !end-date', array(
+  $output = '<span ' . drupal_attributes($attributes) . '>' . t('!start-date to !end-date', array(
     '!start-date' => $start_date,
     '!end-date' => $end_date,
   )) . '</span>';
@@ -388,6 +393,7 @@ function theme_date_display_interval($variables) {
   $options = $variables['display']['settings'];
   $dates = $variables['dates'];
   $attributes = $variables['attributes'];
+  $attributes['class'][] = 'date-display-interval';
 
   // Get the formatter settings, either the default settings for this node type
   // or the View settings stored in $entity->date_info.
@@ -405,7 +411,7 @@ function theme_date_display_interval($variables) {
   );
 
   if ($return = theme('date_time_ago', $time_ago_vars)) {
-    return '<span class="date-display-interval"' . drupal_attributes($attributes) . ">$return</span>";
+    return '<span ' . drupal_attributes($attributes) . ">$return</span>";
   }
   else {
     return '';

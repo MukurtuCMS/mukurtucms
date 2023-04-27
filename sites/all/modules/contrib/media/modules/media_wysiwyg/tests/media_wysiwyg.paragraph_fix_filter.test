@@ -47,7 +47,15 @@ class MediaWYSIWYGParagraphFixFilterTest extends MediaWYSIWYGTestHelper {
    * Set-up the system for testing without the filter enabled.
    */
   public function setUp() {
-    parent::setUp('token');
+    parent::setUp(array('token'));
+
+    // Work around a bug in core's token handling.
+    // @todo This is probably not a good idea.
+    // @see https://www.drupal.org/project/metatag/issues/3271006
+    // @see https://www.drupal.org/project/drupal/issues/1173706
+    $instance = field_read_instance('node', 'field_image', 'article');
+    $instance['settings']['file_directory'] = 'field/image';
+    field_update_instance($instance);
 
     // Create and log in a user.
     $account = $this->drupalCreateUser(array(

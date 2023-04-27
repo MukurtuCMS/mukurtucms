@@ -561,7 +561,7 @@ function taxonomy_service_get_by_machine_name($machine_name) {
  * @return
  *   An array of node objects.
  */
-function taxonomy_service_select_nodes($tid = '', $pager, $limit,  $order) {
+function taxonomy_service_select_nodes($tid, $pager, $limit,  $order) {
   $result = taxonomy_select_nodes($tid, (bool)$pager, $limit, $order);
   foreach ($result as $nid) {
     $node = node_load($nid);

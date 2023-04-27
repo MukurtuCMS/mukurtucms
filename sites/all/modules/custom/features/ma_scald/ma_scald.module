@@ -341,7 +341,7 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
       $default_values = $form['atom' . $atom_index]['field_scald_protocol'][LANGUAGE_NONE]['#default_value'];
       $initial_options = $form['atom' . $atom_index]['field_scald_protocol'][LANGUAGE_NONE]['#options'];
       foreach ($initial_options as $gid => $cp_title) {
-        if (!array_key_exists ($gid, $cp_options) && !in_array($gid, $default_values)) {
+        if ($cp_options && !array_key_exists ($gid, $cp_options) && !in_array($gid, $default_values)) {
           unset ($form['atom' . $atom_index]['field_scald_protocol'][LANGUAGE_NONE]['#options'][$gid]);
         }
       }

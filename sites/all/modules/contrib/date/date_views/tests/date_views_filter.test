@@ -10,6 +10,8 @@
  */
 class DateViewsFilterTestCase extends DateFieldTestBase {
 
+  protected $config_url = NULL;
+  protected $extra_url = NULL;
   /**
    * Date Views filter Test.
    */

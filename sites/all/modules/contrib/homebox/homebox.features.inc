@@ -51,7 +51,7 @@ function homebox_features_export($data, &$export, $module_name = '') {
 /**
  * Implements hook_features_export_render().
  */
-function homebox_features_export_render($module = 'foo', $data) {
+function homebox_features_export_render($module, $data) {
   $code = array();
 
   // Begin code

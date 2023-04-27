@@ -168,6 +168,7 @@ class DBObject implements Iterator {
   /**
    * From Iterator Interface.
    */
+  #[\ReturnTypeWillChange]
   public function rewind() {
     $this->position = 0;
   }
@@ -175,6 +176,7 @@ class DBObject implements Iterator {
   /**
    * From Iterator Interface.
    */
+  #[\ReturnTypeWillChange]
   public function current() {
     return $this->data[$this->key()];
   }
@@ -182,6 +184,7 @@ class DBObject implements Iterator {
   /**
    * From Iterator Interface.
    */
+  #[\ReturnTypeWillChange]
   public function key() {
     return $this->vars[$this->position];
   }
@@ -189,6 +192,7 @@ class DBObject implements Iterator {
   /**
    * From Iterator Interface.
    */
+  #[\ReturnTypeWillChange]
   public function next() {
     ++$this->position;
   }
@@ -196,6 +200,7 @@ class DBObject implements Iterator {
   /**
    * From Iterator Interface.
    */
+  #[\ReturnTypeWillChange]
   public function valid() {
     if (in_array($this->position, array_keys($this->vars))) {
       return TRUE;

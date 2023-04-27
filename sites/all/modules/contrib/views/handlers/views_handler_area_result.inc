@@ -145,14 +145,8 @@ class views_handler_area_result extends views_handler_area {
     ) {
       $format = $this->options['format_plural_plural'];
     }
-    // If there is an item count,
-    if (
-      !empty($total)
-      // or there is content in the empty area,
-      || !empty($this->options['empty'])
-      // and a query has been performed:
-      && !empty($this->view->build_info['count_query'])
-    ) {
+    // If there is an item count or there is content in the empty area.
+    if (!empty($total) || !empty($this->options['empty'])) {
       // Adds the result to the output.
       // We don't want to sanitize with filter_xss_admin() here because Views
       // administrators are trusted users and should be allowed to insert

@@ -705,11 +705,7 @@ function date_entity_metadata_duration_getter($item, array $options, $name, $typ
  */
 function date_entity_metadata_field_setter(&$entity, $name, $value, $langcode, $entity_type, $info) {
   $field = field_info_field($name);
-  if (!isset($langcode)) {
-    // Try to figure out the default language used by the entity.
-    // @todo Update once http://drupal.org/node/1260640 has been fixed.
-    $langcode = isset($entity->language) ? $entity->language : LANGUAGE_NONE;
-  }
+  $langcode = entity_metadata_field_get_language($entity_type, $entity, $field, $langcode);
   $values = $field['cardinality'] == 1 ? array($value) : (array) $value;
 
   $items = array();

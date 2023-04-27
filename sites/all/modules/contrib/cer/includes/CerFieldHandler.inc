@@ -240,6 +240,7 @@ class CerFieldHandler implements Countable, SeekableIterator {
   /**
    * Implements Countable::count().
    */
+  #[\ReturnTypeWillChange]
   public function count() {
     if ($this->isMultiValue) {
       return sizeof($this->value);
@@ -252,6 +253,7 @@ class CerFieldHandler implements Countable, SeekableIterator {
   /**
    * Implements SeekableIterator::seek().
    */
+  #[\ReturnTypeWillChange]
   public function seek($position) {
     $length = $this->count();
 
@@ -270,6 +272,7 @@ class CerFieldHandler implements Countable, SeekableIterator {
   /**
    * Implements Iterator::current().
    */
+  #[\ReturnTypeWillChange]
   public function current() {
     return ($this->isMultiValue ? $this->value[$this->delta] : $this->value);
   }
@@ -277,6 +280,7 @@ class CerFieldHandler implements Countable, SeekableIterator {
   /**
    * Implements Iterator::key().
    */
+  #[\ReturnTypeWillChange]
   public function key() {
     return $this->current()->getIdentifier();
   }
@@ -284,6 +288,7 @@ class CerFieldHandler implements Countable, SeekableIterator {
   /**
    * Implements Iterator::next().
    */
+  #[\ReturnTypeWillChange]
   public function next() {
     $this->delta++;
   }
@@ -291,6 +296,7 @@ class CerFieldHandler implements Countable, SeekableIterator {
   /**
    * Implements Iterator::rewind().
    */
+  #[\ReturnTypeWillChange]
   public function rewind() {
     $this->delta = 0;
   }
@@ -298,6 +304,7 @@ class CerFieldHandler implements Countable, SeekableIterator {
   /**
    * Implements Iterator::valid().
    */
+  #[\ReturnTypeWillChange]
   public function valid() {
     return ($this->delta < $this->count());
   }

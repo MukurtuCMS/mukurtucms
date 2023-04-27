@@ -5,8 +5,8 @@ package = Statistics
 configure = admin/config/system/googleanalytics
 files[] = googleanalytics.test
 test_dependencies[] = token
-; Information added by Drupal.org packaging script on 2019-01-31
-version = "7.x-2.6"
+; Information added by Drupal.org packaging script on 2023-04-18
+version = "7.x-2.8"
 core = "7.x"
 project = "google_analytics"
-datestamp = "1548968597"
+datestamp = "1681835719"

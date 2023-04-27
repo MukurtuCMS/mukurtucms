@@ -1030,7 +1030,8 @@ function ckeditor_admin_profile_form($form, $form_state, $task, $profile = NULL)
     '#title' => t('Auto-detect language'),
     '#default_value' => !empty($profile->settings['auto_lang']) ? $profile->settings['auto_lang'] : 't',
     '#options' => array(
-      't' => t('Enabled'),
+      't' => t('Enabled (browser language)'),
+      'd' => t('Enabled (Drupal language)'),
       'f' => t('Disabled')
     ),
     '#description' => t('Automatically detect the user language.')

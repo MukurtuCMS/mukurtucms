@@ -430,6 +430,10 @@ function ma_collection_add_to_collection_callback($ajax, $nid_to_add, $collectio
  * The original path needs to be written as "node/{nid}/{path}" in order for the tab to show up in the node view.
  */
 function ma_collection_url_outbound_alter(&$path, &$options, $original_path) {
+  if (!$path) {
+    return;
+  }
+  
   if (substr($path,-18) == '/add-to-collection') {
     $path_parts = explode('/', $path);
     if (is_numeric($path_parts[1])) {

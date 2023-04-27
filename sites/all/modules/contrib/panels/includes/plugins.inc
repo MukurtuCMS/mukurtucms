@@ -115,10 +115,10 @@ function panels_clear_cached_content($display) {
  */
 class panels_cache_object {
   var $content = '';
-  var $head = NULL;
-  var $css = NULL;
-  var $js = NULL;
-  var $tokens = NULL;
+  var $head = array();
+  var $css = array();
+  var $js = array();
+  var $tokens = array();
   var $ready = FALSE;
 
   /**
@@ -154,7 +154,7 @@ class panels_cache_object {
     $this->ready = TRUE;
 
     // Simple replacement for head.
-    $this->head = str_replace($this->head, '', drupal_add_html_head());
+    $this->head = array_diff_key(drupal_add_html_head(), $this->head);
 
     // Slightly less simple for CSS:
     $css = drupal_add_css();
@@ -220,7 +220,9 @@ class panels_cache_object {
    */
   function restore() {
     if (!empty($this->head)) {
-      drupal_add_html_head($this->head);
+      foreach ($this->head as $key => $data) {
+        drupal_add_html_head($data, $key);
+      }
     }
     if (!empty($this->css)) {
       foreach ($this->css as $args) {

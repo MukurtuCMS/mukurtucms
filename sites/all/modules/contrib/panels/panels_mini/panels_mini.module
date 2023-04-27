@@ -1,7 +1,8 @@
 <?php
 
 /**
- * @file panels_mini.module
+ * @file
+ * panels_mini.module
  *
  * This module provides mini panels which are basically panels that can be
  * used within blocks or other panels.
@@ -60,6 +61,7 @@ function panels_mini_settings() {
 
 // ---------------------------------------------------------------------------
 // Allow the rest of the system access to mini panels.
+
 /**
  * Implementation of hook_block_info().
  */
@@ -87,7 +89,7 @@ function panels_mini_block_info() {
 /**
  * Implementation of hook_block_view().
  *
- * @see panels_mini_panels_mini_content_type_render().
+ * @see panels_mini_panels_mini_content_type_render()
  */
 function panels_mini_block_view($delta = 0) {
   // Static recursion protection.
@@ -143,15 +145,43 @@ function panels_mini_block_configure($delta = 0) {
  * Remove the block if the required contexts are not available.
  */
 function panels_mini_block_list_alter(&$blocks) {
+  $keys_to_cache = array();
+  $has_cache_hit = FALSE;
+  foreach ($blocks as $key => $block) {
+    if ($block->module != 'panels_mini') {
+      // Ignore anything that is not a mini panel.
+      continue;
+    }
+
+    $result = cache_get('panels_mini_block_list_alter:' . $key, 'cache_panels');
+    if (empty($result->data)) {
+      // If not a cache hit, queue it for caching.
+      $keys_to_cache[] = $key;
+    }
+    else {
+      // If a cache hit, return the cached result and indicate we had a hit.
+      $blocks[$key] = $result->data;
+      $has_cache_hit = TRUE;
+    }
+  }
+
+  // If we don't need to cache anything, exit out of the function.
+  if (empty($keys_to_cache)) {
+    return;
+  }
   $current_page = FALSE;
   if (module_exists('page_manager')) {
     $current_page = page_manager_get_current_page();
   }
 
-  // Load add at once to save time.
-  panels_mini_load_all();
+  // If we didn't have any cache hits, load all at once to save time.
+  if (!$has_cache_hit) {
+    panels_mini_load_all();
+  }
 
-  foreach ($blocks as $key => $block) {
+  // Iterate through all non-cached keys.
+  foreach ($keys_to_cache as $key) {
+    $block = $blocks[$key];
     if ($block->module != 'panels_mini') {
       // This block was added by a contrib module, leave it in the list.
       continue;
@@ -181,6 +211,9 @@ function panels_mini_block_list_alter(&$blocks) {
         }
       }
     }
+
+    // Cache our results.
+    cache_set('panels_mini_block_list_alter:' . $key, $blocks[$key], 'cache_panels', CACHE_TEMPORARY);
   }
 }
 
@@ -241,6 +274,7 @@ function panels_mini_get_id($name) {
 
 // ---------------------------------------------------------------------------
 // Database functions.
+
 /**
  * Create a new page with defaults appropriately set from schema.
  */
@@ -368,6 +402,7 @@ function panels_mini_save(&$mini) {
 
   // Clear the panels_mini_load cache.
   cache_clear_all('panels_mini_load:', 'cache_panels', TRUE);
+  cache_clear_all('panels_mini_block_list_alter:', 'cache_panels', TRUE);
 
   $update = (isset($mini->pid) && $mini->pid != 'new') ? array('pid') : array();
   drupal_write_record('panels_mini', $mini, $update);

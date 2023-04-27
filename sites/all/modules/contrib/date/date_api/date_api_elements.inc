@@ -330,6 +330,12 @@ function date_text_element_process($element, &$form_state, $form) {
   $element['date']['#type'] = 'textfield';
   $element['date']['#weight'] = !empty($element['date']['#weight']) ? $element['date']['#weight'] : $element['#weight'];
   $element['date']['#attributes'] = array('class' => isset($element['#attributes']['class']) ? $element['#attributes']['class'] += array('date-date') : array('date-date'));
+
+  // Allow an optional placeholder to be passed in.
+  if (isset($element['#attributes']['placeholder'])) {
+    $element['date']['#attributes']['placeholder'] = $element['#attributes']['placeholder'];
+  }
+
   $now = date_example_date();
   $element['date']['#title'] = t('Date');
   $element['date']['#title_display'] = 'invisible';

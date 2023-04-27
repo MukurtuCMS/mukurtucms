@@ -176,31 +176,38 @@ function oembed_get_provider($url, &$matches, $role = 'consumer') {
   $plugins = ctools_get_plugins('oembed', 'providers');
   uasort($plugins, 'ctools_plugin_sort');
 
-  // This function may need check twice if a provider matches the URL. The first check
-  // is to determine if the plugin's callback can handle the URL. The second check
-  // returns the name of the child plugin that can fulfill the request.
+  // This function may need check twice if a provider matches the URL. The first
+  // check is to determine if the plugin's callback can handle the URL.
+  // The second check returns the name of the child plugin that can fulfill
+  // the request.
   foreach ($plugins as $plugin) {
 
     // A plugin with no schemes is effectively disabled.
     if ($plugin[$role] && !empty($plugin['scheme'])) {
 
-      // Plugins will only be checked if they are enabled for the role.
-      if (preg_match($plugin['scheme'], $url, $matches)) {
+      // Remove '#' and '#i' from the begining and end.
+      $scheme = substr($plugin['scheme'], 1, -2);
+      $sub_schemes = explode('|', $scheme);
 
-        // A scheme map is used to match a URL to a specific child plugin.
-        if (!empty($plugin['scheme map'])) {
-          foreach ($plugin['scheme map'] as $id => $scheme) {
-            if (preg_match($scheme, $url, $matches)) {
+      foreach ($sub_schemes as $pattern) {
+        // Plugins will only be checked if they are enabled for the role.
+        if (preg_match("#{$pattern}#i", $url, $matches)) {
 
-              // This forces the 'get child' callback to the loaded.
-              ctools_plugin_get_function($plugin, 'get child');
-              $plugin = ctools_get_plugins('oembed', 'providers', $id);
-              break;
+          // A scheme map is used to match a URL to a specific child plugin.
+          if (!empty($plugin['scheme map'])) {
+            foreach ($plugin['scheme map'] as $id => $scheme) {
+              if (preg_match($scheme, $url, $matches)) {
+
+                // This forces the 'get child' callback to the loaded.
+                ctools_plugin_get_function($plugin, 'get child');
+                $plugin = ctools_get_plugins('oembed', 'providers', $id);
+                break;
+              }
             }
           }
-        }
 
-        return $plugin;
+          return $plugin;
+        }
       }
     }
   }

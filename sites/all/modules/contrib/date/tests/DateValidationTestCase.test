@@ -17,7 +17,7 @@ class DateValidationTestCase extends DateFieldTestBase {
     return array(
       'name' => 'Date Validation',
       'description' => 'Test date validation.',
-      'group' => 'Date',
+      'group' => 'date',
     );
   }
 

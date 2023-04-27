@@ -50,7 +50,7 @@ Drupal.behaviors.atom_reference = {
       var $operation_wrapper = $('<div class="atom_reference_operations">');
       var $operation_buttons = $('<div id="ctools-button-0" class="buttons ctools-no-js ctools-button">')
         .append('<div class="ctools-link"><a href="#" class="ctools-twisty ctools-text"><span class="element-invisible">' + Drupal.t('Operation') + '</span></a></div>')
-        .append('<div class="ctools-content"><ul><li class="remove"><li class="edit"><li class="view"></ul></div>')
+        .append('<div class="ctools-content"><ul><li class="edit"><li class="remove"><li class="view"></ul></div>')
         .prependTo($operation_wrapper);
 
       // Add the remove link

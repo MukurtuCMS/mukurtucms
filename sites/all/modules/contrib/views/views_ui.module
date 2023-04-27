@@ -851,7 +851,9 @@ function _views_ui_get_paths($view) {
     foreach ($view->display as $display) {
       if (!empty($display->handler) && $display->handler->has_path()) {
         $one_path = $display->handler->get_option('path');
-
+        if (!isset($one_path)) {
+          $one_path = '';
+        }
         if (empty($view->disabled) && strpos($one_path, '%') === FALSE) {
           // @codingStandardsIgnoreLine
           $all_paths[] = l('/' . $one_path, $one_path);

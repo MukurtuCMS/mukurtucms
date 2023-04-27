@@ -76,7 +76,6 @@ function ma_community_form_og_ui_add_users_alter(&$form, &$form_state) {
  * Implements hook_form_FORM_ID_alter().
  */
 function ma_community_form_community_node_form_alter(&$form, &$form_state) {
-
   // custom form fields for the Custom TK Label Text, if at community-level customization
   if (!variable_get('mukurtu_use_sitewide_custom_tk_label_text')) {
     $form = array_merge($form, license_custom_tk_label_form_shared($form['#entity']->nid)); // insert the custom form
@@ -97,7 +96,7 @@ function ma_community_form_community_node_form_alter(&$form, &$form_state) {
       $form['#group_children'][$checkbox_fieldname] = 'group_custom_tk_label_text';
       $form['#group_children'][$textfield_container] = 'group_custom_tk_label_text';
     }
-
+    $form['#group_children']['usage_message'] = 'group_custom_tk_label_text';
     $form['#group_children']['tk_label_export_link'] = 'group_custom_tk_label_text';
   }
 
