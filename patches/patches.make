@@ -233,6 +233,8 @@ projects[scald_soundcloud][patch][] = contrib/0001-Default-to-not-using-versione
 ;;; Search API
 ; Fix 'For missing images' option will always fail
 projects[search_api][patch][] = https://www.drupal.org/files/issues/search_api-fix_access_info_indexing.patch
+; PHP 8 deprecation warning
+projects[search_api][patch][] = contrib/0001-Fix-deprecation-warning-null-in-substr.patch
 ; Modify dictionary search results based on custom sort
 projects[search_api_db][patch][] = contrib/modify_dictionary_search_results_based_on_custom_sort.patch
 
