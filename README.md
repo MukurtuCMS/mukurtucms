@@ -10,6 +10,7 @@
     * [System Requirements](#system-requirements)
     * [Installation](#installation)
     * [Upgrading](#upgrading)
+  * [Local Testing & Evaluation using DDEV](#ddev)
 * [Developers](#developers)
   * [Contributing Code to Mukurtu](#code-contributing)
 * [Bug Reports](#bug-reports)
@@ -36,61 +37,82 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ### <a name="availability"></a>Availability
 
 #### <a name="vendor-hosted"></a> Vendor Hosted
-Most commercial webhosting companies will be able to host a Mukurtu CMS site but Reclaim Hosting (http://reclaimhosting.com) has a simple one-step install option for Mukurtu CMS.
+Most commercial web hosting companies will be able to host a Mukurtu CMS site. Look for support for Drupal 7. Reclaim Hosting (http://reclaimhosting.com) has a simple one-step install option for Mukurtu CMS.
 
 #### <a name="self-hosted"></a>Self-Hosted
-Mukurtu CMS is available as an open source distribution through https://github.com/mukurtucms/mukurtucms to run on a local server or install on your preferred web platform.
-
-To install on your own server, please find system requirements and installation procedures below.
+Mukurtu CMS is available as an open source distribution through https://github.com/MukurtuCMS/mukurtucms to run on a local server or install on your preferred web platform.
 
 ##### <a name="system-requirements"></a>System Requirements
-* A web server that supports PHP, such as Apache
-* [PHP](http://www.php.net/). Note: If using PHP 8, it is recommended to disable deprecation warnings in `error_reporting`.
-* A database server such as [MySQL 5.0.15 (or higher)](http://www.mysql.com/) or [MariaDb 5.1.44 (or higher)](https://mariadb.org/)
+Mukurtu CMS is built using Drupal 7 and has all of the same [minimum system requirements](https://www.drupal.org/docs/7/system-requirements). This includes:
+* A web server with PHP support, such as Apache or nginx.
+* [PHP](http://www.php.net/) version 7.4 or 8.0/8.1. Note: If using PHP 8, it is recommended to disable deprecation warnings in `error_reporting`.
+* A database server such as [MySQL](http://www.mysql.com/) or [MariaDb](https://mariadb.org/)
 
 ##### <a name="installation"></a>Installation
-Mukurtu CMS is built on Drupal. More detailed installation information can be found in INSTALL.txt in the same directory as this document or on the [Drupal website](https://www.drupal.org/docs/7/install).
+Mukurtu CMS is built on Drupal 7 and can be installed in exactly the same way. Drupal 7 is included with Mukurtu CMS, it is not necessary to download and install Drupal 7 separately. Instructions on how to install Drupal 7 for in your environment are directly applicable to installing Mukurtu CMS, simply download the Mukurtu CMS code repository in place of Drupal 7. More detailed installation information can be found in INSTALL.txt in the same directory as this document or online at [Installing Drupal 7](https://www.drupal.org/docs/7/install). It is highly recommended to use git to download Mukurtu CMS rather than downloading files directly (e.g., the zip package). It will make the process of updating the application files much easier in the future.
 
-###### An Example Installation on Linux using the Apache HTTP Server
-1. Create an Apache vhost for your domain
-1. Clone the Mukurtu CMS Github repository: `git clone git@github.com:MukurtuCMS/mukurtucms.git`
-1. Rename the created mukurtucms directory to the path you set for your vhost (or set your vhost path to this directory)
-1. Navigate into your vhost directory, e.g.,: `cd mukurtucms`
-1. Files permissions
- * Public files
-    * This directory is already created at sites/default/files. However, you need to make sure it is writable by the Apache user (often 'apache' or 'www-data').
- * Private files
- * This directory does not yet exist. By default, Mukurtu CMS will look for the private files directory at `sites/default/files/private`. So you can create that directory. However, this is insecure (publicly-accessible) unless special measures are taken to secure it (beyond the scope of this document). A simpler method is to create a private files directory anywhere outside of your web root, and ensure it is readable and writable by the Apache user. Take note of this path as you will need it later.
-1. Create an empty MySQL database
-1. Create the settings.php file: `cp sites/default/default.settings.php sites/default/settings.php`
-1. Edit the settings file you just created with a text editor. Near the bottom is the $databases array. At minimum, you will need to fill out 'database', 'username', and 'password' to connect to the database you just created.
-1. Run the installation profile
- * Assuming your vhost and database are configured correctly, you can now launch the installation profile. Visit http://{your_domain}/install.php
- * The install script will run for 5-10 minutes, and will then present you with a form to fill out. Complete this form.
- * The install script will run for another 3-5 minutes. After this, you are provided with a link to the site. Click on it to ensure the profile installation was successful.
-1. Set the private files path
- * Go to http://{your_domain}/admin/config/media/file-system
- * Fill "Private file system path" with the private files directory you created earlier.
-1. Setup cron job
-    * See https://www.drupal.org/cron for information on how to set up your cron job. Note automated cron is disabled by default in the Mukurtu CMS. You can enable it at http://{your_domain}/admin/config/system/cron.
-1. Upload your site logo
-    * Go to http://{your_domain}/admin/appearance/settings/mukurtu_starter
-    * Click on "Logo Image Settings", and upload your logo in the field "Upload logo image", then click on "Save configuration"
+##### Configuration and Post-installation Steps
+* Review the recommended settings for PHP and more [here](https://github.com/MukurtuCMS/mukurtucms/wiki/Quick-Installation-Information-for-Experienced-Drupal-Admins).
+* Configure the Drupal private file path. This is critical. Cultural protocols will not function as expected if you skip this step. You can read the official [information about the Drupal private path](https://www.drupal.org/docs/7/core/modules/file/overview). The basic steps are as follows.
+  * Create a new directory, ideally outside of your web root, for private files to be stored. This will be where your users' uploaded media and files will reside.
+  * The web server user will need read and write access to this directory.
+  * Edit `sites/default/settings.php` and add the path of your new private files directory to the `file_private_path` setting. If you do not yet have a `settings.php` file, you can copy and rename `default.settings.php` to use as a starting point.
+* Set the 'database', 'username', and 'password' values to match your database configuration.
+* Once your site is installed, configure cron at `/admin/config/system/cron`.
 
 ##### <a name="upgrading"></a>Upgrading
 
-If you are using a vendor hosted solution (such as Reclaim Hosting), check their support documentation before upgrading. Some vendors provide automated Mukurtu upgrades via the control panel.
+If you are using a vendor hosted solution (such as Reclaim Hosting), check their support documentation before upgrading. Some vendors provide automated Mukurtu CMS upgrades via the control panel.
 
-Mukurtu upgrades are done via its Github repository. Knowing that important security updates are pushed to the Github repository in a timely manner, do not attempt to update either Drupal core or Drupal contributed modules internally -- they could cause system breakage. Upgrades should be done as follows:
+If you are self-hosting Mukurtu CMS, it is best to update the application files using git. Updates to Drupal 7 and contributed modules are included in each Mukurtu CMS release, and in general you should not attempt to update individual modules yourself outside of official Mukurtu releases. Update steps can be found in the [release notes](https://github.com/MukurtuCMS/mukurtucms/blob/master/VERSION.md), but in general upgrades should be done as follows:
 
-1. Login to your server and navigate to your site root mukurtu htdocs directory.
-1. Update your repository: `git pull`
-1. Ensure that Drush is installed. See http://docs.drush.org/en/master/install/
-1. Run the database updates: `drush updb -y`
-1. Revert all features, then clear the cache, and revert again: `drush fra -y ; drush cc all ; drush fra -y`
-1. Check for feature overrides (there should not be any): `drush fd`
-1. Determine your site's current version by looking at the VERSION.md file in the site root, or within the Support block of the Dashboard when logged into your site as a Mukurtu Administrator. In the [release notes](VERSION.md), check for a subsection named "Manual Upgrade Steps" for each version newer than what your site is running. If there are any, run these steps now. All command line steps should be run from the site root.
-  * Steps within each release should be run in the order listed, but steps for older releases should be done prior to steps for newer releases. If the step appears more than once (e.g., in different release versions), it only needs to be completed once, at its newest release point (i.e., ignore it in the older release(s)).
+* In a terminal, navigate to the directory you have Mukurtu CMS installed at.
+* Retrieve the most recent files using git.
+```
+git pull
+```
+* Run any database updates. You can use drush for this. Installation instructions for drush can be found at http://docs.drush.org/en/master/install/. You can also do this step via the web interface by visiting `/update.php` on your site. Repeat this step until there are no more database upgrades available.
+ ```
+ drush updb -y
+ ```
+* Some updates will require you to revert some or all features. Features package Mukurtu CMS specific configuration as code for distribution. Reverting a feature will reset it to match the current Mukurtu CMS configuration. Check each version's release notes for specific notes on which features need to be reverted, but as an example here is how you could revert all features:
+```
+drush fra -y
+```
+* Aspects of some releases may not take effect until you clear the caches. Note that a full cache clear can cause temporary performance issues on larger sites as the cache is rebuilt.
+```
+drush cc all
+```
+
+
+### <a name="ddev"></a>Local Testing & Evaluation using DDEV
+Mukurtu CMS can be installed locally using [DDEV](https://ddev.com/).
+* Download and install [DDEV](https://github.com/drud/ddev), following the instructions for your operating system.
+* Open a terminal and clone the Mukurtu CMS repository to a new directory.
+```
+git clone https://github.com/MukurtuCMS/mukurtucms.git my-mukurtu-site
+```
+* Change into that directory, replacing 'my-mukurtu-site' with whatever you used in the above step.
+```
+cd my-mukurtu-site
+```
+* Initialize the ddev project. Follow the prompts for Drupal 7 and use the current directory as the docroot.
+```
+ddev config
+```
+* Start ddev:
+```
+ddev start
+```
+* Launch your new ddev project:
+```
+ddev launch
+```
+* You should now see the Mukurtu CMS installer, ready for you to use. Follow the form's instructions.
+* When you are done, you can stop the ddev instance with:
+```
+ddev stop
+```
 
 ### <a name="developers"></a>Developers
 
