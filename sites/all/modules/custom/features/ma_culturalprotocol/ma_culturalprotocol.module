@@ -655,3 +655,70 @@ function ma_culturalprotocol_follow_unfollow($entity) {
     return ma_collaboration_tools_follow_unfollow($entity);
   }
 }
+
+/**
+ * Implements hook_action_info().
+ */
+function ma_culturalprotocol_action_info() {
+  return [
+    'ma_culturalprotocol_set_node_protocol_action' => [
+      'type' => 'node',
+      'label' => t('Set Cultural Protocols for Content'),
+      'configurable' => TRUE,
+    ],
+  ];
+}
+
+function ma_culturalprotocol_set_node_protocol_action_form($settings, &$form_state) {
+  $allowed_protocols = ma_cultural_protocol_get_cps_user_can_post_to();
+  $protocol_ids = array_keys($allowed_protocols);
+  $protocol_nodes = node_load_multiple($protocol_ids);
+
+  $options = [];
+  foreach ($protocol_nodes as $protocol) {
+    $access_value = $protocol->group_access[LANGUAGE_NONE][0]['value'] ?? NULL;
+    if (is_null($access_value)) {
+      continue;
+    }
+    $community_name = t("[Unknown Community]");
+    if ($community_id = $protocol->og_group_ref[LANGUAGE_NONE][0]['target_id'] ?? NULL) {
+      if ($community = node_load($community_id)) {
+        $community_name = $community->title;
+      }
+    }
+    $access_text = $access_value == 0 ? 'Open' : 'Strict';
+    $options[$protocol->nid] = "$community_name: {$protocol->title} ($access_text)";
+  }
+
+  $sharing_options = [
+    'any' => t('This item may be shared with members of ANY protocol listed.'),
+    'all' => t('This item may only be shared with members belonging to ALL the protocols listed.'),
+  ];
+
+  $form_description = t('Select the cultural protocol settings to apply to the content. Any existing cultural protocol settings on the content will be replaced with what you select here.');
+
+  $form = [];
+  $form['description'] = [
+    '#markup' => "<div><strong>$form_description</strong></div><br>",
+  ];
+  $form['sharing'] = [
+    '#type' => 'select',
+    '#title' => 'Sharing Setting',
+    '#options' => $sharing_options,
+  ];
+  $form['protocols'] = [
+    '#type' => 'checkboxes',
+    '#title' => 'Select Cultural Protocols',
+    '#options' => $options,
+  ];
+
+  return $form;
+}
+
+function ma_culturalprotocol_set_node_protocol_action_submit($form, $form_state) {
+  return [];
+}
+
+function ma_culturalprotocol_set_node_protocol_action(&$entity, $context) {
+  dpm("function ma_culturalprotocol_set_protocol_action");
+}
