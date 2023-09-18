@@ -669,6 +669,9 @@ function ma_culturalprotocol_action_info() {
   ];
 }
 
+/**
+ * Form for ma_culturalprotocol_set_node_protocol_action.
+ */
 function ma_culturalprotocol_set_node_protocol_action_form($settings, &$form_state) {
   $allowed_protocols = ma_cultural_protocol_get_cps_user_can_post_to();
   $protocol_ids = array_keys($allowed_protocols);
@@ -715,10 +718,48 @@ function ma_culturalprotocol_set_node_protocol_action_form($settings, &$form_sta
   return $form;
 }
 
-function ma_culturalprotocol_set_node_protocol_action_submit($form, $form_state) {
-  return [];
+/**
+ * Validation for ma_culturalprotocol_set_node_protocol_action.
+ */
+function ma_culturalprotocol_set_node_protocol_action_validate($form, &$form_state) {
+  $allowed_protocol_options = ma_cultural_protocol_get_cps_user_can_post_to();
+  $allowed_protocol_ids = array_keys($allowed_protocol_options);
+
+  $protocol_values = $form_state['values']['protocols'] ?? [];
+  $protocols = array_filter($protocol_values, fn($p) => ((int) $p) > 0);
+  $protocol_ids = array_keys($protocols);
+  $invalid_protocol_ids = array_diff($protocol_ids, $allowed_protocol_ids);
+  if (empty($protocols)) {
+    form_set_error('protocols', t("At least one cultural protocol must be selected."));
+  }
+
+  if (!empty($invalid_protocol_ids)) {
+    form_set_error('protocols', t("Please select cultural protocols you have permission to apply to content."));
+  }
+
+  $sharing_value = $form_state['values']['sharing'] ?? NULL;
+  if (!in_array($sharing_value, ['any', 'all'])) {
+    form_set_error('sharing', t("Select a valid sharing setting."));
+  }
 }
 
+/**
+ * Submit handler for ma_culturalprotocol_set_node_protocol_action.
+ */
+function ma_culturalprotocol_set_node_protocol_action_submit($form, &$form_state) {
+  $values = [];
+  $protocol_values = $form_state['values']['protocols'] ?? [];
+  $values['protocols'] = array_filter($protocol_values, fn($p) => ((int) $p) > 0);
+  $values['sharing'] = $form_state['values']['sharing'];
+
+  return $values;
+}
+
+/**
+ * Action for ma_culturalprotocol_set_node_protocol_action.
+ */
 function ma_culturalprotocol_set_node_protocol_action(&$entity, $context) {
-  dpm("function ma_culturalprotocol_set_protocol_action");
+  $content = entity_metadata_wrapper('node', $entity);
+  $content->field_item_privacy_setting->set($context['sharing']);
+  $content->og_group_ref->set($context['protocols']);
 }
