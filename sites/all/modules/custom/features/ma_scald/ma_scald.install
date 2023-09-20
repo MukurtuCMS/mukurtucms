@@ -47,10 +47,25 @@ function ma_scald_schema() {
   return $schema;
 }
 
+
+/**
+ * Create the new protocol set database tables.
+ */
+function ma_scald_update_7001(&$sandbox) {
+  $schema = ma_scald_schema();
+  if (!db_table_exists('mukurtu_protocol_map')) {
+    db_create_table('mukurtu_protocol_map', $schema['mukurtu_protocol_map']);
+  }
+
+  if (!db_table_exists('scald_protocol_access')) {
+    db_create_table('scald_protocol_access', $schema['scald_protocol_access']);
+  }
+}
+
 /**
  * Revert Mukurtu Scald feature.
  */
-function ma_scald_update_7001(&$sandbox) {
+function ma_scald_update_7002(&$sandbox) {
   // Revert ma_scald so that the new sharing setting fields will be available
   // to all our scald atom bundles.
   features_revert_module('ma_scald');
@@ -59,7 +74,7 @@ function ma_scald_update_7001(&$sandbox) {
 /**
  * Update all Scald atoms for new protocol system.
  */
-function ma_scald_update_7002(&$sandbox) {
+function ma_scald_update_7003(&$sandbox) {
   if (!isset($sandbox['progress'])) {
     $sandbox['progress'] = 0;
     $sandbox['current_sid'] = 0;
