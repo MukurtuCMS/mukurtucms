@@ -84,7 +84,7 @@ function ma_scald_update_7003(&$sandbox) {
   $result = db_select('scald_atoms', 'sa')
     ->fields('sa', array('sid'))
     ->condition('sid', $sandbox['current_sid'], '>')
-    ->range(0, 1)
+    ->range(0, 10)
     ->orderBy('sid', 'ASC')
     ->execute()->fetchAllAssoc('sid');
 
