@@ -1,0 +1,55 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function ma_scald_schema() {
+  $schema['mukurtu_protocol_map'] = [
+    'description' => 'Mukurtu Protocol Map',
+    'fields' => [
+      'protocol_set_id' => [
+        'description' => 'The ID of the protocol set.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'protocol_set' => [
+        'description' => 'The set of protocols',
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'big',
+      ],
+    ],
+    'primary key' => [
+      'protocol_set_id',
+    ],
+  ];
+
+  $schema['scald_protocol_access'] = [
+    'description' => 'Scald Protocol Access',
+    'fields' => [
+      'sid' => [
+        'description' => 'The ID of the scald atom.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'protocol_set_id' => [
+        'description' => 'The ID of the protocol set',
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ],
+    ],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Update all Scald atoms for new protocol system.
+ */
+function ma_scald_update_7001(&$sandbox) {
+  // @todo batch update all scald atoms to calculate new protocol field.
+}

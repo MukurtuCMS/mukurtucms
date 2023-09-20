@@ -557,6 +557,24 @@ function ma_cultural_protocol_get_cps_for_user($roles, $community_nid = NULL, $i
 }
 
 /**
+ * Returns an array of all published open cultural protocol IDs.
+ */
+function ma_cultural_protocol_get_open_protocol_ids() {
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'cultural_protocol_group')
+    ->fieldCondition('group_access', 'value', '0')
+    ->propertyCondition('status', NODE_PUBLISHED);
+
+  $result = $query->execute();
+
+  if (isset($result['node'])) {
+    return array_keys($result['node']);
+  }
+  return [];
+}
+
+/**
  * Collab Pages functions shared with cultural protocol feature. Included here because ma_collaboration_tools can be disabled.
  */
 

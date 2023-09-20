@@ -48,6 +48,7 @@ function ma_scald_scald_atom_access($atom, $action, $account = NULL) {
     // DENY if groups are set but they have access to none of them.
     case 'view':
       $group_wrapper = entity_metadata_wrapper('scald_atom', $atom);
+      $field_item_privacy_setting_info = field_info_instance('scald_atom', 'field_item_privacy_setting', $group_wrapper->getBundle());
       if (!isset($group_wrapper->field_scald_protocol)) {
         return SCALD_ATOM_ACCESS_ALLOW;
       } else {
@@ -59,6 +60,7 @@ function ma_scald_scald_atom_access($atom, $action, $account = NULL) {
       }
 
       if ($groups = $group_wrapper->field_scald_protocol->value()) {
+        $sharing_setting = $field_item_privacy_setting_info ? ($group_wrapper->field_item_privacy_setting->value() ?? 'any') : 'any';
         foreach ($groups as $group) {
           if (node_access('view', $group, $account)) {
             return SCALD_ATOM_ACCESS_ALLOW;
@@ -466,46 +468,221 @@ return FALSE;';
 }
 
 /**
- * Implements hook_views_query_alter
+ * Delete all records in our custom protocol access table for a given atom.
+ */
+function ma_scald_clear_protocol_access($atom) {
+  if ($sid = $atom->sid ?? NULL) {
+    db_delete('scald_protocol_access')->condition('sid', $sid)->execute();
+  }
+}
+
+/**
+ * Given an array of protocol IDs (nids), return the corresponding
+ * protocol set ID.
+ */
+function ma_scald_get_protocol_set_id(array $protocol_ids) {
+  $protocol_set = ma_scald_format_protocol_ids($protocol_ids);
+
+  // Check if the protocol set exists.
+  $result = db_select('mukurtu_protocol_map', 'mpm')
+    ->fields('mpm', ['protocol_set_id'])
+    ->condition('protocol_set', $protocol_set, '=')
+    ->execute()->fetchAssoc();
+
+  if (!empty($result)) {
+    return $result['protocol_set_id'];
+  }
+
+  // It doesn't exist, we need to insert it.
+  return db_insert('mukurtu_protocol_map')
+    ->fields(['protocol_set' => $protocol_set])
+    ->execute();
+}
+
+/**
+  * Get a list of all compound protocol sets in use on the site.
+  */
+function ma_scald_get_compound_protocols() {
+  $compoundProtocols = [];
+
+  $query = db_select('mukurtu_protocol_map', 'mpm')
+  ->fields('mpm', ['protocol_set_id', 'protocol_set']);
+  $result = $query->execute()->fetchAll();
+  foreach ($result as $ps) {
+    if (mb_strpos($ps->protocol_set, '|') !== false) {
+      $compoundProtocols[$ps->protocol_set_id] = explode('|', $ps->protocol_set);
+    }
+  }
+
+  return $compoundProtocols;
+}
+
+/**
+ * Return an array of protocol set IDs the current user has access to.
+ */
+function ma_scald_get_current_user_protocol_sets() {
+  $protocol_sets = [];
+
+  // No protocols protocol set.
+  $no_protocols_set = ma_scald_get_protocol_set_id([]);
+  $protocol_sets[$no_protocols_set] = $no_protocols_set;
+
+  // User has access to all open protocols.
+  foreach (ma_cultural_protocol_get_open_protocol_ids() as $pid) {
+    $protocol_sets[$pid] = ma_scald_get_protocol_set_id([$pid]);
+  }
+
+  // User has access to each single protocol they are a member of.
+  $protocol_memberships = ma_cultural_protocol_get_cps_for_user(['member']);
+  $protocol_memberships_ids = array_keys($protocol_memberships);
+  foreach ($protocol_memberships_ids as $pid) {
+    $protocol_sets[$pid] = (int) ma_scald_get_protocol_set_id([$pid]);
+  }
+
+  // Search the entire protocol table for combinations of protocols
+  // that the user is a member of. This is potentially slow, but it's faster
+  // than computing the super set of user protocols.
+  foreach (ma_scald_get_compound_protocols() as $set_id => $set_protocol_ids) {
+    $in_all = TRUE;
+    foreach ($set_protocol_ids as $set_protocol_id) {
+      if (!in_array($set_protocol_id, $protocol_memberships_ids)) {
+        $in_all = FALSE;
+        break;
+      }
+    }
+
+    if ($in_all) {
+      $protocol_sets[$set_id] = (int) $set_id;
+    }
+  }
+
+  return $protocol_sets;
+}
+
+/**
+ * For a given atom, update our custom protocol access table based on the atom's
+ * protocols and sharing setting.
+ */
+function ma_scald_insert_protocol_access($atom) {
+  $entity = entity_metadata_wrapper('scald_atom', $atom);
+  $field_item_privacy_setting_info = field_info_instance('scald_atom', 'field_item_privacy_setting', $entity->getBundle());
+  $sharing_setting = $field_item_privacy_setting_info ? ($entity->field_item_privacy_setting->value() ?? 'any') : 'any';
+  $protocol_ids = $entity->field_scald_protocol->raw() ?? [];
+
+  $permitted_protocol_sets = [];
+
+  if ($sharing_setting === 'all') {
+    // Find the protocol set ID that represents the set of all required
+    // protocols.
+    if ($set_id = ma_scald_get_protocol_set_id($protocol_ids)) {
+      $permitted_protocol_sets[] = $set_id;
+    }
+  }
+
+  if ($sharing_setting === 'any') {
+    // In the case of 'any', each singular protocol will map to an individual
+    // protocol set. If the user has any of them, that is sufficent.
+    foreach ($protocol_ids as $protocol_id) {
+      if ($set_id = ma_scald_get_protocol_set_id([$protocol_id])) {
+        $permitted_protocol_sets[] = $set_id;
+      }
+    }
+  }
+
+  // Empty protocols for scald means open to all. Add the set that represents
+  // that.
+  if (empty($protocol_ids)) {
+    $permitted_protocol_sets[] = ma_scald_get_protocol_set_id([]);
+  }
+
+  // Associate the permitted IDs with the scald atom.
+  foreach ($permitted_protocol_sets as $permitted_protocol_set) {
+    db_insert('scald_protocol_access')
+      ->fields([
+        'sid' => $atom->sid,
+        'protocol_set_id' => $permitted_protocol_set
+        ])
+      ->execute();
+  }
+}
+
+/**
+ * Take an array of group IDs and return a string suitable for DB comnparison.
+ */
+function ma_scald_format_protocol_ids($protocol_ids) {
+  // Let's force them to integers, just to be safe.
+  $protocol_ids = array_map(fn($p) => (int) $p, $protocol_ids);
+
+  // Hardcode no protocols to a "0". No protocols has the same meaning for all
+  // atoms, open access.
+  if (empty($protocol_ids)) {
+    return '0';
+  }
+
+  // Sort them ascending and delimit with '|'. This is critical. Our comparison
+  // in the views query expects this.
+  // @see ma_scald_views_query_alter
+  sort($protocol_ids);
+  return implode( '|', $protocol_ids);
+}
+
+/**
+ * Implements hook_scald_atom_insert().
+ */
+function ma_scald_scald_atom_insert($atom) {
+  ma_scald_clear_protocol_access($atom);
+  ma_scald_insert_protocol_access($atom);
+}
+
+/**
+ * Implements hook_scald_atom_update().
+ */
+function ma_scald_scald_atom_update($atom) {
+  ma_scald_clear_protocol_access($atom);
+  ma_scald_insert_protocol_access($atom);
+}
+
+/**
+ * Implements hook_scald_atom_delete().
+ */
+function ma_scald_scald_atom_delete($atom) {
+  ma_scald_clear_protocol_access($atom);
+}
+
+/**
+ * Implements hook_views_query_alter().
  */
 function ma_scald_views_query_alter(&$view, &$query) {
-    if($view->name == 'scald_library') {
-        // Filter out Scald atoms that are blocked by protocol in the DND scald view
-        // Note that this isn't actually enforcing protocols, we are just trying to avoid the scald
-        // access denied message in the dnd toolbar.
+  // For views gathering scald atoms, filter based on protocol access.
+  if ($view->base_table == 'scald_atoms') {;
+    $user_protocol_sets = ma_scald_get_current_user_protocol_sets();
 
-        // Get the groups the user has view rights to
-        $groups = og_get_groups_by_user(NULL, 'node');
+    // Join our custom protocol access table to the scald table on sid.
+    $join = new views_join();
+    $join->construct('scald_protocol_access', 'scald_atoms', 'sid', 'sid');
+    $query->add_relationship('scald_protocol_access', $join, 'scald_atoms');
 
-        // Join, to bring in the scald protocol field
-        $join = new views_join;
-        $join->construct('field_data_field_scald_protocol', 'scald_atoms', 'sid', 'entity_id');
-        $query->add_relationship('field_data_field_scald_protocol', $join, 'scald_atoms');
+    $whereUserHasProtocolSet = [
+      'conditions' => [],
+      'args' => [],
+      'type' => 'OR'
+    ];
 
-        // Initial condition for all scald atoms without a protocol (effectively open to all)
-        $query->where[] =
-                array('conditions' =>
-                      array(array(
-                          'field' => 'field_data_field_scald_protocol.field_scald_protocol_target_id',
-                          'value' => NULL,
-                          'operator' => 'IS NULL'
-                      )),
-                      'args' => array(),
-                      'type' => 'OR'
-                );
-
-        $query_results = array_keys($query->where);
-        $conditions_key = end($query_results);
-
-        // Add an 'or' condition for each protocol the user can view
-        foreach($groups as $group) {
-            $query->where[$conditions_key]['conditions'][] = array(
-                          'field' => 'field_data_field_scald_protocol.field_scald_protocol_target_id',
-                          'value' => $group,
-                          'operator' => '='
-            );
-        }
+    // Add an 'or' condition for each protocol set the user can view.
+    foreach ($user_protocol_sets as $protocol_set_id) {
+      $whereUserHasProtocolSet['conditions'][] = [
+        'field' => 'scald_protocol_access.protocol_set_id',
+        'value' => $protocol_set_id,
+        'operator' => '='
+      ];
     }
+
+    $query->where[] = $whereUserHasProtocolSet;
+
+    // We need distinct here as most scald atoms have multiple valid protocol
+    // sets. We'd get duplicates otherwise.
+    $query->distinct = TRUE;
+  }
 }
 
 /**
