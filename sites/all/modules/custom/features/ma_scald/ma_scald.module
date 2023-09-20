@@ -61,11 +61,23 @@ function ma_scald_scald_atom_access($atom, $action, $account = NULL) {
 
       if ($groups = $group_wrapper->field_scald_protocol->value()) {
         $sharing_setting = $field_item_privacy_setting_info ? ($group_wrapper->field_item_privacy_setting->value() ?? 'any') : 'any';
-        foreach ($groups as $group) {
-          if (node_access('view', $group, $account)) {
-            return SCALD_ATOM_ACCESS_ALLOW;
+        if ($sharing_setting === 'any') {
+          foreach ($groups as $group) {
+            if (node_access('view', $group, $account)) {
+              return SCALD_ATOM_ACCESS_ALLOW;
+            }
           }
         }
+
+        if ($sharing_setting === 'all') {
+          foreach ($groups as $group) {
+            if (!node_access('view', $group, $account)) {
+              return SCALD_ATOM_ACCESS_DENY;
+            }
+          }
+          return SCALD_ATOM_ACCESS_ALLOW;
+        }
+
         return SCALD_ATOM_ACCESS_DENY;
       }
       return SCALD_ATOM_ACCESS_IGNORE;
@@ -524,12 +536,13 @@ function ma_scald_get_current_user_protocol_sets() {
   $protocol_sets = [];
 
   // No protocols protocol set.
-  $no_protocols_set = ma_scald_get_protocol_set_id([]);
+  $no_protocols_set = (int) ma_scald_get_protocol_set_id([]);
   $protocol_sets[$no_protocols_set] = $no_protocols_set;
 
   // User has access to all open protocols.
-  foreach (ma_cultural_protocol_get_open_protocol_ids() as $pid) {
-    $protocol_sets[$pid] = ma_scald_get_protocol_set_id([$pid]);
+  $open_protocol_ids = ma_cultural_protocol_get_open_protocol_ids();
+  foreach ($open_protocol_ids as $pid) {
+    $protocol_sets[$pid] = (int) ma_scald_get_protocol_set_id([$pid]);
   }
 
   // User has access to each single protocol they are a member of.
@@ -542,10 +555,11 @@ function ma_scald_get_current_user_protocol_sets() {
   // Search the entire protocol table for combinations of protocols
   // that the user is a member of. This is potentially slow, but it's faster
   // than computing the super set of user protocols.
+  $all_protocol_ids_with_view_access = array_merge($open_protocol_ids, $protocol_memberships_ids);
   foreach (ma_scald_get_compound_protocols() as $set_id => $set_protocol_ids) {
     $in_all = TRUE;
     foreach ($set_protocol_ids as $set_protocol_id) {
-      if (!in_array($set_protocol_id, $protocol_memberships_ids)) {
+      if (!in_array($set_protocol_id, $all_protocol_ids_with_view_access)) {
         $in_all = FALSE;
         break;
       }
