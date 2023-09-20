@@ -48,8 +48,51 @@ function ma_scald_schema() {
 }
 
 /**
- * Update all Scald atoms for new protocol system.
+ * Revert Mukurtu Scald feature.
  */
 function ma_scald_update_7001(&$sandbox) {
-  // @todo batch update all scald atoms to calculate new protocol field.
+  // Revert ma_scald so that the new sharing setting fields will be available
+  // to all our scald atom bundles.
+  features_revert_module('ma_scald');
+}
+
+/**
+ * Update all Scald atoms for new protocol system.
+ */
+function ma_scald_update_7002(&$sandbox) {
+  if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['current_sid'] = 0;
+    $sandbox['max'] = db_query('SELECT COUNT(DISTINCT sid) FROM {scald_atoms}')->fetchField();
+  }
+
+  $result = db_select('scald_atoms', 'sa')
+    ->fields('sa', array('sid'))
+    ->condition('sid', $sandbox['current_sid'], '>')
+    ->range(0, 1)
+    ->orderBy('sid', 'ASC')
+    ->execute()->fetchAllAssoc('sid');
+
+  $sids = array_keys($result);
+
+  $atoms = scald_atom_load_multiple($sids);
+  foreach ($atoms as $atom) {
+    $entity = entity_metadata_wrapper('scald_atom', $atom);
+
+    // Prior to this update, scald atoms were hardcoded to 'any' implicitly
+    // because we did not include the privacy setting field. Now that we are
+    // adding that field for atoms, set that value explicitly now for all
+    // existing atoms.
+    $entity->field_item_privacy_setting->set('any');
+    try {
+      scald_atom_save($atom);
+    } catch (Exception $e) {
+      drupal_set_message(t('Could not set sharing settings for scald atom @sid', ['@sid' => $atom->sid]));
+    }
+
+    $sandbox['progress']++;
+    $sandbox['current_sid'] = $atom->sid;
+  }
+
+  $sandbox['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
 }
