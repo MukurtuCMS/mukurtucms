@@ -97,6 +97,7 @@ function mukurtu_migration_prep_summary_report_form($form, &$form_state) {
   $rows[] = mukurtu_migration_prep_report_nodes_empty_protocols();
   $rows[] = mukurtu_migration_prep_report_scald_atoms_empty_protocols();
   $rows[] = mukurtu_migration_prep_report_dictionary_words_with_additional_media();
+  $rows[] = mukurtu_migration_prep_report_dailymotion_atoms();
 
   $form['table'] = [
     '#theme' => 'table',
@@ -291,6 +292,26 @@ function mukurtu_migration_prep_report_dictionary_words_with_additional_media() 
     'data' => [
       t('Dictionary words with additional media'),
       t('In Mukurtu CMS v4, the dictionary word additional media field will not be migrated.'),
+      $summary,
+    ],
+    'class' => mukurtu_migration_prep_get_status_class($status),
+  ];
+  return $row;
+}
+
+/**
+ * Report for dailymotion atoms.
+ */
+function mukurtu_migration_prep_report_dailymotion_atoms() {
+  $result = views_get_view_result('migration_dailymotion_atoms');
+  $status = empty($result) ? MUKURTU_MIGRATION_REPORT_STATUS_OK : MUKURTU_MIGRATION_REPORT_STATUS_WARNING;
+  $link = l(t('Report'), 'admin/reports/migration/dailymotion-atoms');
+  $summary = $status == MUKURTU_MIGRATION_REPORT_STATUS_OK ? t('No Dailymotion atoms found') : t('@count Dailymotion atom(s): ', ['@count' => count($result)]) . $link;
+
+  $row = [
+    'data' => [
+      t('Dailymotion Atoms'),
+      t('Support for Dailymotion has been dropped in Mukurtu CMS v4. Dailymotion atoms will not be migrated'),
       $summary,
     ],
     'class' => mukurtu_migration_prep_get_status_class($status),
