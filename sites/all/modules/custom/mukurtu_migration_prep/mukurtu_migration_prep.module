@@ -29,6 +29,45 @@ function mukurtu_migration_prep_menu() {
   return $items;
 }
 
+/**
+ * Implements hook_views_api().
+ */
+function mukurtu_migration_prep_views_api() {
+  return [
+    'api' => '3.0',
+  ];
+}
+
+/**
+ * Implements hook_views_default_views().
+ */
+function mukurtu_migration_prep_views_default_views() {
+  $views = [];
+  $path = drupal_get_path('module', 'mukurtu_migration_prep') . '/views/*.inc';
+
+  foreach (glob($path) as $file) {
+    require_once $file;
+    $views[$view->name] = $view;
+    unset($view);
+  }
+
+  return $views;
+}
+
+function mukurtu_migration_prep_query_alter($query) {
+  if ($query->hasAllTags('views_content_with_missing_cultural_protocols')) {
+    $count_protocol_refs_subquery = "(SELECT count(*) from og_membership as `ogm` where node.nid = ogm.etid AND ogm.entity_type = 'node' AND ogm.field_name = 'og_group_ref' AND ogm.state = 1)";
+    $query->addExpression($count_protocol_refs_subquery, 'protocol_refs');
+    $query->havingCondition('protocol_refs', 0);
+//    dpm((string) $query);
+//    dpm($query->arguments());
+  }
+
+}
+
+/**
+ * Access function for the form.
+ */
 function mukurtu_migration_prep_current_user_has_role($roles) {
   if (user_is_logged_in()) {
     global $user;
@@ -47,12 +86,6 @@ function mukurtu_migration_prep_current_user_has_role($roles) {
  * Form builder: Builds the migration summary report form.
  */
 function mukurtu_migration_prep_summary_report_form($form, &$form_state) {
-  $empty_count = 0;
-
-  $form['empty_count'] = [
-    '#markup' => t('There are !count nodes with an empty "field_protocols" field.', ['!count' => $empty_count]),
-  ];
-
   $header = [
     'step' => t('Step'),
     'description' => t('Description'),
@@ -61,6 +94,8 @@ function mukurtu_migration_prep_summary_report_form($form, &$form_state) {
 
   $rows = [];
   $rows[] = mukurtu_migration_prep_report_unsupported_text_formats();
+  $rows[] = mukurtu_migration_prep_report_nodes_empty_protocols();
+  $rows[] = mukurtu_migration_prep_report_dictionary_words_with_additional_media();
 
   $form['table'] = [
     '#theme' => 'table',
@@ -91,37 +126,6 @@ function mukurtu_migration_prep_get_status_class($status) {
   }
 }
 
-function mukurtu_migration_prep_report_unsupported_text_formats() {
-  $previous_run = variable_get('mukurtu_migration_prep_report_unsupported_text_formats') ?? NULL;
-  $status = $previous_run[MUKURTU_MIGRATION_RESULT] ?? MUKURTU_MIGRATION_REPORT_STATUS_NOT_RUN;
-  $summary = $previous_run[MUKURTU_MIGRATION_SUMMARY] ?? '';
-
-  $row = [
-    'data' => [
-      t('Text Formats'),
-      t('Text formats "Markdown" and "Display Suite code" are not supported by default in Mukurtu CMS v4 and will not be migrated.'),
-      $summary,
-    ],
-    'class' => mukurtu_migration_prep_get_status_class($status),
-  ];
-  return $row;
-}
-
-/**
- * Helper function to get the count of nodes with an empty 'field_protocols' field.
- */
-function mukurtu_migration_prep_summary_get_empty_field_protocols_count() {
-  $query = db_select('node', 'n')
-    ->fields('n', ['nid'])
-    ->leftJoin('field_data_og_group_ref', 'fp', 'n.nid = fp.entity_id');
-  $query
-    ->condition('fp.field_protocols_target_id', 'NULL', 'IS')
-    ->countQuery();
-
-  return $query->execute()->fetchField();
-}
-
-
 function mukurtu_migration_prep_summary_report_form_submit($form, &$form_state) {
   batch_set(mukurtu_migration_prep_batch());
 }
@@ -137,6 +141,25 @@ function mukurtu_migration_prep_batch() {
     ],
     'finished' => 'mukurtu_migration_prep_report_unsupported_text_formats_batch_finished',
   ];
+}
+
+/**
+ * Report for markdown/ds_code text formats.
+ */
+function mukurtu_migration_prep_report_unsupported_text_formats() {
+  $previous_run = variable_get('mukurtu_migration_prep_report_unsupported_text_formats') ?? NULL;
+  $status = $previous_run[MUKURTU_MIGRATION_RESULT] ?? MUKURTU_MIGRATION_REPORT_STATUS_NOT_RUN;
+  $summary = $previous_run[MUKURTU_MIGRATION_SUMMARY] ?? '';
+
+  $row = [
+    'data' => [
+      t('Text Formats'),
+      t('Text formats "Markdown" and "Display Suite code" are not supported by default in Mukurtu CMS v4 and will not be migrated.'),
+      $summary,
+    ],
+    'class' => mukurtu_migration_prep_get_status_class($status),
+  ];
+  return $row;
 }
 
 /**
@@ -207,9 +230,49 @@ function mukurtu_migration_prep_report_unsupported_text_formats_batch_finished($
       MUKURTU_MIGRATION_SUMMARY => $summary,
     ];
     variable_set('mukurtu_migration_prep_report_unsupported_text_formats', $report);
-    drupal_set_message(t('Found nodes with markdown filter format: @nids', ['@nids' => implode(', ', $results['nids'])]));
+    //drupal_set_message(t('Found nodes with markdown filter format: @nids', ['@nids' => implode(', ', $results['nids'])]));
   }
   else {
-    drupal_set_message(t('An error occurred during processing'), 'error');
+    drupal_set_message(t('An unknown error occurred'), 'error');
   }
+}
+
+/**
+ * Report for nodes with empty protocol fields.
+ */
+function mukurtu_migration_prep_report_nodes_empty_protocols() {
+  $result = views_get_view_result('content_with_missing_cultural_protocols');
+  $status = empty($result) ? MUKURTU_MIGRATION_REPORT_STATUS_OK : MUKURTU_MIGRATION_REPORT_STATUS_ERROR;
+  $link = l(t('Report'), 'admin/reports/migration/content-with-missing-cultural-protocols');
+  $summary = $status == MUKURTU_MIGRATION_REPORT_STATUS_OK ? t('All content has cultural protocols') : t('@count items(s) with missing cultural protocols: ', ['@count' => count($result)]) . $link;
+
+  $row = [
+    'data' => [
+      t('Content (nodes) with no assigned protocols'),
+      t('In Mukurtu CMS v4, cultural protocols are now required for all content types.'),
+      $summary,
+    ],
+    'class' => mukurtu_migration_prep_get_status_class($status),
+  ];
+  return $row;
+}
+
+/**
+ * Report for dictionary words with a non-empty additional media field.
+ */
+function mukurtu_migration_prep_report_dictionary_words_with_additional_media() {
+  $result = views_get_view_result('migration_dictionary_words_with_additional_media');
+  $status = empty($result) ? MUKURTU_MIGRATION_REPORT_STATUS_OK : MUKURTU_MIGRATION_REPORT_STATUS_WARNING;
+  $link = l(t('Report'), 'admin/reports/migration/migration-dictionary-words-with-additional-media');
+  $summary = $status == MUKURTU_MIGRATION_REPORT_STATUS_OK ? t('No dictionary words have additional media') : t('@count dictionary word(s) with additional media: ', ['@count' => count($result)]) . $link;
+
+  $row = [
+    'data' => [
+      t('Dictionary words with additional media'),
+      t('In Mukurtu CMS v4, the dictionary word additional media field will not be migrated.'),
+      $summary,
+    ],
+    'class' => mukurtu_migration_prep_get_status_class($status),
+  ];
+  return $row;
 }
