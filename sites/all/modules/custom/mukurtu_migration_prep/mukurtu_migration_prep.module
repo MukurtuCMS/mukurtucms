@@ -95,6 +95,7 @@ function mukurtu_migration_prep_summary_report_form($form, &$form_state) {
   $rows = [];
   $rows[] = mukurtu_migration_prep_report_unsupported_text_formats();
   $rows[] = mukurtu_migration_prep_report_nodes_empty_protocols();
+  $rows[] = mukurtu_migration_prep_report_scald_atoms_empty_protocols();
   $rows[] = mukurtu_migration_prep_report_dictionary_words_with_additional_media();
 
   $form['table'] = [
@@ -250,6 +251,26 @@ function mukurtu_migration_prep_report_nodes_empty_protocols() {
     'data' => [
       t('Content (nodes) with no assigned protocols'),
       t('In Mukurtu CMS v4, cultural protocols are now required for all content types.'),
+      $summary,
+    ],
+    'class' => mukurtu_migration_prep_get_status_class($status),
+  ];
+  return $row;
+}
+
+/**
+ * Report for scald atoms with empty protocol fields.
+ */
+function mukurtu_migration_prep_report_scald_atoms_empty_protocols() {
+  $result = views_get_view_result('migration_scald_atoms_with_missing_cultural_protocols');
+  $status = empty($result) ? MUKURTU_MIGRATION_REPORT_STATUS_OK : MUKURTU_MIGRATION_REPORT_STATUS_ERROR;
+  $link = l(t('Report'), 'admin/reports/migration/summary/scald-atoms-with-missing-cultural-protocols');
+  $summary = $status == MUKURTU_MIGRATION_REPORT_STATUS_OK ? t('All Scald Atoms have cultural protocols') : t('@count atom(s) with missing cultural protocols: ', ['@count' => count($result)]) . $link;
+
+  $row = [
+    'data' => [
+      t('Media (atoms) with no assigned protocols'),
+      t('In Mukurtu CMS v4, cultural protocols are now required for all media.'),
       $summary,
     ],
     'class' => mukurtu_migration_prep_get_status_class($status),
