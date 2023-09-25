@@ -98,6 +98,7 @@ function mukurtu_migration_prep_summary_report_form($form, &$form_state) {
   $rows[] = mukurtu_migration_prep_report_scald_atoms_empty_protocols();
   $rows[] = mukurtu_migration_prep_report_dictionary_words_with_additional_media();
   $rows[] = mukurtu_migration_prep_report_dailymotion_atoms();
+  $rows[] = mukurtu_migration_prep_report_scald_authors();
 
   $form['table'] = [
     '#theme' => 'table',
@@ -318,3 +319,24 @@ function mukurtu_migration_prep_report_dailymotion_atoms() {
   ];
   return $row;
 }
+
+/**
+ * Report for scald authors.
+ */
+function mukurtu_migration_prep_report_scald_authors() {
+  $result = views_get_view_result('migration_scald_authors');
+  $status = empty($result) ? MUKURTU_MIGRATION_REPORT_STATUS_OK : MUKURTU_MIGRATION_REPORT_STATUS_WARNING;
+  $link = l(t('Report'), 'admin/reports/migration/migration-scald-authors');
+  $summary = $status == MUKURTU_MIGRATION_REPORT_STATUS_OK ? t('No Scald Authors terms found') : t('@count atom(s) use the Authors field: ', ['@count' => count($result)]) . $link;
+
+  $row = [
+    'data' => [
+      t('Scald Authors Field'),
+      t('The Scald "Authors" (scald_authors) field will not be migrated to Mukurtu CMS v4'),
+      $summary,
+    ],
+    'class' => mukurtu_migration_prep_get_status_class($status),
+  ];
+  return $row;
+}
+
