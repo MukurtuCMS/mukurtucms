@@ -277,6 +277,86 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance:
+  // 'node-dictionary_word-field_additional_media_assets'.
+  $field_instances['node-dictionary_word-field_additional_media_assets'] = array(
+    'bundle' => 'dictionary_word',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'In Mukurtu CMS v4, the "Additional Media" field is no longer included and will not be migrated. This field will be migrated to the "Media Assets" field. It is recommended to move media asset references from the "Additional Media" field to this field.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'title',
+        'weight' => 40,
+      ),
+      'dictionary_word_summary' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_additional_media_assets',
+    'label' => 'Additional Media Assets',
+    'required' => 0,
+    'settings' => array(
+      'allow_override' => 0,
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'referencable_types' => array(
+        'audio' => 'audio',
+        'file' => 'file',
+        'image' => 'image',
+        'video' => 'video',
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'atom_reference',
+      'settings' => array(
+        'context' => 'sdl_editor_representation',
+        'treeable' => 0,
+      ),
+      'type' => 'atom_reference_textfield',
+      'weight' => 29,
+    ),
+  );
+
   // Exported field_instance: 'node-dictionary_word-field_collection'.
   $field_instances['node-dictionary_word-field_collection'] = array(
     'bundle' => 'dictionary_word',
@@ -3343,6 +3423,7 @@ function ma_dictionary_field_default_field_instances() {
   t('A reference to one or many related digital heritage items.');
   t('A word list is an collection of dictionary words.');
   t('Additional Media');
+  t('Additional Media Assets');
   t('Alternate Spelling');
   t('Characters');
   t('Choose one or more parts of speech that best matches your word entry. This field can be used for content browsing. Separate multiple entries with a semi-colon.');
@@ -3360,6 +3441,7 @@ function ma_dictionary_field_default_field_instances() {
   t('Groups audience');
   t('If the spelling of an entry differs from the term, enter it here. Leave blank otherwise.');
   t('Image');
+  t('In Mukurtu CMS v4, the "Additional Media" field is no longer included and will not be migrated. This field will be migrated to the "Media Assets" field. It is recommended to move media asset references from the "Additional Media" field to this field.');
   t('Include any media or additional information that does not fit in the other fields here. You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (e.g., audio, YouTube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
   t('Item Sharing Settings');
   t('Keywords');

@@ -32,6 +32,28 @@ function ma_dictionary_field_default_field_bases() {
     'type' => 'text_long',
   );
 
+  // Exported field_base: 'field_additional_media_assets'.
+  $field_bases['field_additional_media_assets'] = array(
+    'active' => 1,
+    'cardinality' => -1,
+    'deleted' => 0,
+    'entity_id_type' => NULL,
+    'entity_types' => array(),
+    'field_name' => 'field_additional_media_assets',
+    'indexes' => array(
+      'sid' => array(
+        0 => 'sid',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'atom_reference',
+    'settings' => array(
+      'treeable' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'atom_reference',
+  );
+
   // Exported field_base: 'field_alternate_spelling'.
   $field_bases['field_alternate_spelling'] = array(
     'active' => 1,

@@ -246,7 +246,7 @@ function mukurtu_migration_prep_report_unsupported_text_formats_batch_finished($
 function mukurtu_migration_prep_report_nodes_empty_protocols() {
   $result = views_get_view_result('content_with_missing_cultural_protocols');
   $status = empty($result) ? MUKURTU_MIGRATION_REPORT_STATUS_OK : MUKURTU_MIGRATION_REPORT_STATUS_ERROR;
-  $link = l(t('Report'), 'admin/reports/migration/content-with-missing-cultural-protocols');
+  $link = l(t('Details'), 'admin/reports/migration/content-with-missing-cultural-protocols');
   $summary = $status == MUKURTU_MIGRATION_REPORT_STATUS_OK ? t('All content has cultural protocols') : t('@count items(s) with missing cultural protocols: ', ['@count' => count($result)]) . $link;
 
   $row = [
@@ -266,7 +266,7 @@ function mukurtu_migration_prep_report_nodes_empty_protocols() {
 function mukurtu_migration_prep_report_scald_atoms_empty_protocols() {
   $result = views_get_view_result('migration_scald_atoms_with_missing_cultural_protocols');
   $status = empty($result) ? MUKURTU_MIGRATION_REPORT_STATUS_OK : MUKURTU_MIGRATION_REPORT_STATUS_ERROR;
-  $link = l(t('Report'), 'admin/reports/migration/summary/scald-atoms-with-missing-cultural-protocols');
+  $link = l(t('Details'), 'admin/reports/migration/summary/scald-atoms-with-missing-cultural-protocols');
   $summary = $status == MUKURTU_MIGRATION_REPORT_STATUS_OK ? t('All Scald Atoms have cultural protocols') : t('@count atom(s) with missing cultural protocols: ', ['@count' => count($result)]) . $link;
 
   $row = [
@@ -286,7 +286,7 @@ function mukurtu_migration_prep_report_scald_atoms_empty_protocols() {
 function mukurtu_migration_prep_report_dictionary_words_with_additional_media() {
   $result = views_get_view_result('migration_dictionary_words_with_additional_media');
   $status = empty($result) ? MUKURTU_MIGRATION_REPORT_STATUS_OK : MUKURTU_MIGRATION_REPORT_STATUS_WARNING;
-  $link = l(t('Report'), 'admin/reports/migration/migration-dictionary-words-with-additional-media');
+  $link = l(t('Details'), 'admin/reports/migration/migration-dictionary-words-with-additional-media');
   $summary = $status == MUKURTU_MIGRATION_REPORT_STATUS_OK ? t('No dictionary words have additional media') : t('@count dictionary word(s) with additional media: ', ['@count' => count($result)]) . $link;
 
   $row = [
@@ -306,7 +306,7 @@ function mukurtu_migration_prep_report_dictionary_words_with_additional_media() 
 function mukurtu_migration_prep_report_dailymotion_atoms() {
   $result = views_get_view_result('migration_dailymotion_atoms');
   $status = empty($result) ? MUKURTU_MIGRATION_REPORT_STATUS_OK : MUKURTU_MIGRATION_REPORT_STATUS_WARNING;
-  $link = l(t('Report'), 'admin/reports/migration/dailymotion-atoms');
+  $link = l(t('Details'), 'admin/reports/migration/dailymotion-atoms');
   $summary = $status == MUKURTU_MIGRATION_REPORT_STATUS_OK ? t('No Dailymotion atoms found') : t('@count Dailymotion atom(s): ', ['@count' => count($result)]) . $link;
 
   $row = [
@@ -326,7 +326,7 @@ function mukurtu_migration_prep_report_dailymotion_atoms() {
 function mukurtu_migration_prep_report_scald_authors() {
   $result = views_get_view_result('migration_scald_authors');
   $status = empty($result) ? MUKURTU_MIGRATION_REPORT_STATUS_OK : MUKURTU_MIGRATION_REPORT_STATUS_WARNING;
-  $link = l(t('Report'), 'admin/reports/migration/migration-scald-authors');
+  $link = l(t('Details'), 'admin/reports/migration/migration-scald-authors');
   $summary = $status == MUKURTU_MIGRATION_REPORT_STATUS_OK ? t('No Scald Authors terms found') : t('@count atom(s) use the Authors field: ', ['@count' => count($result)]) . $link;
 
   $row = [
