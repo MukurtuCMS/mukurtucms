@@ -21,8 +21,10 @@ class views_php_plugin_pager extends views_php_plugin_wrapper {
       }
     }
 
-    $this->wrapped->view->query->set_limit(0);
-    $this->wrapped->view->query->set_offset(0);
+    if (!empty($this->wrapped->view->views_php_query_all)) {
+      $this->wrapped->view->query->set_limit(0);
+      $this->wrapped->view->query->set_offset(0);
+    }
   }
 
   /**
@@ -37,15 +39,17 @@ class views_php_plugin_pager extends views_php_plugin_wrapper {
       }
     }
 
-    $this->wrapped->total_items = count($this->wrapped->view->result);
-    $this->wrapped->update_page_info();
+    if (!empty($this->wrapped->view->views_php_query_all)) {
+      $this->wrapped->total_items = count($this->wrapped->view->result);
+      $this->wrapped->update_page_info();
 
-    $item_per_page = $this->wrapped->get_items_per_page();
-    if ($item_per_page > 0) {
-      $offset = $this->wrapped->get_current_page() * $item_per_page + $this->wrapped->get_offset();
-      $this->wrapped->view->result = array_slice($this->wrapped->view->result, $offset, $item_per_page);
+      $item_per_page = $this->wrapped->get_items_per_page();
+      if ($item_per_page > 0) {
+        $offset = $this->wrapped->get_current_page() * $item_per_page + $this->wrapped->get_offset();
+        $this->wrapped->view->result = array_slice($this->wrapped->view->result, $offset, $item_per_page);
+      }
+      $this->wrapped->post_execute($result);
     }
-    $this->wrapped->post_execute($result);
   }
 
   /**

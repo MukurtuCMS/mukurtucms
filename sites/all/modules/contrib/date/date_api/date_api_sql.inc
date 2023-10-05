@@ -73,6 +73,8 @@ function date_sql_pad($str, $size = 2, $pad = '0', $side = 'l') {
  */
 class date_sql_handler {
 
+  public $granularity = NULL;
+  public $placeholders = NULL;
   public $db_type = NULL;
 
   public $date_type = DATE_DATETIME;
@@ -914,9 +916,11 @@ class date_sql_handler {
     if ($value <= 0) {
       return FALSE;
     }
+
+    $date_min_year = intval(variable_get('date_min_year', 1));
     switch ($type) {
       case 'year':
-        if ($value < DATE_MIN_YEAR) {
+        if ($value < $date_min_year) {
           return FALSE;
         }
         break;

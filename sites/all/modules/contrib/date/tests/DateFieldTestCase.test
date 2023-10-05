@@ -40,7 +40,7 @@ class DateFieldTestCase extends DateFieldTestBase {
     return array(
       'name' => 'Date Field',
       'description' => 'Test date field settings and Start/End date interaction.',
-      'group' => 'Date',
+      'group' => 'date',
     );
   }
 

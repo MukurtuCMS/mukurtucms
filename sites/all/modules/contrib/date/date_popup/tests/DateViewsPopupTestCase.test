@@ -17,7 +17,7 @@ class DatePopupWithViewsTestCase extends DateFieldTestBase {
     return array(
       'name' => 'Date Views - Popup Test',
       'description' => 'Tests date popup in Views',
-      'group' => 'Date',
+      'group' => 'date',
       'dependencies' => array('ctools', 'views'),
     );
   }

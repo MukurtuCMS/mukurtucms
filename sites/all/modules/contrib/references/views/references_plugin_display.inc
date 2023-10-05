@@ -4,9 +4,22 @@
  * @file
  * Handler for references_plugin_display.
  */
-class references_plugin_display extends views_plugin_display {
 
-  function option_definition() {
+/**
+ * Default class.
+ *
+ * @codingStandardsIgnoreStart
+ */
+class references_plugin_display extends views_plugin_display {
+  //@codingStandardsIgnoreEnd
+
+  /**
+   * Option Definition.
+   *
+   * @codingStandardsIgnoreStart
+   */
+  public function option_definition() {
+    // @codingStandardsIgnoreEnd
     $options = parent::option_definition();
 
     // Force the style plugin to 'references_style' and the row plugin to
@@ -25,26 +38,47 @@ class references_plugin_display extends views_plugin_display {
     return $options;
   }
 
-  function get_style_type() {
+  /**
+   * Style type.
+   *
+   * @codingStandardsIgnoreStart
+   */
+  public function get_style_type() {
+    // @codingStandardsIgnoreEnd
     return 'references';
   }
 
-  function execute() {
+  /**
+   * Execute.
+   */
+  public function execute() {
     return $this->view->render($this->display->id);
   }
 
-  function render() {
+  /**
+   * Render.
+   */
+  public function render() {
     if (!empty($this->view->result) || !empty($this->view->style_plugin->definition['even empty'])) {
       return $this->view->style_plugin->render($this->view->result);
     }
     return '';
   }
 
-  function uses_exposed() {
+  /**
+   * Uses exposed.
+   *
+   * @codingStandardsIgnoreStart
+   */
+  public function uses_exposed() {
+    // @codingStandardsIgnoreEnd
     return FALSE;
   }
 
-  function query() {
+  /**
+   * Query.
+   */
+  public function query() {
     $options = $this->get_option('references_options');
 
     // Play nice with View UI 'preview' : if the view is not executed through
@@ -85,4 +119,5 @@ class references_plugin_display extends views_plugin_display {
       $this->view->query->add_where(NULL, $table_alias . '.' . $this->view->base_field, $options['ids'], 'IN');
     }
   }
+
 }

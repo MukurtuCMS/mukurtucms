@@ -58,6 +58,7 @@ class views_php_handler_filter extends views_handler_filter {
   public function query() {
     // Inform views_php_views_pre_execute() to seize control over the query.
     $this->view->views_php = TRUE;
+    $this->view->views_php_query_all = TRUE;
   }
 
   /**

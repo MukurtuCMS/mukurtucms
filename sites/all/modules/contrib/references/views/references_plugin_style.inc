@@ -4,8 +4,19 @@
  * @file
  * Handler for references_plugin_style.
  */
-class references_plugin_style extends views_plugin_style {
-  function render() {
+
+/**
+ * Class to plugin style.
+ *
+ * @codingStandardsIgnoreStart
+ */
+class references_plugin_style extends views_plugin_style {  
+  // @codingStandardsIgnoreEnd
+
+  /**
+   * Render.
+   */
+  public function render() {
     $options = $this->display->handler->get_option('references_options');
 
     // Play nice with View UI 'preview' : if the view is not executed through
@@ -25,7 +36,7 @@ class references_plugin_style extends views_plugin_style {
     $results = array();
     $this->view->row_index = 0;
     foreach ($sets as $title => $records) {
-      foreach ($records as $label => $values) {
+      foreach ($records as $values) {
         // Render the row.
         $rendered = $this->row_plugin->render($values);
         // Remove linebreaks and extra spaces introduced by templates.
@@ -45,4 +56,5 @@ class references_plugin_style extends views_plugin_style {
 
     return $results;
   }
+
 }

@@ -17,7 +17,7 @@ class DatePopupFieldTestCase extends DateFieldTestBase {
     return array(
       'name' => t('Date Popup'),
       'description' => t('Test the custom functionality of the Date Popup module.'),
-      'group' => t('Date'),
+      'group' => 'date',
     );
   }
 

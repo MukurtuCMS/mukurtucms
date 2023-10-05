@@ -737,6 +737,9 @@ function ckeditor_profile_settings_compile($global_profile, $profile) {
     $settings['language'] = $conf['lang'];
     //[#1473010]
     $settings['scayt_sLang'] = ckeditor_scayt_langcode($conf['lang']);
+  } else if ($conf['auto_lang'] == "d") {
+      $settings['language'] = $language->language;
+      $settings['scayt_sLang'] = ckeditor_scayt_langcode($language->language);
   }
 
   if (isset($conf['forcePasteAsPlainText']) && $conf['forcePasteAsPlainText'] == 't') {

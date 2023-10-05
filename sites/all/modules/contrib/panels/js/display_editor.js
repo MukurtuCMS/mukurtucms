@@ -459,7 +459,7 @@ Drupal.Panels.DraggableHandler = function() {
     }
 
     draggable.timeoutId = setTimeout('timer()', scrollTimer);
-  }
+  };
 
   $(this).mousedown(mouseDown);
 };
@@ -469,7 +469,7 @@ $.fn.extend({
 });
 
 /**
- * Implement Drupal behavior for autoattach
+ * Implement Drupal behavior for auto attach.
  */
 Drupal.behaviors.PanelsDisplayEditor = {
   attach: function(context) {
@@ -525,7 +525,7 @@ Drupal.behaviors.PanelsDisplayEditor = {
       else {
         $('#panels-dnd-main').addClass('panels-set-title-hide');
       }
-    }
+    };
 
     // The panes have an option to set the display title, but only if
     // a select is set to the proper value. This sets a class on the
@@ -537,7 +537,7 @@ Drupal.behaviors.PanelsDisplayEditor = {
 
     setTitleClass();
   }
-}
+};
 
 $(function() {
   /**

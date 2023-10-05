@@ -2340,6 +2340,9 @@ function search_api_is_text_type($type, array $allowed = array('text')) {
  *   TRUE iff $type is a list type ("list<*>").
  */
 function search_api_is_list_type($type) {
+  if (is_null($type)) {
+    return FALSE;
+  }
   return substr($type, 0, 5) == 'list<';
 }
 

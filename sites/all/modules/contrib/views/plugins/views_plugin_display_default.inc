@@ -10,6 +10,7 @@
  *
  * @ingroup views_display_plugins
  */
+#[\AllowDynamicProperties]
 class views_plugin_display_default extends views_plugin_display {
 
   /**

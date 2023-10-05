@@ -8,6 +8,7 @@
 /**
  * Provides the basic object definitions used by plugins and handlers.
  */
+#[\AllowDynamicProperties]
 class views_object {
 
   /**
@@ -46,6 +47,7 @@ class views_object {
    *  - 'unpack_translatable' => (optional) callback for special handling for
    *      translating data within the option, if necessary.
    *  ),
+   * @endcode
    *
    * @return array
    *   Returns the options of this handler/plugin.

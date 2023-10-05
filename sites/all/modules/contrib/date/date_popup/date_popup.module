@@ -268,7 +268,7 @@ function date_popup_time_format($element) {
 /**
  * Element value callback for date_popup element.
  */
-function date_popup_element_value_callback($element, $input = FALSE, &$form_state = array()) {
+function date_popup_element_value_callback($element, $input, &$form_state = array()) {
   $granularity = date_format_order($element['#date_format']);
   $has_time = date_has_time($granularity);
   $date = NULL;
@@ -491,6 +491,7 @@ function date_popup_process_time_part(&$element) {
         // Then we are using lowercase am/pm.
         $options = date_ampm_options(FALSE, FALSE);
         $settings['ampmNames'] = array($options['am'], $options['pm']);
+        $settings['ampmPrefix'] = ' ';
       }
 
       if (strpos($element['#date_format'], 'A') !== FALSE) {
@@ -647,7 +648,7 @@ function date_popup_validate($element, &$form_state) {
  *   Useful anytime the time value is optional.
  */
 function date_popup_input_date($element, $input, $auto_complete = FALSE) {
-  if (empty($input) || !is_array($input) || !array_key_exists('date', $input) || (empty($input['date']) && empty($input['time']))) {
+  if (empty($input) || !is_array($input) || ((!array_key_exists('date', $input) || empty($input['date'])) && (!array_key_exists('time', $input) || empty($input['time'])))) {
     return NULL;
   }
   date_popup_add();
@@ -840,7 +841,10 @@ function theme_date_popup($vars) {
   if (isset($element['#children'])) {
     $element['#children'] = '<div id="' . $element['#id'] . '" ' . drupal_attributes($wrapper_attributes) . '>' . $element['#children'] . '</div>';
   }
-  return '<div ' . drupal_attributes($attributes) . '>' . theme('form_element', $element) . '</div>';
+  // Theme the element before calling drupal_attributes(), which modifies
+  // $element['#wrapper_attributes'].
+  $return = theme('form_element', $element);
+  return '<div ' . drupal_attributes($attributes) . '>' . $return . '</div>';
 }
 
 /**

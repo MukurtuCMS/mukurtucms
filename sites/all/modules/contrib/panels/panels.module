@@ -2158,7 +2158,7 @@ function panels_get_path($file, $base_path = FALSE, $module = 'panels') {
  * Remove default sidebar related body classes and provide own css classes.
  */
 function panels_preprocess_html(&$vars) {
-  $panel_body_css = &drupal_static('panel_body_css');
+  $panel_body_css = &drupal_static('panel_body_css', array());
   if (!empty($panel_body_css['body_classes_to_remove'])) {
     $classes_to_remove = array_filter(explode(' ', $panel_body_css['body_classes_to_remove']), 'strlen');
     foreach ($vars['classes_array'] as $key => $css_class) {

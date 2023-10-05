@@ -195,7 +195,10 @@ function date_field_formatter_view($entity_type, $entity, $field, $instance, $la
           $variables['delta'] = $delta;
           $variables['item'] = $item;
           $variables['dates'] = date_formatter_process($formatter, $entity_type, $entity, $field, $instance, $langcode, $item, $display);
-          $variables['attributes'] = !empty($rdf_mapping) ? rdf_rdfa_attributes($rdf_mapping, $item['value']) : array();
+          $variables['attributes'] = array();
+          if (!empty($rdf_mapping) && function_exists('rdf_rdfa_attributes')) {
+            $variables['attributes'] = rdf_rdfa_attributes($rdf_mapping, $item['value']);
+          }
           $element[$delta] = array('#markup' => theme('date_display_interval', $variables));
         }
       }
@@ -210,7 +213,10 @@ function date_field_formatter_view($entity_type, $entity, $field, $instance, $la
           $variables['delta'] = $delta;
           $variables['item'] = $item;
           $variables['dates'] = date_formatter_process($formatter, $entity_type, $entity, $field, $instance, $langcode, $item, $display);
-          $variables['attributes'] = !empty($rdf_mapping) ? rdf_rdfa_attributes($rdf_mapping, $item['value']) : array();
+          $variables['attributes'] = array();
+          if (!empty($rdf_mapping) && function_exists('rdf_rdfa_attributes')) {
+            $variables['attributes'] = rdf_rdfa_attributes($rdf_mapping, $item['value']);
+          }
           $variables['show_remaining_days'] = isset($display['settings']['show_remaining_days']) ? $display['settings']['show_remaining_days'] : FALSE;
           $output = theme('date_display_combination', $variables);
           if (!empty($output)) {
@@ -254,7 +260,7 @@ function date_field_info() {
     'settings' => array(
       'todate' => '',
       'granularity' => drupal_map_assoc($granularity),
-      'tz_handling' => 'site',
+      'tz_handling' => 'none',
       'timezone_db' => 'UTC',
     ),
     'instance_settings' => array(
@@ -350,18 +356,6 @@ function date_field_load($entity_type, $entities, $field, $instances, $langcode,
         $item['timezone'] = date_get_timezone($field['settings']['tz_handling'], $timezone);
         $item['timezone_db'] = $timezone_db;
         $item['date_type'] = $field['type'];
-        if (!empty($field['settings']['cache_enabled']) && ($delta < $field['settings']['cache_count'] || $field['settings']['cache_count'] == 0)) {
-          foreach ($process as $processed) {
-            if (!empty($item[$processed])) {
-              $date = new DateObject($item[$processed], $item['timezone_db'], $db_format);
-              $date->limitGranularity($field['settings']['granularity']);
-              $item['db'][$processed] = $date;
-            }
-          }
-          if (!empty($item['db']['value']) && empty($item['db']['value2'])) {
-            $item['db']['value2'] = $item['db']['value'];
-          }
-        }
       }
     }
   }

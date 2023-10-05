@@ -644,6 +644,11 @@ function scald_is_registered($sid, $rebuild = FALSE) {
  */
 function scald_fetch($sid, $rebuild = FALSE) {
   $atoms = scald_fetch_multiple(array($sid), $rebuild);
+  // The $atoms variable should be an array, otherwise return FALSE.
+  if (!is_array($atoms)) {
+    return FALSE;
+  }
+
   return $atoms[$sid];
 }
 

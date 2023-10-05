@@ -76,6 +76,12 @@ projects[bootstrap][patch][] = contrib/150281138-add-first-last-classes-to-lists
 ; Do not skip over text format fields
 projects[bootstrap][patch][] = contrib/150281089-Dont-skip-over-text_format-fields.patch
 
+;;; Cer
+; PHP 8 deprecation warnings
+projects[cer][patch][] = contrib/0001-Suppress-deprecation-warnings-for-PHP-8.patch
+; More PHP 8 deprecation warnings
+projects[cer][patch][] = contrib/0002-Suppress-deprecation-warnings-for-PHP-8.patch
+
 ;;; Colorbox
 ; Enable Jack Moore's Zoom library to work on top of the Colorbox images
 projects[colorbox][patch][] = contrib/zoom_on_colorbox.patch
@@ -92,6 +98,10 @@ projects[ctools][patch][] = https://www.drupal.org/files/issues/2021-02-03/ctool
 ; The 'For missing images' option will always fail
 projects[dummyimage][patch][] = https://www.drupal.org/files/issues/dummyimage_missing_1728026-5.patch
 
+;;; ECK
+; PHP 8 deprecation warnings
+projects[eck][patch][] = contrib/0001-Suppress-ECK-PHP-8-deprecation-warnings.patch
+
 ;;; Entity
 ; Prevent error from workflow (https://www.drupal.org/project/entity/issues/2289693)
 projects[entity][patch][] = contrib/entity_undefined_entity_get_info-2289693-2.patch
@@ -107,6 +117,16 @@ projects[entityreference][patch][] = contrib/Add-quicker-method-to-load-titles-f
 ;;; Entity Reference Prepopulate
 ; Entity Reference Prepopulate PHP 7.4 patch
 projects[entityreference_prepopulate][patch][] = https://www.drupal.org/files/issues/2020-06-10/3115641-unparenthesized-ternary-deprecated.patch
+
+;;; Facet API
+; PHP 8 deprecation warnings
+projects[facetapi][patch][] = contrib/0001-Facet-API-Suppress-PHP-8-deprecation-warnings.patch
+
+;;; Features extras
+; Default param patch
+projects[fe_block][patch][] = contrib/0001-Remove-default-parameter-value-for-PHP-8.patch
+; Another default param
+projects[fe_block][patch][] = contrib/0001-Remove-another-default-argument.patch
 
 ;;; Feeds
 ; These four patches all support feeds import using a subset of fields (not touching existing data for missing fields)
@@ -159,6 +179,10 @@ projects[og][patch][] = https://www.drupal.org/files/1298238-feeds-og-audience-m
 projects[og][patch][] = contrib/132925713-Apply-Mukurtu-og-patches.patch
 ; Second part of patch to skip OG field validation for admins during feeds import
 projects[og][patch][] = contrib/0002-Skip-protocol-field-OG-validation-during-import-for-.patch
+; OG Contexts PHP 8 patch
+projects[og][patch][] = contrib/og-3306532-5-php8-comp.patch
+; Array to bool conversion fix
+projects[og][patch][] = contrib/0001-Array-to-bool-conversion-not-supported-in-PHP-8.patch
 
 ;;; Organic groups invite
 ; Comment out view modification for group members admin view
@@ -177,6 +201,8 @@ projects[partial_date][patch][] = https://www.drupal.org/files/issues/2020-01-16
 ;;; Owl Carousel
 ; Add ID to handle multiple carousels
 projects[owlcarousel][patch][] = contrib/0001-Add-ID-to-handle-multiple-carousels.patch
+; PHP 8 deprecation fix
+projects[owlcarousel][patch][] = contrib/0001-PHP-8-deprecation-fix.patch
 
 ;;; Quicktabs
 ; Remember collaboration parent page tab on CP, so that when a child page is added, it will return to the parent tab.
@@ -200,6 +226,8 @@ projects[scald][patch][] = contrib/uploaded_video_do_not_fill_dimenions_on_uploa
 projects[scald][patch][] = contrib/scald_atom_access_account_parameter.patch
 ; PHP 7.4 patch
 projects[scald][patch][] = contrib/issue-3248924.patch
+; Operation Link order
+projects[scald][patch][] = contrib/0001-Switch-order-of-the-atom-links.patch
 
 ;;; Scald Feeds
 ; Add scald feeds metadata support
@@ -214,6 +242,8 @@ projects[scald_soundcloud][patch][] = contrib/0001-Default-to-not-using-versione
 ;;; Search API
 ; Fix 'For missing images' option will always fail
 projects[search_api][patch][] = https://www.drupal.org/files/issues/search_api-fix_access_info_indexing.patch
+; PHP 8 deprecation warning
+projects[search_api][patch][] = contrib/0001-Fix-deprecation-warning-null-in-substr.patch
 ; Modify dictionary search results based on custom sort
 projects[search_api_db][patch][] = contrib/modify_dictionary_search_results_based_on_custom_sort.patch
 
@@ -234,6 +264,8 @@ projects[select2][patch][] = contrib/allow-drag-and-dropg-on-select2-fields-even
 projects[services][patch][] = https://www.drupal.org/files/issues/2019-05-09/services-multivalue_fields_fix-2224803-78.patch
 ; Custom validation on paragraph fields.
 projects[services][patch][] = contrib/custom_validation_on_paragraph_fields.patch
+; PHP 8 fix
+projects[services][patch][] = contrib/0001-Function-signature-change-for-PHP-8.patch
 
 ;;; Services Field Collection
 ; Fix the sandbox project services_field_collection so that field collections can be created.
@@ -244,6 +276,8 @@ projects[services_field_collection][patch][] = contrib/fix_services_field_collec
 projects[tree][patch][] = contrib/make_treeable_php8_compatible.patch
 
 ;;; Views
+; Handle array in view definition
+projects[views][patch][] = contrib/0001-Handle-array-type-for-view-definition.patch
 ; Change delimiter from coma to semi-colon
 ;projects[views][patch][] = contrib/109315810-Views-Change-delimiter-from-comma-to-semi-colon.patch
 

@@ -63,17 +63,25 @@ function date_api_requirements($phase) {
 function date_api_install() {
   // Only set the message if Drupal itself is already installed.
   if (variable_get('install_task') == 'done') {
-    // Ensure translations don't break at install time.
-    $t = get_t();
-
     // date_api_set_variables can install date_timezone. The
     // date_timezone_install() function does a module_enable('date_api'). This
     // means that date_api_enable() can be called before date_api_install()
     // finishes! So the date_api schema needs to be installed before this line!
     date_api_set_variables();
 
-    $message = $t('The Date API requires that you set up the <a href="@regional_settings">site timezone and first day of week settings</a> and the <a href="@regional_date_time">date format settings</a> to function correctly.', array('@regional_settings' => url('admin/config/regional/settings'), '@regional_date_time' => url('admin/config/regional/date-time')));
-    drupal_set_message(filter_xss_admin($message), 'warning');
+    $check_timezone = variable_get('date_default_timezone', NULL);
+    $check_day = variable_get('date_first_day', NULL);
+    $check_format = variable_get('date_format_medium', NULL);
+    if (!isset($check_timezone) || !isset($check_day) || !isset($check_format)) {
+      // Ensure translations don't break at install time.
+      $t = get_t();
+
+      $message = $t('The <a href="@regional_settings">site timezone and first day of week settings</a> and the <a href="@regional_date_time">date format settings</a> must be verified to function correctly.', array(
+        '@regional_settings' => url('admin/config/regional/settings'),
+        '@regional_date_time' => url('admin/config/regional/date-time'),
+      ));
+      drupal_set_message($message, 'warning');
+    }
   }
 }
 

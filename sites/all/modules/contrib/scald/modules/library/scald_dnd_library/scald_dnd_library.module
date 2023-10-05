@@ -250,7 +250,7 @@ function theme_sdl_library_item($variables) {
 
   // Mukurtu patch to make the whole row draggable.
   $return =  "<div class='drop' draggable='TRUE' data-atom-id='" . $atom->sid . "'>";
-  $return .= "<div class='image'>{$image}</div>  
+  $return .= "<div class='image'>{$image}</div>
     <div class='meta type-" . drupal_html_class($atom->type) . " clearfix'>
     <div class='title'>{$informations->title}</div>
     <div class='author'>{$authors}</div>

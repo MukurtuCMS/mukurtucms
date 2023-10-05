@@ -149,8 +149,13 @@ function file_entity_add_upload_step_upload($form, &$form_state, array $options 
 
   $form['upload']['#description'] = t('Files must be less than !size.', array('!size' => '<strong>' . format_size($form['upload']['#upload_validators']['file_entity_validate_size_extensions'][0]) . '</strong>'));
 
+  $file_entity_max_filesize = variable_get('file_entity_max_filesize_extensions');
+  if (is_null($file_entity_max_filesize)) {
+    // PHP 8.1 does not accept NULL for a second param in explode().
+    $file_entity_max_filesize = '';
+  }
   // Get list of extensions.
-  $extensions = explode("\n", variable_get('file_entity_max_filesize_extensions'));
+  $extensions = explode("\n", $file_entity_max_filesize);
 
   if (!empty($extensions)) {
     $limits = array();
@@ -227,7 +232,12 @@ function file_entity_validate_size_extensions(stdClass $file, $file_limit = 0, $
   $current_extension = pathinfo($file->filename, PATHINFO_EXTENSION);
 
   // Get list of extensions.
-  $extensions = explode("\n", variable_get('file_entity_max_filesize_extensions'));
+  $file_entity_max_filesize = variable_get('file_entity_max_filesize_extensions');
+  if (is_null($file_entity_max_filesize)) {
+    // PHP 8.1 does not accept NULL for a second param in explode().
+    $file_entity_max_filesize = '';
+  }
+  $extensions = explode("\n", $file_entity_max_filesize);
 
   if ($extensions) {
     foreach ($extensions as $position => $text) {

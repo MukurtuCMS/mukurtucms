@@ -125,11 +125,16 @@ class date_views_filter_handler_simple extends views_handler_filter_date {
     // for consistency between the way filters and arguments work (arguments
     // cannot contain spaces).
     if (empty($input)) {
-      if (empty($this->options['exposed'])) {
-        return str_replace(' ', 'T', $this->date_default_value($prefix));
-      }
-      elseif (isset($this->options['expose']['identifier']) && !isset($_GET[$this->options['expose']['identifier']])) {
-        return str_replace(' ', 'T', $this->date_default_value($prefix));
+      if (empty($this->options['exposed'])
+          || (isset($this->options['expose']['identifier'])
+            && !isset($_GET[$this->options['expose']['identifier']]))) {
+        $prefix = $this->date_default_value($prefix);
+        if (is_null($prefix) || $prefix == '') {
+          return '';
+        }
+        else {
+          return str_replace(' ', 'T', $prefix);
+        }
       }
     }
 

@@ -17,7 +17,7 @@ class DateRepeatTestCase extends DrupalWebTestCase {
     return array(
       'name' => t('Date Repeat'),
       'description' => t('Test Date Repeat functions to create arrays of dates from iCal rules.'),
-      'group' => t('Date'),
+      'group' => 'date',
     );
   }
 

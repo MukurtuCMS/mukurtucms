@@ -316,7 +316,7 @@ function panels_panel_context_render($handler, $base_contexts, $args, $test = TR
   }
 
   // Remove and add body element classes.
-  $panel_body_css = &drupal_static('panel_body_css');
+  $panel_body_css = &drupal_static('panel_body_css', array());
 
   if (isset($handler->conf['body_classes_to_remove'])) {
     $classes = ctools_context_keyword_substitute($handler->conf['body_classes_to_remove'], array(), $contexts, array('css safe' => TRUE));

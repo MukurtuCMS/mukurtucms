@@ -335,6 +335,10 @@ function ma_dictionary_preprocess_views_view(&$vars) {
 // Interestingly, this cannot be done in the facet config, by whatever combo of Operator and "Limit to one active item"
 
 function ma_dictionary_url_outbound_alter(&$path, &$options, $original_path) {
+  if (!$path) {
+    return;
+  }
+  
   if (substr($path, 0, 11) == 'dictionary/') {
     if (substr_count($path, 'title') > 1) { // this catches first letter links adding to an existing first-letter-filtered URL
       $start_of_first_title = strpos ($path, '/title/');

@@ -132,7 +132,9 @@ class views_handler_field extends views_handler {
    *   An array of fields. The key is an identifier used to later find the field
    *   alias used. The value is either a string in which case it's assumed to be
    *   a field on this handler's table; or it's an array in the form of
-   *   @code array('table' => $tablename, 'field' => $fieldname) @endcode
+   *   @code
+   *   array('table' => $tablename, 'field' => $fieldname)
+   *   @endcode
    */
   public function add_additional_fields($fields = NULL) {
     if (!isset($fields)) {
@@ -1191,7 +1193,7 @@ If you would like to have the characters \'[\' and \']\' please use the html ent
       $value = $this->render_altered($alter, $tokens);
     }
 
-    if (!empty($this->options['alter']['trim_whitespace'])) {
+    if (!is_null($value) && !empty($this->options['alter']['trim_whitespace'])) {
       $value = trim($value);
     }
 

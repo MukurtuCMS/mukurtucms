@@ -23,7 +23,7 @@ class DateToolsTestCase extends DrupalWebTestCase {
     return array(
       'name' => 'Date Tools',
       'description' => 'Test Date Wizard and other Date Tools.',
-      'group' => 'Date',
+      'group' => 'date',
     );
   }
 
@@ -118,7 +118,7 @@ class DateToolsTestCase extends DrupalWebTestCase {
       'todate' => 'optional',
       'field_type' => 'date',
       'granularity[]' => array('year', 'month', 'day', 'hour', 'minute'),
-      'tz_handling' => 'site',
+      'tz_handling' => 'none',
       'year_range' => '2010:+2',
       'weight' => -100,
     );

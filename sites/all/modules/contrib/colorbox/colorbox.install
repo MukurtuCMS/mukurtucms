@@ -23,6 +23,8 @@ function colorbox_requirements($phase) {
 
   if ($phase == 'runtime') {
     $t = get_t();
+
+    // The colorbox library is required.
     $library = libraries_detect('colorbox');
     $error_type = isset($library['error']) ? drupal_ucfirst($library['error']) : '';
     $error_message = isset($library['error message']) ? $library['error message'] : '';
@@ -55,6 +57,58 @@ function colorbox_requirements($phase) {
         'description' => $t('You need to download a later version of the !colorbox and replace the old version located in the %path directory on your server.', array(
           '!colorbox' => l($t('Colorbox plugin'),
           $library['download url']),
+          '%path' => $library['library path'],
+        )),
+      );
+    }
+
+    // The DOMPurify library is recommended.
+    $library = libraries_detect('DOMPurify');
+    $error_type = isset($library['error']) ? drupal_ucfirst($library['error']) : '';
+    $error_message = isset($library['error message']) ? $library['error message'] : '';
+
+    if (empty($library['installed'])) {
+      if (empty(variable_get('colorbox_dompurify_hide_warning', 0))) {
+        $requirements['dompurify'] = array(
+          'title' => $t('DOMPurify library'),
+          'value' => $t('@e: At least @a', array('@e' => $error_type, '@a' => COLORBOX_DOMPURIFY_MIN_PLUGIN_VERSION)),
+          'severity' => REQUIREMENT_WARNING,
+          'description' => $t('!error The Colorbox module uses this library to sanitize HTML captions. ' .
+            'Without this library, all captions will be treated as plain text. ' .
+            'If you intend to have HTML captions in Colorbox content, ' .
+            'download the !library, extract the archive, and place the ' .
+            'DOMPurify directory in the %path directory on your server.<br /><br />' .
+            'If you do not intend to use HTML captions, you can suppress this warning on the ' .
+            '!colorbox_config_page .',
+            array(
+            '!error' => $error_message,
+            '!library' => l($t('DOMPurify library'),
+              $library['download url']),
+            '!colorbox_config_page' => l($t('Colorbox configuration page'),
+              '/admin/config/media/colorbox'),
+            '%path' => 'sites/all/libraries',
+          )),
+        );
+      }
+    }
+    elseif (version_compare($library['version'], COLORBOX_DOMPURIFY_MIN_PLUGIN_VERSION, '>=')) {
+      $requirements['dompurify'] = array(
+        'title' => $t('DOMPurify library'),
+        'severity' => REQUIREMENT_OK,
+        'value' => $library['version'],
+      );
+    }
+    else {
+      $requirements['dompurify'] = array(
+        'title' => $t('DOMPurify library'),
+        'value' => $t('At least @a', array('@a' => COLORBOX_DOMPURIFY_MIN_PLUGIN_VERSION)),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => $t('The Colorbox module uses this library to sanitize HTML captions. ' .
+          'Without this library, all captions will be treated as plain text. ' .
+          'You need to download a later version of the !library and replace the old version ' .
+          'located in the %path directory on your server.', array(
+          '!library' => l($t('DOMPurify library'),
+            $library['download url']),
           '%path' => $library['library path'],
         )),
       );

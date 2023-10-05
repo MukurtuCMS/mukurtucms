@@ -153,6 +153,9 @@ function ctools_ajax_command_submit($selector) {
  * Send an error response back via AJAX and immediately exit.
  */
 function ctools_ajax_render_error($error = '') {
+  if (!$error) {
+    $error = t('An error occurred while handling the request: The server received invalid input.');
+  }
   $commands = array();
   $commands[] = ajax_command_alert($error);
   print ajax_render($commands);

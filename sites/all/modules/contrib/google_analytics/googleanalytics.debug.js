@@ -25,21 +25,18 @@ $(document).ready(function() {
         else if (Drupal.settings.googleanalytics.trackDownload && Drupal.googleanalytics.isDownload(this.href)) {
           // Download link clicked.
           console.info("Download url '%s' has been found. Tracked download as extension '%s'.", Drupal.googleanalytics.getPageUrl(this.href), Drupal.googleanalytics.getDownloadExtension(this.href).toUpperCase());
-          ga("send", {
-            "hitType": "event",
-            "eventCategory": "Downloads",
-            "eventAction": Drupal.googleanalytics.getDownloadExtension(this.href).toUpperCase(),
-            "eventLabel": Drupal.googleanalytics.getPageUrl(this.href),
-            "transport": "beacon"
+          gtag('event', Drupal.googleanalytics.getDownloadExtension(this.href).toUpperCase(), {
+            event_category: 'Downloads',
+            event_label: Drupal.googleanalytics.getPageUrl(this.href),
+            transport_type: 'beacon'
           });
         }
         else if (Drupal.googleanalytics.isInternalSpecial(this.href)) {
           // Keep the internal URL for Google Analytics website overlay intact.
           console.info("Click on internal special link '%s' has been tracked.", Drupal.googleanalytics.getPageUrl(this.href));
-          ga("send", {
-            "hitType": "pageview",
-            "page": Drupal.googleanalytics.getPageUrl(this.href),
-            "transport": "beacon"
+          gtag('config', Drupal.settings.googleanalytics.account, {
+            page_path: Drupal.googleanalytics.getPageUrl(this.href),
+            transport_type: 'beacon'
           });
         }
         else {
@@ -51,24 +48,20 @@ $(document).ready(function() {
         if (Drupal.settings.googleanalytics.trackMailto && $(this).is("a[href^='mailto:'],area[href^='mailto:']")) {
           // Mailto link clicked.
           console.info("Click on e-mail '%s' has been tracked.", this.href.substring(7));
-          ga("send", {
-            "hitType": "event",
-            "eventCategory": "Mails",
-            "eventAction": "Click",
-            "eventLabel": this.href.substring(7),
-            "transport": "beacon"
+          gtag('event', 'Click', {
+            event_category: 'Mails',
+            event_label: this.href.substring(7),
+            transport_type: 'beacon'
           });
         }
         else if (Drupal.settings.googleanalytics.trackOutbound && this.href.match(/^\w+:\/\//i)) {
           if (Drupal.settings.googleanalytics.trackDomainMode !== 2 || (Drupal.settings.googleanalytics.trackDomainMode === 2 && !Drupal.googleanalytics.isCrossDomain(this.hostname, Drupal.settings.googleanalytics.trackCrossDomains))) {
             // External link clicked / No top-level cross domain clicked.
             console.info("Outbound link '%s' has been tracked.", this.href);
-            ga("send", {
-              "hitType": "event",
-              "eventCategory": "Outbound links",
-              "eventAction": "Click",
-              "eventLabel": this.href,
-              "transport": "beacon"
+            gtag('event', 'Click', {
+              event_category: 'Outbound links',
+              event_label: this.href,
+              transport_type: 'beacon'
             });
           }
           else {
@@ -85,9 +78,8 @@ $(document).ready(function() {
   if (Drupal.settings.googleanalytics.trackUrlFragments) {
     window.onhashchange = function() {
       console.info("Track URL '%s' as pageview. Hash '%s' has changed.", location.pathname + location.search + location.hash, location.hash);
-      ga("send", {
-        "hitType": "pageview",
-        "page": location.pathname + location.search + location.hash
+      gtag('config', Drupal.settings.googleanalytics.account, {
+        page_path: location.pathname + location.search + location.hash
       });
     };
   }
@@ -99,9 +91,8 @@ $(document).ready(function() {
       var href = $.colorbox.element().attr("href");
       if (href) {
         console.info("Colorbox transition to url '%s' has been tracked.", Drupal.googleanalytics.getPageUrl(href));
-        ga("send", {
-          "hitType": "pageview",
-          "page": Drupal.googleanalytics.getPageUrl(href)
+        gtag('config', Drupal.settings.googleanalytics.account, {
+          page_path: Drupal.googleanalytics.getPageUrl(href)
         });
       }
     });

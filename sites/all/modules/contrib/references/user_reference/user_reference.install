@@ -6,7 +6,7 @@
  */
 
 /**
- * Implements hook_field_schema();
+ * Implements hook_field_schema().
  */
 function user_reference_field_schema($field) {
   $columns = array(

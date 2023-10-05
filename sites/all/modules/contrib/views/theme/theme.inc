@@ -344,9 +344,10 @@ function template_preprocess_views_view_grouping(&$vars) {
 /**
  * Display a single views field.
  *
- * Interesting bits of info:
- * $field->field_alias says what the raw value in $row will be. Reach it like
- * this: @code { $row->{$field->field_alias} @endcode.
+ * $field->field_alias says what the raw value in $row will be, like this:
+ * @code
+ * $row->{$field->field_alias}
+ * @endcode
  */
 function theme_views_view_field($vars) {
   $view = $vars['view'];

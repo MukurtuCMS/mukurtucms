@@ -15,8 +15,8 @@ files[] = plugins/views/views_php_plugin_pager.inc
 files[] = plugins/views/views_php_plugin_query.inc
 files[] = plugins/views/views_php_plugin_wrapper.inc
 
-; Information added by Drupal.org packaging script on 2021-03-24
-version = "7.x-1.0"
+; Information added by Drupal.org packaging script on 2022-01-24
+version = "7.x-1.1"
 core = "7.x"
 project = "views_php"
-datestamp = "1616602106"
+datestamp = "1643036075"

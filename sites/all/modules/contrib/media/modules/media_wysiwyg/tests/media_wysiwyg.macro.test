@@ -10,11 +10,21 @@
  */
 abstract class MediaWYSIWYGMacroTestHelper extends MediaWYSIWYGTestHelper {
 
+  protected $admin_user = NULL;
+
   /**
    * Common setup routines for rendered media macros.
    */
   public function setUp() {
     parent::setUp(array('field_ui', 'token'));
+
+    // Work around a bug in core's token handling.
+    // @todo This is probably not a good idea.
+    // @see https://www.drupal.org/project/metatag/issues/3271006
+    // @see https://www.drupal.org/project/drupal/issues/1173706
+    $instance = field_read_instance('node', 'field_image', 'article');
+    $instance['settings']['file_directory'] = 'field/image';
+    field_update_instance($instance);
 
     // Create and log in a user.
     $this->admin_user = $this->drupalCreateUser(array(
@@ -166,6 +176,12 @@ class MediaWYSIWYGWYSIWYGOverridesTest extends MediaWYSIWYGMacroTestHelper {
     $instance = field_read_instance('file', 'field_file_image_title_text', 'image');
     $instance['display']['preview']['type'] = 'text_default';
     $instance['display']['preview']['module'] = 'text';
+    // Work around a bug in core's token handling.
+    // @todo This is probably not a good idea.
+    // @see https://www.drupal.org/project/metatag/issues/3271006
+    // @see https://www.drupal.org/project/metatag/issues/3272112
+    // @see https://www.drupal.org/project/drupal/issues/1173706
+    $instance['settings']['file_directory'] = 'field/image';
     field_update_instance($instance);
 
     $files = $this->drupalGetTestFiles('image');

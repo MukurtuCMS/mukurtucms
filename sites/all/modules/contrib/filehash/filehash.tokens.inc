@@ -11,18 +11,18 @@
 function filehash_token_info() {
   $info = array();
   $names = filehash_names();
-  foreach (filehash_algos() as $algo) {
-    $info['tokens']['file']["filehash-$algo"] = array(
-      'name' => t('@algo hash', array('@algo' => $names[$algo])),
-      'description' => t('The @algo hash of the file.', array('@algo' => $names[$algo])),
+  foreach (filehash_columns() as $column) {
+    $info['tokens']['file']["filehash-$column"] = array(
+      'name' => t('@algo hash', array('@algo' => $names[$column])),
+      'description' => t('The @algo hash of the file.', array('@algo' => $names[$column])),
     );
-    $info['tokens']['file']["filehash-$algo-pair-1"] = array(
-      'name' => t('@algo hash: Initial pair', array('@algo' => $names[$algo])),
-      'description' => t('The @algo hash of the file: first and second characters.', array('@algo' => $names[$algo])),
+    $info['tokens']['file']["filehash-$column-pair-1"] = array(
+      'name' => t('@algo hash: Initial pair', array('@algo' => $names[$column])),
+      'description' => t('The @algo hash of the file: first and second characters.', array('@algo' => $names[$column])),
     );
-    $info['tokens']['file']["filehash-$algo-pair-2"] = array(
-      'name' => t('@algo hash: Second pair', array('@algo' => $names[$algo])),
-      'description' => t('The @algo hash of the file: third and fourth characters.', array('@algo' => $names[$algo])),
+    $info['tokens']['file']["filehash-$column-pair-2"] = array(
+      'name' => t('@algo hash: Second pair', array('@algo' => $names[$column])),
+      'description' => t('The @algo hash of the file: third and fourth characters.', array('@algo' => $names[$column])),
     );
   }
   return $info;
@@ -34,24 +34,24 @@ function filehash_token_info() {
 function filehash_tokens($type, $tokens, array $data = array(), array $options = array()) {
   $replacements = array();
   if ($type == 'file' && !empty($data['file'])) {
-    foreach (filehash_algos() as $algo) {
+    foreach (filehash_algos() as $column => $algo) {
       // Generate the file hash if it is needed but does not yet exist.
-      if (empty($data['file']->filehash[$algo])) {
+      if (empty($data['file']->filehash[$column])) {
         foreach ($tokens as $name => $original) {
-          if (strpos($name, "filehash-$algo") === 0) {
-            $data['file']->filehash[$algo] = hash_file($algo, $data['file']->uri);
+          if (strpos($name, "filehash-$column") === 0) {
+            $data['file']->filehash[$column] = filehash_hash($algo, $data['file']->uri) ?: NULL;
             break;
           }
         }
       }
-      if (isset($tokens["filehash-$algo"])) {
-        $replacements[$tokens["filehash-$algo"]] = $data['file']->filehash[$algo];
+      if (isset($tokens["filehash-$column"])) {
+        $replacements[$tokens["filehash-$column"]] = $data['file']->filehash[$column];
       }
-      if (isset($tokens["filehash-$algo-pair-1"])) {
-        $replacements[$tokens["filehash-$algo-pair-1"]] = substr($data['file']->filehash[$algo], 0, 2);
+      if (isset($tokens["filehash-$column-pair-1"])) {
+        $replacements[$tokens["filehash-$column-pair-1"]] = substr($data['file']->filehash[$column], 0, 2);
       }
-      if (isset($tokens["filehash-$algo-pair-2"])) {
-        $replacements[$tokens["filehash-$algo-pair-2"]] = substr($data['file']->filehash[$algo], 2, 2);
+      if (isset($tokens["filehash-$column-pair-2"])) {
+        $replacements[$tokens["filehash-$column-pair-2"]] = substr($data['file']->filehash[$column], 2, 2);
       }
     }
   }

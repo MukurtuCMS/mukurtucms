@@ -1,4 +1,4 @@
-# Mukurtu CMS 3.0.4
+# Mukurtu CMS 3.0.5
 ### [Release Notes](VERSION.md)
 
 ## Contents
@@ -45,7 +45,7 @@ To install on your own server, please find system requirements and installation 
 
 ##### <a name="system-requirements"></a>System Requirements
 * A web server that supports PHP, such as Apache
-* [PHP](http://www.php.net/) version 7.4
+* [PHP](http://www.php.net/). Note: If using PHP 8, it is recommended to disable deprecation warnings in `error_reporting`.
 * A database server such as [MySQL 5.0.15 (or higher)](http://www.mysql.com/) or [MariaDb 5.1.44 (or higher)](https://mariadb.org/)
 
 ##### <a name="installation"></a>Installation

@@ -6,8 +6,10 @@ archive.org to wikileaks.org, allow files to be uniquely identified, allow
 duplicate files to be detected, and allow copies to be verified against the
 original source.
 
-File Hash module generates and stores MD5, SHA-1 and/or SHA-256 hashes for each
-file uploaded to the site.
+File Hash module generates and stores BLAKE2b-128, BLAKE2b-160, BLAKE2b-224,
+BLAKE2b-256, BLAKE2b-384, BLAKE2b-512, MD5, SHA-1, SHA-224, SHA-256, SHA-384,
+SHA-512/224, SHA-512/256, SHA-512, SHA3-224, SHA3-256, SHA3-384 and/or
+SHA3-512 hashes for each file uploaded to the site.
 
 Hash algorithms can be enabled and disabled by the site administrator.
 
@@ -31,3 +33,6 @@ A checkbox in File Hash settings allows duplicate uploaded files to be rejected.
 This feature should be considered a proof-of-concept - you likely want better UX
 for such a feature. Note, in Drupal 7, empty files are not considered duplicate
 files, as such "files" may represent remote media assets, etc.
+
+If you want to use the BLAKE2b hash algorithm, either the Sodium PHP extension
+or paragonie/sodium_compat polyfill are required.

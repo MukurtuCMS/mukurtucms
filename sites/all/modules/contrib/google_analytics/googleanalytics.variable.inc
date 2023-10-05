@@ -13,7 +13,7 @@ function googleanalytics_variable_info($options) {
     'type' => 'string',
     'title' => t('Web Property ID', array(), $options),
     'default' => 'UA-',
-    'description' => t('This ID is unique to each site you want to track separately, and is in the form of UA-xxxxxxx-yy. To get a Web Property ID, <a href="@analytics">register your site with Google Analytics</a>, or if you already have registered your site, go to your Google Analytics Settings page to see the ID next to every site profile. <a href="@webpropertyid">Find more information in the documentation</a>.', array('@analytics' => 'https://marketingplatform.google.com/about/analytics/', '@webpropertyid' => url('https://developers.google.com/analytics/resources/concepts/gaConceptsAccounts', array('fragment' => 'webProperty'))), $options),
+    'description' => t('This ID is unique to each site you want to track separately, and is in the form UA-xxxxxxx-yy, G-XXXXXXX, DC-XXXXXXX, or AW-XXXXXXX. To get a Web Property ID, <a href="@analytics">register your site with Google Analytics</a>, or if you already have registered your site, go to your Google Analytics Settings page to see the ID next to every site profile. <a href="@webpropertyid">Find more information in the documentation</a>.', array('@analytics' => 'https://marketingplatform.google.com/about/analytics/', '@webpropertyid' => url('https://developers.google.com/analytics/resources/concepts/gaConceptsAccounts', array('fragment' => 'webProperty'))), $options),
     'required' => TRUE,
     'group' => 'googleanalytics',
     'localize' => TRUE,
@@ -49,7 +49,7 @@ function googleanalytics_validate_googleanalytics_account($variable) {
   // Replace all type of dashes (n-dash, m-dash, minus) with the normal dashes.
   $variable['value'] = str_replace(array('–', '—', '−'), '-', $variable['value']);
 
-  if (!preg_match('/^UA-\d+-\d+$/', $variable['value'])) {
-    return t('A valid Google Analytics Web Property ID is case sensitive and formatted like UA-xxxxxxx-yy.');
+  if (!_google_analytics_valid_property_id($variable['value'])) {
+    return t('A valid Web Property ID is case sensitive and formatted like UA-xxxxxxx-yy, G-XXXXXXX, DC-XXXXXXX, or AW-XXXXXXX.');
   }
 }

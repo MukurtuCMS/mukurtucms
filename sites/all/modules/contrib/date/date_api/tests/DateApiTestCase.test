@@ -17,7 +17,7 @@ class DateApiTestCase extends DrupalWebTestCase {
     return array(
       'name' => t('Date API'),
       'description' => t('Test Date API functions.'),
-      'group' => t('Date'),
+      'group' => 'date',
     );
   }
 
