@@ -18,10 +18,10 @@ function filehash_views_data() {
   );
   // Use a nice human-readable name for each hash algorithm.
   $names = filehash_names();
-  foreach (filehash_algos() as $algo) {
-    $data['filehash'][$algo] = array(
-      'title' => t('@algo hash', array('@algo' => $names[$algo])),
-      'help' => t('The @algo hash of the file.', array('@algo' => $names[$algo])),
+  foreach (filehash_columns() as $column) {
+    $data['filehash'][$column] = array(
+      'title' => t('@algo hash', array('@algo' => $names[$column])),
+      'help' => t('The @algo hash of the file.', array('@algo' => $names[$column])),
       'field' => array(
         'click sortable' => TRUE,
       ),
@@ -36,5 +36,22 @@ function filehash_views_data() {
       ),
     );
   }
+  $data['filehash']['timestamp'] = array(
+    'title' => t('Hash date'),
+    'help' => t('The date the file hash was generated.'),
+    'field' => array(
+      'handler' => 'views_handler_field_date',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_date',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_date',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort_date',
+    ),
+  );
   return $data;
 }

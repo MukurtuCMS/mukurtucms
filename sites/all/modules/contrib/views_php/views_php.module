@@ -41,7 +41,7 @@ function views_php_check_access($php_access, $view_name, $display_id, $account =
 /**
  * Helper function; builds form for PHP code options of views handlers/plugins.
  */
-function views_php_form_element($handler, $checkbox = FALSE, $input, $variables = array()) {
+function views_php_form_element($handler, $checkbox, $input, $variables = array()) {
   static $default_variables;
   if (!isset($default_variables)) {
     $default_variables = array(
@@ -156,7 +156,7 @@ function views_php_views_post_execute($view) {
  */
 function views_php_views_post_build($view) {
   // Clear the limit and offset.
-  if (!empty($view->views_php) && !empty($view->build_info['query']) && is_object($view->build_info['query'])) {
+  if (!empty($view->views_php) && !empty($view->views_php_query_all) && !empty($view->build_info['query']) && is_object($view->build_info['query'])) {
     $view->build_info['query']->range();
   }
 }

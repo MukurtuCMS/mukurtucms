@@ -33,7 +33,7 @@
           $('.panels-add-content-modal .panels-section-columns .content-type-button').show();
         }
       }
-    }
+    };
     // Use timeout to reduce the iteration over the DOM tree.
     input_field.bind('keyup.AddContentModalQuickFilter', jQuery.proxy(function(e){
       var filter = $(this).data.panelsAddContentModalQuickFilter;

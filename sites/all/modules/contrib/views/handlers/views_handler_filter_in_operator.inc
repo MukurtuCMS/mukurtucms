@@ -15,6 +15,7 @@
  *
  * @ingroup views_filter_handlers
  */
+#[\AllowDynamicProperties]
 class views_handler_filter_in_operator extends views_handler_filter {
 
   /**

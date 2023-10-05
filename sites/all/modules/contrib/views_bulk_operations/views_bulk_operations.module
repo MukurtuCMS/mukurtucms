@@ -115,7 +115,7 @@ function views_bulk_operations_views_api() {
 function views_bulk_operations_theme() {
   $themes = array(
     'views_bulk_operations_select_all' => array(
-      'variables' => array('view' => NULL, 'enable_select_all_pages' => TRUE),
+      'variables' => array('view' => NULL, 'enable_select_all_pages' => TRUE, 'enable_select_this_page' => TRUE),
     ),
     'views_bulk_operations_confirmation' => array(
       'variables' => array('rows' => NULL, 'vbo' => NULL, 'operation' => NULL, 'select_all_pages' => FALSE),
@@ -396,6 +396,7 @@ function views_bulk_operations_views_post_build(&$view) {
 function theme_views_bulk_operations_select_all($variables) {
   $view = $variables['view'];
   $enable_select_all_pages = $variables['enable_select_all_pages'];
+  $enable_select_this_page = $variables['enable_select_this_page'];
   $form = array();
 
   if ($view->style_plugin instanceof views_plugin_style_table && empty($view->style_plugin->options['grouping'])) {
@@ -416,33 +417,41 @@ function theme_views_bulk_operations_select_all($variables) {
       '#prefix' => '<span class="vbo-table-this-page">' . $this_page . ' &nbsp;',
       '#suffix' => '</span>',
     );
-    $form['select_this_page'] = array(
-      '#type' => 'button',
-      '#attributes' => array('class' => array('vbo-table-select-this-page')),
-      '#value' => t('Select only !row_count in this page.', array('!row_count' => $this_page_count)),
-      '#prefix' => '<span class="vbo-table-all-pages" style="display: none">' . $all_pages . ' &nbsp;',
-      '#suffix' => '</span>',
-    );
+    if ($enable_select_this_page) {
+      $form['select_this_page'] = array(
+        '#type' => 'button',
+        '#attributes' => array('class' => array('vbo-table-select-this-page')),
+        '#value' => t('Select only !row_count in this page.', array('!row_count' => $this_page_count)),
+        '#prefix' => '<span class="vbo-table-all-pages" style="display: none">' . $all_pages . ' &nbsp;',
+        '#suffix' => '</span>',
+      );
+    }
   }
   else {
     $wrapper_class = 'vbo-select-all-markup';
 
-    $form['select_all'] = array(
-      '#type' => 'fieldset',
-      '#attributes' => array('class' => array('vbo-fieldset-select-all')),
-    );
-    $form['select_all']['this_page'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Select all items on this page'),
-      '#default_value' => '',
-      '#attributes' => array('class' => array('vbo-select-this-page')),
-    );
+    if ($enable_select_all_pages || $enable_select_this_page) {
+      $form['select_all'] = array(
+        '#type' => 'fieldset',
+        '#attributes' => array('class' => array('vbo-fieldset-select-all')),
+      );
+    }
+    if ($enable_select_this_page) {
+      $form['select_all']['this_page'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Select all items on this page'),
+        '#default_value' => '',
+        '#attributes' => array('class' => array('vbo-select-this-page')),
+      );
+    }
 
-    if ($enable_select_all_pages) {
+    if ($enable_select_all_pages && $enable_select_this_page) {
       $form['select_all']['or'] = array(
         '#type' => 'markup',
         '#markup' => '<em>' . t('OR') . '</em>',
       );
+    }
+    if ($enable_select_all_pages) {
       $form['select_all']['all_pages'] = array(
         '#type' => 'checkbox',
         '#title' => t('Select all items on all pages'),
@@ -542,9 +551,10 @@ function views_bulk_operations_form($form, &$form_state, $vbo) {
     if (isset($vbo->view->total_rows) && count($vbo->view->result) != $vbo->view->total_rows && $vbo->get_vbo_option('enable_select_all_pages')) {
       $enable_select_all_pages = TRUE;
     }
+    $enable_select_this_page = $vbo->get_vbo_option('enable_select_this_page');
     $form['select_all_markup'] = array(
       '#type' => 'markup',
-      '#markup' => theme('views_bulk_operations_select_all', array('view' => $vbo->view, 'enable_select_all_pages' => $enable_select_all_pages)),
+      '#markup' => theme('views_bulk_operations_select_all', array('view' => $vbo->view, 'enable_select_all_pages' => $enable_select_all_pages, 'enable_select_this_page' => $enable_select_this_page)),
     );
   }
 
@@ -754,7 +764,7 @@ function views_bulk_operations_form_submit($form, &$form_state) {
 
   // Redirect.
   $query = drupal_get_query_parameters($_GET, array('q'));
-  $form_state['redirect'] = array('path' => $vbo->view->get_url(), array('query' => $query));
+  $form_state['redirect'] = array($vbo->view->get_url(), array('query' => $query));
 }
 
 /**

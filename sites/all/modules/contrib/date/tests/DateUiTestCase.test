@@ -17,7 +17,7 @@ class DateUiTestCase extends DateFieldTestBase {
     return array(
       'name' => 'Field UI',
       'description' => 'Test creation of various date fields and widgets using Field UI.',
-      'group' => 'Date',
+      'group' => 'date',
     );
   }
 

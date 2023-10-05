@@ -354,7 +354,7 @@ class panels_renderer_editor extends panels_renderer_standard {
       );
     }
 
-    if (user_access('administer panels styles')) {
+    if (user_access('administer panels pane styles')) {
       $links['style'] = $this->get_style_links('pane', $pane->pid);
     }
 

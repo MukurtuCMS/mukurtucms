@@ -14,6 +14,7 @@
  * Also includes the member functions to build the view query, execute the
  * query and render the output.
  */
+#[\AllowDynamicProperties]
 class view extends views_db_object {
 
   /**
@@ -2220,6 +2221,7 @@ class view extends views_db_object {
 /**
  * Base class for views' database objects.
  */
+#[\AllowDynamicProperties]
 class views_db_object {
 
   public $db_table;
@@ -2626,6 +2628,7 @@ class views_db_object {
  * This is just the database storage mechanism, and isn't terribly important
  * to the behavior of the display at all.
  */
+#[\AllowDynamicProperties]
 class views_display extends views_db_object {
 
   /**

@@ -8,6 +8,7 @@
 /**
  *
  */
+#[\AllowDynamicProperties]
 abstract class ViewsTestCase extends DrupalWebTestCase {
 
   /**

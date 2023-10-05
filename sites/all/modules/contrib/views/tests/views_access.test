@@ -8,6 +8,7 @@
 /**
  * Basic test for pluggable access.
  */
+#[\AllowDynamicProperties]
 class ViewsAccessTest extends ViewsSqlTest {
   public static function getInfo() {
     return array(

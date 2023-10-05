@@ -9,6 +9,8 @@
  * Test Date (ISO) and the Entity Metadata Wrappers play well together.
  */
 class DateEmwTestCase extends DrupalWebTestCase {
+  public $privileged_user = NULL;
+  public $date_types = NULL;
 
   /**
    * Info about this test.
@@ -17,7 +19,7 @@ class DateEmwTestCase extends DrupalWebTestCase {
     return array(
       'name' => 'Date Entity Metadata Wrappers',
       'description' => 'Ensure default timezone setting in metadata wrapper integration is working as expected.',
-      'group' => 'Date',
+      'group' => 'date',
       'dependencies' => array('entity'),
     );
   }

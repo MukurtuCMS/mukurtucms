@@ -830,7 +830,7 @@ function _mee_process_item_value(&$item, $entity_type, $entity, $field, $delta) 
   // Finally, if there was unknown client-side problem, we might not have new
   // inserted resources. We set default value for them.
   foreach ($sids as $sid) {
-    if (!isset($item['mee']['resource_manager'][$sid])) {
+    if (is_array($item['mee']['resource_manager']) && !isset($item['mee']['resource_manager'][$sid])) {
       $item['mee']['resource_manager'][$sid] = array('required' => FALSE, 'weight' => 0);
     }
   }
@@ -855,7 +855,9 @@ function _mee_load_resources($entity_type, $entity, $field, $delta, &$item) {
       ->execute();
   $item['mee']['resource_manager'] = array();
   $item['mee']['resource_manager'] = $result->fetchAllAssoc('atom_sid', PDO::FETCH_ASSOC);
-  $item['mee']['resource_manager'][0] = array('weight' => 0, 'required' => FALSE);
+  if (is_array($item['mee']['resource_manager']) && isset($item['mee']['resource_manager'][0])) {
+    $item['mee']['resource_manager'][0] = array('weight' => 0, 'required' => FALSE);
+  }
 }
 
 /**

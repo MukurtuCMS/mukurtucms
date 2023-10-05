@@ -10,6 +10,7 @@
  *
  * @ingroup views_argument_handlers
  */
+#[\AllowDynamicProperties]
 class views_handler_argument_locale_group extends views_handler_argument {
 
   /**

@@ -51,7 +51,14 @@ function panels_requirements_install() {
 function panels_schema() {
   // This should always point to our 'current' schema. This makes it relatively
   // easy to keep a record of schema as we make changes to it.
-  return panels_schema_9();
+  return panels_schema_10();
+}
+
+function panels_schema_10() {
+  $schema = panels_schema_9();
+  // Add primary key to panels_allowed_types table.
+  $schema['panels_allowed_types']['primary key'] = array('module', 'type');
+  return $schema;
 }
 
 function panels_schema_9() {
@@ -677,4 +684,11 @@ function panels_update_7308() {
   foreach (array_keys(user_roles(TRUE, 'administer panels styles')) as $rid) {
     user_role_grant_permissions($rid, $permissions);
   }
+}
+
+/**
+ * Add primary key to panels_allowed_types table.
+ */
+function panels_update_7309() {
+  db_add_primary_key('panels_allowed_types', array('module', 'type'));
 }

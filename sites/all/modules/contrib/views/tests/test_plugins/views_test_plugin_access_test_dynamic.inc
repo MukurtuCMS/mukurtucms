@@ -8,6 +8,7 @@
 /**
  * Tests a dynamic access plugin.
  */
+#[\AllowDynamicProperties]
 class views_test_plugin_access_test_dynamic extends views_plugin_access {
 
   /**

@@ -18,8 +18,8 @@ files[] = tests/PanelsNodeViewWebTestCase.test
 files[] = tests/PanelsTermViewWebTestCase.test
 files[] = tests/PanelsUserViewWebTestCase.test
 
-; Information added by Drupal.org packaging script on 2020-07-05
-version = "7.x-3.10"
+; Information added by Drupal.org packaging script on 2022-11-16
+version = "7.x-3.11"
 core = "7.x"
 project = "panels"
-datestamp = "1593990788"
+datestamp = "1668588142"

@@ -96,7 +96,8 @@ function ckeditor_user_customize(&$form, &$form_state, $form_id) {
       '#title' => t('Auto-detect language'),
       '#default_value' => isset($data['ckeditor_auto_lang']) ? $data['ckeditor_auto_lang'] : $default['auto_lang'],
       '#options' => array(
-        't' => t('Yes'),
+        't' => t('Yes (browser language)'),
+        'd' => t('Yes (Drupal language)'),
         'f' => t('No')
       ),
       '#description' => t('Automatically detect the user language.')

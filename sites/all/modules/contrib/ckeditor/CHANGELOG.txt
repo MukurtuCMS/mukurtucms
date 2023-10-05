@@ -1,6 +1,12 @@
 7.x-1.x-dev
 Development snapshot
 
+2023-03-23
+New stable release: 7.x-1.23
+
+[#1203846] by soulfroys, StephenN, martichka5, caiosba, vokiel: CKEditor interface language does not use $user->language variable
+[#3349695] by longwave: Update CKEditor 4 to 4.21.0
+
 2021-11-22
 New stable release: 7.x-1.22
 

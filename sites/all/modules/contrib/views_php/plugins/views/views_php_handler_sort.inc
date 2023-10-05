@@ -48,6 +48,7 @@ class views_php_handler_sort extends views_handler_sort {
   public function query() {
     // Inform views_php_views_pre_execute() to seize control over the query.
     $this->view->views_php = TRUE;
+    $this->view->views_php_query_all = TRUE;
   }
 
   /**

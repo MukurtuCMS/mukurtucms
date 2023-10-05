@@ -74,7 +74,7 @@ function og_context_entity_property_info() {
  *   $group = $wrapper->og_context__node->value();
  * @endcode
  */
-function og_context_get_properties($data = array(), array $options, $name, $type) {
+function og_context_get_properties($data, array $options, $name, $type) {
   // Get the entity type form the property name.
   $group_type = str_replace('og_context__', '', $name);
   if ($context = og_context($group_type)) {

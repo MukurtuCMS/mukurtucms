@@ -17,7 +17,7 @@ class DateFormTestCase extends DrupalWebTestCase {
     return array(
       'name' => t('Date Form test'),
       'description' => t('Test Date form functions.'),
-      'group' => t('Date'),
+      'group' => 'date',
     );
   }
 

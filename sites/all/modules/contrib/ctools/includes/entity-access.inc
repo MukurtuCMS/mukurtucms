@@ -99,7 +99,7 @@ function ctools_metadata_no_hook_node_access($op, $node = NULL, $account = NULL)
 /**
  * Access callback for the user entity.
  */
-function ctools_metadata_user_access($op, $entity = NULL, $account = NULL, $entity_type) {
+function ctools_metadata_user_access($op, $entity, $account , $entity_type) {
   $account = isset($account) ? $account : $GLOBALS['user'];
   // Grant access to the users own user account and to the anonymous one.
   if (isset($entity) && $op != 'delete' && (($entity->uid == $account->uid && $entity->uid) || (!$entity->uid && $op == 'view'))) {
@@ -143,7 +143,8 @@ function ctools_metadata_comment_access($op, $entity = NULL, $account = NULL) {
 /**
  * Access callback for the taxonomy entities.
  */
-function ctools_metadata_taxonomy_access($op, $entity = NULL, $account = NULL, $entity_type) {
+function ctools_metadata_taxonomy_access($op, $entity, $account, $entity_type) {
+
   if ($entity_type == 'taxonomy_vocabulary') {
     return user_access('administer taxonomy', $account);
   }

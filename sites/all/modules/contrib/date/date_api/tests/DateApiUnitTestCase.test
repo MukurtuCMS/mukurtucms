@@ -17,7 +17,7 @@ class DateApiUnitTestCase extends DrupalUnitTestCase {
     return array(
       'name' => t('Date API unit tests'),
       'description' => t('Unit test coverage for Date API functions.'),
-      'group' => t('Date'),
+      'group' => 'date',
     );
   }
 

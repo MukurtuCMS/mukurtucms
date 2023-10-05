@@ -1,3 +1,53 @@
+Date 7.x-2.14, 2023-01-14
+-------------------------
+#2898235 by DamienMcKenna, veugenio, photuris5, drumm: Improved test coverage
+  for timezone handling.
+#3328051 by joseph.olstad, Liam Morland: PHP 8.2 - Fix deprecated dynamic
+  properties.
+#3204114 by DamienMcKenna, Darren Oh, steinmb, jwilson3, webservant316, ron_s,
+  arnoldbird, sadashiv: Date field validation broken after update to 7.x-2.11.
+#2581013 by energee, TLWatson, Francewhoa, Pardip Kumar, DamienMcKenna,
+  Nikhilesh Gupta, imclean, Anybody, tregismoreira, davidwhthomas, jwilson3:
+  Collect end date required toggle is disabled after data entry.
+#2572213 by lwalley, DamienMcKenna, frodri: Unable to set class attributes using
+  preprocess functions for date display themes.
+#2909166 by sakiland, DamienMcKenna: Diff configuration for Date fields.
+#3219052 by steinmb, DamienMcKenna: Minor clean up in date_admin.inc.
+#2503301 by emmonsaz, DamienMcKenna: Conditional warning on install.
+#2907007 by hkirsman, DamienMcKenna: Remove html from date nav if there's no
+  content.
+#2716659 by extqy, DamienMcKenna: Entity Metadata Wrappers doesn't set correctly
+  the value when the entity is translatable, and the field is not.
+
+
+Date 7.x-2.13, 2022-08-04
+-------------------------
+#1762120 by DamienMcKenna: Change field timezone handling default to no
+  conversion.
+#3241762 by DamienMcKenna: Remove date value caching.
+#2779769 by DamienMcKenna, CoderBrandon: Time zone handling for Site's time zone
+  settings incorrectly sets tz to user's.
+#3253233 by Mulambo, DamienMcKenna, Liam Morland, poker10: Deprecated function:
+  changing return type (ReturnTypeWillChange).
+#3271049 by sudheeshps, DamienMcKenna: PHP 8 compatibility - required function
+  arguments after optional ones.
+#3270570 by Natallia Kazarynava, DamienMcKenna, steinmb: PHP 8 compatibility:
+  warnings during static code analysis using phan.
+#3264795 by DamienMcKenna, Liam Morland, poker10: str_replace(): Passing null
+  deprecated.
+#3248357 by danwonac, solideogloria, DamienMcKenna: date_popup time broken after
+  updating to 7.x-3.0-alpha1.
+#3159420 by solideogloria, DamienMcKenna: Fatal error: Date theme functions
+  passing invalid attributes to theme().
+#2570697 by harsha012, DamienMcKenna, JParkinson1991, jasom, Vinay15: Allow a
+  generic placeholder to be added.
+#3273734 by DamienMcKenna: Verify rdf functions exist before using them.
+#3276288 by DamienMcKenna: Change test group to "date" to make running all
+  tests easier.
+#3276311 by DamienMcKenna: Test coverage for Date Repeat Field submodule.
+#3276851 by DamienMcKenna: Test coverage for field timezone conversion.
+
+
 Date 7.x-2.12, 2021-10-07
 -------------------------
 No changes since 7.x-2.12-rc1.

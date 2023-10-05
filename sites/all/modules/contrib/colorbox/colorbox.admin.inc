@@ -14,7 +14,8 @@ function colorbox_admin_settings() {
   $img_folder_path = $base_url . '/' . $module_path . '/images/admin';
   drupal_add_js($module_path . '/js/colorbox_admin_settings.js', array('preprocess' => FALSE));
 
-  $library = libraries_detect('colorbox');
+  $library_colorbox = libraries_detect('colorbox');
+  $library_dompurify = libraries_detect('DOMPurify');
 
   if (module_exists('insert')) {
     $form['colorbox_insert_module'] = array(
@@ -56,6 +57,52 @@ function colorbox_admin_settings() {
     '#description' => t('<a href="https://www.drupal.org/files/druplicon-small.png" class="colorbox">This</a> enables custom links that can open inline content in a Colorbox. Add the class "colorbox-inline" to the link and build the url like this "?width=500&height=500&inline=true#id-of-content". Other modules may activate this for easy Colorbox integration.'),
   );
 
+  $form['colorbox_dompurify'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('DOMPurify Library'),
+  );
+
+  $dompurify_message = t('The DOMPurify library is installed. ' .
+    'This library will sanitize HTML in Colorbox captions.');
+  if (empty($library_dompurify['installed'])) {
+    $dompurify_message = t('The <a href="!dompurify_link">DOMPurify</a> ' .
+      'library is not installed. ' .
+      'This library is necessary if you want to use HTML in Colorbox captions. ' .
+      'Without it, all captions will be treated as plain text.',
+       array(
+         '!dompurify_link' => 'https://github.com/cure53/DOMPurify',
+       )
+    );
+  }
+  elseif (version_compare($library_dompurify['version'], COLORBOX_DOMPURIFY_MIN_PLUGIN_VERSION, '<')) {
+    $dompurify_message = t('The installed version of the <a href="!dompurify_link">DOMPurify</a> ' .
+      'library is below the minimum version of ' . COLORBOX_DOMPURIFY_MIN_PLUGIN_VERSION . '. ' .
+      'Please upgrade this library if you want to use HTML in Colorbox captions. ' .
+      'Without it, all captions will be treated as plain text.',
+      array(
+        '!dompurify_link' => 'https://github.com/cure53/DOMPurify',
+      )
+    );
+  }
+
+  $form['colorbox_dompurify']['dompurify_message'] = array(
+    '#type' => 'markup',
+    '#prefix' => '<p>',
+    '#suffix' => '</p>',
+    '#markup' => $dompurify_message,
+  );
+
+  if (empty($library_dompurify['installed'])) {
+    $form['colorbox_dompurify']['colorbox_dompurify_hide_warning'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Don\'t show warning on status report'),
+      '#default_value' => variable_get('colorbox_dompurify_hide_warning', 0),
+      '#description' => t('By default, a warning appears on Drupal\'s ' .
+        'status report if this library is missing. Check this box to ' .
+        'suppress the warning.'),
+    );
+  }
+
   $form['colorbox_custom_settings'] = array(
     '#type' => 'fieldset',
     '#title' => t('Styles and options'),
@@ -64,11 +111,11 @@ function colorbox_admin_settings() {
     'default' => t('Default'),
     'plain' => t('Plain (mainly for images)'),
     'stockholmsyndrome' => t('Stockholm Syndrome'),
-    $library['library path'] . '/example1' => t('Example 1'),
-    $library['library path'] . '/example2' => t('Example 2'),
-    $library['library path'] . '/example3' => t('Example 3'),
-    $library['library path'] . '/example4' => t('Example 4'),
-    $library['library path'] . '/example5' => t('Example 5'),
+    $library_colorbox['library path'] . '/example1' => t('Example 1'),
+    $library_colorbox['library path'] . '/example2' => t('Example 2'),
+    $library_colorbox['library path'] . '/example3' => t('Example 3'),
+    $library_colorbox['library path'] . '/example4' => t('Example 4'),
+    $library_colorbox['library path'] . '/example5' => t('Example 5'),
     'none' => t('None'),
   );
   $form['colorbox_custom_settings']['colorbox_style'] = array(

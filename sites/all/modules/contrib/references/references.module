@@ -25,7 +25,7 @@ function reference_autocomplete_access($entity_type, $bundle, $field_name, $enti
 function references_init() {
   // Include feeds.module integration.
   if (module_exists('feeds')) {
-    module_load_include('inc','references','references.feeds');
+    module_load_include('inc', 'references', 'references.feeds');
   }
 }
 
@@ -94,12 +94,15 @@ function references_views_plugins() {
 }
 
 /**
- * Retrieves the list of views with a 'references' display, in a format suitable for a 'select' form element..
+ * Get Views Options.
  *
- * @param $entity_type
+ * Retrieves the list of views with a 'references' display, in a format suitable
+ * for a 'select' form element..
+ *
+ * @param string $entity_type
  *   The entity type.
  *
- * @return
+ * @return array
  *   An array of eligible views displays.
  */
 function references_get_views_options($entity_type) {
@@ -114,7 +117,7 @@ function references_get_views_options($entity_type) {
   foreach ($displays as $data) {
     list($view, $display_id) = $data;
     if ($view->base_table == $entity_info['base table']) {
-      $options[$view->name . ':' . $display_id] = $view->name .' - ' . $view->display[$display_id]->display_title;
+      $options[$view->name . ':' . $display_id] = $view->name . ' - ' . $view->display[$display_id]->display_title;
     }
   }
 
@@ -124,29 +127,32 @@ function references_get_views_options($entity_type) {
 /**
  * Retrieves an array of candidate referenceable entities, defined by a view.
  *
- * @param $entity_type
+ * @param string $entity_type
  *   The entity type.
- * @param $view_name
+ * @param string $view_name
  *   The name of the view.
- * @param $display_name
+ * @param string $display_name
  *   The name of the view's display. This has to be a 'References' display.
- * @param $args
+ * @param array $args
  *   The array of arguments ("contextual filters") for the view.
- * @param $options
+ * @param array $options
  *   Array of options to limit the scope of the returned list. This parameter
  *   is similar to the $options parameter for
  *   node_reference_potential_references(). An additional key is required:
  *   - title_field: the name of the column holding entities 'titles' within the
  *     entity base table.
  *
- * @return
+ * @return array
  *   An array of entities, in the format expected by
  *   node_reference_potential_references().
  *
  * @see node_reference_potential_references()
  * @see _node_reference_potential_references_views()
+ *
+ * @codingStandardsIgnoreStart
  */
 function references_potential_references_view($entity_type, $view_name, $display_name, $args, $options) {
+  // @codingStandardsIgnoreEnd
   $entity_info = entity_get_info($entity_type);
 
   // Check that the view is valid and the display still exists.
@@ -157,7 +163,7 @@ function references_potential_references_view($entity_type, $view_name, $display
 
   // If we have no access to the View an empty result should be returned to
   // avoid triggering the fallback results.
-  if  (!$view->access(array($display_name))) {
+  if (!$view->access(array($display_name))) {
     return array();
   }
 
@@ -173,7 +179,6 @@ function references_potential_references_view($entity_type, $view_name, $display
   // the style setting.
   // We might also need to check if there's an argument, and set its
   // style_plugin as well.
-
   // Set additional options to let references_plugin_display::query() narrow
   // the results.
   $references_options = array(
@@ -194,15 +199,30 @@ function references_potential_references_view($entity_type, $view_name, $display
     $view->add_item($display_name, 'field', $entity_info['base table'], $options['title_field'], $label_options);
   }
 
-  // Limit result set size.
-  $limit = !empty($options['limit']) ? $options['limit'] : 0;
-  $view->display_handler->set_option('pager', array('type' => 'some', 'options' => array('items_per_page' => $limit)));
-
-  // Make sure the query is not cached
+  // Make sure the query is not cached.
   $view->is_cacheable = FALSE;
 
   // Get the results.
   $results = $view->execute_display($display_name, $args);
 
   return $results;
+}
+
+/**
+ * Implements hook_help().
+ */
+function references_help($path, $arg) {
+
+  switch ($path) {
+    case 'admin/help#references':
+      $output = '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('The References project contains straight ports of the node_reference and user_reference modules to the Drupal 7 API.') . '</p>';
+      $output .= '<h3>' . t('Usage') . '</h3>';
+      $output .= '<ul>';
+      $output .= '<li>' . t('Access: Structure » Content types and edit one Content type.') . '</li>';
+      $output .= '<li>' . t('Go to Manage Fields and add new field with field type = "Node Reference" or "User Reference".') . '</li>';
+      $output .= '<li>' . t('Access onde with this type and see new field with reference.') . '</li>';
+      $output .= '</ul>';
+      return $output;
+  }
 }

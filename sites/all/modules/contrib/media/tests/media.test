@@ -324,6 +324,11 @@ class MediaElementTestCase extends MediaFileFieldTestCase {
  * Test media file administration page functionality.
  */
 class MediaAdminTestCase extends MediaFileFieldTestCase {
+  protected $base_user_1 = NULL;
+  protected $base_user_2 = NULL;
+  protected $base_user_3 = NULL;
+  protected $base_user_4 = NULL;
+
   public static function getInfo() {
     return array(
       'name' => 'Media file administration',
@@ -515,6 +520,10 @@ class MediaHooksTestCase extends MediaFileFieldTestCase {
  * Tests the media browser 'Library' tab.
  */
 class MediaBrowserLibraryTestCase extends MediaFileFieldTestCase {
+  protected $base_user_1 = NULL;
+  protected $base_user_2 = NULL;
+  protected $base_user_3 = NULL;
+
   public static function getInfo() {
     return array(
       'name' => 'Media browser library test',
@@ -782,6 +791,10 @@ class MediaBrowserSettingsTestCase extends MediaFileFieldTestCase {
  * Tests the media browser 'My files' tab.
  */
 class MediaBrowserMyFilesTestCase extends MediaFileFieldTestCase {
+  protected $base_user_1 = NULL;
+  protected $base_user_2 = NULL;
+  protected $base_user_3 = NULL;
+
   public static function getInfo() {
     return array(
       'name' => 'Media browser my files test',
@@ -996,7 +1009,7 @@ class MediaElementSettingsTestCase extends MediaFileFieldTestCase {
               'schemes' => array(
                 'public' => 'public',
               ),
-              'file_directory' => '',
+              'file_directory' => '[date:custom:Y]-[date:custom:m]',
               'file_extensions' => 'txt',
               'max_filesize' => '',
               'uri_scheme' => 'public',

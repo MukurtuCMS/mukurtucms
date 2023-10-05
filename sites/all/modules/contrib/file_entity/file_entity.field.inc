@@ -354,10 +354,13 @@ function file_entity_field_formatter_view($entity_type, $entity, $field, $instan
 
   switch ($display['type']) {
     case 'file_rendered':
+      // A file entity page view (/file/[fid]) may not have a value on the $field['field_name'] key
+      // @see https://www.drupal.org/project/file_entity/issues/3175010
+      $has_referencing_field = isset($field['field_name']) ? TRUE : FALSE;
       foreach ($items as $delta => $item) {
         if (!empty($item)) {
           // The repeat-rendering protection may be disabled if necessary.
-          if (variable_get('file_entity_protect_repeated_render', TRUE)) {
+          if (variable_get('file_entity_protect_repeated_render', TRUE) && $has_referencing_field) {
             // Protect ourselves from repeated rendering.
             static $repeated_render_depth = array();
             list($entity_id) = entity_extract_ids($entity_type, $entity);
@@ -396,7 +399,7 @@ function file_entity_field_formatter_view($entity_type, $entity, $field, $instan
           // @see https://www.drupal.org/node/2333107
           $file->referencing_entity = $entity;
           $file->referencing_entity_type = $entity_type;
-          $file->referencing_field = $field['field_name'];
+          $file->referencing_field = $has_referencing_field ? $field['field_name'] : '';
 
           // Prevent recursion by checking if the referencing entity is itself
           // do not display it again (return an empty array).
@@ -424,6 +427,7 @@ function file_entity_field_formatter_view($entity_type, $entity, $field, $instan
           );
         }
       }
+
       break;
 
     case 'file_download_link':

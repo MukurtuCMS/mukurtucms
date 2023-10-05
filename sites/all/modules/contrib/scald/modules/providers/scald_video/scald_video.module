@@ -184,7 +184,7 @@ function scald_video_form_scald_atom_add_form_options_alter(&$form, &$form_state
   else {
     $atoms = $form_state['scald']['atoms'];
   }
-
+ 
   // Set one atom's form options. This can be called multiple times in case
   // a multifile field is used.
   foreach ($atoms as $key => $atom) {
@@ -281,7 +281,7 @@ function scald_video_form_scald_atom_add_form_options_submit($form, &$form_state
  * Returns a video file form element compatible with plupload.
  * This function avoid repetitions over the multiple places
  * a file upload field is needed in scald_video.
- *
+ * 
  * @param $form_element
  *   The form element we want to set to video file field.
  *

@@ -17,7 +17,7 @@ class DateMigrateTestCase extends DrupalWebTestCase {
     return array(
       'name' => 'Date Migration',
       'description' => 'Test migration into date fields.',
-      'group' => 'Date',
+      'group' => 'date',
       'dependencies' => array('migrate', 'features'),
     );
   }

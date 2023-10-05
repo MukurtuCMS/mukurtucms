@@ -226,10 +226,8 @@ function license_menu() {
 
 // Form to customize the TK Label text
 function license_custom_tk_label_text_form ($form, &$form_state) {
-
-  $form['#prefix'] = "<label>Tick a TK label's checkbox to customize its text. Hover over the label to see its default (non-customized) text.</label>";
-
   $form = array_merge ($form, license_custom_tk_label_form_shared());
+  $form['tk_label_export_link']['#prefix'] = "<label>Tick a TK label's checkbox to customize its text. Hover over the label to see its default (non-customized) text.</label>";
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -253,7 +251,18 @@ function license_custom_tk_label_form_shared($community_nid = NULL) {
     'expand' => 'bottom-right',
   );
 
-  
+  $message = [];
+  $message[] = t('The TK Labels are an initiative for <strong>Indigenous communities</strong>. TK Labels allow communities to express local and specific conditions for content consistent with already existing community rules, governance and protocols for using, sharing, and circulating knowledge.');
+  $message[] = t('Customized TK Label text can be included in Mukurtu CMS. To develop customized TK Labels, you will need to use the <a href="@url">Local Contexts Hub</a> which allows community control over customization and delivery to institutions, data repositories and other organizations. Upcoming versions of Mukurtu will support closer integration with the Local Contexts Hub, use of the Local Contexts Hub will be required, and manual entry of customized TK Label text in Mukurtu sites will not be possible.', ['@url' => 'https://localcontextshub.org/']);
+  $message[] = t('Traditional Knowledge and Biocultural Labels, Notices and Template Text ©2015-2023 Local Contexts. All Rights Reserved.');
+
+  $form['usage_message'] = [
+    '#type' => 'item',
+    '#markup' => "<div class=\"lc-usage-message\"><p>{$message[0]}</p>
+    <p>{$message[1]}</p> 
+    <p>{$message[2]}</p><br></div>"
+  ];
+
   // Export link
   $form['tk_label_export_link'] = array(
     '#type' => 'item',

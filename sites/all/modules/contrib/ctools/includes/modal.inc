@@ -15,6 +15,7 @@
  *   ctools_include('modal');
  *   ctools_modal_add_js();
  * }
+ * @endcode
  *
  * You can have links and buttons bound to use the modal by adding the
  * class ctools-use-modal.
