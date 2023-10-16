@@ -676,7 +676,6 @@ function mukurtu_splash_block_site_config() {
         'href' => '/admin/reports/migration/summary',
         'localized_options' => [
           'attributes' => ['class' => ['opic-dashboard-content', 'overlay-exclude']],
-          'query' => drupal_get_destination(),
         ],
         'description' => t("A reporting listing any steps needed to prepare your site for migration to Mukurtu CMS v4."),
       ];
