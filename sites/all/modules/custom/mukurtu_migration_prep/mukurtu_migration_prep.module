@@ -188,6 +188,11 @@ function mukurtu_migration_prep_report_unsupported_text_formats_batch_process(&$
   }
 
   $unique_nids = [];
+  $node_batch_query = db_select('node', 'n')
+    ->fields('n', ['nid'])
+    ->range($context['sandbox']['progress'], $context['sandbox']['progress'] + 50);
+  $result = $node_batch_query->execute()->fetchAllAssoc('nid');
+  $batch_nids = array_keys($result);
 
   // Loop through text fields and find nodes with the markdown format.
   foreach ($context['sandbox']['text_fields'] as $table_name => $field_name) {
@@ -196,7 +201,8 @@ function mukurtu_migration_prep_report_unsupported_text_formats_batch_process(&$
     $query = db_select($table_name, 'f')
       ->fields('f', ['entity_id'])
       ->condition($format_column_name, ['markdown', 'ds_code'], 'IN')
-      ->range(0, 50);
+      ->condition('entity_type', 'node')
+      ->condition('entity_id', $batch_nids, 'IN');
 
     $result = $query->execute();
 
@@ -206,10 +212,12 @@ function mukurtu_migration_prep_report_unsupported_text_formats_batch_process(&$
   }
 
   $context['results']['nids'] = array_keys($unique_nids);
-  $context['sandbox']['progress'] += count($unique_nids);
+  $context['sandbox']['progress'] += 50;
 
-  if ($context['sandbox']['progress'] != $context['sandbox']['max']) {
+  if ($context['sandbox']['progress'] < $context['sandbox']['max']) {
     $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
+  } else {
+    $context['finished'] = 1;
   }
 }
 
