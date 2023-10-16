@@ -27,7 +27,9 @@ function ma_dictionary_field_group_info() {
       2 => 'field_collection_summary',
       3 => 'field_description',
       4 => 'field_tags',
-      5 => 'title',
+      5 => 'field_item_privacy_setting',
+      6 => 'og_group_ref',
+      7 => 'title',
     ),
     'format_settings' => array(
       'formatter' => 'open',
@@ -178,8 +180,8 @@ function ma_dictionary_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'children' => array(
-      0 => 'group_word_list_relations',
-      1 => 'group_basic',
+      0 => 'group_basic',
+      1 => 'group_word_list_relations',
       2 => 'group_words',
     ),
     'format_settings' => array(

@@ -622,6 +622,7 @@ function _ma_cultural_protocol_get_node_types_in_cps() {
     'optional' => [
       'collection',
       'dictionary_word',
+      'word_list',
     ],
     'required' => [
       'digital_heritage',
