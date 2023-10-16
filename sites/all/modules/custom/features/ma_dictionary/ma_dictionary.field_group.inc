@@ -27,7 +27,9 @@ function ma_dictionary_field_group_info() {
       2 => 'field_collection_summary',
       3 => 'field_description',
       4 => 'field_tags',
-      5 => 'title',
+      5 => 'field_item_privacy_setting',
+      6 => 'og_group_ref',
+      7 => 'title',
     ),
     'format_settings' => array(
       'formatter' => 'open',
@@ -59,7 +61,8 @@ function ma_dictionary_field_group_info() {
       1 => 'field_dictionary_word_language',
       2 => 'field_tags',
       3 => 'field_word_entry',
-      4 => 'title',
+      4 => 'field_additional_media_assets',
+      5 => 'title',
     ),
     'format_settings' => array(
       'formatter' => 'open',
@@ -88,11 +91,11 @@ function ma_dictionary_field_group_info() {
   $field_group->data = array(
     'children' => array(
       0 => 'field_item_privacy_setting',
-      1 => 'field_word_list',
-      2 => 'og_group_ref',
-      3 => 'field_collection',
-      4 => 'field_personal_collections',
-      5 => 'field_related_content',
+      1 => 'field_related_content',
+      2 => 'field_word_list',
+      3 => 'og_group_ref',
+      4 => 'field_collection',
+      5 => 'field_personal_collections',
     ),
     'format_settings' => array(
       'formatter' => 'open',
@@ -177,8 +180,8 @@ function ma_dictionary_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'children' => array(
-      0 => 'group_word_list_relations',
-      1 => 'group_basic',
+      0 => 'group_basic',
+      1 => 'group_word_list_relations',
       2 => 'group_words',
     ),
     'format_settings' => array(

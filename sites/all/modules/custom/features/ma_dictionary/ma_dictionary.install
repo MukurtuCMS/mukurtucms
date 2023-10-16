@@ -59,3 +59,10 @@ function ma_dictionary_update_7001(&$sandbox) {
     node_save($node);
   }
 }
+
+/**
+ * Revert the Dictionary feature to add the new Additional Media Assets field.
+ */
+function ma_dictionary_update_7002(&$sandbox) {
+  features_revert_module('ma_dictionary');
+}
