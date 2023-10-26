@@ -17,6 +17,7 @@ $handler->display->display_options['access']['type'] = 'perm';
 $handler->display->display_options['cache']['type'] = 'none';
 $handler->display->display_options['query']['type'] = 'views_query';
 $handler->display->display_options['exposed_form']['type'] = 'basic';
+$handler->display->display_options['exposed_form']['options']['reset_button'] = TRUE;
 $handler->display->display_options['pager']['type'] = 'full';
 $handler->display->display_options['pager']['options']['items_per_page'] = '20';
 $handler->display->display_options['style_plugin'] = 'table';
@@ -88,6 +89,18 @@ $handler->display->display_options['filters']['type']['value'] = array(
   'word_list' => 'word_list',
 );
 $handler->display->display_options['filters']['type']['group'] = 1;
+/* Filter criterion: Content: Type */
+$handler->display->display_options['filters']['type_1']['id'] = 'type_1';
+$handler->display->display_options['filters']['type_1']['table'] = 'node';
+$handler->display->display_options['filters']['type_1']['field'] = 'type';
+$handler->display->display_options['filters']['type_1']['exposed'] = TRUE;
+$handler->display->display_options['filters']['type_1']['expose']['operator_id'] = 'type_1_op';
+$handler->display->display_options['filters']['type_1']['expose']['label'] = 'Type';
+$handler->display->display_options['filters']['type_1']['expose']['operator'] = 'type_1_op';
+$handler->display->display_options['filters']['type_1']['expose']['identifier'] = 'type_1';
+$handler->display->display_options['filters']['type_1']['expose']['remember_roles'] = array(
+  2 => '2',
+);
 
 /* Display: Page */
 $handler = $view->new_display('page', 'Page', 'page');

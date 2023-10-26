@@ -18,6 +18,7 @@ $handler->display->display_options['access']['perm'] = 'edit own atom';
 $handler->display->display_options['cache']['type'] = 'none';
 $handler->display->display_options['query']['type'] = 'views_query';
 $handler->display->display_options['exposed_form']['type'] = 'basic';
+$handler->display->display_options['exposed_form']['options']['reset_button'] = TRUE;
 $handler->display->display_options['pager']['type'] = 'full';
 $handler->display->display_options['pager']['options']['items_per_page'] = '20';
 $handler->display->display_options['style_plugin'] = 'table';
@@ -123,6 +124,18 @@ $handler->display->display_options['filters']['field_scald_protocol_target_id'][
 $handler->display->display_options['filters']['field_scald_protocol_target_id']['table'] = 'field_data_field_scald_protocol';
 $handler->display->display_options['filters']['field_scald_protocol_target_id']['field'] = 'field_scald_protocol_target_id';
 $handler->display->display_options['filters']['field_scald_protocol_target_id']['operator'] = 'empty';
+/* Filter criterion: Atom: Type */
+$handler->display->display_options['filters']['type']['id'] = 'type';
+$handler->display->display_options['filters']['type']['table'] = 'scald_atoms';
+$handler->display->display_options['filters']['type']['field'] = 'type';
+$handler->display->display_options['filters']['type']['exposed'] = TRUE;
+$handler->display->display_options['filters']['type']['expose']['operator_id'] = 'type_op';
+$handler->display->display_options['filters']['type']['expose']['label'] = 'Type';
+$handler->display->display_options['filters']['type']['expose']['operator'] = 'type_op';
+$handler->display->display_options['filters']['type']['expose']['identifier'] = 'type';
+$handler->display->display_options['filters']['type']['expose']['remember_roles'] = array(
+  2 => '2',
+);
 
 /* Display: Page */
 $handler = $view->new_display('page', 'Page', 'page');
