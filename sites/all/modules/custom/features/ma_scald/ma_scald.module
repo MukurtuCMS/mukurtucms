@@ -1160,6 +1160,11 @@ function ma_scald_duplicate_content_protocol_action(&$atom, &$context) {
   // Get entities referencing the atom.
   $refs = ma_scald_get_atom_references($atom, FALSE);
 
+  // Remove paragraph references, we don't care about them in this context.
+  if (isset($refs['paragraphs_item'])) {
+    unset($refs['paragraphs_item']);
+  }
+
   // We are only acting in the case where a single node contains it.
   $types = array_keys($refs);
 
