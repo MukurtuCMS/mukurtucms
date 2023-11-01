@@ -28,7 +28,9 @@ function ma_person_field_group_info() {
       3 => 'field_media_asset',
       4 => 'field_sections',
       5 => 'field_tags',
-      6 => 'title',
+      6 => 'og_group_ref',
+      7 => 'field_item_privacy_setting',
+      8 => 'title',
     ),
     'format_settings' => array(
       'formatter' => 'open',
@@ -183,8 +185,8 @@ function ma_person_field_group_info() {
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
     'children' => array(
-      0 => 'field_related_people',
-      1 => 'field_related_content',
+      0 => 'field_related_content',
+      1 => 'field_related_people',
       2 => 'field_collection',
       3 => 'field_personal_collections',
     ),
