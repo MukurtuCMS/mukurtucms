@@ -1,0 +1,104 @@
+<?php
+
+/**
+ * @file
+ * Test extended functionality as provided by Ctools.
+ */
+
+/**
+ * Class for testing CTools' extended functionality.
+ */
+class BmTestCtools extends BmTestBase {
+
+  /**
+   * Define this test class.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'CTools tests',
+      'description' => 'Test integration with the CTools module.',
+      'group' => 'backup_migrate',
+      'dependencies' => array('ctools'),
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    $modules[] = 'bm_test';
+    $modules[] = 'ctools';
+
+    parent::setUp($modules);
+
+    // Log in as user 1, so that permissions are irrelevant.
+    $this->loginUser1();
+  }
+
+  /**
+   * Confirm automated settings exist.
+   */
+  public function testSettingsPage() {
+    // Load the B&M Settings page.
+    $this->drupalGet(BACKUP_MIGRATE_MENU_PATH . '/settings');
+    $this->assertResponse(200);
+
+    // Does the mock schedule exist?
+    $this->assertText('Mock weekly database schedule');
+
+    // Does the mock source exist?
+    $this->assertText('Mock file directory');
+
+    // Does the mock destination exist?
+    $this->assertText('Mock e-mail destination');
+
+    // Load the B&M Schedule page.
+    $this->drupalGet(BACKUP_MIGRATE_MENU_PATH . '/schedule');
+    $this->assertResponse(200);
+
+    // Does the mock schedule exist?
+    $this->assertText('Mock weekly database schedule');
+
+    // Does the mock schedule contain the appropriate values?
+    $this->drupalGet(BACKUP_MIGRATE_MENU_PATH . '/schedule/edit/mock_db_weekly');
+    $this->assertResponse(200);
+
+    $fields = _bm_test_get_mock_schedule();
+
+    // @todo Deal with periods, but now I need sleep.
+    // See the get_frequency_period() method in includes/schedules.inc.
+    unset($fields['period']);
+
+    // Test the destination selection with its own assertion.
+    $this->assertOptionSelected('edit-destination-id', $fields['destination_id']);
+    unset($fields['destination_id']);
+
+    foreach ($fields as $key => $field) {
+      $id = 'edit-' . str_replace('_', '-', $key);
+      $this->assertFieldById($id, $field, 'Found field by id "' . $id . '" and value "' . $field . '".');
+    }
+
+    // Does the mock source contain the appropriate values?
+    $this->drupalGet(BACKUP_MIGRATE_MENU_PATH . '/settings/source/edit/mock_file_directory');
+    $this->assertResponse(200);
+
+    $fields = _bm_test_get_mock_source();
+    unset($fields['subtype']);
+    foreach ($fields as $key => $field) {
+      $id = 'edit-' . str_replace('_', '-', $key);
+      $this->assertFieldById($id, $field, 'Found field by id "' . $id . '" and value "' . $field . '".');
+    }
+
+    // Does the mock destination contain the appropriate values?
+    $this->drupalGet(BACKUP_MIGRATE_MENU_PATH . '/settings/destination/edit/mock_email');
+    $this->assertResponse(200);
+
+    $fields = _bm_test_get_mock_destination();
+    unset($fields['subtype']);
+    foreach ($fields as $key => $field) {
+      $id = 'edit-' . str_replace('_', '-', $key);
+      $this->assertFieldById($id, $field, 'Found field by id "' . $id . '" and value "' . $field . '".');
+    }
+  }
+
+}

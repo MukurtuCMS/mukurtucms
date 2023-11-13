@@ -1,0 +1,63 @@
+.oa_visibility_toolbar {
+  margin: 0;
+  margin-top: 10px;
+}
+.oa_visibility_toolbar .dropdown-menu {
+  min-width: 22em;
+  font-size: 12px;
+}
+
+#contextual-tabs .oa_visibility_toolbar {
+  margin-top: 0px;
+  padding: 0;
+}
+.pull-right .oa_visibility_toolbar {
+  margin-right: 5px;
+}
+.pull-left .oa_visibility_toolbar {
+  margin-left: 5px;
+}
+.oa-visibility-private {
+  min-width: 150px;
+  font-size: 16px;
+  text-align: center;
+  color: white;
+  background-color: #CF696B;
+  border: 2px solid #b85652;
+  padding: 5px;
+}
+.oa-visibility-private i {
+  font-size: 24px;
+  padding-right: 10px;
+  line-height: 5px;
+  color: #B33D3E;
+}
+.oa-visibility-public {
+  min-width: 150px;
+  font-size: 16px;
+  text-align: center;
+  color: #1D3800;
+  background-color: #EEFFE5;
+  border: 1px solid #BDFF99;
+  padding: 5px;
+}
+.oa-visibility-header {
+  background-color: #F2F2F2;
+  margin: 1em 0 0.25em 0;
+  padding: 3px 10px;
+}
+.oa-visibility-list {
+  padding: 0 10px;
+}
+.oa_powered_link {
+  display: inline-block;
+  background: url("openatrium-powered.png") no-repeat 105px 0px;
+  width: 231px;
+  height: 53px;
+  padding: 27px 10px 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.oa_powered_link:hover {
+  text-decoration: none;
+}

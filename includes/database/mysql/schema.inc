@@ -39,8 +39,8 @@ class DatabaseSchema_mysql extends DatabaseSchema {
       $info['table'] = substr($table, ++$pos);
     }
     else {
-      $db_info = Database::getConnectionInfo();
-      $info['database'] = $db_info[$this->connection->getTarget()]['database'];
+      $db_info = $this->connection->getConnectionOptions();
+      $info['database'] = $db_info['database'];
       $info['table'] = $table;
     }
     return $info;
@@ -56,6 +56,11 @@ class DatabaseSchema_mysql extends DatabaseSchema {
    */
   protected function buildTableNameCondition($table_name, $operator = '=', $add_prefix = TRUE) {
     $info = $this->connection->getConnectionOptions();
+
+    // Ensure the table name is not surrounded with quotes as that is not
+    // appropriate for schema queries.
+    $quote_char = variable_get('mysql_identifier_quote_character', MYSQL_IDENTIFIER_QUOTE_CHARACTER_DEFAULT);
+    $table_name = str_replace($quote_char, '', $table_name);
 
     $table_info = $this->getPrefixInfo($table_name, $add_prefix);
 
@@ -81,7 +86,8 @@ class DatabaseSchema_mysql extends DatabaseSchema {
     // Provide defaults if needed.
     $table += array(
       'mysql_engine' => 'InnoDB',
-      'mysql_character_set' => 'utf8',
+      // Allow the default charset to be overridden in settings.php.
+      'mysql_character_set' => $this->connection->utf8mb4IsActive() ? 'utf8mb4' : 'utf8',
     );
 
     $sql = "CREATE TABLE {" . $name . "} (\n";
@@ -107,6 +113,13 @@ class DatabaseSchema_mysql extends DatabaseSchema {
     // @see DatabaseConnection_mysql
     if (!empty($info['collation'])) {
       $sql .= ' COLLATE ' . $info['collation'];
+    }
+
+    // The row format needs to be either DYNAMIC or COMPRESSED in order to allow
+    // for the innodb_large_prefix setting to take effect, see
+    // https://dev.mysql.com/doc/refman/5.6/en/create-table.html
+    if ($this->connection->utf8mb4IsActive()) {
+      $sql .= ' ROW_FORMAT=DYNAMIC';
     }
 
     // Add table comment.
@@ -486,11 +499,11 @@ class DatabaseSchema_mysql extends DatabaseSchema {
       $condition->condition('column_name', $column);
       $condition->compile($this->connection, $this);
       // Don't use {} around information_schema.columns table.
-      return $this->connection->query("SELECT column_comment FROM information_schema.columns WHERE " . (string) $condition, $condition->arguments())->fetchField();
+      return $this->connection->query("SELECT column_comment AS column_comment FROM information_schema.columns WHERE " . (string) $condition, $condition->arguments())->fetchField();
     }
     $condition->compile($this->connection, $this);
     // Don't use {} around information_schema.tables table.
-    $comment = $this->connection->query("SELECT table_comment FROM information_schema.tables WHERE " . (string) $condition, $condition->arguments())->fetchField();
+    $comment = $this->connection->query("SELECT table_comment AS table_comment FROM information_schema.tables WHERE " . (string) $condition, $condition->arguments())->fetchField();
     // Work-around for MySQL 5.0 bug http://bugs.mysql.com/bug.php?id=11379
     return preg_replace('/; InnoDB free:.*$/', '', $comment);
   }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_scald.strongarm.inc
@@ -88,6 +89,39 @@ function ma_scald_strongarm() {
       'mukurtu_scald_media_assets_edit_' => array(
         'custom_settings' => FALSE,
       ),
+      'mukurtu_scald_dictionary_media' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_scald_recording' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_featured_content' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_scald_taxonomy_thumbnail' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_browse_by_grid' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_browse_by_grid_7_4' => array(
+        'custom_settings' => FALSE,
+      ),
+      'taxonomy_record_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_scald_tiny_thumbnail' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_multi_page_carousel' => array(
+        'custom_settings' => TRUE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -95,7 +129,7 @@ function ma_scald_strongarm() {
           'weight' => '0',
         ),
         'redirect' => array(
-          'weight' => '6',
+          'weight' => '8',
         ),
       ),
       'display' => array(
@@ -109,12 +143,36 @@ function ma_scald_strongarm() {
             'visible' => TRUE,
           ),
           'ma_scald_search_results' => array(
-            'weight' => '0',
+            'weight' => '1',
             'visible' => TRUE,
           ),
           'mukurtu_scald_related_items' => array(
             'weight' => '0',
             'visible' => TRUE,
+          ),
+          'mukurtu_scald_dictionary_media' => array(
+            'weight' => '1',
+            'visible' => TRUE,
+          ),
+          'mukurtu_scald_recording' => array(
+            'weight' => '0',
+            'visible' => TRUE,
+          ),
+          'mukurtu_scald_media_assets_edit_' => array(
+            'weight' => '0',
+            'visible' => TRUE,
+          ),
+          'mukurtu_featured_content' => array(
+            'weight' => '1',
+            'visible' => TRUE,
+          ),
+          'mukurtu_carousel_thumbnail' => array(
+            'weight' => '1',
+            'visible' => FALSE,
+          ),
+          'mukurtu_multi_page_carousel' => array(
+            'weight' => '1',
+            'visible' => FALSE,
           ),
         ),
       ),
@@ -158,6 +216,39 @@ function ma_scald_strongarm() {
       'mukurtu_scald_media_assets_edit_' => array(
         'custom_settings' => FALSE,
       ),
+      'mukurtu_scald_dictionary_media' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_featured_content' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_scald_recording' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_scald_taxonomy_thumbnail' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_browse_by_grid' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_browse_by_grid_7_4' => array(
+        'custom_settings' => FALSE,
+      ),
+      'taxonomy_record_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_scald_tiny_thumbnail' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_multi_page_carousel' => array(
+        'custom_settings' => TRUE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -165,7 +256,7 @@ function ma_scald_strongarm() {
           'weight' => '0',
         ),
         'redirect' => array(
-          'weight' => '7',
+          'weight' => '9',
         ),
       ),
       'display' => array(
@@ -179,12 +270,28 @@ function ma_scald_strongarm() {
             'visible' => TRUE,
           ),
           'ma_scald_search_results' => array(
-            'weight' => '0',
-            'visible' => TRUE,
+            'weight' => '1',
+            'visible' => FALSE,
           ),
           'mukurtu_scald_related_items' => array(
             'weight' => '0',
             'visible' => TRUE,
+          ),
+          'mukurtu_scald_dictionary_media' => array(
+            'weight' => '1',
+            'visible' => TRUE,
+          ),
+          'mukurtu_featured_content' => array(
+            'weight' => '2',
+            'visible' => FALSE,
+          ),
+          'mukurtu_carousel_thumbnail' => array(
+            'weight' => '1',
+            'visible' => FALSE,
+          ),
+          'mukurtu_multi_page_carousel' => array(
+            'weight' => '1',
+            'visible' => FALSE,
           ),
         ),
       ),
@@ -231,6 +338,39 @@ function ma_scald_strongarm() {
       'mukurtu_scald_media_assets_edit_' => array(
         'custom_settings' => FALSE,
       ),
+      'mukurtu_scald_dictionary_media' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_scald_taxonomy_thumbnail' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_scald_recording' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_featured_content' => array(
+        'custom_settings' => TRUE,
+      ),
+      'taxonomy_record_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_browse_by_grid' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_browse_by_grid_7_4' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_scald_tiny_thumbnail' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_multi_page_carousel' => array(
+        'custom_settings' => TRUE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -238,13 +378,13 @@ function ma_scald_strongarm() {
           'weight' => '0',
         ),
         'redirect' => array(
-          'weight' => '19',
+          'weight' => '18',
         ),
       ),
       'display' => array(
         'atom' => array(
           'default' => array(
-            'weight' => '0',
+            'weight' => '3',
             'visible' => FALSE,
           ),
           'ma_dh_assets' => array(
@@ -252,7 +392,7 @@ function ma_scald_strongarm() {
             'visible' => FALSE,
           ),
           'ma_colorbox' => array(
-            'weight' => '5',
+            'weight' => '6',
             'visible' => FALSE,
           ),
           'ma_scald_search_results' => array(
@@ -270,6 +410,38 @@ function ma_scald_strongarm() {
           'mukurtu_scald_related_items' => array(
             'weight' => '0',
             'visible' => TRUE,
+          ),
+          'mukurtu_scald_dictionary_media' => array(
+            'weight' => '1',
+            'visible' => FALSE,
+          ),
+          'mukurtu_scald_taxonomy_thumbnail' => array(
+            'weight' => '0',
+            'visible' => FALSE,
+          ),
+          'mukurtu_featured_content' => array(
+            'weight' => '3',
+            'visible' => FALSE,
+          ),
+          'mukurtu_browse_by_grid' => array(
+            'weight' => '3',
+            'visible' => FALSE,
+          ),
+          'mukurtu_browse_by_grid_7_4' => array(
+            'weight' => '3',
+            'visible' => FALSE,
+          ),
+          'mukurtu_scald_tiny_thumbnail' => array(
+            'weight' => '3',
+            'visible' => FALSE,
+          ),
+          'mukurtu_carousel_thumbnail' => array(
+            'weight' => '3',
+            'visible' => FALSE,
+          ),
+          'mukurtu_multi_page_carousel' => array(
+            'weight' => '3',
+            'visible' => FALSE,
           ),
         ),
       ),
@@ -313,6 +485,39 @@ function ma_scald_strongarm() {
       'mukurtu_scald_media_assets_edit_' => array(
         'custom_settings' => FALSE,
       ),
+      'mukurtu_scald_dictionary_media' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_scald_recording' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_scald_taxonomy_thumbnail' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_featured_content' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_browse_by_grid' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_browse_by_grid_7_4' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_scald_tiny_thumbnail' => array(
+        'custom_settings' => FALSE,
+      ),
+      'taxonomy_record_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_multi_page_carousel' => array(
+        'custom_settings' => TRUE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -320,7 +525,7 @@ function ma_scald_strongarm() {
           'weight' => '0',
         ),
         'redirect' => array(
-          'weight' => '6',
+          'weight' => '7',
         ),
       ),
       'display' => array(
@@ -340,6 +545,18 @@ function ma_scald_strongarm() {
           'mukurtu_scald_related_items' => array(
             'weight' => '0',
             'visible' => TRUE,
+          ),
+          'mukurtu_scald_dictionary_media' => array(
+            'weight' => '0',
+            'visible' => TRUE,
+          ),
+          'mukurtu_carousel_thumbnail' => array(
+            'weight' => '1',
+            'visible' => FALSE,
+          ),
+          'mukurtu_multi_page_carousel' => array(
+            'weight' => '1',
+            'visible' => FALSE,
           ),
         ),
       ),
@@ -371,6 +588,20 @@ function ma_scald_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_taxonomy_term_scald_authors_pattern';
+  $strongarm->value = '';
+  $export['pathauto_taxonomy_term_scald_authors_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_taxonomy_term_scald_tags_pattern';
+  $strongarm->value = '';
+  $export['pathauto_taxonomy_term_scald_tags_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'scald_actions_powers';
   $strongarm->value = array(
     'fetch' => 0,
@@ -393,7 +624,7 @@ function ma_scald_strongarm() {
   $strongarm->name = 'scald_atom_defaults';
   $strongarm->value = array(
     'video' => (object) array(
-      'actions' => 7,
+      'actions' => 15,
       'upload_type' => 'plupload',
       'description' => '',
       'thumbnail_source' => 'public://atoms/video.png',
@@ -402,19 +633,19 @@ function ma_scald_strongarm() {
       'thumbnail_source' => 'public://atoms/image.png',
       'description' => '',
       'upload_type' => 'plupload',
-      'actions' => 7,
+      'actions' => 15,
     ),
     'audio' => (object) array(
       'thumbnail_source' => 'public://atoms/audio.png',
       'description' => '',
       'upload_type' => 'plupload',
-      'actions' => 7,
+      'actions' => 15,
     ),
     'file' => (object) array(
       'thumbnail_source' => 'public://atoms/thumbnail_default.png',
       'description' => '',
       'upload_type' => 'plupload',
-      'actions' => 7,
+      'actions' => 15,
     ),
   );
   $export['scald_atom_defaults'] = $strongarm;
@@ -487,6 +718,80 @@ function ma_scald_strongarm() {
     'mukurtu_scald_related_items' => array(
       'name' => 'mukurtu_scald_related_items',
       'title' => 'Mukurtu Scald Related Items',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
+    ),
+    'mukurtu_scald_dictionary_media' => array(
+      'name' => 'mukurtu_scald_dictionary_media',
+      'title' => 'Mukurtu Scald Dictionary Media',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
+    ),
+    'mukurtu_scald_recording' => array(
+      'name' => 'mukurtu_scald_recording',
+      'title' => 'Mukurtu Scald Recording',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
+      'provider' => 'scald',
+    ),
+    'mukurtu_scald_taxonomy_thumbnail' => array(
+      'name' => 'mukurtu_scald_taxonomy_thumbnail',
+      'title' => 'Mukurtu Scald Taxonomy Thumbnail',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
+      'provider' => 'scald',
+    ),
+    'mukurtu_featured_content' => array(
+      'name' => 'mukurtu_featured_content',
+      'title' => 'Mukurtu Featured Content',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
+    ),
+    'mukurtu_browse_by_grid' => array(
+      'name' => 'mukurtu_browse_by_grid',
+      'title' => 'Mukurtu Browse By Grid',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
+    ),
+    'mukurtu_browse_by_grid_7_4' => array(
+      'name' => 'mukurtu_browse_by_grid_7_4',
+      'title' => 'Mukurtu Browse By Grid 7:4',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
+    ),
+    'mukurtu_scald_tiny_thumbnail' => array(
+      'name' => 'mukurtu_scald_tiny_thumbnail',
+      'title' => 'Mukurtu Scald Tiny Thumbnail',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
+    ),
+    'mukurtu_carousel_thumbnail' => array(
+      'name' => 'mukurtu_carousel_thumbnail',
+      'title' => 'Mukurtu Carousel Thumbnail',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
+    ),
+    'mukurtu_multi_page_carousel' => array(
+      'name' => 'mukurtu_multi_page_carousel',
+      'title' => 'Mukurtu Multi-page Carousel',
       'description' => '',
       'render_language' => 'XHTML',
       'parseable' => TRUE,

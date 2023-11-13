@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_culturalprotocol.features.og_features_role.inc

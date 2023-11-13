@@ -48,11 +48,8 @@ function drupal_error_levels() {
  *   The filename that the error was raised in.
  * @param $line
  *   The line number the error was raised at.
- * @param $context
- *   An array that points to the active symbol table at the point the error
- *   occurred.
  */
-function _drupal_error_handler_real($error_level, $message, $filename, $line, $context) {
+function _drupal_error_handler_real($error_level, $message, $filename, $line) {
   if ($error_level & error_reporting()) {
     $types = drupal_error_levels();
     list($severity_msg, $severity_level) = $types[$error_level];
@@ -62,17 +59,18 @@ function _drupal_error_handler_real($error_level, $message, $filename, $line, $c
       require_once DRUPAL_ROOT . '/includes/common.inc';
     }
 
-    // We treat recoverable errors as fatal.
+    // We treat recoverable errors as fatal, and also allow fatal errors to be
+    // explicitly triggered by drupal_trigger_fatal_error().
     _drupal_log_error(array(
       '%type' => isset($types[$error_level]) ? $severity_msg : 'Unknown error',
       // The standard PHP error handler considers that the error messages
-      // are HTML. We mimick this behavior here.
+      // are HTML. We mimic this behavior here.
       '!message' => filter_xss_admin($message),
       '%function' => $caller['function'],
       '%file' => $caller['file'],
       '%line' => $caller['line'],
       'severity_level' => $severity_level,
-    ), $error_level == E_RECOVERABLE_ERROR);
+    ), $error_level == E_RECOVERABLE_ERROR || drupal_static('drupal_trigger_fatal_error'));
   }
 }
 
@@ -105,8 +103,8 @@ function _drupal_decode_exception($exception) {
       // We remove that call.
       array_shift($backtrace);
     }
-    if (isset($exception->query_string, $exception->args)) {
-      $message .= ": " . $exception->query_string . "; " . print_r($exception->args, TRUE);
+    if (isset($exception->errorInfo['query_string'], $exception->errorInfo['args'])) {
+      $message .= ": " . $exception->errorInfo['query_string'] . "; " . print_r($exception->errorInfo['args'], TRUE);
     }
   }
   $caller = _drupal_get_last_caller($backtrace);
@@ -114,7 +112,7 @@ function _drupal_decode_exception($exception) {
   return array(
     '%type' => get_class($exception),
     // The standard PHP exception handler considers that the exception message
-    // is plain-text. We mimick this behavior here.
+    // is plain-text. We mimic this behavior here.
     '!message' => check_plain($message),
     '%function' => $caller['function'],
     '%file' => $caller['file'],
@@ -199,7 +197,16 @@ function _drupal_log_error($error, $fatal = FALSE) {
     $number++;
   }
 
-  watchdog('php', '%type: !message in %function (line %line of %file).', $error, $error['severity_level']);
+  // Log the error immediately, unless this is a non-fatal error which has been
+  // triggered via drupal_trigger_error_with_delayed_logging(); in that case
+  // trigger it in a shutdown function. Fatal errors are always triggered
+  // immediately since for a fatal error the page request will end here anyway.
+  if (!$fatal && drupal_static('_drupal_trigger_error_with_delayed_logging')) {
+    drupal_register_shutdown_function('watchdog', 'php', '%type: !message in %function (line %line of %file).', $error, $error['severity_level']);
+  }
+  else {
+    watchdog('php', '%type: !message in %function (line %line of %file).', $error, $error['severity_level']);
+  }
 
   if ($fatal) {
     drupal_add_http_header('Status', '500 Service unavailable (with message)');
@@ -224,7 +231,7 @@ function _drupal_log_error($error, $fatal = FALSE) {
   }
   else {
     // Display the message if the current error reporting level allows this type
-    // of message to be displayed, and unconditionnaly in update.php.
+    // of message to be displayed, and unconditionally in update.php.
     if (error_displayable($error)) {
       $class = 'error';
 
@@ -260,7 +267,7 @@ function _drupal_log_error($error, $fatal = FALSE) {
 function _drupal_get_last_caller($backtrace) {
   // Errors that occur inside PHP internal functions do not generate
   // information about file and line. Ignore black listed functions.
-  $blacklist = array('debug', '_drupal_error_handler', '_drupal_exception_handler');
+  $blacklist = array('debug', '_drupal_error_handler', '_drupal_exception_handler', 'drupal_trigger_fatal_error');
   while (($backtrace && !isset($backtrace[0]['line'])) ||
          (isset($backtrace[1]['function']) && in_array($backtrace[1]['function'], $blacklist))) {
     array_shift($backtrace);

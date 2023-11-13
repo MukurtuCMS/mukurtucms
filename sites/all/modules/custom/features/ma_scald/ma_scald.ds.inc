@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_scald.ds.inc
@@ -27,6 +28,36 @@ function ma_scald_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'scald_atom|audio|mukurtu_scald_dictionary_media';
+  $ds_fieldsetting->entity_type = 'scald_atom';
+  $ds_fieldsetting->bundle = 'audio';
+  $ds_fieldsetting->view_mode = 'mukurtu_scald_dictionary_media';
+  $ds_fieldsetting->settings = array(
+    'scald_thumbnail' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['scald_atom|audio|mukurtu_scald_dictionary_media'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'scald_atom|audio|mukurtu_scald_recording';
+  $ds_fieldsetting->entity_type = 'scald_atom';
+  $ds_fieldsetting->bundle = 'audio';
+  $ds_fieldsetting->view_mode = 'mukurtu_scald_recording';
+  $ds_fieldsetting->settings = array(
+    'scald_authors' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['scald_atom|audio|mukurtu_scald_recording'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'scald_atom|file|ma_scald_search_results';
   $ds_fieldsetting->entity_type = 'scald_atom';
   $ds_fieldsetting->bundle = 'file';
@@ -42,23 +73,63 @@ function ma_scald_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'scald_atom|file|mukurtu_scald_dictionary_media';
+  $ds_fieldsetting->entity_type = 'scald_atom';
+  $ds_fieldsetting->bundle = 'file';
+  $ds_fieldsetting->view_mode = 'mukurtu_scald_dictionary_media';
+  $ds_fieldsetting->settings = array(
+    'scald_thumbnail' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['scald_atom|file|mukurtu_scald_dictionary_media'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'scald_atom|image|default';
+  $ds_fieldsetting->entity_type = 'scald_atom';
+  $ds_fieldsetting->bundle = 'image';
+  $ds_fieldsetting->view_mode = 'default';
+  $ds_fieldsetting->settings = array(
+    'scald_thumbnail' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['scald_atom|image|default'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'scald_atom|image|ma_colorbox';
   $ds_fieldsetting->entity_type = 'scald_atom';
   $ds_fieldsetting->bundle = 'image';
   $ds_fieldsetting->view_mode = 'ma_colorbox';
   $ds_fieldsetting->settings = array(
     'download_atom' => array(
-      'weight' => '1',
+      'weight' => '2',
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'field_scald_protocol' => array(
+  );
+  $export['scald_atom|image|ma_colorbox'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'scald_atom|image|mukurtu_scald_dictionary_media';
+  $ds_fieldsetting->entity_type = 'scald_atom';
+  $ds_fieldsetting->bundle = 'image';
+  $ds_fieldsetting->view_mode = 'mukurtu_scald_dictionary_media';
+  $ds_fieldsetting->settings = array(
+    'scald_thumbnail' => array(
       'formatter_settings' => array(
         'ft' => array(),
       ),
     ),
   );
-  $export['scald_atom|image|ma_colorbox'] = $ds_fieldsetting;
+  $export['scald_atom|image|mukurtu_scald_dictionary_media'] = $ds_fieldsetting;
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
@@ -138,13 +209,54 @@ function ma_scald_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'atom',
+        0 => 'scald_thumbnail',
+        1 => 'atom',
       ),
     ),
     'fields' => array(
+      'scald_thumbnail' => 'ds_content',
       'atom' => 'ds_content',
     ),
-    'classes' => array(),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['scald_atom|audio|ma_scald_search_results'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'scald_atom|audio|mukurtu_scald_dictionary_media';
+  $ds_layout->entity_type = 'scald_atom';
+  $ds_layout->bundle = 'audio';
+  $ds_layout->view_mode = 'mukurtu_scald_dictionary_media';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'scald_thumbnail',
+        1 => 'atom',
+      ),
+    ),
+    'fields' => array(
+      'scald_thumbnail' => 'ds_content',
+      'atom' => 'ds_content',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
     'wrappers' => array(
       'ds_content' => 'div',
     ),
@@ -154,7 +266,45 @@ function ma_scald_ds_layout_settings_info() {
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
   );
-  $export['scald_atom|audio|ma_scald_search_results'] = $ds_layout;
+  $export['scald_atom|audio|mukurtu_scald_dictionary_media'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'scald_atom|audio|mukurtu_scald_recording';
+  $ds_layout->entity_type = 'scald_atom';
+  $ds_layout->bundle = 'audio';
+  $ds_layout->view_mode = 'mukurtu_scald_recording';
+  $ds_layout->layout = 'bootstrap_8_4';
+  $ds_layout->settings = array(
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+    'regions' => array(
+      'left' => array(
+        0 => 'atom',
+      ),
+      'right' => array(
+        0 => 'field_contributor',
+      ),
+    ),
+    'fields' => array(
+      'atom' => 'left',
+      'field_contributor' => 'right',
+    ),
+  );
+  $export['scald_atom|audio|mukurtu_scald_recording'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -235,12 +385,10 @@ function ma_scald_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'atom',
-        1 => 'scald_thumbnail',
+        0 => 'scald_thumbnail',
       ),
     ),
     'fields' => array(
-      'atom' => 'ds_content',
       'scald_thumbnail' => 'ds_content',
     ),
     'classes' => array(
@@ -256,8 +404,43 @@ function ma_scald_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['scald_atom|file|ma_scald_search_results'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'scald_atom|file|mukurtu_scald_dictionary_media';
+  $ds_layout->entity_type = 'scald_atom';
+  $ds_layout->bundle = 'file';
+  $ds_layout->view_mode = 'mukurtu_scald_dictionary_media';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'scald_thumbnail',
+        1 => 'atom',
+      ),
+    ),
+    'fields' => array(
+      'scald_thumbnail' => 'ds_content',
+      'atom' => 'ds_content',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+  );
+  $export['scald_atom|file|mukurtu_scald_dictionary_media'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -321,6 +504,7 @@ function ma_scald_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['scald_atom|image|default'] = $ds_layout;
 
@@ -335,31 +519,33 @@ function ma_scald_ds_layout_settings_info() {
     'regions' => array(
       'ds_content' => array(
         0 => 'field_scald_protocol',
-        1 => 'scald_thumbnail',
-        2 => 'download_atom',
+        1 => 'group_480_thumbnail_and_link',
+        2 => 'scald_thumbnail',
         3 => 'field_scald_identifier',
-        4 => 'field_original_dng',
-        5 => 'group_scald_atom_metadata',
-        6 => 'field_archival_tiff',
-        7 => 'field_full_size_jpeg',
-        8 => 'field_scald_created',
-        9 => 'field_scald_creator',
-        10 => 'scald_authors',
-        11 => 'field_scald_headline',
-        12 => 'field_scald_description',
-        13 => 'scald_tags',
-        14 => 'field_scald_geo_location',
-        15 => 'field_scald_location',
-        16 => 'field_rights',
-        17 => 'field_licence_std_cc',
-        18 => 'field_category',
+        4 => 'download_atom',
+        5 => 'field_original_dng',
+        6 => 'group_scald_atom_metadata',
+        7 => 'field_archival_tiff',
+        8 => 'field_full_size_jpeg',
+        9 => 'field_scald_created',
+        10 => 'field_scald_creator',
+        11 => 'scald_authors',
+        12 => 'field_scald_headline',
+        13 => 'field_scald_description',
+        14 => 'scald_tags',
+        15 => 'field_scald_geo_location',
+        16 => 'field_scald_location',
+        17 => 'field_rights',
+        18 => 'field_licence_std_cc',
+        19 => 'field_category',
       ),
     ),
     'fields' => array(
       'field_scald_protocol' => 'ds_content',
+      'group_480_thumbnail_and_link' => 'ds_content',
       'scald_thumbnail' => 'ds_content',
-      'download_atom' => 'ds_content',
       'field_scald_identifier' => 'ds_content',
+      'download_atom' => 'ds_content',
       'field_original_dng' => 'ds_content',
       'group_scald_atom_metadata' => 'ds_content',
       'field_archival_tiff' => 'ds_content',
@@ -389,6 +575,7 @@ function ma_scald_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['scald_atom|image|ma_colorbox'] = $ds_layout;
 
@@ -417,6 +604,38 @@ function ma_scald_ds_layout_settings_info() {
     'layout_link_custom' => '',
   );
   $export['scald_atom|image|ma_scald_search_results'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'scald_atom|image|mukurtu_scald_dictionary_media';
+  $ds_layout->entity_type = 'scald_atom';
+  $ds_layout->bundle = 'image';
+  $ds_layout->view_mode = 'mukurtu_scald_dictionary_media';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'scald_thumbnail',
+      ),
+    ),
+    'fields' => array(
+      'scald_thumbnail' => 'ds_content',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+  );
+  $export['scald_atom|image|mukurtu_scald_dictionary_media'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -474,6 +693,7 @@ function ma_scald_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['scald_atom|video|default'] = $ds_layout;
 
@@ -530,14 +750,49 @@ function ma_scald_ds_layout_settings_info() {
     'regions' => array(
       'ds_content' => array(
         0 => 'atom',
-        1 => 'scald_thumbnail',
       ),
     ),
     'fields' => array(
       'atom' => 'ds_content',
-      'scald_thumbnail' => 'ds_content',
     ),
-    'classes' => array(),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['scald_atom|video|ma_scald_search_results'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'scald_atom|video|mukurtu_scald_dictionary_media';
+  $ds_layout->entity_type = 'scald_atom';
+  $ds_layout->bundle = 'video';
+  $ds_layout->view_mode = 'mukurtu_scald_dictionary_media';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'atom',
+      ),
+    ),
+    'fields' => array(
+      'atom' => 'ds_content',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
     'wrappers' => array(
       'ds_content' => 'div',
     ),
@@ -547,7 +802,7 @@ function ma_scald_ds_layout_settings_info() {
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
   );
-  $export['scald_atom|video|ma_scald_search_results'] = $ds_layout;
+  $export['scald_atom|video|mukurtu_scald_dictionary_media'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;

@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * @file
+ * Tests for the Mail Logger module.
+ */
+
+class MailLoggerTest extends DrupalWebTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Mail Logger Test',
+      'description' => "This tests basic functionality of the Mail Logger module.",
+      'group' => 'Mail'
+    );
+  }
+
+  function setUp() {
+    parent::setUp('trigger', 'mail_logger');
+  }
+
+  /**
+  * Make sure the menu items and filter form exist.
+  */
+  function testMailLoggerMenuExistance() {
+    $user = $this->drupalCreateUser(array('access mail logger'));
+    $this->drupalLogin($user);
+    $this->drupalGet('admin/reports/mail-logger/');
+    $this->assertResponse('200');
+    $this->assertRaw('all mail types', t('Mailkey filter form found'));
+  }
+  
+  function testMailLoggerReadMail() {
+    $user = $this->drupalCreateUser(array('access mail logger'));
+    $this->drupalLogin($user);
+    //Test failure
+    $invalid_id = 99999;
+    $this->drupalGet('admin/reports/mail-logger/mail/' . $invalid_id);
+    $this->assertRaw('No Mail Logger record found with id:', t('Invalid mail ID message found'));
+    //Send a test email
+    //Test Success
+    global $language_content;
+    $language = $language_content;
+    $params = array();
+    $message = drupal_mail('simpletest', 'mail_test', 'testing@example.com', $language, $params, 'simpletest@example.com', FALSE);
+    $this->drupalGet('admin/reports/mail-logger/mail/1');
+    $this->assertRaw('Outgoing Mail log entries', t('Mail Message found'));
+    $this->assertRaw('testing@example.com', t('Test mail found'));
+  }
+}

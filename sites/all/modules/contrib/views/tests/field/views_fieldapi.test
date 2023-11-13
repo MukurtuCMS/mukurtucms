@@ -6,33 +6,40 @@
  */
 
 /**
- * @TODO
- *   - Test on a generic entity not on a node.
+ * @todo Test on a generic entity not on a node.
  *
  * What has to be tested:
- *   - Take sure that every wanted field is added to the according entity type.
- *   - Take sure the joins are done correct.
- *   - Use basic fields and take sure that the full wanted object is build.
- *   - Use relationships between different entity types, for example node and the node author(user).
+ * - Take sure that every wanted field is added to the according entity type.
+ * - Take sure the joins are done correct.
+ * - Use basic fields and take sure that the full wanted object is build.
+ * - Use relationships between different entity types, for example node and
+ *   the node author(user).
  */
 
 /**
  * Provides some helper methods for testing fieldapi integration into views.
  */
 class ViewsFieldApiTestHelper extends ViewsSqlTest {
+
   /**
    * Stores the field definitions used by the test.
+   *
    * @var array
    */
   public $fields;
+
   /**
    * Stores the instances of the fields. They have
    * the same keys as the fields.
+   *
    * @var array
    */
   public $instances;
 
-  protected function CreateUser($extra_edit = array()) {
+  /**
+   *
+   */
+  protected function createUser($extra_edit = array()) {
     $permissions = array('access comments', 'access content', 'post comments', 'skip comment approval');
     // Create a role with the given permission set.
     if (!($rid = $this->drupalCreateRole($permissions))) {
@@ -92,6 +99,7 @@ class ViewsFieldApiTestHelper extends ViewsSqlTest {
     drupal_static_reset('_views_fetch_data_recursion_protected');
     drupal_static_reset('_views_fetch_data_fully_loaded');
   }
+
 }
 
 /**
@@ -111,11 +119,13 @@ class viewsFieldApiDataTest extends ViewsFieldApiTestHelper {
     );
   }
 
-  function setUp() {
-    parent::setUp();
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    parent::setUp($modules);
 
     $langcode = LANGUAGE_NONE;
-
 
     $field_names = $this->setUpFields();
 
@@ -152,7 +162,7 @@ class viewsFieldApiDataTest extends ViewsFieldApiTestHelper {
     // Now create some example nodes/users for the view result.
     for ($i = 0; $i < 5; $i++) {
       $edit = array(
-        // @TODO Write a helper method to create such values.
+        // @todo Write a helper method to create such values.
         'field_name_0' => array($langcode => array((array('value' => $this->randomName())))),
         'field_name_2' => array($langcode => array((array('value' => $this->randomName())))),
       );
@@ -164,7 +174,7 @@ class viewsFieldApiDataTest extends ViewsFieldApiTestHelper {
         'field_name_1' => array($langcode => array((array('value' => $this->randomName())))),
         'field_name_2' => array($langcode => array((array('value' => $this->randomName())))),
       );
-      $this->users[] = $this->CreateUser($edit);
+      $this->users[] = $this->createUser($edit);
     }
 
     // Reset views data cache.
@@ -178,7 +188,7 @@ class viewsFieldApiDataTest extends ViewsFieldApiTestHelper {
    */
   function testViewsData() {
     $data = views_fetch_data();
-    
+
     // Check the table and the joins of the first field.
     // Attached to node only.
     $field = $this->fields[0];
@@ -210,7 +220,6 @@ class viewsFieldApiDataTest extends ViewsFieldApiTestHelper {
     );
     $this->assertEqual($expected_join, $data[$revision_table]['table']['join']['node_revision']);
 
-
     // Check the table and the joins of the second field.
     // Attached to both node and user.
     $field_2 = $this->fields[2];
@@ -230,7 +239,7 @@ class viewsFieldApiDataTest extends ViewsFieldApiTestHelper {
       'extra' => array(
         array('field' => 'entity_type', 'value' => 'node'),
         array('field' => 'deleted', 'value' => 0, 'numeric' => TRUE),
-      )
+      ),
     );
     $this->assertEqual($expected_join, $data[$current_table_2]['table']['join']['node']);
     $expected_join = array(
@@ -239,7 +248,7 @@ class viewsFieldApiDataTest extends ViewsFieldApiTestHelper {
       'extra' => array(
         array('field' => 'entity_type', 'value' => 'node'),
         array('field' => 'deleted', 'value' => 0, 'numeric' => TRUE),
-      )
+      ),
     );
     $this->assertEqual($expected_join, $data[$revision_table_2]['table']['join']['node_revision']);
     $expected_join = array(
@@ -248,32 +257,25 @@ class viewsFieldApiDataTest extends ViewsFieldApiTestHelper {
       'extra' => array(
         array('field' => 'entity_type', 'value' => 'user'),
         array('field' => 'deleted', 'value' => 0, 'numeric' => TRUE),
-      )
+      ),
     );
     $this->assertEqual($expected_join, $data[$current_table_2]['table']['join']['users']);
 
-    // Check the fields
-    // @todo
-
-    // Check the arguments
-    // @todo
-
-    // Check the sort criterias
-    // @todo
-
-    // Check the relationships
-    // @todo
-
+    // @todo Check the fields.
+    // @todo Check the arguments.
+    // @todo Check the sort criterias.
+    // @todo Check the relationships.
   }
+
 }
 
 /**
  * Tests the field_field handler.
- * @TODO
- *   Check a entity-type with bundles
- *   Check a entity-type without bundles
- *   Check locale:disabled, locale:enabled and locale:enabled with another language
- *   Check revisions
+ *
+ * @todo Check a entity-type with bundles.
+ * @todo Check a entity-type without bundles.
+ * @todo Check locale:disabled, locale:enabled and locale:enabled with another language.
+ * @todo Check revisions.
  */
 class viewsHandlerFieldFieldTest extends ViewsFieldApiTestHelper {
   public $nodes;
@@ -282,12 +284,15 @@ class viewsHandlerFieldFieldTest extends ViewsFieldApiTestHelper {
     return array(
       'name' => 'Fieldapi: Field handler',
       'description' => 'Tests the field itself of the fieldapi integration',
-      'group' => 'Views Modules'
+      'group' => 'Views Modules',
     );
   }
 
-  protected function setUp() {
-    parent::setUp();
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    parent::setUp($modules);
 
     // Setup basic fields.
     $this->setUpFields(3);
@@ -353,7 +358,7 @@ class viewsHandlerFieldFieldTest extends ViewsFieldApiTestHelper {
     $this->executeView($view);
 
     // Take sure that the formatter works as expected.
-    // @TODO: actually there should be a specific formatter.
+    // @todo actually there should be a specific formatter.
     for ($i = 0; $i < 2; $i++) {
       $rendered_field = $view->style_plugin->get_field($i, $this->fields[0]['field_name']);
       $this->assertEqual(strlen($rendered_field), 3);
@@ -370,6 +375,7 @@ class viewsHandlerFieldFieldTest extends ViewsFieldApiTestHelper {
 
     for ($i = 0; $i < 3; $i++) {
       $rendered_field = $view->style_plugin->get_field($i, $this->fields[3]['field_name']);
+      $this->assertNotNull($rendered_field);
       $items = array();
       $pure_items = $this->nodes[$i]->{$this->fields[3]['field_name']}[LANGUAGE_NONE];
       $pure_items = array_splice($pure_items, 0, 3);
@@ -384,7 +390,7 @@ class viewsHandlerFieldFieldTest extends ViewsFieldApiTestHelper {
 
     $view->destroy();
 
-    // Test delta limit + offset
+    // Test delta limit + offset.
     $view->display['default']->display_options['fields'][$this->fields[3]['field_name']]['group_rows'] = TRUE;
     $view->display['default']->display_options['fields'][$this->fields[3]['field_name']]['delta_limit'] = 3;
     $view->display['default']->display_options['fields'][$this->fields[3]['field_name']]['delta_offset'] = 1;
@@ -392,6 +398,7 @@ class viewsHandlerFieldFieldTest extends ViewsFieldApiTestHelper {
 
     for ($i = 0; $i < 3; $i++) {
       $rendered_field = $view->style_plugin->get_field($i, $this->fields[3]['field_name']);
+      $this->assertNotNull($rendered_field);
       $items = array();
       $pure_items = $this->nodes[$i]->{$this->fields[3]['field_name']}[LANGUAGE_NONE];
       $pure_items = array_splice($pure_items, 1, 3);
@@ -411,6 +418,7 @@ class viewsHandlerFieldFieldTest extends ViewsFieldApiTestHelper {
 
     for ($i = 0; $i < 3; $i++) {
       $rendered_field = $view->style_plugin->get_field($i, $this->fields[3]['field_name']);
+      $this->assertNotNull($rendered_field);
       $items = array();
       $pure_items = $this->nodes[$i]->{$this->fields[3]['field_name']}[LANGUAGE_NONE];
       array_splice($pure_items, 0, -3);
@@ -424,13 +432,14 @@ class viewsHandlerFieldFieldTest extends ViewsFieldApiTestHelper {
 
     // Test delta first last.
     $view->display['default']->display_options['fields'][$this->fields[3]['field_name']]['group_rows'] = TRUE;
-    $view->display['default']->display_options['fields'][$this->fields[3]['field_name']]['delta_limit'] = 0;
+    $view->display['default']->display_options['fields'][$this->fields[3]['field_name']]['delta_limit'] = 'all';
     $view->display['default']->display_options['fields'][$this->fields[3]['field_name']]['delta_first_last'] = TRUE;
     $view->display['default']->display_options['fields'][$this->fields[3]['field_name']]['delta_reversed'] = FALSE;
     $this->executeView($view);
 
     for ($i = 0; $i < 3; $i++) {
       $rendered_field = $view->style_plugin->get_field($i, $this->fields[3]['field_name']);
+      $this->assertNotNull($rendered_field);
       $items = array();
       $pure_items = $this->nodes[$i]->{$this->fields[3]['field_name']}[LANGUAGE_NONE];
       $items[] = $pure_items[0]['value'];
@@ -448,6 +457,7 @@ class viewsHandlerFieldFieldTest extends ViewsFieldApiTestHelper {
 
     for ($i = 0; $i < 3; $i++) {
       $rendered_field = $view->style_plugin->get_field($i, $this->fields[3]['field_name']);
+      $this->assertNotNull($rendered_field);
       $items = array();
       $pure_items = $this->nodes[$i]->{$this->fields[3]['field_name']}[LANGUAGE_NONE];
       $pure_items = array_splice($pure_items, 0, 3);
@@ -459,7 +469,7 @@ class viewsHandlerFieldFieldTest extends ViewsFieldApiTestHelper {
   }
 
   protected function getFieldView() {
-    $view = new view;
+    $view = new view();
     $view->name = 'view_fieldapi';
     $view->description = '';
     $view->tag = 'default';
@@ -491,4 +501,3 @@ class viewsHandlerFieldFieldTest extends ViewsFieldApiTestHelper {
   }
 
 }
-

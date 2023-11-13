@@ -1,0 +1,905 @@
+<?php
+/**
+ * @file
+ * Functional tests for the Open Atrium Access module.
+ */
+
+/**
+ * Parent class for access control tests.
+ *
+ * For the time being, these tests only run with SimpleTestCloneTestCase,
+ * however, it'd be great to get them working with DrupalWebTestCase just
+ * to say we did. :-) SimpleTestCloneTestCase is much, much faster.
+ */
+//abstract class OpenAtriumAccessBaseTestCase extends DrupalWebTestCase {
+abstract class OpenAtriumAccessBaseTestCase extends SimpleTestCloneTestCase {
+  // The 'standard' profile defines an 'administrator' role which conflicts
+  // with panopoly_core's 'administrator' role.
+  // TODO: This is ignored by SimpleTestCloneTestCase...
+  protected $profile = 'testing';
+
+  public function setUp($modules = array()) {
+    // TODO: This is how it should look for DrupalWebTestCase!
+    //
+    //parent::setUp(array_merge(array(
+    //  // Without oa_sections, we'll get a Table 'field_data_field_oa_user_ref'
+    //  // doesn't exist error. Although, we don't actually use Sections here. :-)
+    //  'oa_sections',
+    //  'oa_teams',
+    //  'oa_access',
+    //), $modules));
+
+    // However, since we're using SimpleTestCloneTestCase, we need to use this
+    // instead.
+    parent::setUp();
+    module_enable($modules);
+
+    // Since we're not enabling oa_home, we need to make sure the front page
+    // exists, or $this->drupalLogin() will fail from the 404.
+    variable_set('site_frontpage', 'user');
+
+    // Flush all static caches.
+    drupal_static_reset();
+  }
+
+  /**
+   * Creates a node with an optional Space or Section.
+   *
+   * Replaces $this->drupalCreateNode() inside this test class.
+   *
+   * @param array $info
+   *   An associative array with information about the node which will
+   *   eventually get passed to node_save().
+   * @param object $space
+   *   (Optional) A Drupal node object representing the Space this node should
+   *   be created in.
+   * @param object $section
+   *   (Optional) A Drupal node object representing the Section this node
+   *   should be created in.
+   *
+   * @return object
+   *   The Drupal node object that was created.
+   *
+   * @see DrupalWebTestCase::drupalCreateNode()
+   */
+  protected function oaCreateNode($info, $space = NULL, $section = NULL) {
+    if ($space) {
+      $info['og_group_ref'][LANGUAGE_NONE][0]['target_id'] = $space->nid;
+    }
+    if ($section) {
+      $info['oa_section_ref'][LANGUAGE_NONE][0]['target_id'] = $section->nid;
+    }
+    return $this->drupalCreateNode($info);
+  }
+
+  /**
+   * Create a user with an optional Space.
+   *
+   * Replaces $this->drupalCreateUser() inside this test class.
+   *
+   * @param array $permissions
+   *   An array containing all the permissions this user should have.
+   * @param object $space
+   *   (Optional) A Drupal node object representing the Space this user should
+   *   be created in.
+   *
+   * @return object
+   *   The Drupal user object that was created.
+   *
+   * @see DrupalWebTestCase::drupalCreateUser()
+   */
+  protected function oaCreateUser($permissions, $space = NULL) {
+    $account = $this->drupalCreateUser($permissions);
+
+    if ($space) {
+      og_group('node', $space->nid, array(
+        'entity type' => 'user',
+        'entity' => $account,
+        'membership type' => OG_MEMBERSHIP_TYPE_DEFAULT,
+      ));
+    }
+
+    return $account;
+  }
+
+  /**
+   * Creates an Open Atrium Group with a new user in an optional Space.
+   *
+   * @param array $info
+   *   An associative array with information about the node which
+   *   will eventually get passed to node_save().
+   * @param array $permissions
+   *   An array containing all the permissions this user should have.
+   * @param object $space
+   *   (Optional) A Drupal node object representing the Space this user should
+   *   be created in.
+   *
+   * @return array
+   *   An associative array with two keys:
+   *   - group: (object) A Drupal node object representing the new Group node.
+   *   - user: (object) A Drupal user object representing the new user.
+   */
+  protected function oaCreateGroupWithUser(array $info, array $permissions, $space = NULL) {
+    $info += array(
+      'type' => 'oa_group',
+      'title' => 'Group',
+    );
+    $group = $this->oaCreateNode($info);
+    $account = $this->oaCreateUser($permissions, $space);
+
+    // Add the user to the group.
+    og_group('node', $group->nid, array(
+      'entity type' => 'user',
+      'entity' => $account,
+      'membership type' => OG_MEMBERSHIP_TYPE_DEFAULT,
+    ));
+
+    return array(
+      'group' => $group,
+      'user' => $account,
+    );
+  }
+
+  /**
+   * Creates an Open Atrium Team with a new user in a Space.
+   *
+   * @param array $info
+   *   An associative array with information about the node which
+   *   will eventually get passed to node_save().
+   * @param array $permissions
+   *   An array containing all the permissions this user should have.
+   * @param object $space
+   *   A Drupal node object representing the Space this Team and user should be
+   *   created in.
+   *
+   * @return array
+   *   An associative array with two keys:
+   *   - group: (object) A Drupal node object representing the new Group node.
+   *   - user: (object) A Drupal user object representing the new user.
+   */
+  protected function oaCreateTeamWithUser(array $info, array $permissions, $space) {
+    $info += array(
+      'type' => 'oa_team',
+      'title' => 'Team',
+    );
+    $team = $this->oaCreateNode($info, $space);
+    $account = $this->oaCreateUser($permissions, $space);
+
+    // Add the user to the team.
+    oa_teams_add_member($team, $account->uid);
+
+    return array(
+      'team' => $team,
+      'user' => $account,
+    );
+  }
+
+  /**
+   * Post to a Group/Team permisisons page with a set of values.
+   *
+   * You're expected to use $this->drupalGet() to load the admin page before
+   * calling this function to submit.
+   *
+   * After posting to the admin form, it will verify that the permissions
+   * actually "stuck".
+   *
+   * @param array $values
+   *   An associative array keyed by the module machine name which contains
+   *   an associative array keyed by the permission machine name containing
+   *   arrays of group or team nids.
+   */
+  protected function oaPostPermissions($values) {
+    $edit = array();
+    foreach ($values as $module => $permissions) {
+      foreach ($permissions as $name => $groups) {
+        $edit["permissions[{$module}][{$name}][groups][]"] = $groups;
+      }
+    }
+    $this->drupalPost(NULL, $edit, t('Save permissions'));
+
+    // Verify that the settinsg 'stuck'.
+    foreach ($values as $module => $permissions) {
+      foreach ($permissions as $name => $groups) {
+        $results = $this->xpath('//select[@name=:name]//option', array(':name' => "permissions[{$module}][{$name}][groups][]"));
+        $found_groups = array();
+        foreach ($results as $option) {
+          if ($option['selected']) {
+            $found_groups[] = (string)$option['value'];
+          }
+        }
+        $this->assertEqual($found_groups, $groups, t('Settings for %permission stuck', array('%permission' => $name)));
+      }
+    }
+  }
+
+  /**
+   * Check if a select has a certain option.
+   *
+   * @param string $name
+   *   The name of the select.
+   * @param string $value
+   *   The value of the option to check for.
+   *
+   * @return boolean
+   *   TRUE if found; FALSE otherwise.
+   */
+  function hasSelectOption($name, $value) {
+    $results = $this->xpath('//select[@name=:name]//option[@value=:value]', array(
+      ':name' => $name,
+      ':value' => $value,
+    ));
+    return count($results) > 0;
+  }
+
+  /**
+   * Get all permissions defined by implementing modules.
+   *
+   * Wraps oa_access_get_permissions(). Since we're using
+   * SimpleTestCloneTestCase, we can't guarantee that only our permissions are
+   * available, so we have to filter out all others.
+   *
+   * @param string $module
+   *   The name of the module whose permissions we want included.
+   * @param boolean $reset
+   *   (Optional) If set to TRUE, it will reset the static cache.
+   *
+   * @return array
+   *   Associative array keyed with the permission name containing associative
+   *   arrays with the following keys:
+   *   - title: Human readable name of the permission.
+   *   - description: Human readable description of the permission.
+   *   - module: The machine name of the module which defines it.
+   *   - type: Flags specifying if can be used for Groups or Teams or both.
+   *
+   * @see oa_access_get_permissions()
+   */
+  protected function getPermissions($module, $reset = FALSE) {
+    $permissions = array();
+    foreach (oa_access_get_permissions($reset) as $name => $info) {
+      if ($info['module'] == $module) {
+        $permissions[$name] = $info;
+      }
+    }
+    return $permissions;
+  }
+
+  /**
+   * Gets all the permissions that a list of groups have.
+   *
+   * Wraps oa_access_get_group_permissions(). Since we're using
+   * SimpleTestCloneTestCase, we can't guarantee that only our permissions are
+   * available, so we have to filter out all others.
+   *
+   * @param string $module
+   *   The name of the module whose permissions we want included.
+   * @param array $groups
+   *   An array of nids of Groups or Teams.
+   *
+   * @return array
+   *   An associative array keyed by group nid containing associative arrays
+   *   keyed by the module and containing an array of permission names, for
+   *   example:
+   *   @code
+   *   array('27' => array('mymodule' => array('a permission')))
+   *   @endcode
+   *   Which signifies that the group with nid 27 has 'a permission' from
+   *   a module called 'mymodule'.
+   *
+   * @see oa_access_get_group_permissions().
+   */
+  protected function getGroupPermissions($module, $groups) {
+    $permissions = array();
+    foreach (oa_access_get_group_permissions($groups) as $gid => $info) {
+      if (empty($permissions[$gid])) {
+        $permissions[$gid] = array();
+      }
+      if (isset($info[$module])) {
+        $permissions[$gid][$module] = $info[$module];
+      }
+    }
+    return $permissions;
+  }
+
+}
+
+/**
+ * Functional tests for the Open Atrium Access module.
+ */
+class OpenAtriumAccessTestCase extends OpenAtriumAccessBaseTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Open Atrium Access',
+      'description' => 'Test the Open Atrium Access API.',
+      'group' => 'Open Atrium Access',
+    );
+  }
+
+  public function setUp() {
+    parent::setUp(array(
+      'oa_access_test',
+    ));
+  }
+
+  public function testGetPermissions() {
+    $this->assertEqual($this->getPermissions('oa_access_test'), array(
+      'access oa_access_test' => array(
+        'title' => t('Access Open Atrium Access Test'),
+        'description' => t('Gives you the ability to access Open Atrium Access Test'),
+        'module' => 'oa_access_test',
+        'type' => OA_ACCESS_DEFAULT_PERMISSION,
+        'combine' => OA_ACCESS_COMBINE_UNION,
+      ),
+      'administer oa_access_test' => array(
+        'title' => t('Administer Open Atrium Access Test'),
+        'description' => t('Gives you the ability to administer Open Atrium Access Test'),
+        'module' => 'oa_access_test',
+        'type' => OA_ACCESS_DEFAULT_PERMISSION,
+        'combine' => OA_ACCESS_COMBINE_UNION,
+      ),
+      'group permission for oa_access_test' => array(
+        'title' => t('A Group-only permission for Open Atrium Access Test'),
+        'description' => t('Used to test Group-only permissions'),
+        'type' => OA_ACCESS_GROUP_PERMISSION,
+        'module' => 'oa_access_test',
+        'combine' => OA_ACCESS_COMBINE_UNION,
+      ),
+      'team permission for oa_access_test' => array(
+        'title' => t('A Team-only permission for Open Atrium Access Test'),
+        'description' => t('Used to test Team-only permissions'),
+        'type' => OA_ACCESS_TEAM_PERMISSION,
+        'module' => 'oa_access_test',
+        'combine' => OA_ACCESS_COMBINE_UNION,
+      ),
+      'permission with all option for oa_access_test' => array(
+        'title' => t('A permission with an "All" option'),
+        'description' => t('Used to test the "All" option'),
+        'type' => OA_ACCESS_DEFAULT_PERMISSION | OA_ACCESS_ALLOW_OPTION_ALL,
+        'module' => 'oa_access_test',
+        'combine' => OA_ACCESS_COMBINE_UNION,
+      ),
+      'access oa_access_test intersection' => array(
+        'title' => t('Access Open Atrium Access Test (Intersection)'),
+        'description' => t('Tests OA_ACCESS_COMBINE_INTERSECTION.'),
+        'type' => OA_ACCESS_DEFAULT_PERMISSION | OA_ACCESS_ALLOW_OPTION_ALL,
+        'combine' => OA_ACCESS_COMBINE_INTERSECTION,
+        'module' => 'oa_access_test',
+      ),
+      'access oa_access_test team override' => array(
+        'title' => t('Access Open Atrium Access Test (Team Override)'),
+        'description' => t('Tests OA_ACCESS_COMBINE_TEAM_OVERRIDE.'),
+        'type' => OA_ACCESS_DEFAULT_PERMISSION | OA_ACCESS_ALLOW_OPTION_ALL,
+        'combine' => OA_ACCESS_COMBINE_TEAM_OVERRIDE,
+        'module' => 'oa_access_test',
+      ),
+      'access oa_access_test group override' => array(
+        'title' => t('Access Open Atrium Access Test (Group Override)'),
+        'description' => t('Tests OA_ACCESS_COMBINE_GROUP_OVERRIDE.'),
+        'type' => OA_ACCESS_DEFAULT_PERMISSION | OA_ACCESS_ALLOW_OPTION_ALL,
+        'combine' => OA_ACCESS_COMBINE_GROUP_OVERRIDE,
+        'module' => 'oa_access_test',
+      ),
+      'a permission for oa_access_test that is only conditionally available' => array(
+        'title' => t('Some fickle permission'),
+        'description' => t('A permission for oa_access_test that is only conditionally available'),
+        'module' => 'oa_access_test',
+        'type' => OA_ACCESS_DEFAULT_PERMISSION,
+        'combine' => OA_ACCESS_COMBINE_UNION,
+      ),
+    ));
+  }
+
+  public function testUserGroups() {
+    // Create an admin user and login.
+    $account = $this->oaCreateUser(array('create oa_space content'));
+    $this->drupalLogin($account);
+
+    $group_a = $this->oaCreateGroupWithUser(array('title' => 'Group A'), array('access content'));
+    $group_b = $this->oaCreateGroupWithUser(array('title' => 'Group B'), array('access content'));
+
+    // Add the user from $group_a to $group_b as well.
+    og_group('node', $group_b['group']->nid, array(
+      'entity type' => 'user',
+      'entity' => $group_a['user']->uid,
+      'membership type' => OG_MEMBERSHIP_TYPE_DEFAULT,
+    ));
+
+    // Check the groups that the $group_a user belongs to.
+    $this->assertEqual(oa_access_user_groups($group_a['user']), array(
+      $group_a['group']->nid => $group_a['group']->nid,
+      $group_b['group']->nid => $group_b['group']->nid,
+      // Magic 'All' Group.
+      0 => 0,
+    ));
+
+    // Check the (much simpler) $group_b user.
+    $this->assertEqual(oa_access_user_groups($group_b['user']), array(
+      $group_b['group']->nid => $group_b['group']->nid,
+      // Magic 'All' Group.
+      0 => 0,
+    ));
+  }
+
+  public function testUserTeams() {
+    // Create an admin user and login.
+    $account = $this->oaCreateUser(array('create oa_space content'));
+    $this->drupalLogin($account);
+
+    // Create a Space that all our users are going to belong to.
+    $space1 = $this->oaCreateNode(array(
+      'title' => 'Space A',
+      'type'  => 'oa_space',
+      'uid'   => $account->uid,
+    ));
+
+    $user_a = $this->oaCreateUser(array(), $space1);
+
+    // Now, create a Team in our Space.
+    $team_a = $this->oaCreateTeamWithUser(array('title' => 'Team A'), array('access content'), $space1);
+
+    // Check the teams that the $team_a user belongs to.
+    $this->assertEqual(oa_access_user_teams($space1->nid, $team_a['user']), array(
+      $team_a['team']->nid => $team_a['team']->nid,
+      $space1->nid => $space1->nid,
+    ));
+
+    // Check the (much simpler) $user_a user.
+    $this->assertEqual(oa_access_user_teams($space1->nid, $user_a), array(
+      // Magic 'All' Team.
+      $space1->nid => $space1->nid,
+    ));
+  }
+
+  public function testGetSetGroupPermissions() {
+    $group_a = $this->oaCreateGroupWithUser(array('title' => 'Group A'), array('access content'));
+    $group_b = $this->oaCreateGroupWithUser(array('title' => 'Group B'), array('access content'));
+
+    $group_permissions = array(
+      $group_a['group']->nid => array(
+        'oa_access_test' => array('access oa_access_test', 'administer oa_access_test')
+      ),
+      $group_b['group']->nid => array(
+        'oa_access_test' => array('access oa_access_test'),
+      ),
+    );
+
+    // First, verify that there are no permissions set.
+    $this->assertEqual(oa_access_get_group_permissions(array_keys($group_permissions)), array(
+      $group_a['group']->nid => array(),
+      $group_b['group']->nid => array(),
+    ));
+
+    // Set the permissions in the database, then get them back out and make
+    // sure they are the same.
+    oa_access_set_group_permissions($group_permissions);
+    $this->assertEqual(oa_access_get_group_permissions(array_keys($group_permissions)), $group_permissions);
+
+    // We'll update only one of the groups permissions, but get both and make
+    // sure that we don't overwrite the wrong one.
+    $group_permissions[$group_b['group']->nid]['oa_access_test'] = array(
+      'administer oa_access_test',
+    );
+    $group_permissions_partial = $group_permissions;
+    unset($group_permissions_partial[$group_a['group']->nid]);
+    oa_access_set_group_permissions($group_permissions_partial);
+    $this->assertEqual(oa_access_get_group_permissions(array_keys($group_permissions)), $group_permissions);
+
+    // Now, clear the static cache on 'oa_access_get_group_permissions' and
+    // try it again - this will pull from the database.
+    drupal_static_reset('oa_access_get_group_permissions');
+    $this->assertEqual(oa_access_get_group_permissions(array_keys($group_permissions)), $group_permissions);
+  }
+
+  public function testCombinedGroupPermissions() {
+    $group_a = $this->oaCreateGroupWithUser(array('title' => 'Group A'), array('access content'));
+    $group_b = $this->oaCreateGroupWithUser(array('title' => 'Group B'), array('access content'));
+
+    $group_permissions = array(
+      $group_a['group']->nid => array(
+        'oa_access_test' => array('administer oa_access_test')
+      ),
+      $group_b['group']->nid => array(
+        'oa_access_test' => array('access oa_access_test'),
+      ),
+    );
+    oa_access_set_group_permissions($group_permissions);
+
+    $group_permissions_combined = array(
+      'administer oa_access_test' => TRUE,
+      'access oa_access_test' => TRUE,
+    );
+    $this->assertEqual(oa_access_get_group_permissions_combined(array_keys($group_permissions)), $group_permissions_combined);
+  }
+
+  public function testGroupAccess() {
+    $group_a = $this->oaCreateGroupWithUser(array('title' => 'Group A'), array('access content'));
+    $group_b = $this->oaCreateGroupWithUser(array('title' => 'Group B'), array('access content'));
+    $not_in_group = $this->oaCreateUser(array('access content'));
+
+    $group_permissions = array(
+      $group_a['group']->nid => array(
+        'oa_access_test' => array('access oa_access_test', 'administer oa_access_test')
+      ),
+      $group_b['group']->nid => array(
+        'oa_access_test' => array('access oa_access_test'),
+      ),
+    );
+    oa_access_set_group_permissions($group_permissions);
+
+    // Make sure that each user has the permissions that they should.
+    $this->assertFalse(oa_access(NULL, 'access oa_access_test', $not_in_group));
+    $this->assertFalse(oa_access(NULL, 'administer oa_access_test', $not_in_group));
+    $this->assertTrue(oa_access(NULL, 'access oa_access_test', $group_a['user']));
+    $this->assertTrue(oa_access(NULL, 'administer oa_access_test', $group_a['user']));
+    $this->assertTrue(oa_access(NULL, 'access oa_access_test', $group_b['user']));
+    $this->assertFalse(oa_access(NULL, 'administer oa_access_test', $group_b['user']));
+
+    // Assert that setting the 'All' group permission will give it to everyone
+    // including even the user who is not in any group.
+    $this->assertFalse(oa_access(NULL, 'permission with all option for oa_access_test', $not_in_group));
+    $this->assertFalse(oa_access(NULL, 'permission with all option for oa_access_test', $group_a['user']));
+    $this->assertFalse(oa_access(NULL, 'permission with all option for oa_access_test', $group_b['user']));
+    oa_access_set_group_permissions(array(
+      0 => array(
+        'oa_access_test' => array('permission with all option for oa_access_test'),
+      ),
+    ));
+    drupal_static_reset('oa_access');
+    $this->assertTrue(oa_access(NULL, 'permission with all option for oa_access_test', $not_in_group));
+    $this->assertTrue(oa_access(NULL, 'permission with all option for oa_access_test', $group_a['user']));
+    $this->assertTrue(oa_access(NULL, 'permission with all option for oa_access_test', $group_b['user']));
+  }
+
+  public function testTeamAccess() {
+    // Create an admin user and login.
+    $account = $this->oaCreateUser(array('create oa_space content'));
+    $this->drupalLogin($account);
+
+    // Create a Space that all our users are going to belong to.
+    $space1 = $this->oaCreateNode(array(
+      'title' => 'Space A',
+      'type'  => 'oa_space',
+      'uid'   => $account->uid,
+    ));
+
+    $team_a = $this->oaCreateTeamWithUser(array('title' => 'Team A'), array('access content'), $space1);
+    $team_b = $this->oaCreateTeamWithUser(array('title' => 'Team B'), array('access content'), $space1);
+    $not_in_team = $this->oaCreateUser(array('access content'), $space1);
+    $not_in_group = $this->oaCreateUser(array('access content'));
+
+    $group_permissions = array(
+      $team_a['team']->nid => array(
+        'oa_access_test' => array('access oa_access_test', 'administer oa_access_test')
+      ),
+      $team_b['team']->nid => array(
+        'oa_access_test' => array('access oa_access_test'),
+      ),
+    );
+    oa_access_set_group_permissions($group_permissions);
+
+    // Make sure that each user has the permissions that they should.
+    $this->assertFalse(oa_access($space1, 'access oa_access_test', $not_in_team));
+    $this->assertFalse(oa_access($space1, 'administer oa_access_test', $not_in_team));
+    $this->assertFalse(oa_access($space1, 'access oa_access_test', $not_in_group));
+    $this->assertFalse(oa_access($space1, 'administer oa_access_test', $not_in_group));
+    $this->assertTrue(oa_access($space1, 'access oa_access_test', $team_a['user']));
+    $this->assertTrue(oa_access($space1, 'administer oa_access_test', $team_a['user']));
+    $this->assertTrue(oa_access($space1, 'access oa_access_test', $team_b['user']));
+    $this->assertFalse(oa_access($space1, 'administer oa_access_test', $team_b['user']));
+
+    // Now, create a new Space which our users don't belong to and verify that
+    // they don't get any permissions there.
+    $space2 = $this->oaCreateNode(array(
+      'title' => 'Space B',
+      'type'  => 'oa_space',
+      'uid'   => $account->uid,
+    ));
+    $this->assertFalse(oa_access($space2, 'access oa_access_test', $team_a['user']));
+    $this->assertFalse(oa_access($space2, 'administer oa_access_test', $team_a['user']));
+    $this->assertFalse(oa_access($space2, 'access oa_access_test', $team_b['user']));
+    $this->assertFalse(oa_access($space2, 'administer oa_access_test', $team_b['user']));
+
+    // And, just for good measure, make sure they don't have these permissions
+    // when we aren't in any Space context.
+    $this->assertFalse(oa_access(NULL, 'access oa_access_test', $team_a['user']));
+    $this->assertFalse(oa_access(NULL, 'administer oa_access_test', $team_a['user']));
+    $this->assertFalse(oa_access(NULL, 'access oa_access_test', $team_b['user']));
+    $this->assertFalse(oa_access(NULL, 'administer oa_access_test', $team_b['user']));
+
+    // Assert that setting the 'All' team permission will give it to everyone
+    // including even the user who is not in any team (but not the user who
+    // isn't in the group).
+    $this->assertFalse(oa_access($space1, 'permission with all option for oa_access_test', $not_in_team));
+    $this->assertFalse(oa_access($space1, 'permission with all option for oa_access_test', $not_in_group));
+    $this->assertFalse(oa_access($space1, 'permission with all option for oa_access_test', $team_a['user']));
+    $this->assertFalse(oa_access($space1, 'permission with all option for oa_access_test', $team_b['user']));
+    oa_access_set_group_permissions(array(
+      $space1->nid => array(
+        'oa_access_test' => array('permission with all option for oa_access_test'),
+      ),
+    ));
+    drupal_static_reset('oa_access');
+    $this->assertTrue(oa_access($space1, 'permission with all option for oa_access_test', $not_in_team));
+    $this->assertFalse(oa_access($space1, 'permission with all option for oa_access_test', $not_in_group));
+    $this->assertTrue(oa_access($space1, 'permission with all option for oa_access_test', $team_a['user']));
+    $this->assertTrue(oa_access($space1, 'permission with all option for oa_access_test', $team_b['user']));
+  }
+
+  public function testTeamOverride() {
+    // Create an admin user and login.
+    $account = $this->oaCreateUser(array('create oa_space content'));
+    $this->drupalLogin($account);
+
+    // Create a Space that all our users are going to belong to.
+    $space1 = $this->oaCreateNode(array(
+      'title' => 'Space A',
+      'type'  => 'oa_space',
+      'uid'   => $account->uid,
+    ));
+
+    $team_a = $this->oaCreateTeamWithUser(array('title' => 'Team A'), array('access content'), $space1);
+    $not_in_team = $this->oaCreateUser(array('access content'), $space1);
+    $not_in_space = $this->oaCreateUser(array('access content'));
+
+    $group_permissions = array(
+      // Say (via Groups permissions) that 'All site users' have access to this
+      // permission.
+      0 => array(
+        'oa_access_test' => array('access oa_access_test team override'),
+      ),
+      $team_a['team']->nid => array(
+        'oa_access_test' => array('access oa_access_test team override'),
+      ),
+    );
+    oa_access_set_group_permissions($group_permissions);
+
+    // So, in this case, only members of $team_a should have this permission
+    // even though 'All site users' have it, the Team permissions have further
+    // reduced access.
+    $this->assertTrue(oa_access($space1, 'access oa_access_test team override', $team_a['user']));
+    $this->assertFalse(oa_access($space1, 'access oa_access_test team override', $not_in_team));
+    $this->assertFalse(oa_access($space1, 'access oa_access_test team override', $not_in_space));
+
+    // However, if we are operating outside of a Space context, then all users
+    // should get it, ie. there are no Teams to restrict access further.
+    $this->assertTrue(oa_access(NULL, 'access oa_access_test team override', $team_a['user']));
+    $this->assertTrue(oa_access(NULL, 'access oa_access_test team override', $not_in_team));
+    $this->assertTrue(oa_access(NULL, 'access oa_access_test team override', $not_in_space));
+  }
+
+  public function testGroupAdminPage() {
+    // Create an admin user and login.
+    $account = $this->oaCreateUser(array('administer oa_access permissions'));
+    $this->drupalLogin($account);
+
+    $group_a = $this->oaCreateGroupWithUser(array('title' => 'Group A'), array('access content'));
+    $group_b = $this->oaCreateGroupWithUser(array('title' => 'Group B'), array('access content'));
+
+    // Configure Group A with both permissions, but Group B only with one.
+    $this->drupalGet(OA_ACCESS_GROUP_ADMIN_PATH);
+    $this->assertText(t('Used to test Group-only permissions'));
+    $this->assertNoText(t('Used to test Team-only permissions'));
+    $this->assertText(t('All site users'));
+    $this->assertNoText(t('All Space members'));
+    $this->assertTrue($this->hasSelectOption('permissions[oa_access_test][permission with all option for oa_access_test][groups][]', 0));
+    $this->assertFalse($this->hasSelectOption('permissions[oa_access_test][access oa_access_test][groups][]', 0));
+    $this->oaPostPermissions(array(
+      'oa_access_test' => array(
+        'access oa_access_test' => array($group_a['group']->nid, $group_b['group']->nid),
+        'administer oa_access_test' => array($group_a['group']->nid),
+        'group permission for oa_access_test' => array($group_a['group']->nid),
+      ),
+    ));
+
+    // Get permissions via the API and make sure they match.
+    $group_permissions = array(
+      $group_a['group']->nid => array(
+        'oa_access_test' => array('access oa_access_test', 'administer oa_access_test', 'group permission for oa_access_test'),
+      ),
+      $group_b['group']->nid => array(
+        'oa_access_test' => array('access oa_access_test'),
+      ),
+    );
+    $this->assertEqual(oa_access_get_group_permissions(array_keys($group_permissions)), $group_permissions);
+  }
+
+  public function testTeamAdminPage() {
+    // Create an admin user and login.
+    $account = $this->oaCreateUser(array('administer oa_access permissions'));
+    $this->drupalLogin($account);
+
+    // Create a Space that all our users are going to belong to.
+    $space1 = $this->oaCreateNode(array(
+      'title' => 'Space A',
+      'type'  => 'oa_space',
+      'uid'   => $account->uid,
+    ));
+
+    $team_a = $this->oaCreateTeamWithUser(array('title' => 'Team A'), array('access content'), $space1);
+    $team_b = $this->oaCreateTeamWithUser(array('title' => 'Team B'), array('access content'), $space1);
+
+    // Configure Team A with both permissions, but Team B only with one.
+    $parts = explode('/', OA_ACCESS_TEAM_ADMIN_PATH);
+    $parts[1] = 'node';
+    $parts[2] = $space1->nid;
+    $this->drupalGet(implode('/', $parts));
+    $this->assertNoText(t('Used to test Group-only permissions'));
+    $this->assertText(t('Used to test Team-only permissions'));
+    $this->assertNoText(t('All site users'));
+    $this->assertText(t('All Space members'));
+    $this->assertTrue($this->hasSelectOption('permissions[oa_access_test][permission with all option for oa_access_test][groups][]', $space1->nid));
+    $this->assertFalse($this->hasSelectOption('permissions[oa_access_test][access oa_access_test][groups][]', $space1->nid));
+    $this->oaPostPermissions(array(
+      'oa_access_test' => array(
+        'access oa_access_test' => array($team_a['team']->nid, $team_b['team']->nid),
+        'administer oa_access_test' => array($team_a['team']->nid),
+        'team permission for oa_access_test' => array($team_a['team']->nid),
+      ),
+    ));
+
+    // Get permissions via the API and make sure they match.
+    $group_permissions = array(
+      $team_a['team']->nid => array(
+        'oa_access_test' => array('access oa_access_test', 'administer oa_access_test', 'team permission for oa_access_test'),
+      ),
+      $team_b['team']->nid => array(
+        'oa_access_test' => array('access oa_access_test'),
+      ),
+    );
+    $this->assertEqual(oa_access_get_group_permissions(array_keys($group_permissions)), $group_permissions);
+  }
+
+  public function testCleanupPermissions() {
+    $group_a = $this->oaCreateGroupWithUser(array('title' => 'Group A'), array('access content'));
+    $group_b = $this->oaCreateGroupWithUser(array('title' => 'Group B'), array('access content'));
+
+    // Add some groups with a permission available, that we're going to remove
+    // and then cleanup.
+    $group_permissions = array(
+      $group_a['group']->nid => array(
+        'oa_access_test' => array(
+          'a permission for oa_access_test that is only conditionally available',
+          'access oa_access_test'
+        ),
+      ),
+      $group_b['group']->nid => array(
+        'oa_access_test' => array(
+          'a permission for oa_access_test that is only conditionally available'
+        ),
+      ),
+    );
+    oa_access_set_group_permissions($group_permissions);
+
+    // Now, we remove the permission.
+    variable_set('oa_access_test_remove_permission', TRUE);
+    drupal_static_reset('oa_access_get_permissions');
+    $valid_permissions = oa_access_get_permissions();
+    $this->assertFalse(isset($valid_permissions['a permission for oa_access_test that is only conditionally available']));
+
+    // Before we do the clean-up, the removed permission will still be set for
+    // $group_a and $group_b. Clear the static cache to make sure we're getting
+    // the database version.
+    drupal_static_reset('oa_access_get_group_permissions');
+    $this->assertEqual(oa_access_get_group_permissions(array_keys($group_permissions)), $group_permissions);
+
+    // Perform the clean-up.
+    oa_access_cleanup_permissions();
+
+    // And now verify that the permissions have been removed.
+    drupal_static_reset('oa_access_get_group_permissions');
+    $this->assertEqual(oa_access_get_group_permissions(array_keys($group_permissions)), array(
+      $group_a['group']->nid => array(
+        'oa_access_test' => array(
+          'access oa_access_test'
+        ),
+      ),
+      $group_b['group']->nid => array(),
+    ));
+  }
+}
+
+/**
+ * Functional tests for permissions that default to 'All' for the Open Atrium Access module.
+ */
+class OpenAtriumAccessAllTestCase extends OpenAtriumAccessBaseTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Open Atrium Access (default "All" permissions)',
+      'description' => 'Test permisisons that default to "All" in the Open Atrium Access API.',
+      'group' => 'Open Atrium Access',
+    );
+  }
+
+  public function testModuleEnableAndInitialize() {
+    // First, make sure we don't have access.
+    $this->assertEqual($this->getGroupPermissions('oa_access_test_all', array(0)), array(0 => array()));
+
+    // Then we enable the oa_access_test_all module and check again.
+    module_enable(array('oa_access_test_all'));
+    $this->assertEqual($this->getGroupPermissions('oa_access_test_all', array(0)), array(
+      0 => array(
+        'oa_access_test_all' => array('permission that defaults to all for oa_access_test_all'),
+      ),
+    ));
+
+    // Check that only the single permission is defined.
+    $perms = array(
+      'permission that defaults to all for oa_access_test_all' => array(
+        'title' => t('A permission that defaults to the "All" option'),
+        'description' => t('Used to test the functionality to default to the "All" option'),
+        'type' => OA_ACCESS_DEFAULT_PERMISSION | OA_ACCESS_DEFAULT_OPTION_ALL,
+        'module' => 'oa_access_test_all',
+        'combine' => OA_ACCESS_COMBINE_UNION,
+      ),
+    );
+    $this->assertEqual($this->getPermissions('oa_access_test_all'), $perms);
+
+    // Now, we want to add a new permission and test that it's available.
+    variable_set('oa_access_test_all_initialize_permissions', TRUE);
+    $perms['a permission for oa_access_test_all that is added after install'] = array(
+      'title' => t('Some fickle permission'),
+      'description' => t('A permission for oa_access_test that is only conditionally available'),
+      'type' => OA_ACCESS_DEFAULT_PERMISSION | OA_ACCESS_DEFAULT_OPTION_ALL,
+      'module' => 'oa_access_test_all',
+      'combine' => OA_ACCESS_COMBINE_UNION,
+    );
+    $this->assertEqual($this->getPermissions('oa_access_test_all', TRUE), $perms);
+
+    // Next, we initialize it and check that the 'All' group has it.
+    oa_access_initialize_permissions('a permission for oa_access_test_all that is added after install');
+    $this->assertEqual($this->getGroupPermissions('oa_access_test_all', array(0)), array(
+      0 => array(
+        'oa_access_test_all' => array(
+          'a permission for oa_access_test_all that is added after install',
+          'permission that defaults to all for oa_access_test_all',
+        ),
+      ),
+    ));
+  }
+
+  public function testModuleEnableWithTeams() {
+    // Create an admin user and login.
+    $account = $this->oaCreateUser(array('create oa_space content'));
+    $this->drupalLogin($account);
+
+    // Create a Space that could hold teams some day.
+    $space1 = $this->oaCreateNode(array(
+      'title' => 'Space A',
+      'type'  => 'oa_space',
+      'uid'   => $account->uid,
+    ));
+
+  	// First, make sure we don't have access.
+    $this->assertEqual(oa_access_get_group_permissions(array($space1->nid)), array($space1->nid => array()));
+
+    // Then we enable the oa_access_test_all module and check again.
+    module_enable(array('oa_access_test_all'));
+    $this->assertEqual(oa_access_get_group_permissions(array($space1->nid)), array(
+      $space1->nid => array(
+        'oa_access_test_all' => array('permission that defaults to all for oa_access_test_all'),
+      ),
+    ));
+  }
+
+  public function testAddSpaces() {
+    // Straight off the bat, enable
+    module_enable(array('oa_access_test_all'));
+
+    // Create an admin user and login.
+    $account = $this->oaCreateUser(array('create oa_space content'));
+    $this->drupalLogin($account);
+
+    // Create a new Space that could hold teams some day.
+    $space1 = $this->oaCreateNode(array(
+      'title' => 'Space A',
+      'type'  => 'oa_space',
+      'uid'   => $account->uid,
+    ));
+
+    // Check that default access was added.
+    $this->assertEqual(oa_access_get_group_permissions(array($space1->nid)), array(
+      $space1->nid => array(
+        'oa_access_test_all' => array('permission that defaults to all for oa_access_test_all'),
+      ),
+    ));
+  }
+}

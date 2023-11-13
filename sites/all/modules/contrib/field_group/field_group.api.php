@@ -28,7 +28,7 @@
 
 
 /**
- * Javascript hooks
+ * JavaScript hooks
  *
  * Drupal.FieldGroup.Effects.processHook.execute()
  * See field_group.js for the examples for all implemented formatters.
@@ -220,7 +220,7 @@ function hook_field_group_format_settings($group) {
  * @param Array $elements by address.
  * @param Object $group The Field group info.
  */
-function hook_field_group_pre_render(& $element, $group, & $form) {
+function hook_field_group_pre_render(&$element, $group, &$form) {
 
   // You can prepare some variables to use in the logic.
   $view_mode = isset($form['#view_mode']) ? $form['#view_mode'] : 'form';
@@ -268,7 +268,7 @@ function hook_field_group_pre_render(& $element, $group, & $form) {
  *
  * Function that fungates as last resort to alter the pre_render build.
  */
-function hook_field_group_pre_render_alter(&$element, $group, & $form) {
+function hook_field_group_pre_render_alter(&$element, $group, &$form) {
 
   if ($group->format_type == 'htab') {
     $element['#theme_wrappers'] = array('my_horizontal_tab');
@@ -285,7 +285,7 @@ function hook_field_group_pre_render_alter(&$element, $group, & $form) {
  *
  * @param Array $elements by address.
  */
-function hook_field_group_build_pre_render_alter(& $element) {
+function hook_field_group_build_pre_render_alter(&$element) {
 
   // Prepare variables.
   $display = isset($element['#view_mode']);
@@ -302,7 +302,7 @@ function hook_field_group_build_pre_render_alter(& $element) {
     }
   }
 
-  // You might include additional javascript files and stylesheets.
+  // You might include additional JavaScript files and stylesheets.
   $element['#attached']['js'][] = drupal_get_path('module', 'field_group') . '/field_group.js';
   $element['#attached']['css'][] = drupal_get_path('module', 'field_group') . '/field_group.css';
 

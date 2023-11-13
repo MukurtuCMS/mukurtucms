@@ -57,7 +57,7 @@ Drupal.behaviors.moduleFilterTabs = {
         // Build tabs from package title rows.
         var tabs = '<ul>';
         for (var i in Drupal.settings.moduleFilter.packageIDs) {
-          var id = Drupal.settings.moduleFilter.packageIDs[i];
+          var id = Drupal.checkPlain(Drupal.settings.moduleFilter.packageIDs[i]);
 
           var name = id;
           var tabClass = 'project-tab';
@@ -84,9 +84,9 @@ Drupal.behaviors.moduleFilterTabs = {
                 summary += '<span>' + Drupal.t('No modules were enabled or disabled within the last week.') + '</span>';
               }
               break;
-            default: 
-              var $row = $('#' + id + '-package');
-              name = $.trim($row.text());
+            default:
+              var $row = $('#' + id + '-package', this);
+              name = Drupal.checkPlain($.trim($row.text()));
               $row.remove();
               break;
           }
@@ -233,8 +233,8 @@ Drupal.behaviors.moduleFilterTabs = {
         }
 
         if (Drupal.settings.moduleFilter.useSwitch) {
-          $('td.checkbox div.form-item').hide();
-          $('td.checkbox').each(function(i) {
+          $('td.checkbox div.form-item', table).hide();
+          $('td.checkbox', table).each(function(i) {
             var $cell = $(this);
             var $checkbox = $(':checkbox', $cell);
             var $switch = $('.toggle-enable', $cell);
@@ -242,15 +242,12 @@ Drupal.behaviors.moduleFilterTabs = {
               if (!$(this).hasClass('disabled')) {
                 if (Drupal.ModuleFilter.jQueryIsNewer()) {
                   $checkbox.click();
+                  $switch.toggleClass('off');
                 }
                 else {
                   $checkbox.click().change();
+                  $switch.toggleClass('off');
                 }
-              }
-            });
-            $checkbox.click(function() {
-              if (!$switch.hasClass('disabled')) {
-                $switch.toggleClass('off');
               }
             });
           });
@@ -418,9 +415,13 @@ Drupal.ModuleFilter.selectTab = function(hash) {
     Drupal.ModuleFilter.modulesTop = $('#module-filter-modules').offset().top;
   }
   else {
+    // Calculate header offset; this is important in case the site is using
+    // admin_menu module which has fixed positioning and is on top of everything
+    // else.
+    var headerOffset = Drupal.settings.tableHeaderOffset ? eval(Drupal.settings.tableHeaderOffset + '()') : 0;
     // Scroll back to top of #module-filter-modules.
     $('html, body').animate({
-      scrollTop: Drupal.ModuleFilter.modulesTop
+      scrollTop: Drupal.ModuleFilter.modulesTop - headerOffset
     }, 500);
     // $('html, body').scrollTop(Drupal.ModuleFilter.modulesTop);
   }
@@ -516,7 +517,7 @@ Drupal.ModuleFilter.updateVisualAid = function(type, $row) {
   }
 
   var tab = Drupal.ModuleFilter.tabs[id];
-  var name = $('td:nth(1) strong', $row).text();
+  var name = Drupal.checkPlain($('td:nth(1) strong', $row).text());
   switch (type) {
     case 'enable':
       if (Drupal.ModuleFilter.disabling[id + name] != undefined) {

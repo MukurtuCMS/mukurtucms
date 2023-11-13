@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file This is the exif location install part
+ */
+
+/*
+ * Hook sets weight must be higher than exif module (-10), but lower than location (0 by default).
+ */
+function exif_location_install() {
+  $ret = array();
+  $ret[] = db_query("UPDATE {system} SET weight = -2 WHERE name = 'exif_location'");
+  return $ret;
+}
+
+function exif_location_update_6001() {
+  db_update('system')
+    ->fields(array('weight' => -2))
+    ->condition('name', 'exif_location', '=')
+    ->execute();
+  return t('exif_location weight has been changed.');
+}

@@ -1,0 +1,140 @@
+<?php
+/**
+ * @file
+ * This module simply gives the administrator role all node-based
+ * permissions every time the a new content-type is saved.
+ * Also supports the og_permissions
+ *
+ * Some of this taken from the http://drupal.org/project/adminrole module
+ * Customized for Open Atrium to support og_permissions
+ * and to only handle node-based permissions instead of all permissions
+ */
+
+/**
+ * Update permissions for all content types
+ */
+function oa_adminrole_update_roles() {
+  foreach (node_permissions_get_configured_types() as $type) {
+    oa_adminrole_update_permissions($type);
+    if (og_is_group_content_type('node', $type)) {
+      oa_adminrole_update_og_permissions($type);
+    }
+  }
+}
+
+/**
+ * Implements hook_enable().
+ */
+function oa_adminrole_enable() {
+  oa_adminrole_update_roles();
+}
+
+/**
+ * Respond to new content types
+ */
+function oa_adminrole_node_type_insert($info) {
+  oa_adminrole_update_permissions($info->type);
+  oa_adminrole_update_og_permissions($info->type);
+}
+
+/**
+ * Add the administrator role to all node-$type permissions.
+ */
+function oa_adminrole_update_permissions($type = '') {
+  if ($role = user_role_load_by_name('administrator')) {
+    // get all permissions that contain the node type
+    $perms = array();
+    foreach (module_implements('permission') as $module) {
+      foreach(module_invoke($module, 'permission') as $key => $perm) {
+        if (strpos($key, ' ' . $type . ' ') !== FALSE) {
+          $perms[$key] = $module;
+        }
+      }
+    }
+
+    if ($perms) {
+      $rid = $role->rid;
+      db_delete('role_permission')
+        ->condition('rid', $rid)
+        ->condition('permission', array_keys($perms), 'IN')
+        ->execute();
+
+      $query = db_insert('role_permission')
+        ->fields(array('rid', 'permission', 'module'));
+      foreach ($perms as $perm => $module) {
+        $query->values(array($rid, $perm, $module));
+      }
+      $query->execute();
+      // don't give messages during install
+      if (!defined('MAINTENANCE_MODE')) {
+        drupal_set_message(t('The <em>@role</em> role has been added to @type content permissions.', array('@role' => $role->name, '@type' => $type)));
+      }
+    }
+  }
+}
+
+/**
+ * Add the administrator role to all node-$type OG permissions.
+ */
+function oa_adminrole_update_og_permissions($type = '') {
+  $admin_rids = db_select('og_role', 'r')
+    ->fields('r', array('rid'))
+    ->condition('r.name', OG_ADMINISTRATOR_ROLE)
+    ->execute()
+    ->fetchCol(0);
+  $member_rids = db_select('og_role', 'r')
+    ->fields('r', array('rid'))
+    ->condition('r.name', OG_AUTHENTICATED_ROLE)
+    ->execute()
+    ->fetchCol(0);
+
+  if (!empty($admin_rids)) {
+    $perms = array();
+    foreach (module_implements('og_permission') as $module) {
+      foreach(module_invoke($module, 'og_permission') as $key => $perm) {
+        if (strpos($key, ' ' . $type . ' ') !== FALSE) {
+          $perms[$key] = $module;
+        }
+      }
+    }
+
+    if (!empty($perms)) {
+      $member_permissions = array();
+      $admin_permissions = array();
+      foreach ($perms as $perm => $module) {
+        // add admin to all perms
+        $admin_permissions[] = $perm;
+
+        // add member to all "own" perms
+        if (strpos($perm, ' own ') !== FALSE) {
+          $member_permissions[] = $perm;
+        }
+      }
+      foreach ($member_rids as $rid) {
+        og_role_grant_permissions($rid, $member_permissions);
+      }
+      foreach ($admin_rids as $rid) {
+        og_role_grant_permissions($rid, $admin_permissions);
+      }
+      // don't give messages during install
+      if (!defined('MAINTENANCE_MODE')) {
+        drupal_set_message(t('The <em>@role</em> role has been added to @type group/space permissions.', array('@role' => OG_ADMINISTRATOR_ROLE, '@type' => $type)));
+      }
+    }
+  }
+}
+
+
+/**
+ * Implements hook_modules_installed().
+ */
+function oa_adminrole_modules_installed($modules) {
+  foreach ($modules as $module) {
+    if ($info_array = module_invoke($module, 'node_info')) {
+      foreach ($info_array as $type => $info) {
+        oa_adminrole_update_permissions($type);
+        oa_adminrole_update_og_permissions($type);
+      }
+    }
+  }
+}

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_scald.context_config.inc
@@ -27,6 +28,9 @@ function ma_scald_default_scald_context_config() {
     'video' => array(
       '*' => 'passthrough',
     ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
@@ -44,6 +48,9 @@ function ma_scald_default_scald_context_config() {
     'video' => array(
       '*' => 'default',
       'settings' => array(),
+    ),
+    'gallery' => array(
+      '*' => 'default',
     ),
   );
   $context_config->data = array(
@@ -69,10 +76,13 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'passthrough',
     ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'default',
+      '*' => 'mukurtu_default',
       'settings' => array(),
     ),
     'image' => array(
@@ -86,6 +96,9 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'default',
       'settings' => array(),
+    ),
+    'gallery' => array(
+      '*' => 'default',
     ),
   );
   $context_config->data = array(
@@ -111,10 +124,13 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'passthrough',
     ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'default',
+      '*' => 'mukurtu_default',
       'settings' => array(),
     ),
     'image' => array(
@@ -128,6 +144,9 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'default',
       'settings' => array(),
+    ),
+    'gallery' => array(
+      '*' => 'default',
     ),
   );
   $context_config->data = array(
@@ -145,7 +164,7 @@ function ma_scald_default_scald_context_config() {
       '*' => 'passthrough',
     ),
     'image' => array(
-      '*' => 'style-medium',
+      '*' => 'style-large',
     ),
     'video' => array(
       '*' => 'passthrough',
@@ -153,9 +172,64 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'passthrough',
     ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
+      '*' => 'mukurtu_default',
+      'settings' => array(),
+    ),
+    'image' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'video' => array(
+      '*' => 'mukurtu_default',
+      'settings' => array(),
+    ),
+    'file' => array(
+      '*' => 'mukurtu_default',
+      'settings' => array(),
+    ),
+    'gallery' => array(
+      '*' => 'default',
+    ),
+  );
+  $context_config->data = array(
+    'width' => '480px',
+    'height' => '480px',
+  );
+  $export['ma_scald_search_results'] = $context_config;
+
+  $context_config = new stdClass();
+  $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
+  $context_config->api_version = 1;
+  $context_config->context = 'mukurtu_browse_by_grid';
+  $context_config->transcoder = array(
+    'audio' => array(
+      '*' => 'passthrough',
+    ),
+    'file' => array(
+      '*' => 'passthrough',
+    ),
+    'image' => array(
+      '*' => 'passthrough',
+    ),
+    'video' => array(
+      '*' => 'passthrough',
+    ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
+  );
+  $context_config->player = array(
+    'audio' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'file' => array(
       '*' => 'default',
       'settings' => array(),
     ),
@@ -167,16 +241,195 @@ function ma_scald_default_scald_context_config() {
       '*' => 'default',
       'settings' => array(),
     ),
+    'gallery' => array(
+      '*' => 'default',
+    ),
+  );
+  $context_config->data = array(
+    'width' => '',
+    'height' => '',
+  );
+  $export['mukurtu_browse_by_grid'] = $context_config;
+
+  $context_config = new stdClass();
+  $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
+  $context_config->api_version = 1;
+  $context_config->context = 'mukurtu_browse_by_grid_7_4';
+  $context_config->transcoder = array(
+    'audio' => array(
+      '*' => 'passthrough',
+    ),
+    'file' => array(
+      '*' => 'passthrough',
+    ),
+    'image' => array(
+      '*' => 'passthrough',
+    ),
+    'video' => array(
+      '*' => 'passthrough',
+    ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
+  );
+  $context_config->player = array(
+    'audio' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
     'file' => array(
       '*' => 'default',
       'settings' => array(),
     ),
+    'image' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'video' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'gallery' => array(
+      '*' => 'default',
+    ),
   );
   $context_config->data = array(
-    'width' => '220px',
-    'height' => '220px',
+    'width' => '',
+    'height' => '',
   );
-  $export['ma_scald_search_results'] = $context_config;
+  $export['mukurtu_browse_by_grid_7_4'] = $context_config;
+
+  $context_config = new stdClass();
+  $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
+  $context_config->api_version = 1;
+  $context_config->context = 'mukurtu_carousel_thumbnail';
+  $context_config->transcoder = array(
+    'audio' => array(
+      '*' => 'passthrough',
+    ),
+    'file' => array(
+      '*' => 'passthrough',
+    ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
+    'image' => array(
+      '*' => 'passthrough',
+    ),
+    'video' => array(
+      '*' => 'passthrough',
+    ),
+  );
+  $context_config->player = array(
+    'audio' => array(
+      '*' => 'mukurtu_default',
+    ),
+    'file' => array(
+      '*' => 'mukurtu_default',
+    ),
+    'gallery' => array(
+      '*' => 'default',
+    ),
+    'image' => array(
+      '*' => 'mukurtu_default',
+    ),
+    'video' => array(
+      '*' => 'mukurtu_default',
+    ),
+  );
+  $context_config->data = array(
+    'width' => '',
+    'height' => '',
+  );
+  $export['mukurtu_carousel_thumbnail'] = $context_config;
+
+  $context_config = new stdClass();
+  $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
+  $context_config->api_version = 1;
+  $context_config->context = 'mukurtu_featured_content';
+  $context_config->transcoder = array(
+    'audio' => array(
+      '*' => 'passthrough',
+    ),
+    'file' => array(
+      '*' => 'passthrough',
+    ),
+    'image' => array(
+      '*' => 'passthrough',
+    ),
+    'video' => array(
+      '*' => 'passthrough',
+    ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
+  );
+  $context_config->player = array(
+    'audio' => array(
+      '*' => 'mukurtu_default',
+    ),
+    'file' => array(
+      '*' => 'mukurtu_default',
+    ),
+    'image' => array(
+      '*' => 'mukurtu_default',
+    ),
+    'video' => array(
+      '*' => 'mukurtu_default',
+    ),
+    'gallery' => array(
+      '*' => 'default',
+    ),
+  );
+  $context_config->data = array(
+    'width' => '100%',
+    'height' => '100%',
+  );
+  $export['mukurtu_featured_content'] = $context_config;
+
+  $context_config = new stdClass();
+  $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
+  $context_config->api_version = 1;
+  $context_config->context = 'mukurtu_multi_page_carousel';
+  $context_config->transcoder = array(
+    'audio' => array(
+      '*' => 'passthrough',
+    ),
+    'file' => array(
+      '*' => 'passthrough',
+    ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
+    'image' => array(
+      '*' => 'passthrough',
+    ),
+    'video' => array(
+      '*' => 'passthrough',
+    ),
+  );
+  $context_config->player = array(
+    'audio' => array(
+      '*' => 'mukurtu_default',
+    ),
+    'file' => array(
+      '*' => 'mukurtu_default',
+    ),
+    'gallery' => array(
+      '*' => 'default',
+    ),
+    'image' => array(
+      '*' => 'mukurtu_default',
+    ),
+    'video' => array(
+      '*' => 'mukurtu_default',
+    ),
+  );
+  $context_config->data = array(
+    'width' => '',
+    'height' => '',
+  );
+  $export['mukurtu_multi_page_carousel'] = $context_config;
 
   $context_config = new stdClass();
   $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
@@ -195,6 +448,9 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'passthrough',
     ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
@@ -213,12 +469,63 @@ function ma_scald_default_scald_context_config() {
       '*' => 'default',
       'settings' => array(),
     ),
+    'gallery' => array(
+      '*' => 'default',
+    ),
   );
   $context_config->data = array(
     'width' => '',
     'height' => '',
   );
   $export['mukurtu_scald_banner_image'] = $context_config;
+
+  $context_config = new stdClass();
+  $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
+  $context_config->api_version = 1;
+  $context_config->context = 'mukurtu_scald_dictionary_media';
+  $context_config->transcoder = array(
+    'audio' => array(
+      '*' => 'passthrough',
+    ),
+    'file' => array(
+      '*' => 'passthrough',
+    ),
+    'image' => array(
+      '*' => 'passthrough',
+    ),
+    'video' => array(
+      '*' => 'passthrough',
+    ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
+  );
+  $context_config->player = array(
+    'audio' => array(
+      '*' => 'mukurtu_default',
+      'settings' => array(),
+    ),
+    'file' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'image' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'video' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'gallery' => array(
+      '*' => 'default',
+    ),
+  );
+  $context_config->data = array(
+    'width' => '100%',
+    'height' => '100%',
+  );
+  $export['mukurtu_scald_dictionary_media'] = $context_config;
 
   $context_config = new stdClass();
   $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
@@ -237,14 +544,18 @@ function ma_scald_default_scald_context_config() {
     'video' => array(
       '*' => 'passthrough',
     ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'default',
+      '*' => 'mukurtu_default',
       'settings' => array(),
     ),
     'file' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
     'image' => array(
       '*' => 'default',
@@ -254,12 +565,62 @@ function ma_scald_default_scald_context_config() {
       '*' => 'default',
       'settings' => array(),
     ),
+    'gallery' => array(
+      '*' => 'default',
+    ),
   );
   $context_config->data = array(
     'width' => '750',
     'height' => '560',
   );
   $export['mukurtu_scald_media_assets_edit_'] = $context_config;
+
+  $context_config = new stdClass();
+  $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
+  $context_config->api_version = 1;
+  $context_config->context = 'mukurtu_scald_recording';
+  $context_config->transcoder = array(
+    'audio' => array(
+      '*' => 'passthrough',
+    ),
+    'file' => array(
+      '*' => 'passthrough',
+    ),
+    'image' => array(
+      '*' => 'passthrough',
+    ),
+    'video' => array(
+      '*' => 'passthrough',
+    ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
+  );
+  $context_config->player = array(
+    'audio' => array(
+      '*' => 'mukurtu_default',
+    ),
+    'file' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'image' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'video' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'gallery' => array(
+      '*' => 'default',
+    ),
+  );
+  $context_config->data = array(
+    'width' => '100%',
+    'height' => '100%',
+  );
+  $export['mukurtu_scald_recording'] = $context_config;
 
   $context_config = new stdClass();
   $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
@@ -278,6 +639,57 @@ function ma_scald_default_scald_context_config() {
     'video' => array(
       '*' => 'passthrough',
     ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
+  );
+  $context_config->player = array(
+    'audio' => array(
+      '*' => 'html5_player',
+      'settings' => array(),
+    ),
+    'file' => array(
+      '*' => 'mukurtu_default',
+      'settings' => array(),
+    ),
+    'image' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'video' => array(
+      '*' => 'mukurtu_default',
+      'settings' => array(),
+    ),
+    'gallery' => array(
+      '*' => 'default',
+    ),
+  );
+  $context_config->data = array(
+    'width' => '280px',
+    'height' => '280px',
+  );
+  $export['mukurtu_scald_related_items'] = $context_config;
+
+  $context_config = new stdClass();
+  $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
+  $context_config->api_version = 1;
+  $context_config->context = 'mukurtu_scald_taxonomy_thumbnail';
+  $context_config->transcoder = array(
+    'audio' => array(
+      '*' => 'passthrough',
+    ),
+    'file' => array(
+      '*' => 'passthrough',
+    ),
+    'image' => array(
+      '*' => 'passthrough',
+    ),
+    'video' => array(
+      '*' => 'passthrough',
+    ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
@@ -286,6 +698,7 @@ function ma_scald_default_scald_context_config() {
     ),
     'file' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
     'image' => array(
       '*' => 'default',
@@ -295,12 +708,15 @@ function ma_scald_default_scald_context_config() {
       '*' => 'default',
       'settings' => array(),
     ),
+    'gallery' => array(
+      '*' => 'default',
+    ),
   );
   $context_config->data = array(
-    'width' => '280px',
-    'height' => '280px',
+    'width' => '',
+    'height' => '',
   );
-  $export['mukurtu_scald_related_items'] = $context_config;
+  $export['mukurtu_scald_taxonomy_thumbnail'] = $context_config;
 
   $context_config = new stdClass();
   $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
@@ -319,6 +735,9 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'passthrough',
     ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
@@ -337,12 +756,62 @@ function ma_scald_default_scald_context_config() {
       '*' => 'default',
       'settings' => array(),
     ),
+    'gallery' => array(
+      '*' => 'default',
+    ),
   );
   $context_config->data = array(
     'width' => '',
     'height' => '',
   );
   $export['mukurtu_scald_thumbnail_image'] = $context_config;
+
+  $context_config = new stdClass();
+  $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
+  $context_config->api_version = 1;
+  $context_config->context = 'mukurtu_scald_tiny_thumbnail';
+  $context_config->transcoder = array(
+    'audio' => array(
+      '*' => 'passthrough',
+    ),
+    'file' => array(
+      '*' => 'passthrough',
+    ),
+    'image' => array(
+      '*' => 'passthrough',
+    ),
+    'video' => array(
+      '*' => 'passthrough',
+    ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
+  );
+  $context_config->player = array(
+    'audio' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'file' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'image' => array(
+      '*' => 'mukurtu_default',
+    ),
+    'video' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'gallery' => array(
+      '*' => 'default',
+    ),
+  );
+  $context_config->data = array(
+    'width' => '35px',
+    'height' => '35px',
+  );
+  $export['mukurtu_scald_tiny_thumbnail'] = $context_config;
 
   $context_config = new stdClass();
   $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
@@ -361,10 +830,13 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'passthrough',
     ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'default',
+      '*' => 'mukurtu_default',
       'settings' => array(),
     ),
     'image' => array(
@@ -378,6 +850,9 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'default',
       'settings' => array(),
+    ),
+    'gallery' => array(
+      '*' => 'default',
     ),
   );
   $context_config->data = array(
@@ -391,25 +866,32 @@ function ma_scald_default_scald_context_config() {
   $context_config->api_version = 1;
   $context_config->context = 'sdl_library_item';
   $context_config->transcoder = array(
-    'image' => array(
-      '*' => 'style-Library',
-    ),
     'audio' => array(
-      '*' => 'passthrough',
-    ),
-    'video' => array(
       '*' => 'passthrough',
     ),
     'file' => array(
       '*' => 'passthrough',
+    ),
+    'image' => array(
+      '*' => 'style-library',
+    ),
+    'video' => array(
+      '*' => 'passthrough',
+    ),
+    'gallery' => array(
+      '*' => 'style-Library',
     ),
   );
   $context_config->player = array(
-    'image' => array(
+    'audio' => array(
       '*' => 'default',
       'settings' => array(),
     ),
-    'audio' => array(
+    'file' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'image' => array(
       '*' => 'default',
       'settings' => array(),
     ),
@@ -417,9 +899,8 @@ function ma_scald_default_scald_context_config() {
       '*' => 'default',
       'settings' => array(),
     ),
-    'file' => array(
+    'gallery' => array(
       '*' => 'default',
-      'settings' => array(),
     ),
   );
   $context_config->data = array(
@@ -445,10 +926,13 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'passthrough',
     ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'default',
+      '*' => 'html5_player',
       'settings' => array(),
     ),
     'image' => array(
@@ -462,6 +946,9 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'default',
       'settings' => array(),
+    ),
+    'gallery' => array(
+      '*' => 'default',
     ),
   );
   $context_config->data = array(
@@ -487,6 +974,9 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'passthrough',
     ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
@@ -504,6 +994,9 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'default',
       'settings' => array(),
+    ),
+    'gallery' => array(
+      '*' => 'default',
     ),
   );
   $context_config->data = array(

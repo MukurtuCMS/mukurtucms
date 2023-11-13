@@ -1,0 +1,120 @@
+<?php
+/**
+ * Implementation of hook_services_resources().
+ */
+function services_field_collection_services_resources() {
+
+  return array(
+    'field_collection' => array(
+      'operations' => array(
+        'retrieve' => array(
+          'help' => 'Retrieves field collection',
+          'callback' => '_services_fc_retrieve',
+          'file' => array('file' => 'inc', 'module' => 'services_field_collection'),
+          'args' => array(
+            array(
+              'name' => 'fcid',
+              'type' => 'int',
+              'description' => '',
+              'source' => array('path' => 0),
+              'optional' => FALSE,
+            )
+          ),
+          'access arguments' => array('access content'),
+        ),
+        'create' => array(
+          'help' => 'Create field collection',
+          'file' => array('file' => 'inc', 'module' => 'services_field_collection'),
+          'callback' => '_services_fc_create',
+          'args' => array(
+            array(
+              'name' => 'collection',
+              'optional' => FALSE,
+              'source' => 'data',
+              'description' => 'The field collection to create',
+              'type' => 'array',
+            ),
+          ),
+          'access arguments' => array('administer field collections'),
+        ),
+        'update' => array(
+          'help' => 'Update field collection',
+          'file' => array('file' => 'inc', 'module' => 'services_field_collection'),
+          'callback' => '_services_fc_update',
+          'args' => array(
+            array(
+              'name' => 'fcid',
+              'optional' => FALSE,
+              'source' => array('path' => 0),
+              'type' => 'int',
+              'description' => 'ID of field collection to update',
+            ),
+            array(
+              'name' => 'field_collection',
+              'optional' => FALSE,
+              'source' => 'data',
+              'description' => 'The field_collection data to update',
+              'type' => 'array',
+            ),
+          ),
+          'access arguments' => array('administer field collections'),
+        ),
+        'delete' => array(
+          'help' => t('Delete field collection'),
+          'file' => array('file' => 'inc', 'module' => 'services_field_collection'),
+          'callback' => '_services_fc_delete',
+          'args' => array(
+            array(
+              'name' => 'fcid',
+              'optional' => FALSE,
+              'source' => array('path' => 0),
+              'type' => 'int',
+              'description' => 'The id of the field collection to delete',
+            ),
+          ),
+          'access arguments' => array('administer field collections'),
+        ),
+        'index' => array(
+          'help' => 'List all field collections',
+          'file' => array('file' => 'inc', 'module' => 'services_field_collection'),
+          'callback' => '_services_fc_index',
+          'args' => array(
+            array(
+              'name' => 'page',
+              'optional' => TRUE,
+              'type' => 'int',
+              'description' => 'The zero-based index of the page to get, defaults to 0.',
+              'default value' => 0,
+              'source' => array('param' => 'page'),
+            ),
+            array(
+              'name' => 'fields',
+              'optional' => TRUE,
+              'type' => 'string',
+              'description' => 'The fields to get.',
+              'default value' => '*',
+              'source' => array('param' => 'fields'),
+            ),
+            array(
+              'name' => 'parameters',
+              'optional' => TRUE,
+              'type' => 'array',
+              'description' => 'Parameters array',
+              'default value' => array(),
+              'source' => array('param' => 'parameters'),
+            ),
+            array(
+              'name' => 'pagesize',
+              'optional' => TRUE,
+              'type' => 'int',
+              'description' => 'Number of records to get per page.',
+              'default value' => 20,
+              'source' => array('param' => 'pagesize'),
+            ),
+          ),
+          'access arguments' => array('access content'),
+        ),
+      ),
+    ),
+  );
+}

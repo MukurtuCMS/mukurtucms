@@ -1,0 +1,46 @@
+From ddc3a2494f63ee49ff635f20673968e433ffc986 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Tue, 26 Jan 2021 15:33:05 -0800
+Subject: [PATCH] Use new field language handling in feeds
+
+---
+ mappers/text.inc | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/mappers/text.inc b/mappers/text.inc
+index 1cf76bf9..67bbcc2e 100644
+--- a/mappers/text.inc
++++ b/mappers/text.inc
+@@ -51,6 +51,13 @@ function text_feeds_processor_targets($entity_type, $bundle_name) {
+ function text_feeds_set_target(FeedsSource $source, $entity, $target, array $values, array $mapping) {
+   $language = $mapping['language'];
+
++  // Mukurtu patch for Mukurtu specific importers.
++  // We want to use the node's language for the field language.
++  // Mukurtu does not support field translation.
++  if (stripos($source->id, 'mukurtu_import') !== FALSE) {
++    $language = ma_importexport_get_field_language($entity->feeds_item->entity_type, $entity, $target);
++  }
++
+   list($field_name, $column) = explode(':', $target . ':value');
+
+   if ($column === 'value' && isset($source->importer->processor->config['input_format'])) {
+@@ -63,6 +70,15 @@ function text_feeds_set_target(FeedsSource $source, $entity, $target, array $val
+
+   $field = isset($entity->$field_name) ? $entity->$field_name : array($language => array());
+
++  // Mukurtu Patch.
++  // For our importers, we are completely replacing values.
++  // Start from empty for all languages, we are not supporting field translation.
++  if (stripos($source->id, 'mukurtu_import') !== FALSE) {
++    foreach ($field as $field_lang => $field_values) {
++      $field[$field_lang] = array();
++    }
++  }
++
+   // Iterate over all values.
+   $delta = 0;
+   foreach ($values as $value) {
+--
+2.19.0.windows.1
+

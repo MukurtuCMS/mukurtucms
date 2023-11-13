@@ -16,8 +16,15 @@ class ServicesUITest extends DrupalWebTestCase {
     );
   }
 
-  function setUp() {
-    parent::setUp(array('ctools', 'services', 'rest_server'));
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    $modules[] = 'ctools';
+    $modules[] = 'services';
+    $modules[] = 'rest_server';
+    parent::setUp($modules);
+
     $this->privilegedUser = $this->drupalCreateUser(array('administer services', 'administer site configuration'));
     $this->drupalLogin($this->privilegedUser);
   }

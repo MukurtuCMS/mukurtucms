@@ -64,13 +64,16 @@ function scald_flash_scald_add_form_fill(&$atoms, $form, $form_state) {
 * Implements hook_scald_fetch.
 */
 function scald_flash_scald_fetch($atom, $type) {
-  // Get the flash thumbnail
+  // Get the flash thumbnail.
   $file = file_load($atom->base_id);
   $atom->base_entity = $file;
   $atom->file_source = $file->uri;
 
   if ($items = field_get_items('scald_atom', $atom, 'scald_thumbnail')) {
     $atom->thumbnail_source = $items[0]['uri'];
+  }
+  else {
+    $atom->thumbnail_source = drupal_get_path('module', 'scald_flash') . '/icons/flash.png';
   }
 }
 
@@ -93,17 +96,42 @@ function scald_flash_scald_atom_insert($atom) {
  */
 function scald_flash_scald_prerender($atom, $context, $options, $mode) {
   if ($mode == 'atom') {
-    $langcode = field_language('scald_atom', $atom, 'scald_width');
-    $atom->rendered->player = theme('scald_flash_object',
-      array('vars' =>
-        array(
-          'flash_uri'      => $atom->rendered->file_source_url,
-          'flash_width'   => ($atom->scald_width[$langcode][0]['value'] ? $atom->scald_width[$langcode][0]['value'] : 480),
-          'flash_height'  => ($atom->scald_height[$langcode][0]['value'] ? $atom->scald_height[$langcode][0]['value'] : 365),
-          'thumbnail'     => $atom->thumbnail_source,
-        ),
-      )
-    );
+    if ($context === 'sdl_library_item') {
+      $scald_thumbnail = field_get_items('scald_atom', $atom, 'scald_thumbnail');
+      if (empty($scald_thumbnail)) {
+        $atom->rendered->thumbnail_transcoded_url = file_create_url($atom->thumbnail_source);
+      }
+    }
+    else {
+      $flash_width = 480;
+      $flash_height = 365;
+
+      $scald_width = field_get_items('scald_atom', $atom, 'scald_width');
+      if (!empty($scald_width)) {
+        $flash_width = $scald_width[0]['value'];
+      }
+      $scald_height = field_get_items('scald_atom', $atom, 'scald_height');
+      if (!empty($scald_height)) {
+        $flash_height = $scald_height[0]['value'];
+      }
+
+      // Allow context configuration to override flash dimension variables.
+      $context_config = scald_context_config_load($context);
+      if (!empty($context_config->data['width']) && !empty($context_config->data['height'])) {
+        $flash_width = $context_config->data['width'];
+        $flash_height = $context_config->data['height'];
+      }
+      $atom->rendered->player = theme('scald_flash_object',
+        array('vars' =>
+          array(
+            'flash_uri'      => $atom->rendered->file_source_url,
+            'flash_width'   => $flash_width,
+            'flash_height'  => $flash_height,
+            'thumbnail'     => $atom->thumbnail_source,
+          ),
+        )
+      );
+    }
   }
 }
 

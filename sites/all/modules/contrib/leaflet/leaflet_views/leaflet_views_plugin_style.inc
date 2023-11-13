@@ -18,12 +18,32 @@ class leaflet_views_plugin_style extends views_plugin_style {
     // Fallback for views that do not have entity_type set, for example
     // because the view was created before this option got introduced.
     if (empty($this->entity_type)) {
-      $info = entity_get_info($view->base_table);
+      $info = $this->getEntityInfoByTable($view->base_table);
       if (!empty($info)) {
-        $this->entity_type = $view->base_table;
+        $this->entity_type = $info['entity type'];
         $this->entity_info = $info;
       }
     }
+  }
+
+  /**
+   * Gets entity information based on the entity table passed in.
+   *
+   * @param string $table
+   *   Table name.
+   *
+   * @return array
+   *   Returns the entity_info array.
+   */
+  function getEntityInfoByTable($table) {
+    $info = entity_get_info();
+    foreach($info as $entity_type => &$entity_info) {
+      if($entity_info['base table'] == $table) {
+        $entity_info['entity type'] = $entity_type;
+        return $entity_info;
+      }
+    }
+    return array();
   }
 
   /**
@@ -278,8 +298,13 @@ class leaflet_views_plugin_style extends views_plugin_style {
             if (!empty($result->{$this->entity_info['entity keys']['id']})) {
               $entity_id = $result->{$this->entity_info['entity keys']['id']};
             }
-            elseif ($result->entity) {
+            elseif (isset($result->entity)) {
               $entity_id = $result->entity;
+            }
+            elseif (isset($result->_field_data)) {
+              $tmp = $result->_field_data;
+              $tmp = array_pop($tmp);
+              $entity_id = $tmp['entity']->{$this->entity_info['entity keys']['id']};
             }
             $entity = entity_load_single($this->entity_type, $entity_id);
             if ($this->options['description_field'] === '#rendered_entity') {
@@ -335,5 +360,12 @@ class leaflet_views_plugin_style extends views_plugin_style {
       return leaflet_build_map($map, $data, $this->options['height'] . 'px');
     }
     return;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function even_empty() {
+    return !$this->options['hide_empty'];
   }
 }

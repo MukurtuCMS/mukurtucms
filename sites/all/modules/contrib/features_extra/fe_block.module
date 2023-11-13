@@ -90,7 +90,7 @@ function fe_block_settings_features_export($data, &$export, $module_name = '') {
 /**
  * Implements hook_features_export_render().
  */
-function fe_block_settings_features_export_render($module_name = '', $data) {
+function fe_block_settings_features_export_render($module_name, $data) {
   $code = array();
   $code[] = '  $export = array();';
   $code[] = '';
@@ -499,6 +499,11 @@ function fe_block_settings_features_revert($module_name = NULL) {
     if (module_exists('i18n_block') && isset($block_i18n_block_language)) {
       _fe_block_settings_update_i18n_block_language($block, $block_i18n_block_language);
     }
+
+    // Apply blockcache_alter settings.
+    if (module_exists('blockcache_alter')) {
+      _fe_block_settings_update_block_cache_alter($block);
+    }
   }
 
   // Clear block cache.
@@ -680,6 +685,38 @@ function _fe_block_settings_update_i18n_block_language($block, $block_languages)
 }
 
 /**
+ * Helper to update the blockcache_alter settings for a specific block.
+ *
+ * @param array $block
+ *   Block definition.
+ */
+function _fe_block_settings_update_block_cache_alter($block){
+  $bids = db_select('block', 'b')
+    ->fields('b', array('bid'))
+    ->condition('module', $block['module'])
+    ->condition('delta', $block['delta'])
+    ->execute()
+    ->fetchCol();
+
+  $blockcache_alter = db_select('blockcache_alter', 'b')
+    ->fields('b', array('bid'))
+    ->condition('module', $block['module'])
+    ->condition('delta', $block['delta'])
+    ->execute()
+    ->fetchCol();
+
+  foreach ($bids as $bid) {
+    $block['bid'] = $bid;
+    if (in_array($bid, $blockcache_alter)) {
+      drupal_write_record('blockcache_alter', $block, array('bid'));
+    }
+    else {
+      drupal_write_record('blockcache_alter', $block);
+    }
+  }
+}
+
+/**
  * Implements hook_features_disable_feature().
  */
 function fe_block_settings_features_disable_feature($module) {
@@ -744,7 +781,7 @@ function fe_block_boxes_features_export($data, &$export, $module_name = '') {
 /**
  * Implements hook_features_export_render().
  */
-function fe_block_boxes_features_export_render($module_name = '', $data) {
+function fe_block_boxes_features_export_render($module_name, $data) {
   ctools_include('export');
   $component = 'fe_block_boxes';
   $schema = ctools_export_get_schema($component);

@@ -1,0 +1,79 @@
+.mobile-sync-icon img {
+  width: 12px;
+  height: 20px;
+  vertical-align: top;
+}
+
+// Positioning of the mobile sync icon.
+
+@icon1: field-name-mukurtu-mobile-sync;
+@icon2: field-name-mukurtu-mobile-sync-white;
+
+.view-mode-search_result {
+  .field-name-mukurtu-icon-actions, .@{icon1}, .@{icon2} {
+    display: inline-block;
+  }
+}
+.node-digital-heritage.view-mode-full, .node-community.view-mode-full, .node-cultural-protocol-group.view-mode-full, .node-dictionary-word.view-mode-full, .node-personal-collection.node-teaser, .node-community.node-teaser, .node-unit-plan.view-mode-full, .node-person.view-mode-full {
+  .@{icon1}, .@{icon2} {
+    float: right;
+    margin-top: -25px;
+    margin-right: 25px;
+  }
+}
+.view-mode-collections_browse, .node-collection.view-mode-full, .node-personal-collection.view-mode-full, .node-word-list.view-mode-full {
+  .field-name-title, .@{icon1}, .@{icon2} {
+    display: inline-block;
+  }
+  .@{icon1}, .@{icon2} {
+    float: right;
+    padding: 20px;
+  }
+}
+.view-mode-dictionary_word_summary {
+  .@{icon1}, .@{icon2} {
+    float: left !important;
+    padding: 25px 15px 0 15px !important;
+  }
+}
+.field-name-mm-sync-content-view-field {
+  border-top: 5px solid #EEEAEA;
+  margin-top: 40px;
+  padding-top: 30px;
+  h2 {
+    border-bottom: 5px solid #E6AB49;
+    font-size: 36px;
+    line-height: inherit;
+    font-weight: 400;
+  }
+  .views-row {
+    padding-bottom: 0.3em;
+    .views-field-nothing, .views-field-php {
+      display: inline-block;
+    }
+    .views-field-nothing {
+      max-width: calc(100% - 37px);
+    }
+    .views-field-php {
+      float: right;
+      margin-right: 25px;
+    }
+  }
+}
+
+// Admin page
+#ma-mobile-client-admin-config {
+
+  .linethrough {
+    text-decoration: line-through;
+  }
+
+  // The Form API does not provide a class per field (and only that field, not values within that field), so need to target these individually.
+  .form-item-mukurtu-mobile-enabled {
+    margin-bottom: 30px;
+  }
+  #edit-viewable {
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
+}

@@ -21,6 +21,24 @@
  */
 
 /**
+ * Retrieves the schema for a field.
+ *
+ * @param $field
+ *   The field array to get the schema definition against.
+ * @return
+ *   The field schema definition array.
+ */
+function field_retrieve_schema($field) {
+  module_load_install($field['module']);
+  $schema = (array) module_invoke($field['module'], 'field_schema', $field);
+  $schema += array('columns' => array(), 'indexes' => array(), 'foreign keys' => array());
+  // Give other modules a chance to alter this definition.
+  // @see hook_field_schema_alter()
+  drupal_alter('field_schema', $schema, $field);
+  return $schema;
+}
+
+/**
  * Creates a field.
  *
  * This function does not bind the field to any bundle; use
@@ -130,9 +148,7 @@ function field_create_field($field) {
   $field['storage']['module'] = $storage_type['module'];
   $field['storage']['active'] = 1;
   // Collect storage information.
-  module_load_install($field['module']);
-  $schema = (array) module_invoke($field['module'], 'field_schema', $field);
-  $schema += array('columns' => array(), 'indexes' => array(), 'foreign keys' => array());
+  $schema = field_retrieve_schema($field);
   // 'columns' are hardcoded in the field type.
   $field['columns'] = $schema['columns'];
   // 'foreign keys' are hardcoded in the field type.
@@ -189,7 +205,7 @@ function field_create_field($field) {
   }
 
   // Clear caches
-  field_cache_clear(TRUE);
+  field_cache_clear();
 
   // Invoke external hooks after the cache is cleared for API consistency.
   module_invoke_all('field_create_field', $field);
@@ -242,9 +258,7 @@ function field_update_field($field) {
 
   // Collect the new storage information, since what is in
   // $prior_field may no longer be right.
-  module_load_install($field['module']);
-  $schema = (array) module_invoke($field['module'], 'field_schema', $field);
-  $schema += array('columns' => array(), 'indexes' => array(), 'foreign keys' => array());
+  $schema = field_retrieve_schema($field);
   // 'columns' are hardcoded in the field type.
   $field['columns'] = $schema['columns'];
   // 'foreign keys' are hardcoded in the field type.
@@ -288,7 +302,7 @@ function field_update_field($field) {
   drupal_write_record('field_config', $field, $primary_key);
 
   // Clear caches
-  field_cache_clear(TRUE);
+  field_cache_clear();
 
   // Invoke external hooks after the cache is cleared for API consistency.
   module_invoke_all('field_update_field', $field, $prior_field, $has_data);
@@ -388,9 +402,7 @@ function field_read_fields($params = array(), $include_additional = array()) {
     module_invoke_all('field_read_field', $field);
 
     // Populate storage information.
-    module_load_install($field['module']);
-    $schema = (array) module_invoke($field['module'], 'field_schema', $field);
-    $schema += array('columns' => array(), 'indexes' => array());
+    $schema = field_retrieve_schema($field);
     $field['columns'] = $schema['columns'];
 
     $field_name = $field['field_name'];
@@ -430,7 +442,7 @@ function field_delete_field($field_name) {
     ->execute();
 
   // Clear the cache.
-  field_cache_clear(TRUE);
+  field_cache_clear();
 
   module_invoke_all('field_delete_field', $field);
 }
@@ -469,6 +481,7 @@ function field_delete_field($field_name) {
  * @throws FieldException
  *
  * See: @link field Field API data structures @endlink.
+ * @see hook_field_schema_alter()
  */
 function field_create_instance($instance) {
   $field = field_read_field($instance['field_name']);
@@ -733,6 +746,7 @@ function field_read_instances($params = array(), $include_additional = array()) 
   }
 
   $instances = array();
+  $query->orderBy('fci.id');
   $results = $query->execute();
 
   foreach ($results as $record) {

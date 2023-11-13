@@ -1,0 +1,12 @@
+name = Unsplash service
+description = Integrates the unsplash service with the dummyimage module.
+core = 7.x
+package = Dummy image
+dependencies[] = dummyimage
+
+; Information added by Drupal.org packaging script on 2016-03-06
+version = "7.x-1.6"
+core = "7.x"
+project = "dummyimage"
+datestamp = "1457262243"
+

@@ -1,0 +1,14 @@
+name = "Feeds entity processor module tests"
+description = "Support module for Feeds entity processor related testing."
+package = Testing
+core = 7.x
+hidden = TRUE
+
+files[] = src/FeedsEntityProcessorTestMetadataController.php
+
+; Information added by Drupal.org packaging script on 2017-07-09
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "feeds_entity_processor"
+datestamp = "1499593144"
+

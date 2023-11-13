@@ -1,0 +1,134 @@
+@digital-hertiage-text-size-desktop: 18px;
+
+// Digital Heritage
+.digital-heritage-body {
+    .field-name-field-media-asset {
+        img {
+            margin: auto;
+        }
+
+        .scald-atom {
+            padding-bottom: 30px;
+        }
+    }
+
+    >.field {
+        .metadata-field-padding;
+        font-size: 16px;
+
+        // Desktop
+        @media (min-width: @screen-md-min) {
+            font-size: 18px;
+        }
+
+        > a {
+            .mukurtu-standard-link;
+        }
+
+        .label-above {
+            .metadata-primary-field-label;
+        }
+    }
+
+    // Field dividers
+    >.field::after {
+        content : "";
+        display: inline-block;
+        left: 0;
+        bottom: 0;
+        height: 1px;
+        width: 100%;
+        padding-top: 30px;
+        border-bottom: 5px solid @mukurtu-primary-field-divider-color;
+    }
+}
+
+.view-browse-all-content,
+.view-community-dh-items,
+.view-digital-heritage-grid-list {
+    >.view-content {
+        .views-row-first {
+            border-top: 5px solid @mukurtu-view-row-divider-color;
+        }
+        .views-row {
+            padding-top: 30px;
+            padding-bottom: 30px;
+        }
+    }
+
+    .views-row {
+        .view-border;
+    }
+}
+
+// Community Record Tabs
+.record-drop-shadow {
+    &::after {
+        .section-shadow;
+        content: "";
+        height: 12px;
+        display: block;
+    }
+}
+
+// Community record quicktab container
+#quicktabs-container-community-record {
+    padding-top: 80px;
+
+    // Tablet
+    @media (min-width: @screen-sm-min) {
+        padding-top: 50px;
+    }
+}
+
+// Digital Heritage Node Page
+.node-type-digital-heritage {
+    // Hide title header background
+    h1.page-header {
+        background: none;
+
+        // Tablet
+        padding-left: 20px;
+        padding-right: 20px;
+        @media (min-width: @screen-sm-min) {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+    }
+}
+
+// Browse Page Search
+#views-exposed-form-browse-all-content-all,
+#views-exposed-form-digital-heritage-grid-list-all {
+    // Search Text box
+    #edit-search-api-views-fulltext-wrapper {
+        width: 100%;
+        float: right;
+        padding-right: 0px;
+    }
+
+    // Reset Button
+    .views-reset-button {
+        float: right;
+        a {
+            margin-top: 0px;
+        }
+    }
+
+    // Search Button
+    .views-submit-button {
+        padding-right: 0;
+        float: right;
+        clear: left;
+        button {
+            margin-top: 0px;
+        }
+    }
+}
+
+.field-name-field-external-links {
+    ul {
+        padding-left: 15px;
+    }
+}

@@ -845,8 +845,8 @@ class DeleteQuery extends Query implements QueryConditionInterface {
   /**
    * Executes the DELETE query.
    *
-   * @return
-   *   The return value is dependent on the database connection.
+   * @return int
+   *   The number of rows affected by the delete query.
    */
   public function execute() {
     $values = array();
@@ -871,8 +871,14 @@ class DeleteQuery extends Query implements QueryConditionInterface {
     $query = $comments . 'DELETE FROM {' . $this->connection->escapeTable($this->table) . '} ';
 
     if (count($this->condition)) {
-
-      $this->condition->compile($this->connection, $this);
+      try {
+        $this->condition->compile($this->connection, $this);
+      }
+      // PHP does not allow exceptions to be thrown in __toString(), so trigger
+      // a fatal error instead.
+      catch (InvalidQueryConditionOperatorException $e) {
+        drupal_trigger_fatal_error($e->getMessage());
+      }
       $query .= "\nWHERE " . $this->condition;
     }
 
@@ -1204,7 +1210,14 @@ class UpdateQuery extends Query implements QueryConditionInterface {
     $query = $comments . 'UPDATE {' . $this->connection->escapeTable($this->table) . '} SET ' . implode(', ', $update_fields);
 
     if (count($this->condition)) {
-      $this->condition->compile($this->connection, $this);
+      try {
+        $this->condition->compile($this->connection, $this);
+      }
+      // PHP does not allow exceptions to be thrown in __toString(), so trigger
+      // a fatal error instead.
+      catch (InvalidQueryConditionOperatorException $e) {
+        drupal_trigger_fatal_error($e->getMessage());
+      }
       // There is an implicit string cast on $this->condition.
       $query .= "\nWHERE " . $this->condition;
     }
@@ -1242,7 +1255,7 @@ class UpdateQuery extends Query implements QueryConditionInterface {
  * MergeQuery::updateFields() and MergeQuery::insertFields() needs to be called
  * instead. MergeQuery::fields() can also be called which calls both of these
  * methods as the common case is to use the same column-value pairs for both
- * INSERT and UPDATE. However, this is not mandatory. Another convinient
+ * INSERT and UPDATE. However, this is not mandatory. Another convenient
  * wrapper is MergeQuery::key() which adds the same column-value pairs to the
  * condition and the INSERT query part.
  *
@@ -1273,6 +1286,15 @@ class MergeQuery extends Query implements QueryConditionInterface {
    * The table or subquery to be used for the condition.
    */
   protected $conditionTable;
+
+  /**
+   * The condition object for this query.
+   *
+   * Condition handling is handled via composition.
+   *
+   * @var DatabaseCondition
+   */
+  protected $condition;
 
   /**
    * An array of fields on which to insert.
@@ -1681,6 +1703,13 @@ class DatabaseCondition implements QueryConditionInterface, Countable {
   protected $queryPlaceholderIdentifier;
 
   /**
+   * Contains the string version of the Condition.
+   *
+   * @var string
+   */
+  protected $stringVersion;
+
+  /**
    * Constructs a DataBaseCondition object.
    *
    * @param string $conjunction
@@ -1697,6 +1726,7 @@ class DatabaseCondition implements QueryConditionInterface, Countable {
    * size of its conditional array minus one, because one element is the
    * conjunction.
    */
+  #[\ReturnTypeWillChange]
   public function count() {
     return count($this->conditions) - 1;
   }
@@ -1789,6 +1819,8 @@ class DatabaseCondition implements QueryConditionInterface, Countable {
 
   /**
    * Implements QueryConditionInterface::compile().
+   *
+   * @throws InvalidQueryConditionOperatorException
    */
   public function compile(DatabaseConnection $connection, QueryPlaceholderInterface $queryPlaceholder) {
     // Re-compile if this condition changed or if we are compiled against a
@@ -1819,6 +1851,12 @@ class DatabaseCondition implements QueryConditionInterface, Countable {
             $arguments += $condition['field']->arguments();
           }
           else {
+            // If the operator contains an invalid character, throw an
+            // exception to protect against SQL injection attempts.
+            if (stripos($condition['operator'], 'UNION') !== FALSE || strpbrk($condition['operator'], '[-\'"();') !== FALSE) {
+              throw new InvalidQueryConditionOperatorException('Invalid characters in query operator: ' . $condition['operator']);
+            }
+
             // For simplicity, we treat all operators as the same data structure.
             // In the typical degenerate case, this won't get changed.
             $operator_defaults = array(
@@ -1883,7 +1921,7 @@ class DatabaseCondition implements QueryConditionInterface, Countable {
   public function __toString() {
     // If the caller forgot to call compile() first, refuse to run.
     if ($this->changed) {
-      return NULL;
+      return '';
     }
     return $this->stringVersion;
   }

@@ -317,7 +317,7 @@ define('MENU_PREFERRED_LINK', '1cf698d64d1aa4b83907cf6ed55db3a7f8e92c91');
  * actually exists. This list of 'masks' is built in menu_rebuild().
  *
  * @param $parts
- *   An array of path parts; for the above example, 
+ *   An array of path parts; for the above example,
  *   array('node', '12345', 'edit').
  *
  * @return
@@ -576,7 +576,8 @@ function _menu_load_objects(&$item, &$map) {
           // 'load arguments' in the hook_menu() entry, but they need
           // some processing. In this case the $function is the key to the
           // load_function array, and the value is the list of arguments.
-          list($function, $args) = each($function);
+          $args = current($function);
+          $function = key($function);
           $load_functions[$index] = $function;
 
           // Some arguments are placeholders for dynamic items to process.
@@ -1066,7 +1067,7 @@ function menu_tree_output($tree) {
     // the active class accordingly. But local tasks do not appear in menu
     // trees, so if the current path is a local task, and this link is its
     // tab root, then we have to set the class manually.
-    if ($data['link']['href'] == $router_item['tab_root_href'] && $data['link']['href'] != $_GET['q']) {
+    if ($router_item && $data['link']['href'] == $router_item['tab_root_href'] && $data['link']['href'] != $_GET['q']) {
       $data['link']['localized_options']['attributes']['class'][] = 'active';
     }
 
@@ -1499,13 +1500,25 @@ function menu_tree_check_access(&$tree, $node_links = array()) {
     $nids = array_keys($node_links);
     $select = db_select('node', 'n');
     $select->addField('n', 'nid');
-    $select->condition('n.status', 1);
+    // When a menu administrator who we know has permission to see unpublished
+    // nodes is administering the menu, included the unpublished nodes in the
+    // tree, with a special flag so that the Menu module can label them.
+    // Otherwise, exclude these nodes from the tree.
+    if (!empty($GLOBALS['menu_admin']) && user_access('bypass node access')) {
+      $select->addField('n', 'status');
+    }
+    else {
+      $select->condition('n.status', 1);
+    }
     $select->condition('n.nid', $nids, 'IN');
     $select->addTag('node_access');
-    $nids = $select->execute()->fetchCol();
-    foreach ($nids as $nid) {
-      foreach ($node_links[$nid] as $mlid => $link) {
-        $node_links[$nid][$mlid]['access'] = TRUE;
+    $node_objects = $select->execute()->fetchAll();
+    foreach ($node_objects as $node_object) {
+      foreach ($node_links[$node_object->nid] as $mlid => $link) {
+        $node_links[$node_object->nid][$mlid]['access'] = TRUE;
+        if (isset($node_object->status)) {
+          $node_links[$node_object->nid][$mlid]['node_unpublished'] = !$node_object->status;
+        }
       }
     }
   }
@@ -1606,6 +1619,7 @@ function _menu_tree_data(&$links, $parents, $depth) {
  * Implements template_preprocess_HOOK() for theme_menu_tree().
  */
 function template_preprocess_menu_tree(&$variables) {
+  $variables['#tree'] = $variables['tree'];
   $variables['tree'] = $variables['tree']['#children'];
 }
 
@@ -1866,7 +1880,7 @@ function menu_navigation_links($menu_name, $level = 0) {
   $router_item = menu_get_item();
   $links = array();
   foreach ($tree as $item) {
-    if (!$item['link']['hidden']) {
+    if ($item['link']['access'] && !$item['link']['hidden']) {
       $class = '';
       $l = $item['link']['localized_options'];
       $l['href'] = $item['link']['href'];
@@ -2401,7 +2415,8 @@ function menu_set_active_trail($new_trail = NULL) {
       // a stripped down menu tree containing the active trail only, in case
       // the given menu has not been built in this request yet.
       $tree = menu_tree_page_data($preferred_link['menu_name'], NULL, TRUE);
-      list($key, $curr) = each($tree);
+      $curr = current($tree);
+      next($tree);
     }
     // There is no link for the current path.
     else {
@@ -2419,7 +2434,7 @@ function menu_set_active_trail($new_trail = NULL) {
           // argument placeholders (%). Such links are not contained in regular
           // menu trees, and have only been loaded for the additional
           // translation that happens here, so as to be able to display them in
-          // the breadcumb for the current page.
+          // the breadcrumb for the current page.
           // @see _menu_tree_check_access()
           // @see _menu_link_translate()
           if (strpos($link['href'], '%') !== FALSE) {
@@ -2431,7 +2446,8 @@ function menu_set_active_trail($new_trail = NULL) {
         }
         $tree = $curr['below'] ? $curr['below'] : array();
       }
-      list($key, $curr) = each($tree);
+      $curr = current($tree);
+      next($tree);
     }
     // Make sure the current page is in the trail to build the page title, by
     // appending either the preferred link or the menu router item for the
@@ -2479,6 +2495,9 @@ function menu_link_get_preferred($path = NULL, $selected_menu = NULL) {
     // untranslated paths). Afterwards, the most relevant path is picked from
     // the menus, ordered by menu preference.
     $item = menu_get_item($path);
+    if ($item === FALSE) {
+      return FALSE;
+    }
     $path_candidates = array();
     // 1. The current item href.
     $path_candidates[$item['href']] = $item['href'];
@@ -2588,7 +2607,7 @@ function menu_get_active_breadcrumb() {
 
     // Don't show a link to the current page in the breadcrumb trail.
     $end = end($active_trail);
-    if ($item['href'] == $end['href']) {
+    if (is_array($end) && $item['href'] == $end['href']) {
       array_pop($active_trail);
     }
 
@@ -2682,7 +2701,7 @@ function menu_link_load($mlid) {
 }
 
 /**
- * Clears the cached cached data for a single named menu.
+ * Clears the cached data for a single named menu.
  */
 function menu_cache_clear($menu_name = 'navigation') {
   $cache_cleared = &drupal_static(__FUNCTION__, array());
@@ -3184,7 +3203,7 @@ function menu_link_save(&$item, $existing_item = array(), $parent_candidates = a
         'external' => $item['external'],
         'has_children' => $item['has_children'],
         'expanded' => $item['expanded'],
-        'weight' => $item['weight'],
+        'weight' => (int) $item['weight'],
         'module' => $item['module'],
         'link_title' => $item['link_title'],
         'options' => serialize($item['options']),
@@ -3248,7 +3267,7 @@ function menu_link_save(&$item, $existing_item = array(), $parent_candidates = a
         'external' => $item['external'],
         'has_children' => $item['has_children'],
         'expanded' => $item['expanded'],
-        'weight' => $item['weight'],
+        'weight' => (int) $item['weight'],
         'depth' => $item['depth'],
         'p1' => $item['p1'],
         'p2' => $item['p2'],
@@ -3887,7 +3906,7 @@ function _menu_router_save($menu, $masks) {
       'type' => $item['type'],
       'description' => $item['description'],
       'position' => $item['position'],
-      'weight' => $item['weight'],
+      'weight' => (int) $item['weight'],
       'include_file' => $item['include file'],
     ));
 

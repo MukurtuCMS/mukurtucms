@@ -1,0 +1,144 @@
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Events Feed
+X-WR-TIMEZONE:America/New_York
+X-WR-CALDESC:A calendar for the events feed
+
+BEGIN:VTIMEZONE
+TZID:America/New_York
+X-LIC-LOCATION:America/New_York
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0400
+TZNAME:EDT
+DTSTART:19700308T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0400
+TZOFFSETTO:-0500
+TZNAME:EST
+DTSTART:19701101T020000
+RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU
+END:STANDARD
+END:VTIMEZONE
+
+BEGIN:VEVENT
+SUMMARY:UTC Event
+DTSTART:20131020T000000Z
+DTEND:20131020T020000Z
+UID:date_ical_basic_test01
+DESCRIPTION:This is a standard 2-hour event using UTC.
+END:VEVENT
+
+BEGIN:VEVENT
+SUMMARY:America/New_York Event
+DTSTART;TZID=America/New_York:20131009T190000
+DTEND;TZID=America/New_York:20131009T210000
+UID:date_ical_basic_test02
+DESCRIPTION:This is a standard 2-hour event in America/New_York.
+END:VEVENT
+
+BEGIN:VEVENT
+SUMMARY:Central Standard Time Event
+DTSTART;TZID=Central Standard Time:20131009T190000
+DTEND;TZID=Central Standard Time:20131009T210000
+UID:date_ical_basic_test03
+DESCRIPTION:This event uses a Windows TZID, Central Standard Time, and will be parsed correctly only in Date iCal 3.1+.
+END:VEVENT
+
+BEGIN:VEVENT
+SUMMARY:Event with no DTEND or DURATION
+DTSTART;TZID=America/New_York:20131009T190000
+UID:date_ical_basic_test04
+DESCRIPTION:This event doesn't have an end time.
+END:VEVENT
+
+BEGIN:VEVENT
+SUMMARY:Event with no DTEND, but with 45-min DURATION
+DTSTART;TZID=America/New_York:20131009T190000
+DURATION:PT45M
+UID:date_ical_basic_test05
+DESCRIPTION:This event uses DURATION for end time, instead of DTEND.
+END:VEVENT
+
+BEGIN:VEVENT
+SUMMARY:Event with no TZID (should use X-WR-TIMEZONE)
+DTSTART:20131009T190000
+DURATION:PT45M
+UID:date_ical_basic_test06
+DESCRIPTION:This event defines no TZID, so the parser should fall back onto the X-WR-TIMEZONE.
+END:VEVENT
+
+BEGIN:VEVENT
+SUMMARY:Event with no DESCRIPTION
+DTSTART;TZID=America/New_York:20131009T190000
+DTEND;TZID=America/New_York:20131009T210000
+UID:date_ical_basic_test07
+END:VEVENT
+
+BEGIN:VEVENT
+SUMMARY:Event with LOCATION + ALTREP
+DTSTART;TZID=America/New_York:20131009T190000
+DTEND;TZID=America/New_York:20131009T210000
+UID:date_ical_basic_test08
+DESCRIPTION:This event has a LOCATION with an ALTREP.
+LOCATION;ALTREP="http://www.example.com":Example's Place
+END:VEVENT
+
+BEGIN:VEVENT
+SUMMARY:Event with 1 CATEGORIES
+DTSTART;TZID=America/New_York:20131009T190000
+DTEND;TZID=America/New_York:20131009T210000
+UID:date_ical_basic_test09
+DESCRIPTION:This event has a single CATEGORIES value.
+CATEGORIES:Category 1
+END:VEVENT
+
+BEGIN:VEVENT
+SUMMARY:Event with multiple CATEGORIES
+DTSTART;TZID=America/New_York:20131009T190000
+DTEND;TZID=America/New_York:20131009T210000
+UID:date_ical_basic_test0A
+DESCRIPTION:This event has several CATEGORIES values.
+CATEGORIES:Category 1,Category 2,Category 3
+END:VEVENT
+
+BEGIN:VEVENT
+SUMMARY:Event with a URL
+DTSTART;TZID=America/New_York:20131009T190000
+DTEND;TZID=America/New_York:20131009T210000
+UID:date_ical_basic_test0B
+DESCRIPTION:This event has a URL.
+URL:http://www.example.com
+END:VEVENT
+
+BEGIN:VEVENT
+SUMMARY:Event with escaped characters in DESCRIPTION
+DTSTART;TZID=America/New_York:20131009T190000
+DTEND;TZID=America/New_York:20131009T210000
+UID:date_ical_basic_test0C
+DESCRIPTION:This event has several escaped characters right here:\,\;\\\n\NThis text should be 2 lines down from the rest.
+END:VEVENT
+
+BEGIN:VEVENT
+SUMMARY:Bad TZID Event
+DTSTART;TZID=Fake TZID:20131009T190000
+DTEND;TZID=Fake TZID:20131009T210000
+UID:date_ical_basic_test0D
+DESCRIPTION:This event uses a fake TZID and should throw the "not a valid timezone" warning at import time, and be treated as UTC.
+END:VEVENT
+
+BEGIN:VEVENT
+SUMMARY:Event w/ GEO
+DTSTART;TZID=America/New_York:20131009T190000
+DTEND;TZID=America/New_York:20131009T210000
+UID:date_ical_basic_test0E
+DESCRIPTION:This is a standard event that has a GEO field.
+GEO:34.1378534;-118.1252851
+END:VEVENT
+
+END:VALENDAR

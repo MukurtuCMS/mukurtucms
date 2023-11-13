@@ -106,7 +106,7 @@ function _drupal_session_read($sid) {
   // active user.
   if ($user && $user->uid > 0 && $user->status == 1) {
     // This is done to unserialize the data member of $user.
-    $user->data = unserialize($user->data);
+    $user->data = unserialize((string) $user->data);
 
     // Add roles element to $user.
     $user->roles = array();
@@ -163,7 +163,7 @@ function _drupal_session_write($sid, $value) {
   try {
     if (!drupal_save_session()) {
       // We don't have anything to do if we are not allowed to save the session.
-      return;
+      return TRUE;
     }
 
     // Check whether $_SESSION has been changed in this request.
@@ -284,6 +284,20 @@ function drupal_session_start() {
     // Save current session data before starting it, as PHP will destroy it.
     $session_data = isset($_SESSION) ? $_SESSION : NULL;
 
+    // Apply any overrides to the session cookie params.
+    $params = $original_params = session_get_cookie_params();
+    // PHP settings for samesite will be handled by _drupal_cookie_params().
+    unset($params['samesite']);
+    $params = _drupal_cookie_params($params);
+    if ($params !== $original_params) {
+      if (\PHP_VERSION_ID >= 70300) {
+        session_set_cookie_params($params);
+      }
+      else {
+        session_set_cookie_params($params['lifetime'], $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+      }
+    }
+
     session_start();
     drupal_session_started(TRUE);
 
@@ -323,7 +337,14 @@ function drupal_session_commit() {
         $insecure_session_name = substr(session_name(), 1);
         $params = session_get_cookie_params();
         $expire = $params['lifetime'] ? REQUEST_TIME + $params['lifetime'] : 0;
-        setcookie($insecure_session_name, $_COOKIE[$insecure_session_name], $expire, $params['path'], $params['domain'], FALSE, $params['httponly']);
+        $options = array(
+          'expires' => $expire,
+          'path' => $params['path'],
+          'domain' => $params['domain'],
+          'secure' => FALSE,
+          'httponly' => $params['httponly'],
+        );
+        drupal_setcookie($insecure_session_name, $_COOKIE[$insecure_session_name], $options);
       }
     }
     // Write the session data.
@@ -365,19 +386,36 @@ function drupal_session_regenerate() {
     // $params['lifetime'] seconds from the current request. If it is not set,
     // it will expire when the browser is closed.
     $expire = $params['lifetime'] ? REQUEST_TIME + $params['lifetime'] : 0;
-    setcookie($insecure_session_name, $session_id, $expire, $params['path'], $params['domain'], FALSE, $params['httponly']);
+    $options = array(
+      'expires' => $expire,
+      'path' => $params['path'],
+      'domain' => $params['domain'],
+      'secure' => FALSE,
+      'httponly' => $params['httponly'],
+    );
+    drupal_setcookie($insecure_session_name, $session_id, $options);
     $_COOKIE[$insecure_session_name] = $session_id;
   }
 
   if (drupal_session_started()) {
     $old_session_id = session_id();
+    _drupal_session_regenerate_existing();
   }
-  session_id(drupal_random_key());
+  else {
+    session_id(drupal_random_key());
+  }
 
   if (isset($old_session_id)) {
     $params = session_get_cookie_params();
     $expire = $params['lifetime'] ? REQUEST_TIME + $params['lifetime'] : 0;
-    setcookie(session_name(), session_id(), $expire, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+    $options = array(
+      'expires' => $expire,
+      'path' => $params['path'],
+      'domain' => $params['domain'],
+      'secure' => $params['secure'],
+      'httponly' => $params['httponly'],
+    );
+    drupal_setcookie(session_name(), session_id(), $options);
     $fields = array('sid' => session_id());
     if ($is_https) {
       $fields['ssid'] = session_id();
@@ -413,6 +451,26 @@ function drupal_session_regenerate() {
 }
 
 /**
+ * Regenerates an existing session.
+ */
+function _drupal_session_regenerate_existing() {
+  global $user;
+  // Preserve existing settings for the saving of sessions.
+  $original_save_session_status = drupal_save_session();
+  // Turn off saving of sessions.
+  drupal_save_session(FALSE);
+  session_write_close();
+  drupal_session_started(FALSE);
+  // Preserve the user object, as starting a new session will reset it.
+  $original_user = $user;
+  session_id(drupal_random_key());
+  drupal_session_start();
+  $user = $original_user;
+  // Restore the original settings for the saving of sessions.
+  drupal_save_session($original_save_session_status);
+}
+
+/**
  * Session handler assigned by session_set_save_handler().
  *
  * Cleans up a specific session.
@@ -425,7 +483,7 @@ function _drupal_session_destroy($sid) {
 
   // Nothing to do if we are not allowed to change the session.
   if (!drupal_save_session()) {
-    return;
+    return TRUE;
   }
 
   // Delete session data.
@@ -446,6 +504,8 @@ function _drupal_session_destroy($sid) {
   elseif (variable_get('https', FALSE)) {
     _drupal_session_delete_cookie('S' . session_name(), TRUE);
   }
+
+  return TRUE;
 }
 
 /**
@@ -463,7 +523,14 @@ function _drupal_session_delete_cookie($name, $secure = NULL) {
     if ($secure !== NULL) {
       $params['secure'] = $secure;
     }
-    setcookie($name, '', REQUEST_TIME - 3600, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+    $options = array(
+      'expires' => REQUEST_TIME - 3600,
+      'path' => $params['path'],
+      'domain' => $params['domain'],
+      'secure' => $params['secure'],
+      'httponly' => $params['httponly'],
+    );
+    drupal_setcookie($name, '', $options);
     unset($_COOKIE[$name]);
   }
 }

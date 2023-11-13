@@ -8,15 +8,23 @@
 /**
  * Returns HTML for an Colorbox image field formatter.
  *
- * @param $variables
+ * @param array $variables
  *   An associative array containing:
  *   - item: An array of image data.
  *   - image_style: An optional image style.
  *   - path: An array containing the link 'path' and link 'options'.
  *
+ * @return string
+ *   An HTML string representing the themed output.
+ *
  * @ingroup themeable
+ *
+ * @codingStandardsIgnoreStart
  */
 function theme_colorbox_image_formatter($variables) {
+  // @codingStandardsIgnoreEnd
+  global $language;
+  static $gallery_token = NULL;
   $item = $variables['item'];
   $entity_type = $variables['entity_type'];
   $entity = $variables['entity'];
@@ -62,7 +70,7 @@ function theme_colorbox_image_formatter($variables) {
   $entity_title = entity_label($entity_type, $entity);
 
   switch ($settings['colorbox_caption']) {
-     case 'auto':
+    case 'auto':
       // If the title is empty use alt or the entity title in that order.
       if (!empty($image['title'])) {
         $caption = $image['title'];
@@ -77,23 +85,29 @@ function theme_colorbox_image_formatter($variables) {
         $caption = '';
       }
       break;
+
     case 'title':
       $caption = $image['title'];
       break;
+
     case 'alt':
       $caption = $image['alt'];
       break;
+
     case 'node_title':
       $caption = $entity_title;
       break;
+
     case 'custom':
-      $caption = token_replace($settings['colorbox_caption_custom'], array($entity_type => $entity, 'file' => (object) $item), array('clear' => TRUE));
+      $caption = token_replace($settings['colorbox_caption_custom'], array($entity_type => $entity, 'file' => (object) $item), array('clear' => TRUE, 'language' => $language));
       break;
+
     default:
       $caption = '';
   }
 
-  // Shorten the caption for the example styles or when caption shortening is active.
+  // Shorten the caption for the example styles or when caption shortening is
+  // active.
   $colorbox_style = variable_get('colorbox_style', 'default');
   $trim_length = variable_get('colorbox_caption_trim_length', 75);
   if (((strpos($colorbox_style, 'colorbox/example') !== FALSE) || variable_get('colorbox_caption_trim', 0)) && (drupal_strlen($caption) > $trim_length)) {
@@ -101,26 +115,43 @@ function theme_colorbox_image_formatter($variables) {
   }
 
   // Build the gallery id.
-  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+  list($id) = entity_extract_ids($entity_type, $entity);
   $entity_id = !empty($id) ? $entity_type . '-' . $id : 'entity-id';
   switch ($settings['colorbox_gallery']) {
     case 'post':
       $gallery_id = 'gallery-' . $entity_id;
       break;
+
     case 'page':
       $gallery_id = 'gallery-all';
       break;
+
     case 'field_post':
       $gallery_id = 'gallery-' . $entity_id . '-' . $field['field_name'];
       break;
+
     case 'field_page':
-      $gallery_id = 'gallery-' . $field['field_name'];
+      $gallery_id = isset($field['field_name']) ? 'gallery-' . $field['field_name'] : 'gallery-page';
       break;
+
     case 'custom':
       $gallery_id = $settings['colorbox_gallery_custom'];
       break;
+
     default:
       $gallery_id = '';
+  }
+
+  // If gallery id is not empty add unique per-request token to avoid images
+  // being added manually to galleries.
+  if (!empty($gallery_id) && variable_get('colorbox_unique_token', 1)) {
+    // Check if gallery token has already been set, we need to reuse the token
+    // for the whole request.
+    if (is_null($gallery_token)) {
+      // We use a short token since randomness is not critical.
+      $gallery_token = drupal_random_key(8);
+    }
+    $gallery_id = $gallery_id . '-' . $gallery_token;
   }
 
   if ($style_name = $settings['colorbox_image_style']) {
@@ -130,22 +161,33 @@ function theme_colorbox_image_formatter($variables) {
     $path = file_create_url($image['path']);
   }
 
-  return theme('colorbox_imagefield', array('image' => $image, 'path' => $path, 'title' => $caption, 'gid' => $gallery_id));
+  return theme('colorbox_imagefield', array(
+    'image' => $image,
+    'path' => $path,
+    'title' => $caption,
+    'gid' => $gallery_id,
+  ));
 }
 
 /**
  * Returns HTML for an image using a specific Colorbox image style.
  *
- * @param $variables
+ * @param array $variables
  *   An associative array containing:
  *   - image: image item as array.
  *   - path: The path of the image that should be displayed in the Colorbox.
  *   - title: The title text that will be used as a caption in the Colorbox.
  *   - gid: Gallery id for Colorbox image grouping.
  *
+ * @return string
+ *   An HTML string containing a link to the given path.
+ *
  * @ingroup themeable
+ *
+ * @codingStandardsIgnoreStart
  */
 function theme_colorbox_imagefield($variables) {
+  // @codingStandardsIgnoreEnd
   $class = array('colorbox');
 
   if ($variables['image']['style_name'] == 'hide') {
@@ -159,15 +201,22 @@ function theme_colorbox_imagefield($variables) {
     $image = theme('image', $variables['image']);
   }
 
+  // Add Zoom Library
+  $zoom_path = libraries_get_path('zoom');
+  $js = $zoom_path . "/jquery.zoom.min.js";
+  if (file_exists($js)) {
+    drupal_add_js($js);
+  }
+
   $options = drupal_parse_url($variables['path']);
   $options += array(
     'html' => TRUE,
     'attributes' => array(
       'title' => $variables['title'],
       'class' => $class,
-      'rel' => $variables['gid'],
+      'data-colorbox-gallery' => $variables['gid'],
+      'data-cbox-img-attrs' => '{"title": "' . $variables['image']['title'] . '", "alt": "' . $variables['image']['alt'] . '"}',
     ),
-    'language' => array('language' => NULL),
   );
 
   return l($image, $options['path'], $options);
@@ -175,8 +224,14 @@ function theme_colorbox_imagefield($variables) {
 
 /**
  * Preprocess variables for the colorbox-insert-image.tpl.php file.
+ *
+ * @param array $variables
+ *   Array with variables values.
+ *
+ * @codingStandardsIgnoreStart
  */
 function template_preprocess_colorbox_insert_image(&$variables) {
+  // @codingStandardsIgnoreEnd
   $item = $variables['item'];
   $variables['file'] = file_load($item['fid']);
   $variables['style_name'] = $item['style_name'];
@@ -222,6 +277,7 @@ function template_preprocess_colorbox_insert_image(&$variables) {
     case 2:
       $variables['gallery_id'] = 'gallery-all';
       break;
+
     case 3:
       $variables['gallery_id'] = '';
       break;

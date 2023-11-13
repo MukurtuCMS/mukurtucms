@@ -1,0 +1,125 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function mukurtu_content_warnings_menu() {
+  $items = array();
+  $items['admin/config/mukurtu/content-warnings'] = array(
+    'title' => 'Mukurtu Content Warning Configuration',
+    'access arguments' => array('restrict atom access'),
+    'description' => 'Select which media contexts and taxonomy terms Mukurtu content warnings apply to.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mukurtu_content_warnings_form'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'mukurtu_content_warnings.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_scald_postrender().
+ */
+function mukurtu_content_warnings_scald_display_alter(&$content, $atom, $context) {
+  // Get the config for which scald contexts are enabled for warnings.
+  $scald_contexts_defaults = variable_get('mukurtu_content_warning_scald_contexts');
+
+  $warning = mukurtu_content_warnings_get_warning($atom);
+
+  if ($warning != "") {
+    if (isset($scald_contexts_defaults[$context]) && $scald_contexts_defaults[$context]) {
+      drupal_add_css(drupal_get_path('module', 'mukurtu_content_warnings') . '/css/mukurtu-content-warnings.css');
+      drupal_add_js(drupal_get_path('module', 'mukurtu_content_warnings') . '/js/mukurtu-content-warnings.js');
+
+      $content['#prefix'] = $content['#prefix'] . '<div class="mukurtu-content-warning mukurtu-content-warning-' . $atom->sid . '" onclick="mukurtu_remove_content_warning(' . $atom->sid . ')">';
+      $content['#suffix'] = '<div class="mukurtu-content-warning-overlay"><div class="mukurtu-content-warning-overlay-text mukurtu-content-warning-instance-' . $atom->sid . '">' . $warning . '</div></div></div>' . $content['#suffix'];
+    }
+  }
+
+  return $content;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function mukurtu_content_warnings_form_scald_atom_add_form_options_alter(&$form, &$form_state, $form_id) {
+  drupal_add_css(drupal_get_path('module', 'mukurtu_content_warnings') . '/css/mukurtu-content-warnings.css');
+}
+
+/**
+ * Get the warning for a scald atom, if any.
+ *
+ * Currently the need for this content warning system is quite specific. If in the future other
+ * use cases present themselves, this function should be generalized (perhaps returning a weighted set
+ * of warnings).
+ */
+function mukurtu_content_warnings_get_warning($atom) {
+  $emw_atom = entity_metadata_wrapper('scald_atom', $atom);
+
+  // Deceased Person check.
+  if (module_exists('mukurtu_taxonomy_records')) {
+    $people_warning_settings = variable_get('mukurtu_content_warning_people');
+
+    // Check if people warnings are enabled.
+    $people_names = array();
+    if (isset($people_warning_settings['enabled']) && $people_warning_settings['enabled']) {
+      // Check each person taxonomy term the atom is tagged with.
+      if (isset($emw_atom->field_people)) {
+        foreach ($emw_atom->field_people->value() as $index => $person_ref) {
+          $person_term = taxonomy_term_load($person_ref->tid);
+          // Check if the term has one or more records attached to it.
+          if ($person_term && mukurtu_taxonomy_records_are_records_enabled($person_term)) {
+            $emw_term = entity_metadata_wrapper('taxonomy_term', $person_term);
+            // Check each record.
+            foreach ($emw_term->field_mukurtu_records->value() as $index => $record) {
+              if ($record->type == 'person') {
+                if ($record->field_deceased[LANGUAGE_NONE][0]['value'] == 1) {
+                  // Add the person's name to the message.
+                  $people_names[] = $record->title;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Check if we found any deceased.
+  if (!empty($people_names)) {
+    // Multiple or single?
+    if (count($people_names) == 1) {
+      return str_ireplace('[name]', $people_names[0], $people_warning_settings['warning_single']);
+    }
+    return str_ireplace('[names]', implode(', ', $people_names), $people_warning_settings['warning_multiple']);
+  }
+
+  // Taxonomy based warning check.
+  $taxonomy_warning_settings = variable_get('mukurtu_content_warning_taxonomy');
+
+  if (!empty($taxonomy_warning_settings)) {
+    // Build a list of all term references for the atom.
+    $all_fields = field_info_instances('scald_atom', $atom->type);
+    $taxonomy_refs = array();
+    foreach ($all_fields as $field_name => $field_value) {
+      $field_info = field_info_field($field_name);
+      if ($field_info['type'] == 'taxonomy_term_reference' && !empty($emw_atom->{$field_name})) {
+        foreach ($emw_atom->{$field_name}->value() as $index => $ref) {
+          if (is_object($ref)) {
+            $taxonomy_refs[] = $ref->tid;
+          }
+        }
+      }
+    }
+
+    // Check each warning against that list.
+    foreach ($taxonomy_warning_settings as $warning) {
+      if (in_array($warning['term'], $taxonomy_refs)) {
+        return $warning['warning'];
+      }
+    }
+  }
+
+  return "";
+}

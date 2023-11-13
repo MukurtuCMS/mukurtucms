@@ -1,0 +1,16 @@
+name = Search API Test Service 2
+description = "A module providing a second test search service."
+core = 7.x
+package = Search
+
+dependencies[] = search_api:search_api
+
+files[] = search_api_test_service_2.module
+
+hidden = TRUE
+
+; Information added by Drupal.org packaging script on 2021-07-19
+version = "7.x-1.28"
+core = "7.x"
+project = "search_api"
+datestamp = "1626685178"

@@ -1,0 +1,371 @@
+<?php
+/**
+ * @file
+ * Code for the Mukurtu File Fixity feature.
+ */
+
+include_once 'ma_file_fixity.features.inc';
+
+/**
+ * Bulk generate the file hashes for all existing files. Called once by an ma_core update hook
+ */
+function ma_file_fixity_bulk_generate_file_hashes() {
+  $query = new EntityFieldQuery();
+  $files = $query->entityCondition('entity_type', 'file')
+    ->addMetaData('account', user_load(1))
+    ->execute();
+  foreach ($files['file'] as $file) {
+    file_load($file->fid); // The hashes are generated on file load if they do yet not exist for the file.
+  }
+  drupal_set_message($message = t('Added file hashes for ' . count($files['file']) . ' files.'), $type = 'status');
+}
+
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_file_fixity_form_fixity_check_node_form_alter(&$form, &$form_state) {
+
+  // The Fixity Check node title gets set automatically.
+  $form['title']['#access'] = FALSE;
+  $form['title']['#required'] = FALSE;
+
+  // The the check run latest and next fields. They are already hidden in the DS field config but this prevents form errors and value resets.
+  $form['field_fixity_latest_check_time']['#access'] = FALSE;
+  $form['field_fixity_next_check_run_time']['#access'] = FALSE;
+
+}
+
+/**
+ * Implements hook_entity_presave().
+ */
+function ma_file_fixity_entity_presave($entity, $type) {
+  if (!isset($entity->type)) {
+    return;
+  }
+  if ($entity->type == 'fixity_check') {
+
+    // Set the Fixity Check node title
+    $schedule_title = $schedule = $entity->field_fixity_schedule['und'][0]['value'];
+    if ($schedule == 'Every x days') {
+      $frequency =  $entity->field_fixity_days_frequency['und'][0]['value'];
+      $schedule_title = str_replace('x', $frequency, $schedule_title);
+    }
+    if (isset($entity->field_fixity_cps[LANGUAGE_NONE])) {
+      $cps = $entity->field_fixity_cps[LANGUAGE_NONE];
+      if (count($cps)) {
+        $cp_names = [];
+        foreach ($cps as $cp) {
+          $cp_node = node_load($cp['target_id']);
+          $cp_names[] = $cp_node->title;
+        }
+        $cps_title = implode(', ', $cp_names);
+      }
+      else {
+        $cps_title = 'all media assets';
+      }
+      $entity->title = $schedule_title . ' - ' . $cps_title;
+    }
+
+    // Set the fixity check scheduled job if it has a schedule, and delete the job in case it was a formerly scheduled, now Unscheduled fixity check.
+    switch ($schedule) {
+      case 'Weekly':
+        $seconds = 604800;
+        break;
+      case 'Monthly':
+        $seconds = 2592000;
+        break;
+      case 'Every x days':
+        $seconds = $frequency * 86400;
+        break;
+      case 'Unscheduled':
+        $job = array(
+          'type' => 'fixity_check',
+          'id' => $entity->nid,
+        );
+        JobScheduler::get('run_fixity_check')->remove($job);
+        if (isset($entity->field_fixity_next_check_run_time[LANGUAGE_NONE][0]['value'])) {
+          unset ($entity->field_fixity_next_check_run_time[LANGUAGE_NONE][0]['value']);
+        }
+    }
+    if (isset($seconds)) {
+      $job = [
+        'type' => 'fixity_check',
+        'id' => $entity->nid,
+        'period' => $seconds,
+        'periodic' => TRUE,
+      ];
+      JobScheduler::get('run_fixity_check')->set($job);
+
+      // Set next check run value.
+      $entity->field_fixity_next_check_run_time[LANGUAGE_NONE][0]['value'] = $_SERVER['REQUEST_TIME'] + $seconds;
+
+    }
+  }
+}
+
+
+/**
+ * Implements hook_entity_delete().
+ */
+function ma_file_fixity_entity_delete($entity, $type) {
+  if (!isset($entity->type)) {
+    return;
+  }
+  if ($entity->type == 'fixity_check') {
+
+    // Delete fixity check scheduled job when deleting a fixity check node.
+    $job = array(
+      'type' => 'fixity_check',
+      'id' => $entity->nid,
+    );
+    JobScheduler::get('run_fixity_check')->remove($job);
+
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function ma_file_fixity_menu() {
+  $items = array();
+
+  // Run fixity check manually
+  $items['run-fixity-check/%node'] = array(
+    'page callback' => 'ma_file_fixity_run_check_manually',
+    'page arguments' => array(1),
+    'access callback' => 'user_access',
+    'access arguments' => array('create fixity_check content'),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+/**
+ * Run file fixity check manually page callback.
+ */
+function ma_file_fixity_run_check_manually($node) {
+  if ($node->type <> 'fixity_check') {
+    return "Not a Fixity Check node.";
+  }
+  $job = [
+    'id' => $node->nid
+  ];
+  ma_file_fixity_run_fixity_check($job);
+  drupal_goto ('node/' . $node->nid);
+}
+
+/**
+ * Implements hook_cron_job_scheduler_info().
+ */
+function ma_file_fixity_cron_job_scheduler_info() {
+
+  // Use the jobs_scheduler module (already in the build as a feeds dependency) for scheduled check runs.
+  $schedulers = array();
+  $schedulers['run_fixity_check'] = array(
+    'worker callback' => 'ma_file_fixity_run_fixity_check',
+  );
+  return $schedulers;
+}
+
+/**
+ * Run a fixity check. Can be called from the job_scheduler (on cron runs), or manually from the page callback.
+ */
+function ma_file_fixity_run_fixity_check($job) {
+
+  $node = node_load($job['id']);
+  $fw = entity_metadata_wrapper('node', $node);
+  $start_time = time();
+  $hashes_to_check_against = $fw->field_fixity_hashes_to_use->raw();
+  $files_checked = 0;
+  $file_fails = [];
+
+  // If CP(s) are set, make an array of the files for the atoms in the CPs, to limit the hash checks to these files.
+  $cps = $fw->field_fixity_cps->raw();
+  if (count($cps)) {
+    $files_in_cps = [0]; // Need at least one element in the array for EFQ not to fail in case no files get added.
+    // Get all the atoms in the CPs.
+    $query = new EntityFieldQuery();
+    $atoms = $query->entityCondition('entity_type', 'scald_atom')
+      ->fieldCondition('field_scald_protocol', 'target_id', $cps)
+      ->execute();
+    if (count($atoms)) {
+      // Get all files for these atoms.
+      foreach ($atoms['scald_atom'] as $atom_result) {
+        $atom = scald_atom_load ($atom_result->sid);
+        if (isset($atom->file_source)) {
+          $files_in_cps[] = $atom->file_source;
+        }
+      }
+    }
+  }
+
+  // Now build the query for the files to check hashes.
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'file')
+    ->addMetaData('account', user_load(1));
+  if (count($cps)) {
+    $query->propertyCondition('uri', $files_in_cps);
+  };
+  $files = $query->execute();
+  foreach ($files['file'] as $file) {
+    $file = file_load($file->fid);
+    $algo_comp_text = '';
+    $algo_fail = 0;
+    foreach ($hashes_to_check_against as $algo) {
+      $saved_hash =  $file->filehash[$algo];
+      if (!file_exists($file->uri)) {
+        $algo_comp_text .= '<li><span class="fail"><i>' . $algo . '</i> does not match.</span> Saved as ' . $saved_hash . '. File is missing.</li>';
+        $algo_fail = 1; // Comment this out if we do not want to show these in the fixity log.
+      }
+      else {
+        $checked_hash = hash_file($algo, $file->uri);
+        if ($saved_hash <> $checked_hash) {
+          $algo_comp_text .= '<li><span class="fail"><i>' . $algo . '</i> does not match.</span> Saved as ' . $saved_hash . '. Check returned ' . $checked_hash . '.</li>';
+          $algo_fail = 1;
+        }
+        else {
+          $algo_comp_text .= '<li class="pass"><i>' . $algo . '</i> matches.</li>';
+        }
+      }
+    }
+    if ($algo_fail) {
+      $algo_comp_text = '<li>Checks:<ul>' . $algo_comp_text . '</ul></li>';
+      $file_link = 'File: ' . l($file->filename, 'file/' . $file->fid);
+      $usages_text = '';
+      $file_usages = file_usage_list($file);
+      if ($file_usages) {
+        $usages_text = '<li>' . l('File usages', 'file/' . $file->fid . '/usage') . '</li>';
+        foreach ($file_usages as $file_usage) {
+          if (isset($file_usage['scald_atom'])) {
+            $usages_text .= '<li>Atom usages of file:<ul>';
+            foreach ($file_usage['scald_atom'] as $atom_id => $file_usage_count) {
+              $atom = scald_atom_load($atom_id);
+              $usages_text .= '<li>' . l($atom->title, '/atom/' . $atom_id) . '</li>';
+              $atom_usages = scald_index_get_nodes($atom_id);
+              if (count($atom_usages)) {
+                $usages_text .= '<li>Media item usages of atom:<ul>';
+                foreach ($atom_usages as $atom_usage) {
+                  $atom_usage_node = node_load($atom_usage);
+                  $usages_text .= '<li>' . l($atom_usage_node->title, '/node/' . $atom_usage_node->nid) . '</li>';
+                }
+                $usages_text .= '</ul></li>';
+              }
+            }
+            $usages_text .= '</ul></li>';
+          }
+        }
+
+      }
+      $file_fails[] = [
+        'value' => $file_link . '<ul>' . $algo_comp_text . $usages_text. '</ul>',
+        'format' => 'full_html'
+      ];
+    }
+    $files_checked++;
+  }
+
+  $ffc_item = entity_create('field_collection_item', array('field_name' => 'field_fixity_report'));
+  $ffc_item->setHostEntity('node', $node);
+  $ffcw = entity_metadata_wrapper('field_collection_item', $ffc_item);
+  $ffcw->field_fixity_time_of_check->set($start_time);
+  $ffcw->field_fixity_processing_time->set(time()-$start_time);
+  $ffcw->field_fixity_files_checked->set($files_checked);
+  $ffcw->field_fixity_algos_checked->set($hashes_to_check_against);
+
+  $overall_status = 'pass';
+  if (count($file_fails)) {
+    $overall_status = 'fail';
+
+    // Update the fixity check node.
+    $ffcw->field_fixity_check_fails_details->set($file_fails);
+    $ffcw->field_fixity_check_fails_count->set(count($file_fails));
+
+    // Send an check fail email.
+    $message = 'There has been a file fixity check fail on ' . variable_get('site_name') . ".";
+    $message .= "\n\nFixity check name: " . $node->title;
+    $message .= "\nTime of check: " . format_date ($start_time, 'long');
+    $message .= "\nFiles failed: " . count($file_fails);
+    $message .= "\n\nFor more information see: " . $GLOBALS['base_url'] . url('node/'. $node->nid);
+    $params = array(
+      'subject' => t('File fixity check fail on ' . variable_get('site_name')),
+      'body' => check_markup($message,'plain_text'),
+    );
+
+    $check_author = user_load($node->uid);
+    $recipients = [$check_author->mail];
+    if ($fw->field_fixity_email_all_admins->value()) {
+      $mukurtu_admins = ma_core_get_users_per_role('Mukurtu Administrator');
+      foreach ($mukurtu_admins as $mukurtu_admin) {
+        $recipients[] = $mukurtu_admin->mail;
+      }
+    }
+    $recipients = implode (', ', array_unique($recipients));
+
+    drupal_mail('ma_file_fixity', 'fixity_check_error', $recipients, language_default(), $params);
+
+  }
+
+  $node->field_fixity_latest_check_time[LANGUAGE_NONE][0]['value'] = $start_time;
+  $node->field_fixity_latest_check_status[LANGUAGE_NONE][0]['value'] = $overall_status;
+  node_save($node);
+
+}
+
+/**
+ * Implements hook_field_collection_item_view().
+ */
+function ma_file_fixity_field_collection_item_view($field_collection_item, $view_mode, $langcode) {
+  // Show the time of check field in either green or red depending on whether it found check fails, and make it a header.
+  if ($field_collection_item->field_name == 'field_fixity_report') {
+    $color = 'green';
+    if (isset($field_collection_item->field_fixity_check_fails_count[LANGUAGE_NONE]) && $field_collection_item->field_fixity_check_fails_count[LANGUAGE_NONE] > 0) {
+      $color = 'red';
+    }
+    $time_of_check =& $field_collection_item->content['field_fixity_time_of_check'][0]['#markup'];
+    $time_of_check = '<h4 style="color: ' . $color . ';">' . $time_of_check . '</h4>';
+  }
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function ma_file_fixity_node_view($node, $view_mode, $langcode) {
+  if ($node->type == 'fixity_check') {
+
+    // Create a breadcrumb on the fixity check node, so that the user can link back to the fixity-checks view.
+    drupal_set_breadcrumb ([
+      l(t('test'), 'fixity-checks'), // Not sure why this dummy entry is required.
+      l(t('Home'), '<front>'),
+      l(t('Fixity Checks'), 'fixity-checks'),
+    ]);
+  }
+}
+
+/**
+ * Implements hook_views_post_render.
+ */
+function ma_file_fixity_views_post_render(&$view, &$output, &$cache) {
+  if ($view->name == 'fixity_checks') {
+
+    // Create a breadcrumb on the fixity checks view, for visual consistency with the fixity check node.
+    drupal_set_breadcrumb([
+      l(t('test'), 'fixity-checks'), // Not sure why this dummy entry is required.
+      l(t('Home'), '<front>'),
+    ]);
+
+  }
+}
+
+/**
+ * Implements hook_mail for module_name.
+ */
+function ma_file_fixity_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'fixity_check_error':
+      $message['subject'] = $params['subject'];
+      $message['body'][] = $params['body'];
+      break;
+  }
+}

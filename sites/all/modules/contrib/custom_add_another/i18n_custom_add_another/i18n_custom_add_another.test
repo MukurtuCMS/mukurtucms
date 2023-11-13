@@ -1,0 +1,76 @@
+<?php
+/**
+ * @file
+ * Test case for multilingual fields.
+ */
+
+
+class i18nCustomAddAnotherTestCase extends Drupali18nTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => t('Custom add another translation'),
+      'group' => 'Custom add another',
+      'description' => t('Custom add another translation functions')
+    );
+  }
+
+  function setUp() {
+    parent::setUp('i18n_field', 'field_test', 'i18n_custom_add_another', 'i18n_custom_add_another_testing');
+    parent::setUpLanguages(array('access field_test content', 'administer field_test content'));
+    $this->translator = $this->drupalCreateUser(array('translate interface', 'translate user-defined strings'));
+  }
+
+  /**
+   * Test the translation of text fields.
+   */
+  function testCustomAddAnotherTranslation() {
+    $field_name = drupal_strtolower($this->randomName());
+    $label = $this->randomName();
+    $add_another_label = $this->randomName();
+    $remove_label = $this->randomName();
+
+    $field = array(
+      'field_name' => $field_name,
+      'type' => 'text',
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+    );
+    $field = field_create_field($field);
+
+    $instance = array(
+      'field_name' => $field_name,
+      'entity_type' => 'test_entity',
+      'bundle' => 'test_bundle',
+      'label' => $label,
+      'widget' => array(
+        'type' => 'i18n_caa_test_field_widget',
+      ),
+      'custom_add_another' => $add_another_label,
+      'custom_remove' => $remove_label,
+    );
+    $instance = field_create_instance($instance);
+
+
+    // Refresh i18n_strings.
+    $edit = array('groups[field]' => TRUE);
+    $this->drupalPost('admin/config/regional/translate/i18n_string', $edit, t('Refresh strings'));
+
+    // Save translations for each attribute.
+    $label_translation = $this->createStringTranslation('field', $label);
+    $add_another_label_translation = $this->createStringTranslation('field', $add_another_label);
+    $remove_label_translation = $this->createStringTranslation('field', $remove_label);
+    $this->drupalLogin($this->admin_user);
+
+    // Test untranslated values in default language.
+    $this->drupalGet('test-entity/add/test-bundle');
+    $this->assertText($label, 'Field label is not translated');
+    $this->assertRaw('value="'. $add_another_label, 'Custom add another is not translated');
+    $this->assertRaw('value="'. $add_another_label, 'Custom remove is not translated');
+
+    // Test translated values in secondary language.
+    $this->drupalGet($this->secondary_language . '/test-entity/add/test-bundle');
+    $this->assertText($label_translation[$this->secondary_language], 'Field label is translated');
+    $this->assertRaw('value="'. $add_another_label_translation[$this->secondary_language], 'Custom add another is translated');
+    $this->assertRaw('value="'. $remove_label_translation[$this->secondary_language], 'Custom remove is translated');
+  }
+}

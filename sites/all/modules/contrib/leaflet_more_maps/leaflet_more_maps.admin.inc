@@ -17,15 +17,37 @@ function leaflet_more_maps_admin_configure() {
     '#collapsed' => FALSE,
     '#title' => t('Global settings'),
   );
+
+  // An arbitrary map tile.
+  $google_sat_test_url = 'http://khms2.googleapis.com/kh?x=428&y=242&z=9&v=';
+  for ($v = 713; $v < 1000; $v++) {
+    if (leaflet_more_maps_check_url($google_sat_test_url . $v)) {
+      break;
+    }
+  }
+  if ($v < 1000) {
+    // Found! Now find the first that does NOT work, return version before it.
+    while (leaflet_more_maps_check_url($google_sat_test_url . ++$v)) { }
+    $v--;
+  }
+
   $form['global_settings']['google_satellite_version'] = array(
     '#type' => 'textfield',
     '#title' => t('Google satellite map version'),
-    '#default_value' => variable_get('google_satellite_version', '183'),
-    '#description' => t('If you find that tiles have gone missing, it is time to increase this number.'),
+    '#default_value' => variable_get('google_satellite_version', 713),
+    '#description' => t('Latest working version: %version', array('%version' => ($v < 1000) ? $v : '?')),
   );
 
   $map_info = array();
-  // @todo call hook_leaflet_map_info() ?
+  foreach (module_implements('leaflet_map_info') as $module) {
+    if ($module !== 'leaflet_more_maps') {
+      $function = $module . '_leaflet_map_info';
+      if (function_exists($function)) {
+        $result = call_user_func_array($function, array());
+        $map_info = array_merge_recursive($map_info, $result);
+      }
+    }
+  }
   _leaflet_more_maps_assemble_default_map_info($map_info);
 
   $all_layer_keys = array();
@@ -113,4 +135,27 @@ function leaflet_more_maps_admin_configure_form_submit($form, &$form_state) {
 
   // Refresh the cache table or hook_leaflet_more_maps() won't be called.
   cache_clear_all('*', 'cache', TRUE);
+}
+
+/**
+ * A way to test if a URL returns an OK (200) response. 
+ *
+ * Thanks www.drupal.org/u/n20
+ *
+ * @param string $test_url
+ * @return boolean
+ */
+function leaflet_more_maps_check_url($test_url) {
+  $agent= 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)';
+
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+  curl_setopt($ch, CURLOPT_VERBOSE, true);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_USERAGENT, $agent);
+  curl_setopt($ch, CURLOPT_URL, $test_url);
+  $result = curl_exec($ch);
+
+  $info = curl_getinfo($ch);
+  return ($info['http_code'] == 200);
 }

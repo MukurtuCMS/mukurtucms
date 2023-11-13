@@ -1,0 +1,463 @@
+<?php
+
+/**
+ * This module is heavily based on Node Export
+ * (https://www.drupal.org/project/node_export) and uses a significant amount
+ * of code from that project.
+ */
+
+
+define("MUKURTU_EXPORT_IMPORT_DIR", "[mukurtu:batch_import_temp_directory]");
+
+/**
+ * @file
+ * The Mukurtu export module.
+ *
+ * Allows users to export Mukurtu content.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function mukurtu_export_menu() {
+  $items['node/%node/mukurtu-export'] = [
+    'access callback' => 'mukurtu_export_access_export',
+    'access arguments' => [1],
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['mukurtu_export_form'],
+    'title' => 'Export',
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'mukurtu_export.pages.inc',
+    'weight' => 105,
+  ];
+
+  $items['atom/%scald_atom/mukurtu-export'] = [
+    'access callback' => 'mukurtu_export_access_export',
+    'access arguments' => [1],
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['mukurtu_export_form'],
+    'title' => 'Export',
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'mukurtu_export.pages.inc',
+    'weight' => 105,
+  ];
+
+  $items['taxonomy/term/%taxonomy_term/mukurtu-export'] = [
+    'access callback' => 'mukurtu_export_access_export',
+    'access arguments' => [2],
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['mukurtu_export_form'],
+    'title' => 'Export',
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'mukurtu_export.pages.inc',
+    'weight' => 105,
+  ];
+
+  $items['admin/config/mukurtu_export'] = [
+    'title' => 'Configure Mukurtu Export',
+    'description' => 'Configuration for the Mukurtu Export module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['mukurtu_export_config_form'],
+    'access arguments' => ['access administration pages'],
+    'type' => MENU_NORMAL_ITEM,
+  ];
+
+  return $items;
+}
+
+/**
+ * Admin settings form for Mukurtu Export
+ */
+function mukurtu_export_config_form() {
+  $form = [];
+
+  // Display entity/feeds import mappings
+  foreach (array_keys(entity_get_info()) as $entity_type) {
+
+    // Currently only show node/scald_atom fields
+    if (!in_array($entity_type, [
+      'paragraphs_item',
+      'node',
+      'scald_atom',
+      'taxonomy_term',
+    ])
+    ) {
+      continue;
+    }
+
+    $entity_info = entity_get_info($entity_type);
+
+    foreach ($entity_info['bundles'] as $bundle_name => $ids) {
+      $form["mukurtu_export_feeds_{$entity_type}_{$bundle_name}"] = [
+        '#type' => 'textfield',
+        '#title' => $entity_info['label'] . ' - ' . $entity_info['bundles'][$bundle_name]['label'],
+        '#default_value' => variable_get("mukurtu_export_feeds_{$entity_type}_{$bundle_name}", ''),
+        '#size' => 30,
+        '#description' => t("The machine name of a feeds importer to use as export header labels for @bundle.", ['@bundle' => $ids['label']]),
+        '#required' => FALSE,
+      ];
+    }
+  }
+
+  return system_settings_form($form);
+}
+
+/**
+ * Access check for entity export
+ */
+function mukurtu_export_access_export($entity, $entity_type = 'node') {
+  global $user;
+
+  if (is_int($entity)) {
+    $entity = array_shift(entity_load($entity_type, [$entity]));
+  }
+
+  if (function_exists('drush_main')) {
+    // Always allow drush to export nodes.
+    $access = TRUE;
+  }
+  else {
+    // Check basic role permissions first.
+    $access = TRUE;
+
+    // Allow only admins to export
+    $access = $access && (in_array('administrator', $user->roles)
+        || in_array('Mukurtu Administrator', $user->roles)
+        || in_array('Community Administrator', $user->roles));
+
+    // Make sure the user can view the original content.
+    $access = $access && entity_access('view', $entity_type, $entity);
+  }
+
+  return $access;
+}
+
+/**
+ * Returns an array of available field handlers
+ *
+ * Field handlers can further process the raw field values.
+ * For example, during export we might want to load the title of a taxonomy
+ * term, rather than simply exporting the tid.
+ */
+function mukurtu_export_field_handlers() {
+  module_load_include('inc', 'mukurtu_export', 'mukurtu_export.field_handlers');
+  $field_handlers = &drupal_static(__FUNCTION__);
+  if (empty($field_handlers)) {
+    $field_handlers = module_invoke_all('mukurtu_export_field_handlers');
+  }
+  // Let other modules override our handlers
+  drupal_alter('mukurtu_export_field_handlers', $field_handlers);
+
+  // Load all the files for the handler callbacks, presumably they are about to be used
+  foreach ($field_handlers as $handler) {
+    if (!empty($handler['#file']) && is_file($handler['#file'])) {
+      require_once $handler['#file'];
+    }
+  }
+
+  return $field_handlers;
+}
+
+/**
+ * Get a list of format handlers
+ *
+ * @return
+ *   An array of format handlers from hook implementations.
+ * @see hook_mukurtu_export_format_handlers()
+ */
+function mukurtu_export_format_handlers() {
+  module_load_include('inc', 'mukurtu_export', 'mukurtu_export.format_handlers');
+  $format_handlers = &drupal_static(__FUNCTION__);
+  if (empty($format_handlers)) {
+    $format_handlers = module_invoke_all('mukurtu_export_format_handlers');
+  }
+  drupal_alter('mukurtu_export_format_handlers', $format_handlers);
+  return $format_handlers;
+}
+
+/**
+ * Returns the export friendly value for a raw field value
+ */
+function mukurtu_export_extract_value($entity_type, $field_name, $value, $options = []) {
+  // Make hook to allow custom changes?
+
+  $referenced_entities = [];
+  $files = [];
+  $field_handlers = mukurtu_export_field_handlers();
+
+  // Headers, no value to extract
+  if (is_numeric($field_name)) {
+    return [$value, $referenced_entities, $files];
+  }
+
+  $field_info = field_info_field($field_name);
+
+  if (!is_null($field_info) && isset($field_info['type'])) {
+    // Call the specific field handler, if available
+    if (isset($field_handlers[$field_info['type']])
+      && isset($field_handlers[$field_info['type']]['#callback'])
+      && function_exists($field_handlers[$field_info['type']]['#callback'])
+    ) {
+      return call_user_func($field_handlers[$field_info['type']]['#callback'], $value, $field_info, $options);
+    }
+
+    // No default handler.
+    // If using GUID, convert DnD Scald embed code to use GUID rather than SID
+    if(in_array($field_info['type'], mee_field_types())
+    && (isset($options['id_format']) && ($options['id_format'] == 'guid')
+    && isset($value['value']))) {
+      return _mukurtu_export_encode_scald_dnd($value['value']);
+    }
+  }
+
+  // Default behavior for simple fields
+  if (isset($value['value'])) {
+    return [$value['value'], $referenced_entities, $files];
+  }
+
+  // Check if file
+  if (file_valid_uri($value)) {
+    $field_files = file_load_multiple([], ['uri' => $value]);
+    $file = reset($field_files);
+    if (isset($file->fid)) {
+      $uri_scheme = file_uri_scheme($file->uri);
+      $localname = implode(DIRECTORY_SEPARATOR, [
+        'files',
+        $uri_scheme,
+        $file->type,
+        $file->fid,
+        $file->filename,
+      ]);
+
+      // Add file to binary export list.
+      $files[$file->fid] = ['uri' => $file->uri, 'filename' => $localname];
+      $exported_file_value = "";
+      // If user has selected to package binary files, we always
+      // want to reference the relative file path.
+      if ($options['export_files']) {
+        $exported_file_value = MUKURTU_EXPORT_IMPORT_DIR . DIRECTORY_SEPARATOR . $localname;
+      } else {
+        if ($options['id_format'] == 'internal') {
+          // Internal IDs, metadata only -> Export the internal URI.
+          $exported_file_value = $file->uri;
+        } else {
+          // GUIDs, metadata only -> External URL
+          $exported_file_value = file_create_url($file->uri);
+        }
+      }
+
+      return [
+        $exported_file_value,
+        $referenced_entities,
+        $files,
+      ];
+    }
+  }
+  return [$value, $referenced_entities, $files];
+}
+
+/**
+ * Defines the VBO for Mukurtu Export
+ */
+function mukurtu_export_action_info() {
+  return [
+    'mukurtu_export_action' => [
+      'type' => 'entity',
+      'label' => t('Mukurtu CSV Export'),
+      'behavior' => ['views_property'],
+      'configurable' => FALSE,
+      'vbo_configurable' => TRUE,
+      'triggers' => ['any'],
+    ],
+  ];
+}
+
+/**
+ * VBO form function for Mukurtu Export
+ */
+function mukurtu_export_action_form($settings, &$form_state) {
+  module_load_include('inc', 'mukurtu_export', 'mukurtu_export.pages');
+
+  $form_state['mukurtu_export']['is_batch'] = TRUE;
+  $form_state['mukurtu_export']['formatter'] = 'csv';
+  return drupal_retrieve_form('mukurtu_export_form', $form_state);
+}
+
+/**
+ * VBO form submit function for Mukurtu Export
+ */
+function mukurtu_export_action_submit($form, $form_state) {
+  $settings = [];
+  $settings['export_fields'] = $form_state['input']['export_fields'];
+  $settings['csv']['settings'] = $form_state['input']['csv'];
+  return $settings;
+}
+
+/**
+ * VBO action for Mukurtu Export
+ */
+function mukurtu_export_action(&$entity, $context) {
+  module_load_include('inc', 'mukurtu_export', 'mukurtu_export.pages');
+  module_load_include('inc', 'mukurtu_export', 'formats/csv');
+
+  // Start of batch run, start with an empty result set
+  if ($context['progress']['current'] == 1) {
+    $_SESSION['mukurtu_export_csv_vbo'] = [];
+  }
+
+  // Batch settings to pass to CSV exporter
+  $context['csv']['settings']['batch_current'] = $context['progress']['current'];
+  $context['csv']['settings']['batch_total'] = $context['progress']['total'];
+  $context['csv']['settings']['batch_previous'] = $_SESSION['mukurtu_export_csv_vbo'];
+
+  // Export current entity
+  $entity_type = _mukurtu_export_entity_type($entity);
+  $entity_wrapper = entity_metadata_wrapper($entity_type, $entity);
+  $entities = [$entity_type => [$entity->type => [$entity_wrapper->getIdentifier() => $entity]]];
+  $_SESSION['mukurtu_export_csv_vbo'] = mukurtu_export_csv_export($entities, $context['export_fields'], $context['csv']['settings']);
+
+  // Batch run complete, show link to download the file
+  if ($context['progress']['current'] == $context['progress']['total']) {
+    $zip_file = $_SESSION['mukurtu_export_csv_vbo'];
+    $download_link = file_create_url($zip_file->uri);
+    $message = t('Download your exported items: <div class="btn btn-default form-submit"><a href="@downloadlink">Download</a></div>', ['@downloadlink' => $download_link]);
+    unset($_SESSION['mukurtu_export_csv_vbo']);
+    drupal_set_message($message);
+  }
+}
+
+/**
+ * Helper function that returns the type of an entity
+ */
+function _mukurtu_export_entity_type($entity) {
+  if (is_object($entity)) {
+    if (isset($entity->nid)) {
+      return 'node';
+    }
+    if (isset($entity->sid)) {
+      return 'scald_atom';
+    }
+    if (isset($entity->item_id)) {
+      return 'paragraphs_item';
+    }
+  }
+
+  return NULL;
+}
+
+/**
+ * Returns the name of the field that contains the entity ID
+ */
+function _mukurtu_export_entity_id($entity_type = NULL, $entity = NULL) {
+  if (is_null($entity_type)) {
+    $entity_type = _mukurtu_export_entity_type($entity);
+  }
+  $entity_info = entity_get_info($entity_type);
+  return $entity_info['entity keys']['id'];
+}
+
+/**
+ * Gets the GUID for an entity
+ *
+ * Fetches the existing feeds GUID if available, creates a new GUID if not
+ */
+function _mukurtu_export_entity_get_guid($entity_type, $entity_id) {
+  $entity = entity_load($entity_type, [$entity_id]);
+  $entity_wrapper = entity_metadata_wrapper($entity_type, $entity[$entity_id]);
+
+  $feeds_info = feeds_item_info_load($entity_type, $entity_id);
+  // Check for an existing feeds guid
+  if ($feeds_info && isset($feeds_info->guid)) {
+    return $feeds_info->guid;
+  }
+
+  // Otherwise generate a new one
+  $guid_components = [$entity_wrapper->getBundle(), $entity_id];
+  if (isset($entity[$entity_id]->created)) {
+    $guid_components[] = $entity[$entity_id]->created;
+  }
+  $guid = implode('_', $guid_components);
+  return $guid;
+}
+
+/**
+ * Replace SIDs with GUIDs in embedded Scald drag and drop fields for export.
+ */
+function _mukurtu_export_encode_scald_dnd($value) {
+  $referenced_entities = [];
+  $files = [];
+
+  // Old 'scald=123:' style.
+  $sid_pattern = "/scald=(\d+):/";
+  preg_match_all($sid_pattern, $value, $matches);
+
+  foreach ($matches[1] as $sid) {
+    $atom_guid = _mukurtu_export_entity_get_guid('scald_atom', $sid);
+    $referenced_entities['scald_atom'][$sid] = $sid;
+    if ($atom_guid != "") {
+      $atom_guid_token = '[MUKURTU_ATOM_GUID:' . $atom_guid . ']';
+      $value = str_replace("scald=$sid:", "scald=$atom_guid_token:", $value);
+      $value = str_replace("<!--copyright=$sid", "<!--copyright=$atom_guid_token", $value);
+      $value = str_replace("<!--END copyright=$sid", "<!--END copyright=$atom_guid_token", $value);
+    }
+  }
+
+  // Newer 'data-scald-sid="123"' style. If any more format styles get added,
+  // we need to come up with a better, less copy and paste solution.
+  $sid_pattern = "/data-scald-sid=\"(\d+)\"/";
+  preg_match_all($sid_pattern, $value, $matches);
+
+  foreach ($matches[1] as $sid) {
+    $atom_guid = _mukurtu_export_entity_get_guid('scald_atom', $sid);
+    $referenced_entities['scald_atom'][$sid] = $sid;
+    if ($atom_guid != "") {
+      $atom_guid_token = '[MUKURTU_ATOM_GUID:' . $atom_guid . ']';
+      $value = str_replace("data-scald-sid=\"$sid\"", "data-scald-sid=\"$atom_guid_token\"", $value);
+      $value = str_replace("<!--copyright=$sid", "<!--copyright=$atom_guid_token", $value);
+      $value = str_replace("<!--END copyright=$sid", "<!--END copyright=$atom_guid_token", $value);
+    }
+  }
+
+  return [$value, $referenced_entities, $files];
+}
+
+function _mukurtu_export_get_entity_bundle_array() {
+  $entities = [];
+  foreach (array_keys(entity_get_info()) as $entity_type) {
+
+    // Currently only support node/scald_atom/taxonomy fields
+    if (!in_array($entity_type, [
+      'paragraphs_item',
+      'node',
+      'scald_atom',
+      'taxonomy_term',
+    ])
+    ) {
+      continue;
+    }
+
+    $entity_info = entity_get_info($entity_type);
+
+    foreach ($entity_info['bundles'] as $bundle_name => $ids) {
+      $entities[$entity_type][] = $bundle_name;
+    }
+  }
+  return $entities;
+}
+
+// Wrapper for entity_load. entity_load doesn't pull some non-fields we want to export, so we use the specific
+// entity loader for certain types (e.g., Scald atoms)
+function mukurtu_export_entity_load_wrapper($entity_type, $ids = FALSE, $conditions = [], $reset = FALSE) {
+  switch ($entity_type) {
+    case 'scald_atom':
+      $atoms = [];
+      foreach ($ids as $id) {
+        $atoms[$id] = scald_atom_load($id);
+      }
+      return $atoms;
+  }
+  return entity_load($entity_type, $ids, $conditions, $reset);
+}

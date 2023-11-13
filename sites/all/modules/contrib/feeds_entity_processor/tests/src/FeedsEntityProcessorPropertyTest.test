@@ -1,0 +1,199 @@
+<?php
+
+/**
+ * @file
+ * Contains FeedsEntityProcessorPropertyTest.
+ */
+
+/**
+ * Tests importing entities with properties of various data types.
+ */
+class FeedsEntityProcessorPropertyTest extends FeedsWebTestCase {
+
+  /**
+   * The created feeds_entity_processor_test_type bundle.
+   *
+   * @var string
+   */
+  private $bundle;
+
+  /**
+   * The created node.
+   *
+   * @var object
+   */
+  private $node;
+
+  /**
+   * Describes this test.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Entity property test',
+      'description' => 'Tests importing entities with properties of various data types.',
+      'group' => 'Feeds entity processor',
+    );
+  }
+
+  /**
+   * Set up test.
+   */
+  public function setUp() {
+    parent::setUp(array('feeds_entity_processor', 'feeds_entity_processor_test'));
+
+    // Create an importer configuration.
+    $this->createImporterConfiguration('Syndication', 'syndication');
+    $this->setPlugin('syndication', 'FeedsCSVParser');
+    $this->setPlugin('syndication', 'FeedsEntityProcessorFeeds_entity_processor_test');
+
+    // Create bundle entity.
+    $this->bundle = drupal_strtolower($this->randomName());
+    entity_create('feeds_entity_processor_test_type', array(
+      'id' => drupal_strtolower($this->randomName()),
+      'name' => $this->bundle,
+    ))->save();
+
+    // Create a node.
+    $this->node = $this->drupalCreateNode();
+  }
+
+  /**
+   * Test basic entity creation.
+   */
+  public function test() {
+    // Set bundle and set default values for required properties.
+    $this->setSettings('syndication', 'FeedsEntityProcessorFeeds_entity_processor_test', array(
+      'bundle' => $this->bundle,
+      'values[entity][entity_type]' => 'node',
+      'values[entity][entity_id]' => $this->node->nid,
+      'values[user]' => 1,
+    ));
+
+    $this->addMappings('syndication', array(
+      0 => array(
+        'source' => 'guid',
+        'target' => 'guid',
+        'unique' => TRUE,
+      ),
+      1 => array(
+        'source' => 'title',
+        'target' => 'title',
+      ),
+      2 => array(
+        'source' => 'status',
+        'target' => 'status',
+      ),
+      3 => array(
+        'source' => 'uid',
+        'target' => 'user',
+      ),
+      4 => array(
+        'source' => 'nid',
+        'target' => 'entity',
+      ),
+      5 => array(
+        'source' => 'created',
+        'target' => 'created',
+      ),
+    ));
+
+    // Run import.
+    $this->importURL('syndication', $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'feeds_entity_processor') . '/tests/resources/test_content.csv');
+    $this->assertText('Created 1 test entity');
+
+    // Check values of imported entity.
+    $entity = entity_load_single('feeds_entity_processor_test', 1);
+    $this->assertEqual('Lorem Ipsum', $entity->title);
+    $this->assertEqual($this->bundle, $entity->type);
+    $this->assertEqual(1, $entity->status);
+    $this->assertEqual(2, $entity->uid);
+    $this->assertEqual(1, $entity->etid);
+    $this->assertEqual('node', $entity->entity_type);
+    $this->assertEqual(1454172758, $entity->created);
+  }
+
+  /**
+   * Tests if default values are used for properties that are not mapped.
+   */
+  public function testDefaultValues() {
+    $title = $this->randomString();
+    $created = REQUEST_TIME - 86400;
+
+    // Set bundle and set default values for required properties.
+    $this->setSettings('syndication', 'FeedsEntityProcessorFeeds_entity_processor_test', array(
+      'bundle' => $this->bundle,
+      'values[title]' => $title,
+      'values[status]' => '1',
+      'values[created]' => $created,
+      'values[entity][entity_type]' => 'node',
+      'values[entity][entity_id]' => $this->node->nid,
+      'values[user]' => 1,
+    ));
+
+    $this->addMappings('syndication', array(
+      0 => array(
+        'source' => 'guid',
+        'target' => 'guid',
+        'unique' => TRUE,
+      ),
+    ));
+
+    // Run import.
+    $this->importURL('syndication', $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'feeds_entity_processor') . '/tests/resources/test_content.csv');
+    $this->assertText('Created 1 test entity');
+
+    // Check values of imported entity.
+    $entity = entity_load_single('feeds_entity_processor_test', 1);
+    $this->assertEqual($title, $entity->title);
+    $this->assertEqual($this->bundle, $entity->type);
+    $this->assertEqual(1, $entity->status);
+    $this->assertEqual(1, $entity->uid);
+    $this->assertEqual($this->node->nid, $entity->etid);
+    $this->assertEqual('node', $entity->entity_type);
+    $this->assertEqual($created, $entity->created);
+  }
+
+  /**
+   * Tests without setting default value data type "entity".
+   */
+  public function testWithoutDefaultValues() {
+    // Make all properties of feeds_entity_processor_test entities non-required.
+    variable_set('feeds_entity_processor_test_required', FALSE);
+    // Make sure that entity info is reset.
+    drupal_flush_all_caches();
+    drupal_static_reset();
+
+    // Set bundle and set default values for required properties.
+    $this->setSettings('syndication', 'FeedsEntityProcessorFeeds_entity_processor_test', array(
+      'bundle' => $this->bundle,
+    ));
+
+    $this->addMappings('syndication', array(
+      0 => array(
+        'source' => 'guid',
+        'target' => 'guid',
+        'unique' => TRUE,
+      ),
+      1 => array(
+        'source' => 'uid',
+        'target' => 'user',
+      ),
+      2 => array(
+        'source' => 'nid',
+        'target' => 'entity',
+        'entity_type' => 'node',
+      ),
+    ));
+
+    // Run import.
+    $this->importURL('syndication', $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'feeds_entity_processor') . '/tests/resources/test_content.csv');
+    $this->assertText('Created 1 test entity');
+
+    // Check values of imported entity.
+    $entity = entity_load_single('feeds_entity_processor_test', 1);
+    $this->assertEqual(2, $entity->uid);
+    $this->assertEqual(1, $entity->etid);
+    $this->assertEqual('node', $entity->entity_type);
+  }
+
+}

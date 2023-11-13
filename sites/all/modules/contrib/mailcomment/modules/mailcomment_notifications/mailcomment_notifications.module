@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * Implements hook_notifications_message_alter().
+ *
+ * Adds message headers into outgoing emails for notifications
+ */
+function mailcomment_notifications_notifications_message_alter(&$message) {
+    $params = array();
+    // For now, just for non digested emails
+    if (($account = current($message->get_destinations())->get_user()) && $message->digest == FALSE && $message->send_method()->type == 'mail') {
+        $event = current($message->events);
+        if (($event->type == 'node-post' || $event->type == 'node-comment') && !empty($event->objects['node'])) {
+            $node = node_load($event->objects['node']->value);
+            $params['uid'] = $node->uid;
+            $params['nid'] = $node->nid;
+            $params['cid'] = 0;
+            $params['time'] = $node->created;
+            if ($event->action == 'comment' && !empty($event->objects['comment'])) {
+                $comment = comment_load($event->objects['comment']->value);
+                $params['uid'] = $comment->uid;
+                $params['cid'] = $comment->cid;
+                $ancestor_msg_id = mailcomment_mail_comment_ancestor_message_id($params['nid'], $params['cid']);
+                $params['time'] = $comment->created;
+            }
+        }
+    }
+    // If we've got some params out of the message, embed them into the message id for emails only
+    // and only if the recipient of the message is allowed to post comments.
+    if ($params && ($reply = variable_get('mailcomment_mailbox', '')) && user_access('post comments', $account) && (node_load($event->objects['node']->value)->comment == 2)) {
+        // Alter message subjects
+        if (variable_get('mailcomment_alter_subjects', 1)) {
+            $subject = $message->get_template()->get_element('subject');
+            if (($event->type == 'node' || $event->type == 'node-comment') && !empty($event->objects['node'])) {
+                $subject['#markup'] = variable_get('site_name', '') ? '[' . variable_get('site_name', '') . '] ' . node_load($event->objects['node']->value)->title : $subject['#markup'];
+            }
+            if ($event->action == 'comment') {
+                $subject['#markup'] = t('Re:') . ' ' . $subject['#markup'];
+            }
+            $message->subject = $subject;
+        }
+
+        $message->params['mail']['headers']['Message-ID'] = mailcomment_build_messageid($params);
+        $message->params['mail']['headers']['Reply-To'] = $reply;
+        if (isset($ancestor_msg_id)) {
+            $message->params['mail']['headers']['In-Reply-To'] = $ancestor_msg_id;
+        }
+        // Add marker text into the message header part taking care of already existing text
+        $insert_reply_text = variable_get('mailcomment_insert_reply_text', 1);
+        $text = variable_get('mailcomment_reply_text', t('((( Reply ABOVE this LINE to POST a COMMENT )))'));
+        if ($text && $insert_reply_text) {
+            $prefix = array($text);
+            $header = $message->get_template()->get_element('header');
+            $prefix[] = $header['#markup'];
+            $header['#markup'] = implode("\n", $prefix);
+            $message->get_template()->add_element('header', $header);
+        }
+        // Alter $params in order to provide recipient uid in message signature
+        $params['uid'] = $account->uid;
+        $footer = $message->get_template()->get_element('footer');
+        $footer['mailcomment'] = array('#type' => 'messaging_link', '#text' => 'View original post: ', '#url' =>  url('mailcomment/redirect/' . mailcomment_build_messageid($params), array('absolute' => TRUE)));
+        $message->get_template()->add_element('footer', $footer);
+    }
+}

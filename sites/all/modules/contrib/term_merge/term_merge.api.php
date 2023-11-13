@@ -23,6 +23,6 @@ function hook_term_merge($term_trunk, $term_branch, $context) {
   // UPDATE {my_table}
   //   SET term_tid = $term_trunk->tid
   //   WHERE term_tid = $term_branch->tid
-  // Or do anything else that you own logic requires when merging of 2 terms
+  // Or do anything else that your own logic requires when merging of 2 terms
   // happens.
 }

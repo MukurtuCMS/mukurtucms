@@ -1,0 +1,76 @@
+<?php
+
+/**
+ * @file
+ * Add view / create / update / delete permissions for all paragraph bundles.
+ */
+
+/**
+ * Implements hook_paragraphs_item_access().
+ */
+function paragraphs_bundle_permissions_paragraphs_item_access($entity, $op, $account) {
+  $permissions = &drupal_static(__FUNCTION__, array());
+
+  if (!in_array($op, array('view', 'update', 'delete', 'create'), TRUE) || $entity === NULL) {
+    // If there is no bundle to check against, or the $op is not one of the
+    // supported ones, we return access ignore.
+    return PARAGRAPHS_ITEM_ACCESS_IGNORE;
+  }
+
+  $bundle = $entity->bundle;
+
+  // Set static cache id to use the bundle machine name.
+  $cid = $bundle;
+
+  // If we've already checked access for this bundle, user and op, return from
+  // cache.
+  if (isset($permissions[$account->uid][$cid][$op])) {
+    return $permissions[$account->uid][$cid][$op];
+  }
+
+  if (user_access('bypass paragraphs bundle content access', $account) || user_access($op . ' paragraph content ' . $bundle, $account)) {
+    $permissions[$account->uid][$cid][$op] = PARAGRAPHS_ITEM_ACCESS_ALLOW;
+  }
+  else {
+    $permissions[$account->uid][$cid][$op] = PARAGRAPHS_ITEM_ACCESS_DENY;
+  }
+
+  return $permissions[$account->uid][$cid][$op];
+}
+
+/**
+ * Implements hook_permission().
+ */
+function paragraphs_bundle_permissions_permission() {
+  $perms = array(
+    'bypass paragraphs bundle content access' => array(
+      'title' => t('Bypass paragraphs bundle content access control'),
+      'description' => t('Is able to administer content for all paragraph bundles'),
+    ),
+  );
+
+  // Add permissions for each bundle.
+  $bundles = paragraphs_bundle_load();
+  foreach ($bundles as $machine_name => $bundle) {
+    $perms += array(
+      'view paragraph content ' . $machine_name => array(
+        'title' => t('%type_name: View content', array('%type_name' => $bundle->name)),
+        'description' => t('Is able to view paragraphs content of bundle %type_name', array('%type_name' => $bundle->name)),
+      ),
+      'create paragraph content ' . $machine_name => array(
+        'title' => t('%type_name: Create content', array('%type_name' => $bundle->name)),
+        'description' => t('Is able to create paragraphs content of bundle %type_name', array('%type_name' => $bundle->name)),
+      ),
+      'update paragraph content ' . $machine_name => array(
+        'title' => t('%type_name: Edit content', array('%type_name' => $bundle->name)),
+        'description' => t('Is able to update paragraphs content of bundle %type_name', array('%type_name' => $bundle->name)),
+      ),
+      'delete paragraph content ' . $machine_name => array(
+        'title' => t('%type_name: Delete content', array('%type_name' => $bundle->name)),
+        'description' => t('Is able to delete paragraphs content of bundle %type_name', array('%type_name' => $bundle->name)),
+      ),
+    );
+  }
+
+  return $perms;
+}

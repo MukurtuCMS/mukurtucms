@@ -28,13 +28,22 @@ At this time, this module supports Exif information only with JPEG files.
 [1] Reference: http://en.wikipedia.org/wiki/Exchangeable_image_file_format
 
 
-Requirements and Constraints
-****************************
+Requirements
+**************
 
 CCK with at least textfields enabled.
-If you use a module like imagefield. It's only possible to have one image per node!! 
-If there are more than one images per node, only the exif data of one image is read!
+Exif PHP Extension enabled.
 
+
+Constraints
+*************
+
+Constraints with Image Processing utility :
+
+Note that, it has been reported that when using GD, it strips some fields
+(like field_gps_gpslatitude or field_gps_gpslongitude) from uploaded files.
+Imagemagick seems not to have this limitation and does not strip these fields.
+So Imagemagick is recommended when access to GPS data.
 
 Usage
 ************
@@ -44,7 +53,7 @@ aswell as the imagefield module. Let's say you have an content type "photo". Go 
 cck settings and add a new field. For the name of the field you need to follow the following
 naming conventions:
 
-Example: 
+### Example:
 #1 field_exif_exposuretime -> this would read the ExposureTime of the image and save it
 in this field.
 

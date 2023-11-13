@@ -1,0 +1,600 @@
+<?php
+
+/**
+ * @file
+ * Allows multi-value fields to be stored as an hierarchical tree.
+ */
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function treeable_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'entityreference') {
+    return 'plugins/' . $plugin;
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function treeable_theme() {
+  return array(
+    'treeable_field' => array(
+      'render element' => 'element',
+    ),
+    'treeable_multiple_value_form' => array(
+      'render element' => 'element',
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_schema_alter() provided by this patch: https://www.drupal.org/node/691932.
+ */
+function treeable_field_schema_alter(&$schema, $field) {
+  if (!empty($field['settings']['treeable'])) {
+    $schema['columns'] += _treeable_columns();
+  }
+}
+
+/**
+ * Implements hook_field_info_alter().
+ *
+ * Extend all field types with a tree option.
+ */
+function treeable_field_info_alter(&$field_types) {
+  foreach ($field_types as $name => $field_type) {
+    $field_types[$name]['settings']['treeable'] = FALSE;
+  }
+}
+
+/**
+ * Implements hook_field_widget_info_alter().
+ */
+function treeable_field_widget_info_alter(&$widget_types) {
+  foreach ($widget_types as $name => $widget_type) {
+    // Only widgets that don't handle multiple values by themselves
+    if (isset($widget_type['behaviors']['multiple values']) && $widget_type['behaviors']['multiple values'] != FIELD_BEHAVIOR_CUSTOM) {
+      $widget_types[$name]['settings']['treeable'] = FALSE;
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() where FORM_ID is "field_ui_field_settings_form".
+ *
+ * Add tree settings to the field settings form.
+ */
+function treeable_form_field_ui_field_settings_form_alter(&$form, $form_state) {
+  $instance = $form_state['build_info']['args'][0];
+  $field = field_info_field($instance['field_name']);
+  $has_data = field_has_data($field);
+
+  $form['field']['settings']['treeable'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Store as tree'),
+    '#description' => 'Store values as a hierarchical tree.',
+    '#default_value' => !empty($field['settings']['treeable']) ? $field['settings']['treeable'] : FALSE,
+    '#weight' => -9,
+    '#disabled' => $has_data,
+  );
+
+  if (!$has_data) {
+    array_unshift($form['#submit'], 'treeable_form_field_ui_field_settings_form_submit');
+  }
+}
+
+/**
+ * If field is set to be treeable set field's cardinality to unlimited, set
+ * widget to use the treeable form and set the formatter to treeable_list.
+ */
+function treeable_form_field_ui_field_settings_form_submit($form, &$form_state) {
+  $instance = $form_state['build_info']['args'][0];
+  $form_values = $form_state['values'];
+  $field_values = $form_values['field'];
+
+  if (!empty($field_values['settings']['treeable'])) {
+    $form_state['values']['field']['cardinality'] = FIELD_CARDINALITY_UNLIMITED;
+
+    if (field_behaviors_widget('multiple values', $instance) == FIELD_BEHAVIOR_DEFAULT) {
+      $instance['widget']['settings']['treeable'] = TRUE;
+    }
+
+    $instance['display']['default'] = array(
+      'type' => 'treeable_list',
+      'module' => 'treeable',
+      'settings' => array(
+        'subformatter' => $instance['display']['default']['type'],
+        'subformatter_settings' => $instance['display']['default']['settings']
+      )
+    ) + $instance['display']['default'];
+  }
+  else {
+    $instance['widget']['settings']['treeable'] = FALSE;
+
+    $field_type = field_info_field_types($form_values['field']['type']);
+    $formatter = field_info_formatter_types($field_type['default_formatter']);
+    $default = array(
+      'type' => $field_type['default_formatter'],
+      'module' => $formatter['module'],
+      'settings' => $formatter['settings']
+    );
+
+    foreach ($instance['display'] as $name => $display) {
+      if ($display['type'] == 'treeable_list') {
+        $instance['display'][$name] = $default + $instance['display'][$name];
+      }
+    }
+  }
+
+  field_update_instance($instance);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() where FORM_ID is "field_ui_field_edit_form".
+ *
+ * Add tree settings to the field instance edit form.
+ */
+function treeable_form_field_ui_field_edit_form_alter(&$form, $form_state) {
+  $field = $form['#field'];
+  $instance = $form_state['build_info']['args'][0];
+  $widget = $instance['widget'];
+  $widget_type = field_info_widget_types($widget['type']);
+  $has_data = field_has_data($field);
+
+  $form['instance']['widget']['settings']['treeable'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Hierarchical edit form'),
+    '#description' => t('Show an hierarchical edit form in which the values can be dragged around.'),
+    '#default_value' => !empty($widget['settings']['treeable']),
+    '#states' => array(
+      'invisible' => array(
+        'input[name="field[settings][treeable]"]' => array('checked' => FALSE),
+      ),
+      'unchecked' => array(
+        'input[name="field[settings][treeable]"]' => array('checked' => FALSE),
+      ),
+    ),
+    '#weight' => -9,
+  );
+
+  if (field_behaviors_widget('multiple values', $instance) != FIELD_BEHAVIOR_DEFAULT) {
+    $form['instance']['widget']['settings']['treeable']['#description'] .= '<br/>' . t('The currently active widget handles multiple value by itself. The hierarchical edit form cannot be enabled.');
+    $form['instance']['widget']['settings']['treeable']['#value'] = 0;
+    $form['instance']['widget']['settings']['treeable']['#disabled'] = TRUE;
+  }
+
+  $form['field']['settings']['treeable'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Store as tree'),
+    '#description' => t('Store values as a hierarchical tree.'),
+    '#default_value' => $field['settings']['treeable'],
+    '#disabled' => $has_data,
+    '#weight' => -9,
+  );
+}
+
+/**
+ * Helper function that defines extra columns for tree-enabled fields.
+ */
+function _treeable_columns() {
+  return array(
+    'parent_delta' => array(
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => FALSE,
+      'description' => 'The parent sequence number for this data item, used for multi-value fields',
+    )
+  );
+}
+
+/**
+ * Mimics _field_invoke() to enable tree functionality on any field type.
+ *
+ * @see _field_invoke()
+ */
+function _treeable_field_invoke($op, $entity_type, $entity, &$a = NULL, &$b = NULL, $options = array()) {
+  // Merge default options.
+  $default_options = array(
+    'default' => FALSE,
+    'deleted' => FALSE,
+    'language' => NULL,
+  );
+  $options += $default_options;
+
+  // Determine the list of instances to iterate on.
+  list(, , $bundle) = entity_extract_ids($entity_type, $entity);
+  $instances = _field_invoke_get_instances($entity_type, $bundle, $options);
+
+  // Iterate through the instances and collect results.
+  $return = array();
+  foreach ($instances as $instance) {
+    $field_name = $instance['field_name'];
+    $field = field_info_field($field_name);
+    $function = '_treeable_field_' . $op;
+
+    // Only continue if this field is configured to be stored as a tree.
+    if (!empty($field['settings']['treeable'])) {
+      // Determine the list of languages to iterate on.
+      $available_languages = field_available_languages($entity_type, $field);
+      $languages = _field_language_suggestion($available_languages, $options['language'], $field_name);
+
+      foreach ($languages as $langcode) {
+        $items = isset($entity->{$field_name}[$langcode]) ? $entity->{$field_name}[$langcode] : array();
+
+        $function($entity_type, $entity, $field, $instance, $langcode, $items, $a, $b);
+
+        // Populate $items back in the field values, but avoid replacing missing
+        // fields with an empty array (those are not equivalent on update).
+        if ($items !== array() || isset($entity->{$field_name}[$langcode])) {
+          $entity->{$field_name}[$langcode] = $items;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_attach_form().
+ *
+ * @see field_attach_form()
+ * @see _treeable_field_form()
+ */
+function treeable_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
+  // If no language is provided use the default site language.
+  $options = array('language' => field_valid_language($langcode));
+  _treeable_field_invoke('form', $entity_type, $entity, $form, $form_state, $options);
+}
+
+/**
+ * Extends field's form with tree functionality.
+ *
+ * @see field_default_form()
+ * @see field_multiple_value_form()
+ */
+function _treeable_field_form($entity_type, $entity, $field, $instance, $langcode, $items, &$form, &$form_state, $get_delta = NULL) {
+  $field_name = $field['field_name'];
+
+  if (field_access('edit', $field, $entity_type, $entity)) {
+    if (!isset($get_delta) && field_behaviors_widget('multiple values', $instance) == FIELD_BEHAVIOR_DEFAULT) {
+      // Determine the number of widgets to display.
+      switch ($field['cardinality']) {
+        case FIELD_CARDINALITY_UNLIMITED:
+          $filled_items = _field_filter_items($field, $items);
+          $current_item_count = isset($form_state['values'][$field_name][$langcode])
+                                ? sizeof($form_state['values'][$field_name][$langcode])
+                                : count($items);
+          // We always want at least one empty icon for the user to fill in.
+          $max = ($current_item_count > count($filled_items))
+                  ? $current_item_count - 1
+                  : $current_item_count;
+
+          break;
+        default:
+          $max = $field['cardinality'] - 1;
+          break;
+      }
+
+      for ($delta = 0; $delta <= $max; $delta++) {
+        // Hide field_multiple_value_form's _weight elements as it's order is
+        // going to be overridden in _treeable_field_submit().
+        $form[$field_name][$langcode][$delta]['_weight']['#type'] = 'hidden';
+
+        $form[$field_name][$langcode][$delta]['treeable_weight'] = array(
+          '#type' => 'textfield',
+          '#default_value' => $form[$field_name][$langcode][$delta]['_weight']['#default_value'],
+          '#size' => 2,
+        );
+        $form[$field_name][$langcode][$delta]['parent_delta'] = array(
+          '#type' => 'textfield',
+          '#default_value' => isset($items[$delta]['parent_delta']) ? $items[$delta]['parent_delta'] : -1,
+          '#size' => 2,
+        );
+      }
+
+      // @todo rather without overriding the theme callback.
+      $form[$field_name][$langcode]['#theme'] = 'treeable_multiple_value_form';
+    }
+  }
+}
+
+/**
+ * Implements hook_field_attach_submit().
+ *
+ * @see field_attach_submit()
+ * @see _treeable_field_submit()
+ */
+function treeable_field_attach_submit($entity_type, $entity, $form, &$form_state) {
+  _treeable_field_invoke('submit', $entity_type, $entity, $form, $form_state);
+}
+
+/**
+ * Perform necessary operations on (tree-enabled) field data submitted by a form.
+ *
+ * @see field_default_extract_form_values()
+ * @see field_default_submit()
+ * @see _field_sort_items()
+ */
+function _treeable_field_submit($entity_type, $entity, $field, $instance, $langcode, &$items, $form, &$form_state) {
+  $field_name = $field['field_name'];
+
+  // Deltas were normalized in field_default_submit(), but parent_deltas need
+  // to match them.
+  if (isset($form_state['values'][$field_name][$langcode])) {
+    // Reorder items to account for drag-n-drop reordering.
+    usort($items, '_treeable_field_sort_items_helper');
+
+    // Build an weight-to-delta translation array.
+    $prior_deltas = array();
+    foreach ($items as $delta => $item) {
+      $prior_deltas[$item['treeable_weight']] = $delta;
+    }
+
+    foreach ($items as $delta => $item) {
+      $items[$delta]['parent_delta'] = $item['parent_delta'] == -1 || !isset($prior_deltas[$item['parent_delta']])
+        ? NULL
+        : $prior_deltas[$item['parent_delta']];
+    }
+  }
+}
+
+/**
+ * Sort function for items order.
+ * (copied from _field_sort_items_helper())
+ */
+function _treeable_field_sort_items_helper($a, $b) {
+  $a_weight = (is_array($a) ? $a['treeable_weight'] : 0);
+  $b_weight = (is_array($b) ? $b['treeable_weight'] : 0);
+  return $a_weight - $b_weight;
+}
+
+/**
+ * Returns HTML for an individual form element.
+ *
+ * Combine multiple values into a table with drag-n-drop reordering.
+ * TODO : convert to a template.
+ *
+ * @param $variables
+ *   An associative array containing:
+ *   - element: A render element representing the form element.
+ *
+ * @ingroup themeable
+ */
+function theme_treeable_multiple_value_form($variables) {
+  $element = $variables['element'];
+  $output = '';
+
+  if ($element['#cardinality'] > 1 || $element['#cardinality'] == FIELD_CARDINALITY_UNLIMITED) {
+    $table_id = drupal_html_id($element['#field_name'] . '_values');
+    //$order_class = $element['#field_name'] . '-delta-order';
+    $required = !empty($element['#required']) ? '<span class="form-required" title="' . t('This field is required. ') . '">*</span>' : '';
+
+    $header = array(
+      array(
+        'data' => '<label>' . t('!title: !required', array('!title' => $element['#title'], '!required' => $required)) . "</label>",
+        //'colspan' => 2,
+        //'class' => array('field-label'),
+      ),
+      array('data' => t('Order'), 'class' => 'treeable-form-weight'),
+      array('data' => t('Parent'), 'class' => 'treeable-form-parent'),
+    );
+    $rows = array();
+
+    // Sort items according to '_weight' (needed when the form comes back after
+    // preview or failed validation)
+    $items = array();
+    foreach (element_children($element) as $key) {
+      if ($key === 'add_more') {
+        $add_more_button = &$element[$key];
+      }
+      else {
+        $items[] = &$element[$key];
+      }
+    }
+    usort($items, '_field_sort_items_value_helper');
+
+    // Add the items as (indented) table rows.
+    $depths = array(-1 => -1);
+    foreach ($items as $key => $item) {
+      //$item['_weight']['#attributes']['class'] = array($order_class);
+      $item['treeable_weight']['#attributes']['class'] = array('treeable-weight');
+      $item['parent_delta']['#attributes']['class'] = array('treeable-parent');
+      $delta_element = drupal_render($item['_weight']) . drupal_render($item['treeable_weight']);
+      $parent_element = drupal_render($item['parent_delta']);
+
+      $depth = 0;
+      if (isset($depths[$item['parent_delta']['#value']])) {
+        $depth = $depths[$item['parent_delta']['#value']] + 1;
+        $depths[$item['_weight']['#value']] = $depth;
+      }
+
+      $cells = array(
+        array('data' => theme('indentation', array('size' => max($depth, 0))) . '<div class="treeable-form-item">' . drupal_render($item) . '</div>' ),
+        array('data' => $delta_element, 'class' => array('delta-order')),
+        array('data' => $parent_element),
+      );
+      $rows[] = array(
+        'data' => $cells,
+        'class' => array('draggable'),
+      );
+    }
+
+    $output = '<div class="form-item">';
+    $output .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => $table_id, 'class' => array('field-multiple-table'))));
+    $output .= $element['#description'] ? '<div class="description">' . $element['#description'] . '</div>' : '';
+    $output .= '<div class="clearfix">' . drupal_render($add_more_button) . '</div>';
+    $output .= '</div>';
+
+    drupal_add_tabledrag($table_id, 'match', 'parent', 'treeable-parent', NULL, 'treeable-weight');
+    drupal_add_tabledrag($table_id, 'order', 'root', 'treeable-weight');
+    drupal_add_js(drupal_get_path('module', 'treeable') . '/treeable.js');
+    drupal_add_css(drupal_get_path('module', 'treeable') . '/treeable.css');
+  }
+  else {
+    foreach (element_children($element) as $key) {
+      $output .= drupal_render($element[$key]);
+    }
+  }
+
+  return $output;
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function treeable_field_formatter_info() {
+  $field_types = array_keys(field_info_field_types());
+
+  return array(
+    'treeable_list' => array(
+      'label' => t('Hierarchical tree list'),
+      'field types' => $field_types,
+      'settings' => array('subformatter' => '', 'subformatter_settings' => array())
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function treeable_field_formatter_settings_form($field, $instance, $view_mode, $form, $form_state) {
+  $field_type = field_info_field_types($field['type']);
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $formatter_name = !empty($settings['subformatter']) ? $settings['subformatter'] : $field_type['default_formatter'];
+  $formatter = field_info_formatter_types($formatter_name);
+
+  $formatter_options = field_ui_formatter_options($field['type']);
+  unset($formatter_options['treeable_list']);
+
+  $form['subformatter'] = array(
+    '#type' => 'select',
+    '#title' => t('Sub formatter'),
+    '#options' => $formatter_options,
+    '#default_value' => $formatter_name,
+  );
+
+  $subinstance = $instance;
+  $subinstance['display'][$view_mode] = array(
+    'type' => $formatter_name,
+    'module' => $formatter['module'],
+    'settings' => $settings['subformatter_settings']
+  ) + $subinstance['display'][$view_mode];
+
+  $additions = module_invoke($formatter['module'], 'field_formatter_settings_form', $field, $subinstance, $view_mode, $form, $form_state);
+  if (is_array($additions)) {
+    $form['subformatter_setting'] = $additions;
+    $form['subformatter_setting']['#tree'] = TRUE;
+    $form['subformatter_setting']['#input'] = TRUE;
+  }
+
+  return $form;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function treeable_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $field_type = field_info_field_types($field['type']);
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $formatter_name = !empty($settings['subformatter']) ? $settings['subformatter'] : $field_type['default_formatter'];
+  $formatter = field_info_formatter_types($formatter_name);
+
+  $subinstance = $instance;
+  $subinstance['display'][$view_mode] = array(
+    'type' => $formatter_name,
+    'module' => $formatter['module'],
+    'settings' => $settings['subformatter_settings']
+  ) + $subinstance['display'][$view_mode];
+
+  $summary = t('Subformatter: %subformatter', array('%subformatter' => $formatter['label']));
+  $formatter_summary = module_invoke($formatter['module'], 'field_formatter_settings_summary', $field, $subinstance, $view_mode);
+  if ($formatter_summary) {
+    $summary .= '<br />' . $formatter_summary;
+  }
+
+  return $summary;
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function treeable_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  $field_type = field_info_field_types($field['type']);
+  $settings = $display['settings'];
+
+  $formatter_name = !empty($settings['subformatter']) ? $settings['subformatter'] : $field_type['default_formatter'];
+  $formatter = field_info_formatter_types($formatter_name);
+
+  $function = $formatter['module'] . '_field_formatter_view';
+  if (function_exists($function)) {
+    $subdisplay = array(
+      'type' => $formatter_name,
+      'settings' => $settings['subformatter_settings'],
+      'module' => $formatter['module']
+    ) + $display;
+
+    $element = $function($entity_type, $entity, $field, $instance, $langcode, $items, $subdisplay);
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_preprocess_HOOK() where HOOK is "field".
+ */
+function treeable_preprocess_field(&$variables) {
+  $element = $variables['element'];
+
+  if ($element['#formatter'] == 'treeable_list') {
+    // Never use theme_field for tree-enabled fields, but ensure more specific
+    // hook suggestions are still useable.
+    array_unshift($variables['theme_hook_suggestions'], 'treeable_field');
+  }
+}
+
+/**
+ * Returns HTML for a (tree) field.
+ *
+ * @see theme_field()
+ *
+ * @ingroup themeable
+ */
+function theme_treeable_field($variables) {
+  $output = '';
+
+  // Render the label, if it's not hidden.
+  if (!$variables['label_hidden']) {
+    $output .= '<div class="field-label"' . $variables['title_attributes'] . '>' . $variables['label'] . ':&nbsp;</div>';
+  }
+
+  // Render the items.
+  $output .= '<div class="field-items"' . $variables['content_attributes'] . '>';
+
+  $tree = array();
+  $refs = array(-1 => &$tree);
+  foreach ($variables['items'] as $delta => $item) {
+    $classes = 'field-item ' . ($delta % 2 ? 'odd' : 'even');
+
+    $parent = $variables['element']['#items'][$delta]['parent_delta'];
+    $parent = is_null($parent) ? -1 : $parent;
+    $refs[$parent][$delta] = array(
+      'data' => '<div class="' . $classes . '"' . $variables['item_attributes'][$delta] . '>' . drupal_render($item) . '</div>',
+      'children' => array(),
+    );
+    $refs[$delta] = &$refs[$parent][$delta]['children'];
+  }
+
+  $output .= theme('item_list', array('items' => $tree));
+
+  $output .= '</div>';
+
+  // Render the top-level DIV.
+  $output = '<div class="' . $variables['classes'] . '"' . $variables['attributes'] . '>' . $output . '</div>';
+
+  return $output;
+}

@@ -1,0 +1,28 @@
+From 0444364327f5d3294633fe26d1f64561449462c2 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Thu, 27 Apr 2023 09:03:22 -0700
+Subject: [PATCH] Handle array type for view definition
+
+---
+ includes/handlers.inc | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/includes/handlers.inc b/includes/handlers.inc
+index 99eb5937..e2be1261 100644
+--- a/includes/handlers.inc
++++ b/includes/handlers.inc
+@@ -17,6 +17,11 @@ function _views_create_handler($definition, $type = 'handler', $handler_type = N
+     return;
+   }
+ 
++  // Mukurtu patch. Somehow (PHP 8 specific?) arrays are getting in here and crashing sites.
++  if (is_array($definition['handler'])) {
++    return;
++  }
++
+   // class_exists will automatically load the code file.
+   if (!empty($definition['override handler']) &&
+       !class_exists($definition['override handler'])) {
+-- 
+2.34.1
+

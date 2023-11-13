@@ -7,3 +7,8 @@
   border: #ccc 2px dashed;
   padding: 2px;
 }
+
+.atom_reference_operations .buttons ul {
+  margin: 0;
+  padding: 0;
+}

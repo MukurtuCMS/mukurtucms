@@ -68,6 +68,12 @@ function entity_delete_log_schema() {
         'type' => 'int',
         'not null' => TRUE,
       ),
+      'entity' => array(
+        'serialize' => TRUE,
+        'type' => 'text',
+        'description' => 'The serialized entity.',
+        'size' => 'medium',
+      ),
     ),
     'primary key' => array('entity_delete_log_id'),
   );
@@ -81,3 +87,22 @@ function entity_delete_log_uninstall() {
   variable_del('entity_delete_log_entity_types');
 }
 
+/**
+ * Clear the cache.
+ */
+function entity_delete_log_update_7000() {
+  // This just has to be empty.
+}
+
+/**
+ * Add a serialized entity field for deleted entities.
+ */
+function entity_delete_log_update_7001() {
+  db_add_field('entity_delete_log', 'entity', array(
+    'serialize' => TRUE,
+    'type' => 'text',
+    'description' => 'The serialized entity.',
+    'size' => 'medium',
+  ));
+  return t('Added serialized entity field for deleted entities.');
+}

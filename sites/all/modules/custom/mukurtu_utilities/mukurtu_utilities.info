@@ -1,0 +1,6 @@
+name = Mukurtu Utilities
+description = Mukurtu Tools and Utilities
+package = Mukurtu
+dependencies[] = ma_core
+core = 7.x
+version = "7.x-0.1"
