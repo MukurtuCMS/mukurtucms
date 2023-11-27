@@ -91,7 +91,12 @@ function ma_scald_update_7003(&$sandbox) {
   $sids = array_keys($result);
 
   $atoms = scald_atom_load_multiple($sids);
-  foreach ($atoms as $atom) {
+  foreach ($atoms as $sid => $atom) {
+    $sandbox['progress']++;
+    $sandbox['current_sid'] = $sid;
+    if (!$atom) {
+      continue;
+    }
     $entity = entity_metadata_wrapper('scald_atom', $atom);
 
     // Prior to this update, scald atoms were hardcoded to 'any' implicitly
@@ -104,9 +109,6 @@ function ma_scald_update_7003(&$sandbox) {
     } catch (Exception $e) {
       drupal_set_message(t('Could not set sharing settings for scald atom @sid', ['@sid' => $atom->sid]));
     }
-
-    $sandbox['progress']++;
-    $sandbox['current_sid'] = $atom->sid;
   }
 
   $sandbox['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
