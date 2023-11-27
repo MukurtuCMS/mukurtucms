@@ -1165,10 +1165,19 @@ function ma_scald_duplicate_content_protocol_action(&$atom, &$context) {
     unset($refs['paragraphs_item']);
   }
 
-  // We are only acting in the case where a single node contains it.
-  $types = array_keys($refs);
+  // Filter out communities and protocols, we don't count these for this kind of
+  // reference as they don't have our normal content protocol fields.
+  if (isset($refs['node'])) {
+    $query = db_select('node', 'n')
+      ->fields('n', ['nid'])
+      ->condition('n.nid', $refs['node'], 'IN')
+      ->condition('n.type', ['community', 'protocol'], 'NOT IN');
+    $refs['node'] = $query->execute()->fetchCol();
+  }
 
-  if (empty($refs) || !in_array('node', $types)) {
+  // Fail if there are no node references.
+  $types = array_keys($refs);
+  if (!in_array('node', $types) || empty($refs['node'])) {
     drupal_set_message(t("@title (@sid): Could not find any valid items referencing this media. You must set the protocol fields manually.", [
       '@title' => $atom->title,
       '@sid' => $atom->sid,
@@ -1176,6 +1185,8 @@ function ma_scald_duplicate_content_protocol_action(&$atom, &$context) {
     return;
   }
 
+  // Fail if there are multiple nodes and/or multiple types. We have no way of
+  // knowing which we should duplicate from.
   if (count($refs['node']) > 1 || count($types) > 1) {
     drupal_set_message(t("@title (@sid): This media is referenced by multiple items. You must set the protocol fields manually.", [
       '@title' => $atom->title,
@@ -1184,8 +1195,21 @@ function ma_scald_duplicate_content_protocol_action(&$atom, &$context) {
     return;
   }
 
-  $nid = $refs['node'][0];
+  $nid = $refs['node'][0] ?? NULL;
+  if ($nid == NULL) {
+    return;
+  }
   if ($node = node_load($nid)) {
+    // Check if the node has our protocol fields.
+    $instances = field_info_instances('node', $node->type);
+    if (!isset($instances['field_item_privacy_setting']) || !isset($instances['og_group_ref'])) {
+      drupal_set_message(t("@title (@sid): Could not find any valid items referencing this media. You must set the protocol fields manually.", [
+        '@title' => $atom->title,
+        '@sid' => $atom->sid,
+      ]), 'error');
+      return;
+    }
+
     // Fail if the user can't update the owning node. We don't want them to
     // deny themselves access to their own media.
     if (!node_access('update', $node)) {
@@ -1198,7 +1222,16 @@ function ma_scald_duplicate_content_protocol_action(&$atom, &$context) {
 
     // Get the node's protocol settings.
     $containing_content = entity_metadata_wrapper('node', $node);
-    $sharing = $containing_content->field_item_privacy_setting->value();
+    $sharing = $containing_content->field_item_privacy_setting->value() ?? NULL;
+    // Fail if for some reason the content doesn't have a sharing setting set.
+    if (!$sharing) {
+      drupal_set_message(t("@title (@sid): Could not find any valid items referencing this media. You must set the protocol fields manually.", [
+        '@title' => $atom->title,
+        '@sid' => $atom->sid,
+      ]), 'error');
+      return;
+    }
+
     $protocol_ids = $containing_content->og_group_ref->raw() ?? [];
 
     // Owning content must have valid protocol settings to duplicate to the
