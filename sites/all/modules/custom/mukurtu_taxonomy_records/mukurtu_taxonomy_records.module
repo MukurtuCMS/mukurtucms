@@ -1306,9 +1306,11 @@ function mukurtu_taxonomy_records_field_widget_form(&$form, &$form_state, $field
 function _mukurtu_taxonomy_records_widget_validate($element, &$form_state, $form) {
     // TODO: This has got to be the WRONG way to do this...
     // Convert our custom form input into the expected Drupal format so that the field API can save the values
-    foreach($form_state['input']['field_mukurtu_terms'][LANGUAGE_NONE]['mukurtu_record']['terms_all'] as $index => $tid) {
-        $form_state['input']['field_mukurtu_terms'][LANGUAGE_NONE][$index]['target_id'] = $tid;
-        $form_state['values']['field_mukurtu_terms'][LANGUAGE_NONE][$index]['target_id'] = $tid;
+    if (!empty($form_state['input']['field_mukurtu_terms'][LANGUAGE_NONE]['mukurtu_record']['terms_all'])) {
+        foreach ($form_state['input']['field_mukurtu_terms'][LANGUAGE_NONE]['mukurtu_record']['terms_all'] as $index => $tid) {
+            $form_state['input']['field_mukurtu_terms'][LANGUAGE_NONE][$index]['target_id'] = $tid;
+            $form_state['values']['field_mukurtu_terms'][LANGUAGE_NONE][$index]['target_id'] = $tid;
+        }
     }
 }
 
