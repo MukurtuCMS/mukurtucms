@@ -731,12 +731,12 @@ function ma_culturalprotocol_get_set_protocol_form($description) {
     $options[$protocol->nid] = "$community_name: {$protocol->title} ($access_text)";
   }
 
+  asort($options);
+
   $sharing_options = [
     'any' => t('This item may be shared with members of ANY protocol listed.'),
     'all' => t('This item may only be shared with members belonging to ALL the protocols listed.'),
   ];
-
-//  $form_description = t('Select the cultural protocol settings to apply to the content. Any existing cultural protocol settings on the content will be replaced with what you select here.');
 
   $form = [];
   $form['description'] = [
