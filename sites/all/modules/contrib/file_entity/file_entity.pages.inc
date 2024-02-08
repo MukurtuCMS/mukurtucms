@@ -831,39 +831,34 @@ function file_entity_edit($form, &$form_state, $file) {
     // Set up replacement file validation.
     $replacement_options = !empty($form_state['#upload_options']) ? $form_state['#upload_options'] : array();
 
-    // The replacement file must have an extension valid for the original type.
-    $file_extensions = array();
-    $file_type_name = isset($file->type) ? $file->type : file_get_type($file);
-    if (!empty($replacement_options['file_extensions'])) {
-      $file_extensions = explode(' ', $replacement_options['file_extensions']);
-    }
-    elseif ($file_type_name && ($file_type = file_type_load($file_type_name))) {
-      $file_extensions = file_type_get_valid_extensions($file_type);
-    }
+    // Replacement file must have the same extension as the original file.
+    $replacement_options['file_extensions'] = pathinfo($file->uri, PATHINFO_EXTENSION);
 
-    // Set allowed file extensions.
-    if (!empty($file_extensions)) {
-      // Set to type based file extensions.
-      $replacement_options['file_extensions'] = implode(' ', $file_extensions);
+    // Replacement file must also be one of the allowed filetypes.
+    $allowed_filetypes = explode(' ', variable_get('file_entity_default_allowed_extensions', 'jpg jpeg gif png txt doc docx xls xlsx pdf ppt pptx pps ppsx odt ods odp mp3 mov mp4 m4a m4v mpeg avi ogg oga ogv weba webp webm'));
+
+    if (!empty($replacement_options['file_extensions']) && in_array($replacement_options['file_extensions'], $allowed_filetypes)) {
+      $form['replace_upload'] = array(
+        '#type' => 'file',
+        '#title' => t('Replace file'),
+        '#description' => t('This file will replace the existing file. This action cannot be undone.'),
+        '#upload_validators' => file_entity_get_upload_validators($replacement_options),
+        '#pre_render' => array('file_entity_upload_validators_pre_render'),
+      );
+      $form['replace_keep_original_filename'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Keep original filename'),
+        '#default_value' => variable_get('file_entity_file_replace_options_keep_original_filename', FALSE),
+        '#description' => t('Rename the newly uploaded file to the name of the original file. This action cannot be undone.'),
+      );
     }
     else {
-      // Fallback to the extension of the current file.
-      $replacement_options['file_extensions'] = pathinfo($file->uri, PATHINFO_EXTENSION);
+      $form['replace_upload'] = array(
+        '#type' => 'item',
+        '#title' => t('Replace file'),
+        '#description' => t('This file cannot be replaced.'),
+      );
     }
-
-    $form['replace_upload'] = array(
-      '#type' => 'file',
-      '#title' => t('Replace file'),
-      '#description' => t('This file will replace the existing file. This action cannot be undone.'),
-      '#upload_validators' => file_entity_get_upload_validators($replacement_options),
-      '#pre_render' => array('file_entity_upload_validators_pre_render'),
-    );
-    $form['replace_keep_original_filename'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Keep original filename'),
-      '#default_value' => variable_get('file_entity_file_replace_options_keep_original_filename', FALSE),
-      '#description' => t('Rename the newly uploaded file to the name of the original file. This action cannot be undone.'),
-    );
   }
 
   $form['preview'] = file_view_file($file, 'preview');
@@ -1297,7 +1292,7 @@ function file_entity_get_upload_validators(array $options = array()) {
     $max_filesize = min($max_filesize, $file_entity_max_filesize);
   }
 
-  if (!empty($options['max_filesize']) && $options['max_filesize'] < $max_filesize) {
+  if (!empty($options['max_filesize']) && parse_size($options['max_filesize']) < $max_filesize) {
     $max_filesize = parse_size($options['max_filesize']);
   }
 

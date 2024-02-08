@@ -56,7 +56,7 @@ class FileEntityTestHelper extends DrupalWebTestCase {
   protected function createFileEntity($settings = array()) {
     // Populate defaults array.
     $settings += array(
-      'filepath' => 'Файл для тестирования ' . $this->randomName(), // Prefix with non-latin characters to ensure that all file-related tests work with international filenames.
+      'filepath' => 'Файл для тестирования ' . $this->randomName() . '.txt', // Prefix with non-latin characters to ensure that all file-related tests work with international filenames.
       'filemime' => 'text/plain',
       'uid' => 1,
       'timestamp' => REQUEST_TIME,
@@ -1086,6 +1086,16 @@ class FileEntityReplaceTestCase extends FileEntityTestHelper {
     // Test that validation works by uploading a non-text file as a replacement.
     $this->drupalPost('file/' . $file->fid . '/edit', $edit, t('Save'));
     $this->assertRaw(t('The specified file %file could not be uploaded. Only files with the following extensions are allowed:', array('%file' => $image->filename)), 'File validation works, upload failed correctly.');
+
+    // Restrict allowed document filetypes to exclude plain text files.
+    variable_set('file_entity_default_allowed_extensions', 'doc docx pdf');
+
+    // Test that the file can't be replaced if there's a problem with the original file's extension.
+    $this->drupalGet('file/' . $file->fid . '/edit');
+    $this->assertRaw(t('This file cannot be replaced.'), 'File extension filter works, upload prevented correctly.');
+
+    // Clean up variable.
+    variable_del('file_entity_default_allowed_extensions');
 
     // Create a non-local file record.
     $file2 = new stdClass();
