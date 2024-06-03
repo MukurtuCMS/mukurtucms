@@ -229,6 +229,8 @@ projects[scald_feeds][patch][] = contrib/83564940-add_scald_metadata_support.pat
 projects[scald_soundcloud][patch][] = contrib/Respect-quoted-strings-in-Soundcloud-tags.patch
 ; Don't use versioned API URLs
 projects[scald_soundcloud][patch][] = contrib/0001-Default-to-not-using-versioned-URL.patch
+; Soundcloud api authentication token
+projects[scald_soundcloud][patch][] = contrib/scald_soundcloud.3248343-04_api_token_authentication.patch
 
 ;;; Search API
 ; Fix 'For missing images' option will always fail
