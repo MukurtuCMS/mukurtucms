@@ -58,10 +58,10 @@ function ma_dictionary_field_group_info() {
   $field_group->data = array(
     'children' => array(
       0 => 'field_additional_media',
-      1 => 'field_dictionary_word_language',
-      2 => 'field_tags',
-      3 => 'field_word_entry',
-      4 => 'field_additional_media_assets',
+      1 => 'field_additional_media_assets',
+      2 => 'field_dictionary_word_language',
+      3 => 'field_tags',
+      4 => 'field_word_entry',
       5 => 'title',
     ),
     'format_settings' => array(

@@ -200,6 +200,7 @@ features[field_instance][] = node-dictionary_word-field_pre_actions
 features[field_instance][] = node-dictionary_word-field_related_content
 features[field_instance][] = node-dictionary_word-field_related_dictionary_words
 features[field_instance][] = node-dictionary_word-field_tags
+features[field_instance][] = node-dictionary_word-field_thumbnail_image
 features[field_instance][] = node-dictionary_word-field_word_entry
 features[field_instance][] = node-dictionary_word-field_word_list
 features[field_instance][] = node-dictionary_word-og_group_ref

@@ -294,7 +294,7 @@ function ma_dictionary_field_default_field_instances() {
           'link' => 0,
           'override' => 0,
         ),
-        'type' => 'title',
+        'type' => 'mukurtu_scald_dictionary_media',
         'weight' => 40,
       ),
       'dictionary_word_summary' => array(
@@ -868,8 +868,12 @@ function ma_dictionary_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'title',
         'weight' => 26,
       ),
       'dictionary_word_summary' => array(
@@ -1341,6 +1345,85 @@ function ma_dictionary_field_default_field_instances() {
       ),
       'type' => 'options_select',
       'weight' => 27,
+    ),
+  );
+
+  // Exported field_instance: 'node-dictionary_word-field_thumbnail_image'.
+  $field_instances['node-dictionary_word-field_thumbnail_image'] = array(
+    'bundle' => 'dictionary_word',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'mukurtu_scald_thumbnail_image',
+        'weight' => 41,
+      ),
+      'dictionary_word_summary' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_thumbnail_image',
+    'label' => 'Thumbnail Image',
+    'required' => 0,
+    'settings' => array(
+      'allow_override' => 0,
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'referencable_types' => array(
+        'audio' => 0,
+        'file' => 0,
+        'image' => 'image',
+        'video' => 0,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'atom_reference',
+      'settings' => array(
+        'context' => 'sdl_editor_representation',
+        'treeable' => 0,
+      ),
+      'type' => 'atom_reference_textfield',
+      'weight' => 37,
     ),
   );
 
@@ -3713,6 +3796,7 @@ function ma_dictionary_field_default_field_instances() {
   t('Summary');
   t('The word entry term translated (if appropriate) to the primary language of the site.');
   t('This field is for making pronunciation guides for word entries. By default this field supports some HTML tags such as "<strong>" and "<em>" if bold or italics are desired.');
+  t('Thumbnail Image');
   t('Translation');
   t('Word Entry');
   t('Word List');
