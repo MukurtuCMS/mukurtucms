@@ -104,7 +104,7 @@ $handler->display->display_options['filters']['type_1']['expose']['remember_role
 
 /* Display: Page */
 $handler = $view->new_display('page', 'Page', 'page');
-$handler->display->display_options['path'] = 'admin/reports/migration/content-with-missing-cultural-protocols';
+$handler->display->display_options['path'] = 'admin/reports/migration/summary/content-with-missing-cultural-protocols';
 $translatables['content_with_missing_cultural_protocols'] = array(
   t('Master'),
   t('Content with Missing Cultural Protocols'),

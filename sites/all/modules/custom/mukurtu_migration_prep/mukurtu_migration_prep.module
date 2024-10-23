@@ -255,7 +255,7 @@ function mukurtu_migration_prep_report_nodes_empty_protocols() {
   $view = views_get_view('content_with_missing_cultural_protocols');
   $view->execute();
   $status = $view->total_rows <= 0 ? MUKURTU_MIGRATION_REPORT_STATUS_OK : MUKURTU_MIGRATION_REPORT_STATUS_ERROR;
-  $link = l(t('Details'), 'admin/reports/migration/content-with-missing-cultural-protocols');
+  $link = l(t('Details'), 'admin/reports/migration/summary/content-with-missing-cultural-protocols');
   $summary = $status == MUKURTU_MIGRATION_REPORT_STATUS_OK ? t('All content has cultural protocols') : t('@count items(s) with missing cultural protocols: ', ['@count' => $view->total_rows]) . $link;
 
   $row = [
