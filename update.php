@@ -96,7 +96,7 @@ function update_script_selection_form($form, &$form_state) {
       $module_update_key = $data['module'] . '_updates';
       if (isset($form['start'][$module_update_key]['#items'][$data['number']])) {
         $text = $data['missing_dependencies'] ? 'This update will been skipped due to the following missing dependencies: <em>' . implode(', ', $data['missing_dependencies']) . '</em>' : "This update will be skipped due to an error in the module's code.";
-        $form['start'][$module_update_key]['#items'][$data['number']] .= '<div class="warning">' . $text . '</div>';
+        $form['start'][$module_update_key]['#items'][$data['number']] .= '<div class="messages warning">' . $text . '</div>';
       }
       // Move the module containing this update to the top of the list.
       $form['start'] = array($module_update_key => $form['start'][$module_update_key]) + $form['start'];
@@ -260,9 +260,9 @@ function update_info_page() {
   $token = drupal_get_token('update');
   $output = '<p>Use this utility to update your database whenever a new release of Drupal or a module is installed.</p><p>For more detailed information, see the <a href="http://drupal.org/upgrade">upgrading handbook</a>. If you are unsure what these terms mean you should probably contact your hosting provider.</p>';
   $output .= "<ol>\n";
-  $output .= "<li><strong>Back up your database</strong>. This process will change your database values and in case of emergency you may need to revert to a backup.</li>\n";
   $output .= "<li><strong>Back up your code</strong>. Hint: when backing up module code, do not leave that backup in the 'modules' or 'sites/*/modules' directories as this may confuse Drupal's auto-discovery mechanism.</li>\n";
   $output .= '<li>Put your site into <a href="' . base_path() . '?q=admin/config/development/maintenance">maintenance mode</a>.</li>' . "\n";
+  $output .= "<li><strong>Back up your database</strong>. This process will change your database values and in case of emergency you may need to revert to a backup.</li>\n";
   $output .= "<li>Install your new files in the appropriate location, as described in the handbook.</li>\n";
   $output .= "</ol>\n";
   $output .= "<p>When you have performed the steps above, you may proceed.</p>\n";

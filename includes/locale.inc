@@ -1093,7 +1093,7 @@ function _locale_import_one_string($op, $value = NULL, $mode = NULL, $lang = NUL
  *
  * @param $report
  *   Report array summarizing the number of changes done in the form:
- *   array(inserts, updates, deletes).
+ *   array(additions, deletes, skips, updates).
  * @param $langcode
  *   Language code to import string into.
  * @param $context
@@ -2056,6 +2056,14 @@ function _locale_rebuild_js($langcode = NULL) {
   $translations = array();
   foreach ($result as $data) {
     $translations[$data->context][$data->source] = $data->translation;
+  }
+
+  // Include custom string overrides.
+  $custom_strings = variable_get('locale_custom_strings_' . $language->language, array());
+  foreach ($custom_strings as $context => $strings) {
+    foreach ($strings as $source => $translation) {
+      $translations[$context][$source] = $translation;
+    }
   }
 
   // Construct the JavaScript file, if there are translations.

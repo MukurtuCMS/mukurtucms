@@ -281,9 +281,9 @@ function hook_field_schema($field) {
 /**
  * Allow modules to alter the schema for a field.
  *
- * @param $schema
+ * @param array $schema
  *   The schema definition as returned by hook_field_schema().
- * @param $field
+ * @param array $field
  *   The field definition.
  *
  * @see field_retrieve_schema()

@@ -1660,7 +1660,7 @@ function _filter_xss_attributes($attr) {
     switch ($mode) {
       case 0:
         // Attribute name, href for instance.
-        if (preg_match('/^([-a-zA-Z]+)/', $attr, $match)) {
+        if (preg_match('/^([-a-zA-Z][-a-zA-Z0-9]*)/', $attr, $match)) {
           $attrname = strtolower($match[1]);
           $skip = (
             $attrname == 'style' ||
@@ -1670,7 +1670,7 @@ function _filter_xss_attributes($attr) {
             strlen($attrname) > 96
           );
           $working = $mode = 1;
-          $attr = preg_replace('/^[-a-zA-Z]+/', '', $attr);
+          $attr = preg_replace('/^[-a-zA-Z][-a-zA-Z0-9]*/', '', $attr);
         }
         break;
 
@@ -5544,14 +5544,47 @@ function drupal_cron_run() {
       DrupalQueue::get($queue_name)->createQueue();
     }
 
+    $module_previous = '';
+
+    // If detailed logging isn't enabled, don't log individual execution times.
+    $time_logging_enabled = variable_get('cron_detailed_logging', DRUPAL_CRON_DETAILED_LOGGING);
+
     // Iterate through the modules calling their cron handlers (if any):
     foreach (module_implements('cron') as $module) {
+      if ($time_logging_enabled) {
+        if (!$module_previous) {
+          watchdog('cron', 'Starting execution of @module_cron().', array('@module' => $module));
+        }
+        else {
+          watchdog('cron', 'Starting execution of @module_cron(), execution of @module_previous_cron() took @time.', array(
+            '@module' => $module,
+            '@module_previous' => $module_previous,
+            '@time' => timer_read('cron_' . $module_previous) . 'ms',
+          ));
+        }
+        timer_start('cron_' . $module);
+      }
+
       // Do not let an exception thrown by one module disturb another.
       try {
         module_invoke($module, 'cron');
       }
       catch (Exception $e) {
         watchdog_exception('cron', $e);
+      }
+
+      if ($time_logging_enabled) {
+        timer_stop('cron_' . $module);
+        $module_previous = $module;
+      }
+    }
+
+    if ($time_logging_enabled) {
+      if ($module_previous) {
+        watchdog('cron', 'Execution of @module_previous_cron() took @time.', array(
+          '@module_previous' => $module_previous,
+          '@time' => timer_read('cron_' . $module_previous) . 'ms',
+        ));
       }
     }
 
@@ -7363,6 +7396,13 @@ function _drupal_schema_initialize(&$schema, $module, $remove_descriptions = TRU
         unset($field['description']);
       }
     }
+    // Set the type key for all fields where it is not set (mostly when using
+    // datatabase specific data types).
+    foreach ($table['fields'] as &$field) {
+      if (!isset($field['type'])) {
+        $field['type'] = NULL;
+      }
+    }
   }
 }
 
@@ -7793,7 +7833,7 @@ function drupal_implode_tags($tags) {
 
     $encoded_tags[] = $tag;
   }
-  return implode('; ', $encoded_tags);
+  return implode(', ', $encoded_tags);
 }
 
 /**
@@ -8205,7 +8245,10 @@ function entity_get_controller($entity_type) {
   $controllers = &drupal_static(__FUNCTION__, array());
   if (!isset($controllers[$entity_type])) {
     $type_info = entity_get_info($entity_type);
-    $class = $type_info['controller class'];
+    // Explicitly fail for malformed entities missing a valid controller class.
+    if (!isset($type_info['controller class']) || !class_exists($class = $type_info['controller class'])) {
+      throw new EntityMalformedException(t('Missing or non-existent controller class on entity of type @entity_type.', array('@entity_type' => $entity_type)));
+    }
     $controllers[$entity_type] = new $class($entity_type);
   }
   return $controllers[$entity_type];

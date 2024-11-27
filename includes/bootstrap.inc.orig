@@ -8,7 +8,7 @@
 /**
  * The current system version.
  */
-define('VERSION', '7.97');
+define('VERSION', '7.102');
 
 /**
  * Core API compatibility.
@@ -454,6 +454,12 @@ abstract class DrupalCacheArray implements ArrayAccess {
    * Destructs the DrupalCacheArray object.
    */
   public function __destruct() {
+    if ($this->bin == 'cache_form' && !variable_get('drupal_cache_array_persist_cache_form', FALSE)) {
+      return;
+    }
+    if (!is_array($this->keysToPersist)) {
+      throw new UnexpectedValueException();
+    }
     $data = array();
     foreach ($this->keysToPersist as $offset => $persist) {
       if ($persist) {
@@ -2039,6 +2045,8 @@ function watchdog_exception($type, Exception $exception, $message = NULL, $varia
  *   - WATCHDOG_DEBUG: Debug-level messages.
  * @param $link
  *   A link to associate with the message.
+ *   SECURITY NOTE: Make sure your link is properly sanitized.
+ *   Use the l() function to generate secure links.
  *
  * @see watchdog_severity_levels()
  * @see hook_watchdog()
@@ -2280,7 +2288,8 @@ function drupal_block_denied($ip) {
  *   The number of random bytes to fetch and base64 encode.
  *
  * @return string
- *   The base64 encoded result will have a length of up to 4 * $byte_count.
+ *   A base-64 encoded string, with + replaced with -, / with _ and any =
+ *   padding characters removed.
  */
 function drupal_random_key($byte_count = 32) {
   return drupal_base64_encode(drupal_random_bytes($byte_count));
@@ -2303,15 +2312,30 @@ function drupal_base64_encode($string) {
 /**
  * Returns a string of highly randomized bytes (over the full 8-bit range).
  *
- * This function is better than simply calling mt_rand() or any other built-in
- * PHP function because it can return a long string of bytes (compared to < 4
- * bytes normally from mt_rand()) and uses the best available pseudo-random
- * source.
+ * On PHP 7 and later, this function is a wrapper around the built-in PHP
+ * function random_bytes(). If that function does not exist or cannot find an
+ * appropriate source of randomness, this function is better than simply calling
+ * mt_rand() or any other built-in PHP function because it can return a long
+ * string of bytes (compared to < 4 bytes normally from mt_rand()) and uses the
+ * best available pseudo-random source.
  *
- * @param $count
+ * @param int $count
  *   The number of characters (bytes) to return in the string.
+ *
+ * @return string
+ *   A randomly generated string.
  */
 function drupal_random_bytes($count)  {
+  if (function_exists('random_bytes')) {
+    try {
+      return random_bytes($count);
+    }
+    catch (Exception $e) {
+      // An appropriate source of randomness could not be found. Fall back to a
+      // less secure implementation.
+    }
+  }
+
   // $random_state does not use drupal_static as it stores random bytes.
   static $random_state, $bytes, $has_openssl;
 

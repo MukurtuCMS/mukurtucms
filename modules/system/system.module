@@ -16,6 +16,11 @@ define('DRUPAL_MAXIMUM_TEMP_FILE_AGE', 21600);
 define('DRUPAL_CRON_DEFAULT_THRESHOLD', 10800);
 
 /**
+ * Detailed cron logging disabled by default.
+ */
+define('DRUPAL_CRON_DETAILED_LOGGING', 0);
+
+/**
  * New users will be set to the default time zone at registration.
  */
 define('DRUPAL_USER_TIMEZONE_DEFAULT', 0);
@@ -335,7 +340,7 @@ function system_element_info() {
     '#button_type' => 'submit',
     '#executes_submit_callback' => TRUE,
     '#limit_validation_errors' => FALSE,
-    '#process' => array('ajax_process_form'),
+    '#process' => array('ajax_process_form', 'form_process_button'),
     '#theme_wrappers' => array('button'),
   );
   $types['button'] = array(
@@ -344,7 +349,7 @@ function system_element_info() {
     '#button_type' => 'submit',
     '#executes_submit_callback' => FALSE,
     '#limit_validation_errors' => FALSE,
-    '#process' => array('ajax_process_form'),
+    '#process' => array('ajax_process_form', 'form_process_button'),
     '#theme_wrappers' => array('button'),
   );
   $types['image_button'] = array(
@@ -352,7 +357,7 @@ function system_element_info() {
     '#button_type' => 'submit',
     '#executes_submit_callback' => TRUE,
     '#limit_validation_errors' => FALSE,
-    '#process' => array('ajax_process_form'),
+    '#process' => array('ajax_process_form', 'form_process_button'),
     '#return_value' => TRUE,
     '#has_garbage_value' => TRUE,
     '#src' => NULL,
@@ -1136,6 +1141,15 @@ function system_library() {
     'version' => VERSION,
     'js' => array(
       'misc/form.js' => array('group' => JS_LIBRARY, 'weight' => 1),
+    ),
+  );
+
+  // Drupal's form single submit library.
+  $libraries['drupal.form-single-submit'] = array(
+    'title' => 'Drupal form single submit library',
+    'version' => VERSION,
+    'js' => array(
+      'misc/form-single-submit.js' => array('group' => JS_LIBRARY, 'weight' => 1),
     ),
   );
 
@@ -4124,4 +4138,12 @@ function system_file_download($uri) {
       );
     }
   }
+}
+
+/**
+ * Implements hook_registry_files_alter
+ */
+function system_registry_files_alter(&$files, $modules) {
+  // Database drivers that use DatabaseStatementPrefetch must include this file.
+  unset($files['includes/database/prefetch.inc']);
 }
