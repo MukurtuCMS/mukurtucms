@@ -308,7 +308,7 @@ function geofield_proximity_element_process($element, &$form_state, $form) {
   }
 
   if (isset($element['#element_validate'])) {
-    array_push($element['#element_validate'], 'goefield_proximity_search_validate');
+    array_push($element['#element_validate'], 'geofield_proximity_search_validate');
   }
   else {
     $element['#element_validate'] = array('geofield_proximity_search_validate');

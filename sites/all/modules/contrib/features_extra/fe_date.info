@@ -1,0 +1,14 @@
+name = FE Date
+description = Build date format as features.
+core = 7.x
+package = Features extra
+
+dependencies[] = ctools
+dependencies[] = features
+
+; Information added by Drupal.org packaging script on 2015-08-12
+version = "7.x-1.0"
+core = "7.x"
+project = "features_extra"
+datestamp = "1439376840"
+

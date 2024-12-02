@@ -1,0 +1,11 @@
+<?php
+/**
+ * Alter machine name of Mukurtu Dashboard
+ */
+function ma_dashboard_update_7100(&$sandbox) {
+// UPDATE `homebox_pages` SET `name` = 'mukurtu_dashboard' WHERE `homebox_pages`.`name` = 'Mukurtu Dashboard';
+$update = db_update('homebox_pages')
+        ->fields(array('name' => 'mukurtu_dashboard'))
+        ->condition('name', 'Mukurtu Dashboard', '=')
+        ->execute();
+}

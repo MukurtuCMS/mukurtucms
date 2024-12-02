@@ -1,0 +1,378 @@
+<?php
+
+/**
+ * @file
+ * The EckTestHelper class.
+ */
+
+/**
+ * Helper logic for the other ECK tests.
+ */
+abstract class EckTestHelper extends DrupalWebTestCase {
+
+  /**
+   * Log in as user 1.
+   */
+  protected function loginUser1() {
+    // Load user 1 and set a new password for it.
+    $account = user_load(1);
+    $password = user_password();
+    $account->pass_raw = $password;
+
+    // Update the stored password.
+    require_once DRUPAL_ROOT . '/' . variable_get('password_inc', 'includes/password.inc');
+    $account->pass = user_hash_password(trim($account->pass_raw));
+    drupal_write_record('users', $account, 'uid');
+    entity_get_controller('user')->resetCache(array($account->uid));
+
+    $this->drupalLogin($account);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function verbose($message, $title = NULL) {
+    // Handle arrays, objects, etc.
+    if (!is_string($message)) {
+      $message = "<pre>\n" . print_r($message, TRUE) . "\n</pre>\n";
+    }
+
+    // Optional title to go before the output.
+    if (!empty($title)) {
+      $title = '<h2>' . check_plain($title) . "</h2>\n";
+    }
+
+    parent::verbose($title . $message);
+  }
+
+  /**
+   * Create an entity type.
+   *
+   * @param array $args
+   *   Any arguments to be passed to the form. Key elements include:
+   *   - 'entity_type_label'
+   *   - 'entity_type_name'
+   *   - 'bundle_label' - If not present, a bundle with the same name as the
+   *     entity type will be created.
+   *   - 'bundle_name' - If not present, a bundle with the same name as the
+   *     entity type will be created.
+   */
+  protected function createEntityType(array $args = array()) {
+    // Load the 'add type' form, confirm it is what was expected.
+    $this->drupalGet('admin/structure/entity-type/add');
+    $this->assertResponse(200);
+    $this->assertFieldByName('entity_type_label');
+    $this->assertFieldByName('entity_type_name');
+    $this->assertFieldByName('bundle_label');
+    $this->assertFieldByName('bundle_name');
+    $this->assertFieldByName('default_properties[title]');
+    $this->assertFieldByName('default_properties[uid]');
+    $this->assertFieldByName('default_properties[created]');
+    $this->assertFieldByName('default_properties[changed]');
+    $this->assertFieldByName('default_properties[language]');
+
+    // Default values.
+    $edit = $args + array(
+      'entity_type_label' => 'Test entity',
+      'entity_type_name' => 'test_entity',
+      'bundle_label' => '',
+      'bundle_name' => '',
+      'default_properties[title]' => TRUE,
+      'default_properties[uid]' => TRUE,
+      'default_properties[created]' => TRUE,
+      'default_properties[changed]' => TRUE,
+      'default_properties[language]' => TRUE,
+    );
+    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->assertResponse(200);
+
+    // Confirm the submission worked.
+    $this->assertText(strip_tags(t('The entity type %entity_type has been created.', array('%entity_type' => $edit['entity_type_label']))));
+    $this->assertEqual($this->getUrl(), url('admin/structure/entity-type/' . $edit['entity_type_name'], array('absolute' => TRUE)));
+    $this->assertLinkByHref(url('admin/structure/entity-type/' . $edit['entity_type_name']));
+    $this->assertLink('delete');
+    $this->assertLinkByHref(url('admin/structure/entity-type/' . $edit['entity_type_name'] . '/delete'));
+
+    // @todo Bug: Upon creating a new entity type the visitor should see the "bundle list" page, instead the "entity types" list page is shown.
+  }
+
+  /**
+   * Add a field to a given entity type.
+   *
+   * @param string $entity_type
+   *   The machine name of the entity type for this entity object; defaults to
+   *   'test_entity'.
+   * @param string $bundle
+   *   The machine name of the bundle for this entity object; defaults to
+   *   'test_entity'.
+   */
+  protected function addField($entity_type = 'test_entity', $bundle = 'test_entity') {
+    $this->drupalGet("admin/structure/entity-type/{$entity_type}/{$bundle}/fields");
+    $this->assertResponse(200);
+
+    $edit = array(
+      'fields[_add_new_field][label]' => 'Body',
+      'fields[_add_new_field][weight]' => 1,
+      'fields[_add_new_field][field_name]' => 'body',
+      'fields[_add_new_field][type]' => 'text_long',
+      'fields[_add_new_field][widget_type]' => 'text_textarea',
+    );
+    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->assertResponse(200);
+    $this->assertText('has no field settings');
+    $this->drupalPost(NULL, array(), t('Save field settings'));
+    $this->assertResponse(200);
+    $this->assertText('Updated field Body field settings.');
+    $edit = array(
+      'field[translatable]' => TRUE,
+    );
+    $this->drupalPost(NULL, $edit, t('Save settings'));
+    $this->assertResponse(200);
+    $this->assertText('Saved Body configuration');
+  }
+
+  /**
+   * Create a test entity object.
+   *
+   * @param string $entity_type
+   *   The machine name of the entity type for this entity object; defaults to
+   *   'test_entity'.
+   * @param string $bundle
+   *   The machine name of the bundle for this entity object; defaults to
+   *   'test_entity'.
+   * @param array $args
+   *   Any arguments to be passed to the form. Key elements include.
+   *   - title: Will be dynamically generated if not present.
+   *
+   * @return object
+   *   The entity that was created.
+   */
+  protected function createEntity($entity_type = 'test_entity', $bundle = 'test_entity', array $args = array()) {
+    // Gotta have a title value.
+    $args += array(
+      'title' => $this->randomSentence(3),
+    );
+    $this->verbose(entity_get_info($entity_type));
+
+    // Load the entity form.
+    $this->drupalGet("admin/structure/entity-type/{$entity_type}/{$bundle}/add");
+    $this->assertResponse(200);
+
+    // Make sure all of the values have fields.
+    foreach ($args as $field_name => $value) {
+      $this->assertFieldByName($field_name);
+    }
+
+    // Save the entity.
+    $this->drupalPost(NULL, $args, t('Save'));
+    $this->assertResponse(200);
+
+    // Make sure the entity saved correctly.
+    $this->assertText($args['title']);
+
+    // Return the entity ID.
+    return $this->getEntityIdFromPath();
+  }
+
+  /**
+   * Generate a random string with multiple words of random lengths.
+   *
+   * @param int $word_count
+   *   How many words to have in the sentence; if not a positive, whole number
+   *   a random number of words will be generated (between three and fifty).
+   * @param bool $proper
+   *   Proper English, so the first letter will be uppercase and the sentence
+   *   will end in a period; defaults to FALSE.
+   *
+   * @return string
+   *   The final sentences.
+   */
+  protected function randomSentence($word_count = NULL, $proper = FALSE) {
+    $word_count = intval($word_count);
+    if (empty($word_count) || $word_count < 1) {
+      $word_count = intval(rand(3, 50));
+    }
+    $words = array();
+    for ($ctr = 0; $ctr < $word_count; $ctr++) {
+      $words[] = strtolower(parent::randomName(intval(rand(3, 8))));
+    }
+    $sentence = implode(' ', $words);
+    if ($proper) {
+      $sentence = ucfirst($sentence) . '.';
+    }
+    return $sentence;
+  }
+
+  /**
+   * Set up a basic starting point for the locales.
+   *
+   * This assumes the Locale module is enabled. This also must be done before
+   * other user accounts are logged in.
+   *
+   * @param array $locales
+   *   A list of locales to be enabled, in langcode format.
+   */
+  protected function setupLocales(array $locales = array()) {
+    // If no locales were requested, add Spanish and French.
+    if (empty($locales)) {
+      $locales[] = 'es';
+      $locales[] = 'fr';
+    }
+
+    // Identify the site's default language.
+    $default_language = language_default('language');
+
+    // Add the locales.
+    foreach ($locales as $langcode) {
+      // Don't create the default language, it's already present.
+      if ($langcode != $default_language) {
+        $this->addSiteLanguage($langcode);
+      }
+    }
+
+    // Enable URL language detection and selection.
+    $this->drupalGet('admin/config/regional/language/configure');
+    $this->assertResponse(200);
+    $edit = array(
+      'language[enabled][locale-url]' => TRUE,
+      'language_content[enabled][locale-url]' => TRUE,
+    );
+    $this->drupalPost(NULL, $edit, t('Save settings'));
+    $this->assertResponse(200);
+  }
+
+  /**
+   * Add a locale to the site.
+   *
+   * @param string $langcode
+   *   The language code to be enabled.
+   */
+  protected function addSiteLanguage($langcode) {
+    // Load the language-add page.
+    $this->drupalGet('admin/config/regional/language/add');
+    $this->assertResponse(200, 'Loaded the language-add admin page.');
+
+    // Submit the language-add form.
+    $args = array(
+      'langcode' => $langcode,
+    );
+    $this->drupalPost(NULL, $args, t('Add language'));
+    $this->assertResponse(200);
+
+    // Verify that the browser was returned to the main languages admin page.
+    $this->assertEqual($this->getUrl(), url('admin/config/regional/language', array('absolute' => TRUE)), 'Redirected back to the main languages admin page.');
+
+    // Clear the language list cache so it can be reloaded.
+    drupal_static_reset('language_list');
+
+    // Get all language definitions.
+    $languages = language_list();
+    $language = $languages[$langcode]->name;
+    $this->assertText(strip_tags(t('The language %language has been created and can now be used. More information is available on the <a href="@locale-help">help screen</a>.', array('%language' => t($language), '@locale-help' => url('admin/help/locale')))), 'A new language has been added.');
+  }
+
+  /**
+   * Extract an entity ID from its path.
+   *
+   * @param string $path
+   *   The path to examine; defaults to the current path.
+   *
+   * @return int
+   *   The ID of the requested entity path.
+   */
+  protected function getEntityIdFromPath($path = NULL) {
+    if (empty($path)) {
+      $path = $this->getUrl();
+    }
+
+    // The ID will be the last portion of the URL.
+    $parts = explode('/', $path);
+    return array_pop($parts);
+  }
+
+  /**
+   * Enable Entity Translation for a given entity type.
+   */
+  protected function enableEntityTypeTranslation($entity_type) {
+    $this->drupalGet('admin/config/regional/entity_translation');
+    $this->assertResponse(200);
+    $edit = array(
+      "entity_translation_entity_types[{$entity_type}]" => $entity_type,
+    );
+    $this->drupalPost(NULL, $edit, t('Save configuration'));
+    $this->assertResponse(200);
+    $this->assertText(t('The configuration options have been saved.'));
+  }
+
+  /**
+   * Add a reference field to a content type that points to an ECK entity type.
+   *
+   * @param string $entity_type
+   *   The entity type to add the reference field to; defaults to "test_entity".
+   */
+  protected function addReferenceFieldToNode($entity_type = 'test_entity') {
+    $this->drupalGet('admin/structure/types/manage/page/fields');
+    $this->assertResponse(200);
+
+    $edit = array(
+      'fields[_add_new_field][label]' => 'Reference',
+      'fields[_add_new_field][weight]' => 1,
+      'fields[_add_new_field][field_name]' => 'reference',
+      'fields[_add_new_field][type]' => 'entityreference',
+      'fields[_add_new_field][widget_type]' => 'entityreference_autocomplete',
+    );
+    foreach ($edit as $field_name => $value) {
+      $this->assertFieldByName($field_name);
+    }
+    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->assertResponse(200);
+    $this->assertText('The entity type that can be referenced through this field.');
+    $edit = array(
+      'field[settings][target_type]' => $entity_type,
+    );
+    $this->drupalPost(NULL, $edit, t('Save field settings'));
+    $this->assertResponse(200);
+    $this->assertText('Updated field Reference field settings.');
+    $edit = array(
+      'field[cardinality]' => -1,
+    );
+    $this->drupalPost(NULL, $edit, t('Save settings'));
+    $this->assertResponse(200);
+    $this->assertText('Saved Reference configuration.');
+
+    // Configure the display settings to output a rendered entity.
+    $this->drupalGet('admin/structure/types/manage/page/display');
+    $this->assertResponse(200);
+    $this->assertText(t('Here, you can define which fields are shown and hidden when Basic page content is displayed in each view mode, and define how the fields are displayed in each view mode.'));
+    $edit = array(
+      'fields[field_reference][type]' => 'entityreference_entity_view',
+    );
+    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->assertResponse(200);
+    $this->assertText(t('Your settings have been saved.'));
+  }
+
+  /**
+   * Enable Entity Translation for a content type.
+   */
+  protected function enableContentTypeTranslation() {
+    $this->drupalGet('admin/structure/types/manage/page');
+    $this->assertResponse(200);
+    $edit = array(
+      'language_content_type' => ENTITY_TRANSLATION_ENABLED,
+    );
+    $this->drupalPost(NULL, $edit, t('Save content type'));
+    $this->assertResponse(200);
+    $this->assertText(strip_tags(t('The content type %name has been updated.', array('%name' => 'Basic page'))));
+
+    $this->drupalGet('admin/structure/types/manage/page/fields/body');
+    $this->assertResponse(200);
+    $edit = array(
+      'field[translatable]' => TRUE,
+    );
+    $this->drupalPost(NULL, $edit, t('Save settings'));
+    $this->assertResponse(200);
+    $this->assertText(strip_tags(t('Saved %label configuration.', array('%label' => 'Body'))));
+  }
+
+}

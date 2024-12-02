@@ -1,0 +1,87 @@
+
+# $Id$
+#
+# Russian translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  select_2_integration.module: n/a
+#  select_2_integration.info: n/a
+#  js/select2_integration.js: n/a
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2013-06-04 21:00+0400\n"
+"PO-Revision-Date: 2013-06-04 21:00+0400\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Russian <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=((((n%10)==1)&&((n%100)!=11))?(0):(((((n%10)>=2)&&((n%10)<=4))&&(((n%100)<10)||((n%100)>=20)))?(1):2));\n"
+
+#: select_2_integration.module:301
+msgid "Use Select2 plugin for this field in form"
+msgstr ""
+"Использовать Select2 для отображения "
+"этого поля при редактировании"
+
+#: select_2_integration.module:310
+msgid "Allow add terms \"on fly\""
+msgstr ""
+"Разрешить добавлять значения «на "
+"лету»"
+
+#: select_2_integration.module:322
+msgid "Show link to vocabulary terms list page"
+msgstr ""
+
+#: select_2_integration.module:337
+msgid "Placeholder text"
+msgstr ""
+
+#: select_2_integration.module:350
+msgid "Dropdown auto width"
+msgstr ""
+"Автоматическая ширина выпадающего "
+"списка"
+
+#: select_2_integration.module:408
+msgid "This element supports \"Add terms on fly\" function.<br>You can select terms from defined terms list, or add your new term(s), by typing name of term(s) manually, press Enter key after typing new term name, for adding it to selected items list. <br><b>New term(s) will be saved when form will be submitted</b>."
+msgstr ""
+"Этот элемент поддерживает добавление "
+"новых значений в список «на лету».<br>Вы "
+"можете выбрать значение из списка или "
+"ввести новое значение (которого пока "
+"ещё нет в списке). После ввода нового "
+"значения нажмите Enter.<br><b>После "
+"сохранения товара с новым введённым "
+"вручную значением, вы сможете "
+"выбирает его из списка при добавлении "
+"всех последующих товаров</b>."
+
+#: select_2_integration.module:410
+msgid "Edit vocabulary terms"
+msgstr "Редактировать список терминов"
+
+#: select_2_integration.module:490
+msgid "New taxonomy term \"%term_name\" saved in vocabulary \"%vocabulary_name\". You can edit it on !edit_term_link."
+msgstr ""
+
+#: select_2_integration.info:0
+msgid "Select 2 integration"
+msgstr ""
+
+#: select_2_integration.info:0
+msgid "Adds integration with the <a herf=\"http://ivaynberg.github.io/select2\" target=\"_blank\">Select2</a> Javascript plugin."
+msgstr ""
+
+#: select_2_integration.info:0
+msgid "User interface"
+msgstr "Пользовательский интерфейс"
+
+#: js/select2_integration.js:0
+msgid "jQuery 1.8.x or higher required for using \"Select2 integration\" module. Some of your forms element may be not working properly."
+msgstr ""
+

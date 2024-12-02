@@ -1,0 +1,493 @@
+<?php
+
+/**
+ * @file
+ * Generate hashes for each uploaded file.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function filehash_menu() {
+  $items['admin/config/media/filehash'] = array(
+    'title' => 'File hash',
+    'description' => 'Configure File Hash settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('filehash_settings'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'filehash.admin.inc',
+  );
+  $items['admin/config/media/filehash/settings'] = array(
+    'title' => 'Settings',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  $items['admin/config/media/filehash/bulk'] = array(
+    'title' => 'Bulk generate',
+    'description' => 'Generates hashes for each uploaded file.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('filehash_bulk'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'filehash.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/config/media/filehash/clean'] = array(
+    'title' => 'Clean up',
+    'description' => 'Delete data for disabled hash algorithms.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('filehash_clean'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'filehash.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+/**
+ * Returns array of enabled File Hash algorithm identifiers.
+ */
+function filehash_columns() {
+  $options = filehash_names();
+  foreach ($options as $column => $name) {
+    $options[$column] = $column;
+  }
+  return array_intersect_assoc($options, variable_get('filehash_algos', array()));
+}
+
+/**
+ * Returns array of enabled PHP hash algorithm identifiers.
+ */
+function filehash_algos() {
+  return str_replace(array('3_', '512_', '2b_'), array('3-', '512/', '2b-'), filehash_columns());
+}
+
+/**
+ * Implements hook_file_delete().
+ */
+function filehash_file_delete($file) {
+  db_delete('filehash')
+    ->condition('fid', $file->fid)
+    ->execute();
+}
+
+/**
+ * Implements hook_file_insert().
+ */
+function filehash_file_insert($file) {
+  filehash_save($file);
+}
+
+/**
+ * Implements hook_file_load().
+ */
+function filehash_file_load($files) {
+  $columns = filehash_columns();
+  if ($columns) {
+    $result = db_select('filehash')
+      ->fields('filehash')
+      ->condition('fid', array_keys($files), 'IN')
+      ->execute();
+    foreach ($result as $record) {
+      foreach ($columns as $column) {
+        // Handle missing column.
+        $files[$record->fid]->filehash[$column] = property_exists($record, $column) ? $record->$column : NULL;
+      }
+      $files[$record->fid]->filehash['timestamp'] = property_exists($record, 'timestamp') ? $record->timestamp : NULL;
+    }
+    // Generate hash if it does not already exist for the file.
+    foreach ($files as $fid => $file) {
+      if (!filehash_should_hash($file->uri)) {
+        continue;
+      }
+      foreach ($columns as $column) {
+        if (empty($file->filehash[$column])) {
+          filehash_save($files[$fid]);
+          break;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_file_update().
+ */
+function filehash_file_update($file) {
+  filehash_save($file);
+}
+
+/**
+ * Allows file hashing to be skipped.
+ */
+function filehash_should_hash($uri) {
+  if (variable_get('filehash_local_only', FALSE)) {
+    $local = file_get_stream_wrappers(STREAM_WRAPPERS_LOCAL);
+    if (!isset($local[file_uri_scheme($uri)])) {
+      return FALSE;
+    }
+  }
+  return TRUE;
+}
+
+/**
+ * Wraps hash_file() to also support BLAKE2b.
+ */
+function filehash_hash($algo, $uri) {
+  if (!filehash_should_hash($uri)) {
+    return FALSE;
+  }
+  // If a file's directory was deleted, the stream wrapper will generate an
+  // empty path. Opening a file with empty path throws a ValueError on PHP 8.
+  try {
+    if (preg_match('/^blake2b-([0-9]{3})$/', $algo, $matches)) {
+      return filehash_blake2b($uri, $matches[1] / 8);
+    }
+    else {
+      return hash_file($algo, $uri);
+    }
+  }
+  catch (ValueError $e) {
+    $variables = array('%uri' => $uri);
+    require_once DRUPAL_ROOT . '/includes/errors.inc';
+    $variables += _drupal_decode_exception($e);
+    watchdog('filehash', '%type while hashing %uri (directory may not exist or not be accessible): !message in %function (line %line of %file).', $variables, WATCHDOG_ERROR);
+    return FALSE;
+  }
+}
+
+/**
+ * Implements hook_file_validate().
+ */
+function filehash_file_validate($file) {
+  $errors = array();
+  // Zero size may indicate unreadable remote media source; bypass dedupe.
+  if ($file->filesize && variable_get('filehash_dedupe', 0)) {
+    foreach (filehash_algos() as $column => $algo) {
+      if (!$hash = filehash_hash($algo, $file->uri)) {
+        continue;
+      }
+      try {
+        $fid = filehash_duplicate_lookup($column, $hash);
+      }
+      catch (PDOException $e) {
+        filehash_add_columns();
+        $fid = filehash_duplicate_lookup($column, $hash);
+      }
+      if ($fid) {
+        $duplicate = file_load($fid);
+        if (file_download_access($duplicate->uri)) {
+          $errors[] = t('This file has already been uploaded as %filename.', array('%filename' => $duplicate->filename));
+        }
+        else {
+          $errors[] = t('Sorry, duplicate files are not permitted.');
+        }
+        break;
+      }
+    }
+  }
+  return $errors;
+}
+
+/**
+ * Returns file ID for any duplicates.
+ */
+function filehash_duplicate_lookup($column, $hash) {
+  return db_query("SELECT fid FROM {filehash} WHERE $column = :hash LIMIT 1", array(':hash' => $hash))->fetchField();
+}
+
+/**
+ * Returns array of hash algorithm hexadecimal output lengths.
+ */
+function filehash_lengths() {
+  return array_combine(array_keys(filehash_names()), array(
+    32, 40, 56, 64, 96, 128, 32, 40, 56, 64, 96, 56, 64, 128, 56, 64, 96, 128,
+  ));
+}
+
+/**
+ * Returns array of human-readable hash algorithm names.
+ */
+function filehash_names() {
+  return array(
+    'blake2b_128' => 'BLAKE2b-128',
+    'blake2b_160' => 'BLAKE2b-160',
+    'blake2b_224' => 'BLAKE2b-224',
+    'blake2b_256' => 'BLAKE2b-256',
+    'blake2b_384' => 'BLAKE2b-384',
+    'blake2b_512' => 'BLAKE2b-512',
+    'md5' => 'MD5',
+    'sha1' => 'SHA-1',
+    'sha224' => 'SHA-224',
+    'sha256' => 'SHA-256',
+    'sha384' => 'SHA-384',
+    'sha512_224' => 'SHA-512/224',
+    'sha512_256' => 'SHA-512/256',
+    'sha512' => 'SHA-512',
+    'sha3_224' => 'SHA3-224',
+    'sha3_256' => 'SHA3-256',
+    'sha3_384' => 'SHA3-384',
+    'sha3_512' => 'SHA3-512',
+  );
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function filehash_node_view($node, $view_mode) {
+  static $fields;
+  // Add <media:hash> elements for at most one file per RSS item.
+  if ('rss' !== $view_mode) {
+    return;
+  }
+  // The <media:hash> element only supports MD5 and SHA-1.
+  $columns = filehash_columns();
+  if (!isset($columns['md5']) && !isset($columns['sha1'])) {
+    return;
+  }
+  if (!isset($fields[$node->type])) {
+    $fields[$node->type] = field_read_fields(array(
+      'bundle' => $node->type,
+      'entity_type' => 'node',
+      // The following field types are currently supported.
+      'type' => array('file', 'image', 'media'),
+    ));
+  }
+  foreach ($fields[$node->type] as $field) {
+    if ($items = field_get_items('node', $node, $field['field_name'])) {
+      foreach ($items as $file) {
+        // Media fields have a file object rather than a file array.
+        if ('media' === $field['type']) {
+          filehash_rss_elements((array) $file['file'], $node);
+          return;
+        }
+        elseif (('image' === $field['type']) || $file['display']) {
+          filehash_rss_elements($file, $node);
+          return;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Adds <media:hash> RSS elements to $node object.
+ */
+function filehash_rss_elements(array $file, $node) {
+  $names = array('md5' => 'md5', 'sha1' => 'sha-1');
+  foreach ($names as $column => $name) {
+    if (!empty($file['filehash'][$column])) {
+      $node->rss_elements[] = array(
+        'key' => 'media:hash',
+        'attributes' => array('algo' => $name),
+        'value' => $file['filehash'][$column],
+      );
+    }
+  }
+  $node->rss_namespaces['xmlns:media'] = 'http://search.yahoo.com/mrss/';
+}
+
+/**
+ * Calculates and saves the file hashes.
+ */
+function filehash_save($file) {
+  $file->filehash = array_fill_keys(filehash_columns(), NULL);
+  $file->filehash['timestamp'] = REQUEST_TIME;
+  foreach (filehash_algos() as $column => $algo) {
+    $file->filehash[$column] = filehash_hash($algo, $file->uri) ?: NULL;
+  }
+  try {
+    filehash_merge($file);
+  }
+  catch (PDOException $e) {
+    filehash_add_columns();
+    filehash_merge($file);
+  }
+}
+
+/**
+ * Merges file hashes into database.
+ */
+function filehash_merge($file) {
+  db_merge('filehash')
+    ->key(array('fid' => $file->fid))
+    ->fields($file->filehash)
+    ->execute();
+}
+
+/**
+ * Adds any database columns required by configuration.
+ */
+function filehash_add_columns() {
+  $lengths = filehash_lengths();
+  foreach (filehash_algos() as $column => $algo) {
+    if (!db_field_exists('filehash', $column)) {
+      db_add_field('filehash', $column, array(
+        'description' => "The $algo hash for this file.",
+        'type' => 'char',
+        'length' => $lengths[$column],
+        'not null' => FALSE,
+      ));
+    }
+    if (!db_index_exists('filehash', $column . '_idx')) {
+      db_add_index('filehash', $column . '_idx', array($column));
+    }
+  }
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function filehash_views_api() {
+  return array(
+    'api' => 3,
+  );
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function filehash_field_formatter_info() {
+  $columns = filehash_columns();
+  return array(
+    'filehash_table' => array(
+      'label' => t('Table of files with file hashes'),
+      'field types' => array('file', 'image', 'media'),
+      'settings' => array('algo' => array_pop($columns)),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function filehash_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $names = filehash_names();
+  $options = array();
+  foreach (filehash_columns() as $column) {
+    $options[$column] = $names[$column];
+  }
+  $element['algo'] = array(
+    '#title' => t('Hash algorithm'),
+    '#type' => 'select',
+    '#default_value' => $instance['display'][$view_mode]['settings']['algo'],
+    '#options' => $options,
+  );
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function filehash_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $names = filehash_names();
+  if (isset($names[$instance['display'][$view_mode]['settings']['algo']])) {
+    return t('@algo hash', array('@algo' => $names[$instance['display'][$view_mode]['settings']['algo']]));
+  }
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function filehash_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  if (!empty($items)) {
+    $element[0] = array(
+      '#theme' => 'filehash_table',
+      '#items' => $items,
+      '#settings' => $display['settings'],
+    );
+  }
+  return $element;
+}
+
+/**
+ * Returns HTML for a file attachments table with hashes.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - items: An array of file attachments.
+ *   - settings: The field instance display settings.
+ *
+ * @ingroup themeable
+ */
+function theme_filehash_table(array $variables) {
+  $names = filehash_names();
+  $header = array(
+    t('Attachment'),
+    t('Size'),
+    t('@algo hash', array('@algo' => $names[$variables['settings']['algo']])),
+  );
+  $rows = array();
+  foreach ($variables['items'] as $item) {
+    // Media field items contain a file object.
+    if (!isset($item['uri']) && isset($item['file'])) {
+      $file = $item['file'];
+    }
+    else {
+      $file = (object) $item;
+    }
+    $rows[] = array(
+      theme('file_link', array('file' => $file)),
+      format_size($file->filesize),
+      isset($file->filehash[$variables['settings']['algo']]) ? substr(chunk_split($file->filehash[$variables['settings']['algo']], 1, '<wbr />'), 0, -7) : '',
+    );
+  }
+  return empty($rows) ? '' : theme('table', array(
+    'header' => $header,
+    'rows' => $rows,
+  ));
+}
+
+/**
+ * Implements hook_theme().
+ */
+function filehash_theme() {
+  return array(
+    'filehash_table' => array(
+      'variables' => array('items' => array(), 'settings' => array()),
+    ),
+  );
+}
+
+/**
+ * Implements hook_help().
+ */
+function filehash_help($path) {
+  switch ($path) {
+    case 'admin/help#filehash':
+    case 'admin/config/media/filehash':
+      return function_exists('sodium_crypto_generichash_init') ? t('Note, the BLAKE2b hash algorithm requires the Sodium PHP extension, which is currently enabled.') : t('Note, the BLAKE2b hash algorithm requires the Sodium PHP extension, which is not currently enabled.');
+  }
+}
+
+/**
+ * Implements hash_file() for the BLAKE2b hash algorithm.
+ *
+ * Requires the Sodium PHP extension.
+ *
+ * @return string|false
+ *   Same return type as hash_file().
+ */
+function filehash_blake2b($file, $length, $chunk_size = 8192) {
+  if (!function_exists('sodium_crypto_generichash_init')) {
+    return FALSE;
+  }
+  $handle = fopen($file, 'rb');
+  if (FALSE === $handle) {
+    return FALSE;
+  }
+  $state = sodium_crypto_generichash_init('', $length);
+  while ('' !== ($message = fread($handle, $chunk_size))) {
+    if (FALSE === $message) {
+      return FALSE;
+    }
+    if (!sodium_crypto_generichash_update($state, $message)) {
+      return FALSE;
+    }
+  }
+  if (!feof($handle)) {
+    return FALSE;
+  }
+  fclose($handle);
+  return bin2hex(sodium_crypto_generichash_final($state, $length));
+}

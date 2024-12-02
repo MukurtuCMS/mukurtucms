@@ -1,0 +1,376 @@
+<?php
+
+/**
+ * @file
+ * Rules UI tests.
+ */
+
+/**
+ * Tests for creating rules through the UI.
+ */
+class RulesUiTestCase extends DrupalWebTestCase {
+
+  /**
+   * Declares test metadata.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Rules UI Tests ',
+      'description' => 'Tests Rules UI.',
+      'group' => 'Rules',
+    );
+  }
+
+  /**
+   * Overrides DrupalWebTestCase::setUp().
+   */
+  protected function setUp() {
+    parent::setUp('rules', 'rules_admin', 'rules_test');
+    RulesLog::logger()->clear();
+    variable_set('rules_debug_log', TRUE);
+  }
+
+  /**
+   * Tests that NOT condition labels are not HTML-encoded in the UI.
+   *
+   * @see https://www.drupal.org/project/rules/issues/1945006
+   */
+  public function testConditionLabel() {
+    // Create a simple user account with permission to create a rule.
+    $user = $this->drupalCreateUser(array('access administration pages', 'administer rules'));
+    $this->drupalLogin($user);
+
+    // First we need an event.
+    $this->drupalGet('admin/config/workflow/rules/reaction/add');
+    $edit = array(
+      'settings[label]' => 'Test node event',
+      'settings[name]' => 'test_node_event',
+      'event' => 'node_insert',
+    );
+    $this->drupalPost(NULL, $edit, 'Save');
+    $this->assertText('Editing reaction rule', 'Rule edit page is shown.');
+
+    // Now add a condition with a special character in the label.
+    $this->clickLink('Add condition');
+    $this->assertText('Add a new condition', 'Condition edit page is shown.');
+    $edit = array(
+      'element_name' => 'rules_test_condition_apostrophe',
+    );
+    $this->drupalPost(NULL, $edit, 'Continue');
+
+    // Negate the condition, as this is how it gets improperly HTML encoded.
+    $edit = array(
+      'negate' => TRUE,
+    );
+    $this->drupalPost(NULL, $edit, 'Save');
+    $this->assertNoRaw("&amp;#039;", 'Apostrophe is not HTML-encoded.');
+  }
+
+  /**
+   * Tests that the title for embedded container plugins displays properly.
+   *
+   * @see https://www.drupal.org/project/rules/issues/3028444
+   */
+  public function testContainerPluginLabel() {
+    // Create a simple user account with permission to create a rule.
+    $user = $this->drupalCreateUser(array('access administration pages', 'administer rules'));
+    $this->drupalLogin($user);
+
+    // First we need an event.
+    $this->drupalGet('admin/config/workflow/rules/reaction/add');
+    $edit = array(
+      'settings[label]' => 'Test node event',
+      'settings[name]' => 'test_node_event',
+      'event' => 'node_insert',
+    );
+    $this->drupalPost(NULL, $edit, 'Save');
+    $this->assertText('Editing reaction rule', 'Rule edit page is shown.');
+
+    // Now add an OR condition container.
+    $this->clickLink('Add or');
+    $this->assertText('Add a new condition set (OR)', 'Condition set add confirmation is shown.');
+    $this->drupalPost(NULL, array(), 'Continue');
+    $this->assertRaw('<div class="rules-element-label">OR</div>', 'Condition set label is shown.');
+  }
+
+  /**
+   * Tests setting component variables in the UI.
+   *
+   * @see https://www.drupal.org/project/rules/issues/3005864
+   */
+  public function testComponentVariables() {
+    // Create a simple user account with permission to create a rule.
+    $user = $this->drupalCreateUser(array(
+      'access administration pages',
+      'administer rules',
+      'bypass rules access',
+    ));
+    $this->drupalLogin($user);
+
+    // Variables cannot be set/changed for code-provided components, so we must
+    // build our test component here.
+    // Create an 'action set' rule component.
+    $action_set = rules_action_set(array(
+      'node' => array('type' => 'node', 'label' => 'Input node'),
+    ));
+    $action_set->save('rules_test_variables');
+
+    // Verify that our test component appears in the UI.
+    $this->drupalGet('admin/config/workflow/rules/components');
+    $this->assertText(
+      'rules_test_variables',
+      'Test component is defined.'
+    );
+
+    // Visit the component edit page.
+    $this->clickLink('rules_test_variables');
+    $this->assertText(
+      'Variables are normally input parameters for the component',
+      'Component variables form is present.'
+    );
+
+    // Check for presence of pre-existing variable fields AND for presence
+    // of exactly one row of fields for new variable input.
+    $this->assertFieldByName(
+      'settings[vars][items][node][label]',
+      'Input node',
+      'Label of pre-existing variable is defined.'
+    );
+    $this->assertFieldByName(
+      'settings[vars][items][0][label]',
+      '',
+      'First row for new variable is present.'
+    );
+    // Should only have line [0], not [1] or [2].
+    $this->assertNoFieldByName(
+      'settings[vars][items][1][label]',
+      NULL,
+      'Second row for new variable is missing.'
+    );
+    $this->assertNoFieldByName(
+      'settings[vars][items][2][label]',
+      NULL,
+      'Third row for new variable is missing.'
+    );
+
+    // Save new variable.
+    $edit = array(
+      'settings[vars][items][0][type]' => 'integer',
+      'settings[vars][items][0][label]' => 'Integer value',
+      'settings[vars][items][0][name]' => 'integer_value',
+    );
+    $this->drupalPost(NULL, $edit, 'Save changes');
+    $this->assertFieldByName(
+      'settings[vars][items][node][label]',
+      'Input node',
+      'Label of pre-existing variable is defined.'
+    );
+    $this->assertFieldByName(
+      'settings[vars][items][integer_value][label]',
+      'Integer value',
+      'Label of variable is defined.'
+    );
+    $this->assertFieldByName(
+      'settings[vars][items][integer_value][name]',
+      'integer_value',
+      'Machine name of variable is defined.'
+    );
+
+    // Check to see if "Add more" button properly adds one more row for
+    // variable input while preserving what we've already entered.
+    $edit = array(
+      'settings[vars][items][0][type]' => 'decimal',
+      'settings[vars][items][0][label]' => 'Decimal value',
+      'settings[vars][items][0][name]' => 'decimal_value',
+    );
+    $this->drupalPostAjax(NULL, $edit, array('op' => 'Add more'));
+    $this->assertFieldByName(
+      'settings[vars][items][node][label]',
+      'Input node',
+      'Label of pre-existing variable is defined.'
+    );
+    $this->assertFieldByName(
+      'settings[vars][items][integer_value][label]',
+      'Integer value',
+      'Label of integer variable is defined.'
+    );
+    $this->assertFieldByName(
+      'settings[vars][items][decimal_value][label]',
+      'Decimal value',
+      'Label of decimal variable is defined.'
+    );
+    $this->assertFieldByName(
+      'settings[vars][items][0][label]',
+      NULL,
+      'First row for new variable is present.'
+    );
+  }
+
+  /**
+   * Tests setting component permissions in the UI.
+   *
+   * @see https://www.drupal.org/project/rules/issues/2340505
+   */
+  public function testComponentPermissions() {
+    // Create a simple user account with permission to create a rule.
+    $user = $this->drupalCreateUser(array(
+      'access administration pages',
+      'administer rules',
+      'bypass rules access',
+    ));
+    $this->drupalLogin($user);
+
+    // The rules_test module defines the component 'rules_test_action_set'.
+    // Verify that this code-provided component appears in the UI.
+    $this->drupalGet('admin/config/workflow/rules/components');
+    $this->assertText(
+      'rules_test_action_set',
+      'Test component is defined.'
+    );
+
+    // Visit the component edit page.
+    $this->clickLink('rules_test_action_set');
+    $this->assertText(
+      'Configure access for using this component with a permission.',
+      'Enable component permission checkbox is present.'
+    );
+    $this->assertText(
+      'Use Rules component rules_test_action_set',
+      'Permission configuration form is present.'
+    );
+
+    // Try to enable permissions on this component and set a component
+    // permission at the same time.
+    $edit = array(
+      'settings[access][access_exposed]' => TRUE,
+      'settings[access][permissions][matrix][checkboxes][1][use Rules component rules_test_action_set]' => TRUE,
+    );
+    $this->drupalPost(NULL, $edit, 'Save changes');
+  }
+
+  /**
+   * Tests overriding and reverting configurations.
+   *
+   * Verify that when we overwrite a default rule with an import, the status of
+   * that rule is overridden.
+   *
+   * @see https://www.drupal.org/project/rules/issues/2027717#comment-12904190
+   */
+  public function testOverrideStatus() {
+    // Create a simple user account with permission to create a rule.
+    $user = $this->drupalCreateUser(array(
+      'access administration pages',
+      'administer rules',
+      'bypass rules access',
+    ));
+    $this->drupalLogin($user);
+
+    // The rules_test module defines the rule 'rules_test_default_1' in code.
+    // Ensure this rule has status equals ENTITY_IN_CODE.
+    $rule = rules_config_load('rules_test_default_1');
+    $this->assertTrue(
+      $rule->hasStatus(ENTITY_IN_CODE),
+      'Rule defined in hook_default_rules_configuration() has status ENTITY_IN_CODE.'
+    );
+
+    // Verify the code-provided rule appears in the UI.
+    $this->drupalGet('admin/config/workflow/rules');
+    $this->assertText(
+      'example default rule',
+      'Example default rule is defined in code.'
+    );
+    $this->assertText(
+      'rules_test_default_1',
+      'Machine name shows up in UI.'
+    );
+
+    // Now we need to overwrite the 'rules_test_default_1' rule in the
+    // database by importing a rule with the same id and forcing the overwrite.
+    // First check that importing fails if the 'overwrite' box is not checked.
+    $this->drupalGet('admin/config/workflow/rules/reaction/import');
+    $edit = array(
+      'import' => $this->getTestRuleExport('rules_test_default_1'),
+      'overwrite' => FALSE,
+    );
+    $this->drupalPost(NULL, $edit, 'Import');
+    $this->assertText(
+      'Import of Rules configuration example imported default rule failed, a Rules configuration with the same machine name already exists. Check the overwrite option to replace it.',
+      'Rule overwrite failed.'
+    );
+
+    // Now set the 'overwrite' checkbox to force the overwrite and resubmit.
+    $edit = array(
+      'import' => $this->getTestRuleExport('rules_test_default_1'),
+      'overwrite' => TRUE,
+    );
+    $this->drupalPost(NULL, $edit, 'Import');
+
+    // Verify that the overwritten rule now has a status of ENTITY_OVERRIDDEN.
+    $this->assertText(
+      'example imported default rule',
+      'New example default rule has been imported.'
+    );
+    $this->assertText(
+      'rules_test_default_1',
+      'Machine name shows up in UI.'
+    );
+    $this->assertText(
+      'Overridden',
+      'Example default rule has overridden status.'
+    );
+
+    // Clear cache and ensure the rule is still overridden.
+    cache_clear_all();
+    // Visit reaction rules listing page to force refresh.
+    $this->clickLink('Rules');
+    $this->assertText(
+      'example imported default rule',
+      'Rule label unchanged after cache clear.'
+    );
+    $this->assertText(
+      'Overridden',
+      'Rule overridden status unchanged after cache clear.'
+    );
+
+    // A 'revert' link should now be available for the overridden rule.
+    $this->assertText('revert', 'Revert link is now present.');
+
+    // Revert the overridden rule and verify it's back to its original status.
+    $this->clickLink('revert');
+    $this->drupalPost(NULL, array(), 'Confirm');
+    $this->assertText(
+      'example default rule',
+      'Example default rule original label restored.'
+    );
+    $this->assertText(
+      'Reverted reaction rule example imported default rule to the defaults',
+      'Example default rule was reverted.'
+    );
+    $this->assertNoText('revert', 'Revert link is not present.');
+  }
+
+  /**
+   * Helper function to return a known JSON encoded rule export.
+   *
+   * @param string $machine_name
+   *   The machine name of the returned rule.
+   */
+  protected function getTestRuleExport($machine_name) {
+    return '{ "' . $machine_name . '" : {
+    "LABEL" : "example imported default rule",
+    "PLUGIN" : "reaction rule",
+    "ACTIVE" : false,
+    "OWNER" : "rules",
+    "TAGS" : [ "Admin", "Tag2" ],
+    "REQUIRES" : [ "rules" ],
+    "ON" : { "node_update" : [] },
+    "IF" : [
+      { "NOT data_is" : { "data" : [ "node:status" ], "value" : true } },
+      { "data_is" : { "data" : [ "node:type" ], "value" : "page" } }
+    ],
+    "DO" : [ { "drupal_message" : { "message" : "A node has been updated." } } ]
+  }
+}';
+  }
+
+}

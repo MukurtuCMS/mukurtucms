@@ -11,7 +11,7 @@
 function entity_delete_log_og_entity_delete_log_post_process($entity, $type, $variables) {
   // If there is a group audience attached to this entity, let's log each group
   // id that was associated with this entity for the entity delete log id.
-  if ($entity->group_audience) {
+  if (isset($entity->group_audience) && !empty($entity->group_audience)) {
     $gids = array();
     // For each language code, and then for each gruop, add the group id to the
     // group ids array.

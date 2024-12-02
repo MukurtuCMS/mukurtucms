@@ -1,0 +1,393 @@
+.node-discussion-space,
+.node-discussion-topic,
+.node-calendar,
+.node-event,
+.node-document-library,
+.node-document-page
+ {
+  .field {
+      .field-label,
+      .label-above {
+          .metadata-field-label;
+      }
+
+      a {
+          .mukurtu-standard-link;
+      }
+
+      ul {
+        list-style-type: none;
+        padding-left: 0;
+        margin: 0;
+      }
+  }
+
+  .field-name-body {
+    padding-top: 10px;
+  }
+
+  .filter-help {
+    float: none;
+  }
+
+  .group-left {
+    margin-top: 20px;
+  }
+
+  .group-right {
+    >.panel {
+        .metadata-field-padding;
+
+        margin-top: 20px;
+        border: none;
+        border-top: 5px solid @brand-secondary;
+        border-radius: 0px;
+        background-color: @mukurtu-navbar-collapse-bg;
+        padding-top: 0px;
+        padding-bottom: 20px;
+
+        h2,
+        .block-title,
+        .label-above,
+        .panel-title,
+        .panel-heading,
+        .panel-heading > a {
+            .metadata-field-label;
+            padding-left: 0px;
+            border: none;
+            padding-top: 15px;
+            padding-bottom: 10px;
+        }
+
+        .field-name-add-content-to-collab-sect-link,
+        .field-name-edit-collab-section-link,
+        .panel-collapse {
+          a {
+            .arrow-right;
+            .mukurtu-standard-link;
+            padding-right: 15px;
+            font-weight: bold;
+          }
+
+          .view-documents,
+          .field-name-field-following-users,
+          .field-name-follow-unfollow {
+            a {
+              background: none;
+            }
+
+            .notifications-message {
+              padding-top: 10px;
+            }
+          }
+        }
+
+        .panel-heading > a {
+          padding-left: 15px;
+          color: @text-color;
+        }
+
+        .panel-body {
+          padding: 0px;
+          .label-above {
+            font-size: 12px;
+          }
+        }
+
+        a {
+            .mukurtu-standard-link;
+        }
+
+        .field-name-add-content-to-collab-sect-link {
+          padding-top: 10px;
+          padding-bottom: 10px;
+        }
+    }
+  }
+
+  .field-name-generic-dynamic-field {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+
+  &.ds-2col > .group-left,
+  &.ds-2col > .group-right {
+      width: auto;
+      float: none;
+  }
+
+  &.ds-2col {
+    clear: both;
+    padding-top: 10px;
+    .group-left {
+      .label-above {
+        font-size: 22px;
+      }
+    }
+  }
+
+  // Calendar controls
+  .fullcalendar {
+    .fc-header {
+      td {
+        float: left;
+        clear: left;
+
+        // Desktop
+        @media (min-width: @screen-md-min) {
+          float: none;
+        }
+      }
+    }
+  }
+
+  // Tablet
+  @media (min-width: @screen-sm-min) {
+    &.ds-2col > .group-left {
+      width: 66%;
+      float: left;
+    }
+    &.ds-2col > .group-right {
+      width: 30%;
+      float: right;
+    }
+  }
+
+  .view-oa-comment-topics {
+    h3 {
+      font-size: 12px;
+      line-height: 1.1;
+      color: #6D7074;
+      font-weight: bold;
+      font-style: normal;
+      text-transform: uppercase;
+      border-top: 4px solid #EAEAEA;
+      margin: 0;
+      padding-top: 1.3em;
+      padding-bottom: 1.3em;
+    }
+    li {
+      border-top: 1px solid #EAEAEA;
+      padding: 10px 0;
+      font-size: 13px;
+    }
+    .oa-list.oa-discussion-topic {
+      .oa-list-header.oa-description {
+        overflow: visible;
+        text-align: right;
+        float: right;
+      }
+      h5 {
+        font-size: 16px;
+        font-weight: 500;
+        margin: 0 0 2px 0;
+      }
+
+      .oa-reply-last {
+        display: inline-block;
+        text-align: right;
+        > a {
+          color: inherit;
+        }
+      }
+      .oa-reply-text {
+        display: none;
+      }
+      .oa-reply-icon {
+        position: relative;
+        display: inline-block;
+        .oa-reply-count {
+          position: relative;
+          display: inline-block;
+          z-index: 2;
+          color: white;
+          width: 2em;
+          text-align: center;
+          margin: 0 3px 3px 3px;
+          a {
+            color: inherit;
+          }
+        }
+        i {
+          position: absolute;
+          z-index: 1;
+          left: 0;
+          font-size: 25px;
+          top: -0.1em;
+          margin: 0 3px;
+          color: rgba(64, 64, 64, 0.7);
+        }
+        &.updated i {
+          color: rgba(150, 150, 0, 0.7);;
+        }
+        &.new i {
+          color: rgba(64, 161, 58, 0.7);
+        }
+      }
+    }
+  }
+
+  // Events
+  // Based on OA, then modified.
+  .event-date-wrapper {
+    height: 5em;
+    width: 5em;
+    margin: 5px;
+    margin-left: 0px;
+    border: 1px solid #AAA;
+    background: #F6F7FC;
+    float: left;
+    font-size: 10px;
+  }
+
+  .event-date-month-wrapper {
+    height: 1.4em;
+    background: #4791FF;
+    margin: 2px;
+  }
+
+  .event-date-month {
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    display: block;
+    text-align: center;
+    font-size: 1em;
+    font-weight: normal;
+    color: #FFFFFF;
+  }
+
+
+  .event-label {
+    font-weight: bold;
+    float: left;
+    height: 0;
+  }
+
+  .event-item {
+    display: inline-block;
+    font-size: 1em;
+    padding-left: 8ex;
+    line-height: 1.4em;
+  }
+
+  .event-date-day {
+    display: block;
+    font-size: 2.5em;
+    line-height: 120%;
+    text-align: center;
+  }
+
+  .event-day,
+  .event-time {
+    white-space: nowrap;
+  }
+
+  .event .addthisevent-drop {
+    margin: 10px;
+    float: right;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+  }
+
+  .event-location .field-content {
+    display: inline-block;
+  }
+
+  .event-description .flag-subscribe-section-content {
+    display: none;
+  }
+
+  .event-header .event-icon {
+    float: left;
+    padding-right: 10px;
+  }
+
+  .event-header .location {
+    padding-top: 20px;
+  }
+
+  .event-details {
+    overflow: hidden;
+  }
+
+  .event-description ul,
+  .event-list li {
+    list-style: none;
+  }
+
+  .view-oa-event-list li {
+    overflow: hidden;
+    clear: both;
+  }
+
+  .views-field-field-oa-media {
+    float: right;
+  }
+
+  &.view-mode-full {
+    // Calendar icon
+    .event-date-wrapper {
+      height: 7em !important;
+      width: 7em !important;
+      .event-date-month-wrapper {
+        height: 1.96em !important;
+      }
+      .event-date-month {
+        font-size: 1.4em !important;
+      }
+      .event-date-day {
+        font-size: 3.5em !important;
+      }
+    }
+
+
+    .field-name-field-document-doc-lib-section {
+      clear: left;
+
+      .label-inline {
+        width: 160px;
+        float: left;
+        font-weight: bold;
+      }
+    }
+
+    // Fields to the right of calendar icon
+    .group-event-details {
+      clear: left;
+
+      // Tablet
+      @media (min-width: @screen-sm-min) {
+        clear: none;
+      }
+
+      .label-inline {
+        width: 90px;
+        float: left;
+        font-weight: bold;
+
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+          text-align: right;
+        }
+      }
+      .field-name-field-oa-address, .field-name-field-oa-date, .field-name-calendar-date {
+        margin-bottom: 0.1em !important;
+      }
+    }
+
+    .field-name-body, .comment-wrapper {
+      clear: both;
+    }
+    .field-name-body {
+      font-size: 1.3em;
+    }
+
+    .view-documents {
+      .views-field-body {
+        padding-top: 10px;
+      }
+    }
+  }
+}

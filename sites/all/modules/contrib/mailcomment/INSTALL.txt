@@ -1,0 +1,35 @@
+CONTENTS OF THIS FILE
+---------------------
+
+ * Requirements
+ * Quick setup
+ * Overview
+ * Message Notify Setup
+
+REQUIREMENTS
+------------
+
+Dependencies:
+- Mailhandler (matching version required - i.e., if you are using Mail Comment
+  7.x-2.0-alpha5, you must use Mailhandler 7.x-2.0-alpha5)
+- Notifications and Messaging (7.x-1.x)
+  OR Message Notify (7.x-2.x)
+
+QUICK SETUP
+-----------
+
+- Enable the "Mail Comment Default" module.
+- Enable a submodule for either Notifications or Message Notify integration.
+- Add a mailbox at admin/structure/mailhandler.
+- Configure Mail Comment at admin/messaging/mailcomment
+- Create a node and subscribe to the thread to receive email notifications.
+- Add a comment to the thread to generate a notification message.
+- Reply to the message.
+- Go to /import, choose the Mailhandler comments importer, choose the mailbox
+  you just set up from the drop-down menu, and select "Import". Your email
+  should be imported as a comment.
+
+MESSAGE NOTIFY SETUP
+--------------------
+Some additional steps may be required to get Message Notify integration working.
+See the INSTALL.txt for that module.

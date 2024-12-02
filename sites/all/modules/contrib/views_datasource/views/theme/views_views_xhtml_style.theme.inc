@@ -24,9 +24,9 @@ function template_preprocess_views_views_xhtml_style_hcard(&$vars) {
   $base = $view->base_table;
   $plaintext_output = $options["plaintext_output"];
   $vars["content_type"] = ($options['content_type'] == 'default') ? 'text/html' : $options['content_type'];
-  $header  = $options["header"];
+  $header = $options["header"];
   if (!$vars["header"]) {
-    $vars["title"] = check_plain(($view->get_title() ? $view->get_title(): $view->name));
+    $vars["title"] = check_plain(($view->get_title() ? $view->get_title() : $view->name));
     $vars["id"] = check_url($view->get_url());
     $vars["author"] = _views_xhtml_format_author($options["author"]);
     $vars['link'] = check_url(url($view->display_handler->get_path(), $url_options));
@@ -81,22 +81,27 @@ function template_preprocess_views_views_xhtml_style_hcard(&$vars) {
         }
         else {
           $content = array();
-          foreach ($field->content as $n => $oc) $content[$n] = $plaintext_output ? check_plain(html_entity_decode(strip_tags($oc))) : $oc;
+          foreach ($field->content as $n => $oc) {
+            $content[$n] = $plaintext_output ? check_plain(html_entity_decode(strip_tags($oc))) : $oc;
+          }
           $content = implode(" ", $content);
         }
       }
       elseif ($options["field_output"] == "raw") {
         $label = $plaintext_output ? check_plain(html_entity_decode(strip_tags($field->id))) : $field->id;
-        if (!$field->is_multiple)
+        if (!$field->is_multiple) {
           $content = $plaintext_output ? check_plain(html_entity_decode(strip_tags($field->content))) : $field->raw;
+        }
         else {
           $content = array();
-          foreach ($field->raw as $n => $oc) $content[$n] = $plaintext_output ? check_plain(html_entity_decode(strip_tags($oc))) : $oc;
+          foreach ($field->raw as $n => $oc) {
+            $content[$n] = $plaintext_output ? check_plain(html_entity_decode(strip_tags($oc))) : $oc;
+          }
           $content = implode(" ", $content);
         }
       }
       $label = _views_xml_strip_illegal_xml_name_chars(html_entity_decode(check_plain(strip_tags($label))));
-      $content = (($options['escape_as_CDATA'] == 'yes') ? "<![CDATA[$content]]>": $content);
+      $content = (($options['escape_as_CDATA'] == 'yes') ? "<![CDATA[$content]]>" : $content);
       //if (($options["skip_empty_fields"] == TRUE) && (is_null($content) || $content === "")) continue;
       if ((stripos($label, 'address_type') !== FALSE) || (stripos($label, 'addresstype') !== FALSE)) {
         $hcard['adr']['type'] = $content;
@@ -174,7 +179,8 @@ function template_preprocess_views_views_xhtml_style_hcard(&$vars) {
       if (stripos($label, 'tel') === 0) {
         $hcard['tel'][$label] = $content;
       }
-    } $hcards[] = $hcard;
+    }
+    $hcards[] = $hcard;
   }//for
   $vars["hcards"] = $hcards;
 }
@@ -191,9 +197,9 @@ function template_preprocess_views_views_xhtml_style_hcalendar(&$vars) {
   $base = $view->base_table;
   $plaintext_output = $options["plaintext_output"];
   $vars["content_type"] = ($options['content_type'] == 'default') ? 'text/html' : $options['content_type'];
-  $header  = $options["header"];
+  $header = $options["header"];
   if (!$vars["header"]) {
-    $vars["title"] = check_plain(($view->get_title() ? $view->get_title(): $view->name));
+    $vars["title"] = check_plain(($view->get_title() ? $view->get_title() : $view->name));
     $vars["id"] = check_url($view->get_url());
     $vars["author"] = _views_xhtml_format_author($options["author"]);
     $vars['link'] = check_url(url($view->display_handler->get_path(), $url_options));
@@ -213,26 +219,32 @@ function template_preprocess_views_views_xhtml_style_hcalendar(&$vars) {
         else {
           $label = $plaintext_output ? check_plain(html_entity_decode(strip_tags($field->id))) : $field->id;
         }
-        if (!$field->is_multiple)
+        if (!$field->is_multiple) {
           $content = $plaintext_output ? check_plain(html_entity_decode(strip_tags($field->content))) : $field->content;
+        }
         else {
           $content = array();
-          foreach ($field->content as $n => $oc) $content[$n] = $plaintext_output ? check_plain(html_entity_decode(strip_tags($oc))) : $oc;
+          foreach ($field->content as $n => $oc) {
+            $content[$n] = $plaintext_output ? check_plain(html_entity_decode(strip_tags($oc))) : $oc;
+          }
           $content = implode(" ", $content);
         }
       }
       elseif ($options["field_output"] == "raw") {
         $label = $plaintext_output ? check_plain(html_entity_decode(strip_tags($field->id))) : $field->id;
-        if (!$field->is_multiple)
+        if (!$field->is_multiple) {
           $content = $plaintext_output ? check_plain(html_entity_decode(strip_tags($field->content))) : $field->raw;
+        }
         else {
           $content = array();
-          foreach ($field->raw as $n => $oc) $content[$n] = $plaintext_output ? check_plain(html_entity_decode(strip_tags($oc))) : $oc;
+          foreach ($field->raw as $n => $oc) {
+            $content[$n] = $plaintext_output ? check_plain(html_entity_decode(strip_tags($oc))) : $oc;
+          }
           $content = implode(" ", $content);
         }
       }
       $label = _views_xml_strip_illegal_xml_name_chars(html_entity_decode(check_plain(strip_tags($label))));
-      $content = (($options['escape_as_CDATA'] == 'yes') ? "<![CDATA[$content]]>": $content);
+      $content = (($options['escape_as_CDATA'] == 'yes') ? "<![CDATA[$content]]>" : $content);
       if (stripos($label, 'class') !== FALSE) {
         $hcalendar['class'] = $content;
       }
@@ -246,7 +258,8 @@ function template_preprocess_views_views_xhtml_style_hcalendar(&$vars) {
         $hcalendar['summary'] = $content;
       }
       if ((stripos($label, 'dtstart') !== FALSE) || (stripos($label, 'event_start') !== FALSE) || (stripos($label, 'eventstart') !== FALSE)
-        || (stripos($label, 'start'))) {
+        || (stripos($label, 'start'))
+      ) {
 //        if (preg_match('/\d/', $content)) {
 //          if (strtotime($content))
 //            $content = format_date(strtotime($content), 'custom', EXHIBIT_DATE_FORMAT);
@@ -254,7 +267,8 @@ function template_preprocess_views_views_xhtml_style_hcalendar(&$vars) {
         $hcalendar['dtstart'] = $content;
       }
       if ((stripos($label, 'dtend') !== FALSE) || (stripos($label, 'event_end') !== FALSE) || (stripos($label, 'eventendtime') !== FALSE)
-      || (stripos($label, 'eventend') !== FALSE)|| (stripos($label, 'end') !== FALSE)) {
+        || (stripos($label, 'eventend') !== FALSE) || (stripos($label, 'end') !== FALSE)
+      ) {
 //        if (preg_match('/\d/', $content)) {
 //          if (strtotime($content))
 //            $content = format_date(strtotime($content), 'custom', EXHIBIT_DATE_FORMAT);

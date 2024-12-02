@@ -1,0 +1,136 @@
+<?php
+/**
+ * @file
+ * Tests Mail Comment message parsing.
+ */
+
+class MailCommentTestCase extends DrupalUnitTestCase {
+  /**
+   * getInfo() returns properties that are displayed in the test selection form.
+   */
+  public static function getinfo() {
+    return array(
+      'name' => 'Message parsing',
+      'description' => 'Test Mail Comment message parsing.',
+      'group' => 'Mail Comment',
+    );
+  }
+
+  /**
+   * setUp() performs any pre-requisite tasks that need to happen.
+   */
+  public function setUp() {
+    variable_set('mailcomment_reply_text', t('((( Reply ABOVE this LINE to POST a COMMENT )))'));
+
+    drupal_load('module', 'mailcomment');
+
+    // Enable any modules required for the test.
+    parent::setUp(
+      'ctools',
+      'feeds',
+      'autoload',
+      'token',
+      'job_scheduler',
+      'mailhandler',
+      'mailcomment'
+    );
+  }
+
+  public static function mailCommentTestMessages() {
+    $messages = array();
+
+    // Gmail
+    $messages['gmail'] =  "Hello world.
+
+On Fri, Aug 19, 2011 at 9:51 AM, test person <user@hostname.tld> wrote:
+> ((( Reply ABOVE this LINE to POST a COMMENT )))
+>
+> user said:
+>
+> Courgette lettuce bell pepper asparagus collard greens epazote broccoli rabe. Wattle
+> seed cress welsh onion broccoli rabe pea sprouts tomatillo celery ricebean napa cabbage
+> bush tomato daikon horseradish turnip winter purslane. Chickweed radicchio taro tigernut
+> spinach tomatillo black-eyed pea avocado.
+
+--
+Test person name | http://hostname.tld";
+
+    // Thunderbird
+    $messages['thunderbird'] = "Hello world.
+
+On 08/18/2011 04:19 PM, Test Person wrote:
+> ((( Reply ABOVE this LINE to POST a COMMENT )))
+>
+> user said:
+>
+> Mustard scallion yarrow aubergine sierra leone bologi sea lettuce
+> chicory broccoli collard greens turnip greens shallot radicchio komatsuna.
+> Broccoli celery grape bell pepper kohlrabi radicchio sierra leone bologi.";
+
+    // Mac Mail 4.2
+    $messages['mac_mail42'] = "Hello world.
+
+On 14 Sep 2011, at 4:37 PM, someuser wrote:
+
+> ((( Reply ABOVE this LINE to POST a COMMENT )))
+>
+> Kakadu plum burdock collard greens sorrel dulse seakale winter purslane soko
+> beet greens summer purslane radish tomato bunya nuts. Amaranth chickweed onion
+> broccoli rabe shallot kombu pea napa cabbage welsh onion soko water chestnut
+> tomatillo bell pepper arugula pea sprouts. Azuki bean seakale scallion turnip
+> greens azuki bean groundnut beetroot cress courgette lentil epazote kale celery
+> garbanzo watercress.";
+
+    // Yahoo mail
+    $messages['yahoo'] = "Hello world.
+________________________________
+From: Firstname Lastname <user@hostname.tld>
+To: recipient@hostname.tld
+Sent: Tuesday, September 13, 2011 10:14 AM
+Subject: Re: Test subject
+
+((( Reply ABOVE this LINE to POST a COMMENT )))
+
+Earthnut pea eggplant brussels sprout bitterleaf quandong desert raisin wattle
+seed celtuce bamboo shoot mung bean cauliflower maize salad chickpea celery.
+Winter purslane silver beet daikon brussels sprout broccoli rabe lotus root
+water chestnut garlic melon lettuce potato pumpkin. Ricebean groundnut potato
+celery corn artichoke sea lettuce. No joke.";
+
+    // Outlook web
+    $messages['outlook_web'] = "Hello world.
+________________________________________
+From: user@hostname.tld [user@hostname.tld]
+Sent: Thursday, August 18, 2011 4:19 PM
+To: Recipient Name
+Subject: Re: [Site-name] Subject
+
+((( Reply ABOVE this LINE to POST a COMMENT )))
+
+Test user said:
+
+Pea cress water spinach summer purslane asparagus scallion squash sorrel. Pea
+green bean celery chickpea lotus root parsnip celery arugula carrot winter
+purslane cress plantain tatsoi pumpkin pea ricebean mung bean lentil.";
+
+    $messages['generic_reply'] = "Hello world.
+
+> ((( Reply ABOVE this LINE to POST a COMMENT )))
+>
+> user said:
+>
+> Mustard scallion yarrow aubergine sierra leone bologi sea lettuce
+> chicory broccoli collard greens turnip greens shallot radicchio komatsuna.
+> Broccoli celery grape bell pepper kohlrabi radicchio sierra leone bologi.";
+
+    return $messages;
+  }
+
+  public function testMailCommentParseMessage() {
+    $messages = $this->mailCommentTestMessages();
+    foreach ($messages as $key => $message) {
+      $text = _mailcomment_filter_aggressive($message);
+      $this->assertEqual($text, 'Hello world.', 'Filtered ' . $key);
+    }
+  }
+}

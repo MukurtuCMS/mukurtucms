@@ -2,7 +2,7 @@
 /**
  * @file
  * General structure is drop down of all communities hierarchy the user has permission to which then populates a list of sub-protocols in a second drop down
- * theme the drop down in chosen
+ * theme the drop down in select2
  *
  */
 
@@ -16,7 +16,7 @@
  */
 function mukurtu_protocol_field_node_insert($node) {
   if ($node->type == 'community' && !property_exists($node,'feeds_item')) {
-    
+
     // create protocol
     $newnode = new stdClass();
     $newnode->title = $node->title." Community Only";
@@ -42,182 +42,273 @@ function mukurtu_protocol_field_node_insert($node) {
 /**
  *  Implements hook_form_alter().
  *
- *  Alters the digitial heritage node edit form to replace the og_group_ref with our enhanced protocol selector field
+ *  Alters node forms to replace the og_group_ref with our enhanced protocol selector field
  */
 function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
 
-  if ($form_id == 'digital_heritage_node_form') {
+  $disable_field = FALSE;
+  $node_type = str_replace('_node_form', '', $form_id, $count);
+  if ($count && ma_cultural_protocol_node_type_can_have_cp_except_hidden($node_type)) {
+    // Hide the original Protocol field.
+    $form['og_group_ref']['#access'] = FALSE;
+
+    if (isset($form['#node_edit_form']) and $form['#node_edit_form']) {
+      if (!isset($form['#node'])) {
+        return;
+      }
+      $node = $form['#node'];
+      $allowed_protocols = ma_cultural_protocol_get_cps_user_can_post_to();
+
+      $privacy_setting = $node->field_item_privacy_setting[LANGUAGE_NONE][0]['value'] ?? 'all';
+      if ($privacy_setting == 'all') {
+        foreach ($node->og_group_ref[LANGUAGE_NONE] as $delta => $value) {
+          if (!isset($allowed_protocols[$value['target_id']])) {
+            $disable_field = TRUE;
+            $form['og_group_ref']['#access'] = FALSE;
+            $form['field_item_privacy_setting']['#access'] = FALSE;
+          }
+        }
+      }
+
+      if ($privacy_setting == 'any') {
+        $form['og_group_ref']['#access'] = FALSE;
+        $form['field_item_privacy_setting']['#access'] = FALSE;
+        $disable_field = TRUE;
+        foreach ($node->og_group_ref[LANGUAGE_NONE] as $delta => $value) {
+          if (isset($allowed_protocols[$value['target_id']])) {
+            $disable_field = FALSE;
+            $form['field_item_privacy_setting']['#access'] = TRUE;
+          }
+        }
+      }
+    }
 
     // Do not create this custom field for Book Pages
-    // Also hide the Item Sharing Settings field
-    if ($form['field_book_parent'][LANGUAGE_NONE][0]['target_id']['#default_value'] OR arg(3) == 'book-page') {
-      $form['field_item_privacy_setting']['#access'] = FALSE;
+    if(isset($form_state['mukurtu_book_parent'])) {
       return;
     }
 
-    // Gather group field info
-    $og_group_parent = $form['#group_children']['og_group_ref'];
-    $form['#group_children']['oggroup_fieldset'] = $og_group_parent;
+    // Do not create this custom field for Book Pages
+    // Also hide the Item Sharing Settings field
+    if (isset($form['field_book_parent'])) {
+      if (isset($form['field_book_parent'][LANGUAGE_NONE][0]['target_id']['#default_value']) OR arg(3) == 'book-page') {
+        $form['field_item_privacy_setting']['#access'] = FALSE;
+        return;
+      }
+    }
 
-    // Build the $structure and $community_defaults_with_titles arrays
-    $structure = array();
-    $community_defaults_with_titles = array();
-    $cps = $form_state['node']->og_group_ref['und'];
+    // Build the custom protocol field.
+    list ($form, $form_state) = mukurtu_protocol_field_custom_field($form, $form_state, $node_type, FALSE, $disable_field);
+
+  }
+}
+
+/**
+ * Build a custom protocol field. This is called both by the mukurtu_protocol_field module on node forms,
+ * and by the Dublin Core XML importer form.
+ */
+function mukurtu_protocol_field_custom_field($form, $form_state, $node_type, $import_form = FALSE, $disabled = FALSE) {
+  // Gather group field info
+  if (isset($form['#group_children']['og_group_ref'])) {
+    $form['#group_children']['oggroup_fieldset'] = $form['#group_children']['og_group_ref'];
+  }
+
+  // Build the $structure and $community_defaults_with_titles arrays
+  $structure = array();
+  $community_defaults_with_titles = array();
+  $cps = array();
+  if (isset($form_state['node']->og_group_ref[LANGUAGE_NONE])) {
+    $cps = $form_state['node']->og_group_ref[LANGUAGE_NONE];
     foreach ($cps as $cp) {
       $cp_nid = $cp['target_id'];
       $cp_wrapper = entity_metadata_wrapper('node', $cp_nid);
-      $community_nodes = $cp_wrapper->og_group_ref->value();
-      $community_node = $community_nodes[0];
-      $community_nid = $community_node->nid;
-      $structure[$community_nid][] = $cp_nid;
-      $community_defaults_with_titles[$community_nid] = $community_node->title;
+      if (isset($cp_wrapper->og_group_ref)) {
+        $community_nodes = $cp_wrapper->og_group_ref->value();
+        $community_node = $community_nodes[0];
+        $community_nid = $community_node->nid;
+        $structure[$community_nid][] = $cp_nid;
+        $community_defaults_with_titles[$community_nid] = $community_node->title;
+      }
     }
+  }
 
-    // Set the $first_build value
-    $first_build = 0;
-    if (!$form_state['rebuild'] && !empty($form_state['node']->og_group_ref)) {
+  // Set the $first_build value
+  $first_build = 0;
+  if (!$form_state['rebuild']) {
+    if ($import_form) {
       $first_build = 1;
     }
+    elseif (!empty($form_state['node']->og_group_ref)) {
+      $first_build = 1;
+    }
+  }
 
-    // Get the list of options to populate the first dropdown.
-    $options_first = _ajax_get_community_dropdown_options($community_defaults_with_titles);
 
-    // Set the number of combo field instances
-    if ($first_build) {
+  // Get the list of options to populate the first dropdown.
+  $options_first = _ajax_get_community_dropdown_options($community_defaults_with_titles, $import_form);
+
+  // Set the number of combo field instances
+  if ($first_build) {
+    if ($import_form) {
+      $form_state['num_protocols'] = 1;
+    }
+    else {
       $form_state['num_protocols'] = sizeof($structure);
     }
-    elseif (empty($form_state['num_protocols'])) {
-      // DH node is being added via Services. Set num_protocols according to the number of communities set in the service request.
-      if (isset($form_state['values']['oggroup_fieldset'])) {
-        $form_state['num_protocols'] = count($form_state['values']['oggroup_fieldset']);
-      }
-      // DH node is being added from the UI
-      else {
-        $form_state['num_protocols'] = 1;
-      }
-    }
-
-    // Wrap the combo fields in an overall fieldset
-    $form['oggroup_fieldset'] = array(
-      '#title' => t('Communities and Protocols *'),
-      '#type' => 'fieldset',
-      '#collapsible' => TRUE,
-      '#collapsed' => FALSE,
-    );
-
-    // Retrieve defaults from the url (only applies to node creation)
-    $community_first_default = arg(3);
-    $protocol_first_default = arg(4);;
-
-    // Loop through each combo field
-    for ($i = 0; $i < $form_state['num_protocols']; $i++) {
-
-      if (isset($form_state['values']['oggroup_fieldset'][$i]['dropdown_first'])) {
-        $selected = $form_state['values']['oggroup_fieldset'][$i]['dropdown_first'];
-      } else if (isset($form_state['input']['oggroup_fieldset'][$i]['dropdown_first'])) {
-        $selected = $form_state['input']['oggroup_fieldset'][$i]['dropdown_first'];
-      } else {
-        $selected = false;
-      }
-
-      // Set the default Community of the first combo field if it's not set and if there's a numeric value in the url
-      if ($i == 0 && !$selected && is_numeric($community_first_default) ) {
-        $selected = $community_first_default;
-      }
-
-      $protocol_options = array();
-
-      if ($first_build) {
-        $keys = array_keys($structure);
-        $selected = $keys[$i];
-        list($protocol_options) = array_slice($structure, $i, 1);
-      }
-
-      // Wrap the combo field in a fieldset
-      $form['oggroup_fieldset'][$i] = array(
-        '#type' => 'fieldset',
-        '#title' => t("Communities and Protocols @num", array('@num' => $i+1)),
-        // Set up the wrapper so that AJAX will be able to replace the fieldset.
-        '#prefix' => '<div id="og_gorup-fieldset-wrapper-'.$i.'">',
-        '#suffix' => '</div>',
-      );
-
-      // Community dropdown
-      $form['oggroup_fieldset'][$i]['dropdown_first'] = array(
-        '#type' => 'select',
-        '#title' => 'Community',
-        '#options' => $options_first,
-        '#default_value' => $selected,
-        // Bind an ajax callback to the change event (which is the default for the
-        // select form type) of the first dropdown. It will replace the second
-        // dropdown when rebuilt.
-        '#ajax' => array(
-          'callback' => 'ajax_mukurtu_protocol_dependent_dropdown_callback',
-          'event' => 'change',
-          'wrapper' => 'dropdown-second-replace-'.$i,
-        ),
-        '#attributes' => array ('class' => array('chosen-enable')),
-      );
-
-
-      if (isset($form_state['values']['oggroup_fieldset'][$i]['dropdown_second'])) {
-        $protocol_defaults = $form_state['values']['oggroup_fieldset'][$i]['dropdown_second'];
-      } else if(isset($form_state['input']['oggroup_fieldset'][$i]['dropdown_second'])) {
-        $protocol_defaults = $form_state['input']['oggroup_fieldset'][$i]['dropdown_second'];
-      } else {
-        $protocol_defaults = false;
-      }
-
-      // Set the default protocol of the first combo field if it's not set and if there's a numeric value in the url
-      if ($i == 0 && !$protocol_defaults && is_numeric($protocol_first_default) ) {
-        $protocol_defaults = $protocol_first_default;
-      }
-      if (!empty($protocol_options)) {
-        $protocol_defaults = $protocol_options;
-      }
-
-      // Protocol dropdown
-      $form['oggroup_fieldset'][$i]['dropdown_second'] = array(
-        '#type' => 'select',
-        '#title' => t('Protocol'),
-        // The entire enclosing div created here gets replaced when dropdown_first
-        // is changed.
-        '#prefix' => '<div id="dropdown-second-replace-'.$i.'">',
-        '#suffix' => '</div>',
-        // When the form is rebuilt during ajax processing, the $selected variable
-        // will now have the new value and so the options will change.
-        '#options' => _ajax_get_protocol_by_community_dropdown_options($selected, $protocol_defaults),
-        '#default_value' => $protocol_defaults,
-        '#multiple' => TRUE,
-        '#attributes' => array ('class' => array('chosen-enable')),
-      );
-      // DH node needs at least one protocol
-      if ($i == 0) {
-        $form['oggroup_fieldset'][$i]['dropdown_second']['#required'] = TRUE;
-      }
-    }
-    // finished combo field building loop
-
-
-    // Adds "Add another name" button.
-    $form['oggroup_fieldset']['add_community'] = array(
-      '#type' => 'submit',
-      '#value' => t('Add another community'),
-      '#submit' => array('form_field_add_communities'),
-    );
-
-    $form['oggroup_fieldset']['#tree'] = TRUE;
-    array_unshift($form['#validate'], 'mukurtu_protocol_field_form_validate');
-    //$form['og_group_ref']['#type'] = 'hidden';
-    $weight = $form['og_group_ref']['#weight'];
-    $form['oggroup_fieldset']['#weight'] = $weight;
-    
   }
+  elseif (empty($form_state['num_protocols'])) {
+    if ($import_form) {
+      $form_state['num_protocols'] = 1;
+    }
+    // DH node is being added via Services. Set num_protocols according to the number of communities set in the service request.
+    elseif (isset($form_state['values']['oggroup_fieldset'])) {
+      $form_state['num_protocols'] = count($form_state['values']['oggroup_fieldset']);
+    }
+    // DH node is being added from the UI
+    else {
+      $form_state['num_protocols'] = 1;
+    }
+  }
+
+  // Wrap the combo fields in an overall fieldset
+  $form['oggroup_fieldset'] = array(
+    '#title' => t('Communities and Protocols'),
+    '#type' => 'fieldset',
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#weight' => $form['og_group_ref']['#weight'],
+  );
+  if ($import_form OR ma_cultural_protocol_node_type_must_have_cp($node_type)) {
+    $form['oggroup_fieldset']['#title'] .= " *"; // Mark the fieldset as required.
+  }
+
+  // Retrieve defaults from the url (only applies to node creation)
+  $community_first_default = arg(3);
+  $protocol_first_default = arg(4);;
+
+  // Loop through each combo field
+  for ($i = 0; $i < $form_state['num_protocols']; $i++) {
+
+    if (isset($form_state['values']['oggroup_fieldset'][$i]['dropdown_first'])) {
+      $selected = $form_state['values']['oggroup_fieldset'][$i]['dropdown_first'];
+    } else if (isset($form_state['input']['oggroup_fieldset'][$i]['dropdown_first'])) {
+      $selected = $form_state['input']['oggroup_fieldset'][$i]['dropdown_first'];
+    } else {
+      $selected = false;
+    }
+
+    // Set the default Community of the first combo field if it's not set and if there's a numeric value in the url
+    if ($i == 0 && !$selected && is_numeric($community_first_default) ) {
+      $selected = $community_first_default;
+    }
+
+    $protocol_options = array();
+
+    if ($first_build) {
+      $keys = array_keys($structure);
+      $selected = $keys[$i];
+      list($protocol_options) = array_slice($structure, $i, 1);
+    }
+
+    // Wrap the combo field in a fieldset
+    $form['oggroup_fieldset'][$i] = array(
+      '#type' => 'fieldset',
+      '#title' => t("Communities and Protocols @num", array('@num' => $i+1)),
+      // Set up the wrapper so that AJAX will be able to replace the fieldset.
+      '#prefix' => '<div id="og_gorup-fieldset-wrapper-'.$i.'">',
+      '#suffix' => '</div>',
+    );
+
+    // Community dropdown
+    $form['oggroup_fieldset'][$i]['dropdown_first'] = array(
+      '#type' => 'select',
+      '#select2' => [],
+      '#title' => 'Community',
+      '#options' => $options_first,
+      '#default_value' => $selected,
+      // Bind an ajax callback to the change event (which is the default for the
+      // select form type) of the first dropdown. It will replace the second
+      // dropdown when rebuilt.
+      '#ajax' => array(
+        'callback' => 'ajax_mukurtu_protocol_dependent_dropdown_callback',
+        'event' => 'change',
+        'wrapper' => 'dropdown-second-replace-'.$i,
+      ),
+    );
+
+
+    if (isset($form_state['values']['oggroup_fieldset'][$i]['dropdown_second'])) {
+      $protocol_defaults = $form_state['values']['oggroup_fieldset'][$i]['dropdown_second'];
+    } else if(isset($form_state['input']['oggroup_fieldset'][$i]['dropdown_second'])) {
+      $protocol_defaults = $form_state['input']['oggroup_fieldset'][$i]['dropdown_second'];
+    } else {
+      $protocol_defaults = false;
+    }
+
+    // Set the default protocol of the first combo field if it's not set and if there's a numeric value in the url
+    if ($i == 0 && !$protocol_defaults && is_numeric($protocol_first_default) ) {
+      $protocol_defaults = array($protocol_first_default);
+    }
+    if (!empty($protocol_options)) {
+      $protocol_defaults = $protocol_options;
+    }
+
+    // Protocol dropdown
+    $form['oggroup_fieldset'][$i]['dropdown_second'] = array(
+      '#type' => 'select',
+      '#select2' => [],
+      '#title' => t('Protocol'),
+      // The entire enclosing div created here gets replaced when dropdown_first
+      // is changed.
+      '#prefix' => '<div id="dropdown-second-replace-'.$i.'">',
+      '#suffix' => '</div>',
+      // When the form is rebuilt during ajax processing, the $selected variable
+      // will now have the new value and so the options will change.
+      '#options' => _ajax_get_protocol_by_community_dropdown_options($selected, $protocol_defaults, $import_form),
+      '#default_value' => $protocol_defaults,
+      '#multiple' => TRUE,
+    );
+    if ($i == 0 && ma_cultural_protocol_node_type_must_have_cp($node_type)) {
+      $form['oggroup_fieldset'][$i]['dropdown_second']['#required'] = TRUE;
+    }
+  }
+  // finished combo field building loop
+
+
+  // Adds "Add another name" button.
+  $form['oggroup_fieldset']['add_community'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add another community'),
+    '#submit' => array('form_field_add_communities'),
+  );
+
+  $form['oggroup_fieldset']['#tree'] = TRUE;
+
+  // Validate the custom field.
+  if (!$import_form) {
+    array_unshift($form['#validate'], 'mukurtu_protocol_field_form_validate');
+  }
+
+  if ($disabled) {
+    $form['oggroup_fieldset']['#access'] = FALSE;
+    foreach ($form['oggroup_fieldset'] as $delta => $value) {
+      if (is_numeric($delta)) {
+        $form['oggroup_fieldset'][$delta]['dropdown_first']['#access'] = FALSE;
+        $form['oggroup_fieldset'][$delta]['dropdown_second']['#access'] = FALSE;
+      }
+    }
+  }
+
+  // Return the form and form_sate
+  return [$form, $form_state];
 }
 
 // fired when the Add Communities button is clicked
 function form_field_add_communities($form, &$form_state) {
   // Everything in $form_state is persistent, so we'll just use $form_state['num_protocols']
+  if (!$form_state['num_protocols']) {
+    $form_state['num_protocols'] = 1;
+  }
   $form_state['num_protocols']++;
 
   // Setting $form_state['rebuild'] = TRUE causes the form to be rebuilt again.
@@ -246,7 +337,7 @@ function mukurtu_protocol_field_form_validate($form, &$form_state) {
     }
   }
 
-  $form_state['values']['og_group_ref']['und'] = $newstate;
+  $form_state['values']['og_group_ref'][LANGUAGE_NONE] = $newstate;
 
 }
 
@@ -263,13 +354,26 @@ function ajax_mukurtu_protocol_dependent_dropdown_callback($form, $form_state) {
 /**
  * Generate a list of communities for a user
  */
-function _ajax_get_community_dropdown_options($community_defaults_with_titles) {
-  $groups_for_user = og_get_groups_by_user(null, 'node');
-  $postable_communities[] = array();
-  foreach ($groups_for_user as $group_for_user) {
-    $group_node = node_load ($group_for_user);
+function _ajax_get_community_dropdown_options($community_defaults_with_titles, $import_form) {
+
+  if (!$import_form) {
+    $group_ids = og_get_groups_by_user(NULL, 'node');
+  }
+  else {
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'community');
+    $result = $query->execute();
+    $group_ids = array_keys($result['node']);
+  }
+  $postable_communities[] = [];
+  foreach ($group_ids as $group_id) {
+    $group_node = node_load($group_id);
     if ($group_node->type == 'community') {
-      $postable_communities[$group_for_user] = $group_node->title;
+      $postable_protocols_for_community =_ajax_get_protocol_by_community_dropdown_options($group_id, [], FALSE);
+      if (count($postable_protocols_for_community)) {
+        $postable_communities[$group_id] = $group_node->title;
+      }
     }
   }
   $referenceable_communities = array(0 => 'Select a community') + $community_defaults_with_titles + $postable_communities;
@@ -279,7 +383,7 @@ function _ajax_get_community_dropdown_options($community_defaults_with_titles) {
 /**
  * Generate a list of protocols for a community
  */
-function _ajax_get_protocol_by_community_dropdown_options($community, $protocol_defaults) {
+function _ajax_get_protocol_by_community_dropdown_options($community, $protocol_defaults, $import_form = FALSE) {
 
   if (!$community) {
     return array(0 => 'Select a community first');
@@ -294,7 +398,7 @@ function _ajax_get_protocol_by_community_dropdown_options($community, $protocol_
       $protocol_defaults_with_titles[$cp_wrapper->getIdentifier()] = $cp_wrapper->label();
     }
   }
-  if (!$postable_cps = ma_cultural_protocol_get_cps_user_can_post_to($community)) {
+  if (!$postable_cps = ma_cultural_protocol_get_cps_user_can_post_to($community, $import_form)) {
     $postable_cps = array();
   }
   $referenceable_cps = $protocol_defaults_with_titles + $postable_cps;
@@ -303,23 +407,44 @@ function _ajax_get_protocol_by_community_dropdown_options($community, $protocol_
 
 }
 
+/**
+ * Implements hook_node_presave().
+ */
+function mukurtu_protocol_field_node_presave($node) {
+  if (ma_cultural_protocol_node_type_can_have_cp_except_hidden($node->type)) {
+    $nmw = entity_metadata_wrapper('node', $node);
+
+    // Update the Community field according to the protocols for the node. The community field is a noderef field hidden from the node form, but displayed on the node view and search results view (and used as a search facet), on certain node types. It is a hidden noderef field (as opposed to group field) because we can only have one group field per node type and that's already used for the protocol.
+    $communities = array();
+    foreach ($nmw->og_group_ref->value() as $protocol) {
+      $p_emw = entity_metadata_wrapper('node', $protocol);
+      foreach ($p_emw->og_group_ref->value() as $community) {
+        $communities[] = $community->nid;
+      }
+    }
+    if (count($communities)) {
+      $nmw->field_community_ref->set(array_unique($communities));
+    }
+  }
+}
+
 
 
 /**
- * HOW DIGITAL HERITAGE CULTURAL PROTOCOL PERMISSIONS ARE IMPLEMENTED:
+ * HOW NODES-IN-CULTURAL PROTOCOL (Digital Heritage, Dictionary Words, Collections) PERMISSIONS ARE IMPLEMENTED:
  *
  * 1. At the node view level, via hook_node_access
  *    - mukurtu_protocol_field_node_access is used on node views but not search results. SAPI search uses a list query (from a view), and list queries are, by core implementation, not run through hook_node_access for performance reasons.
- *    - DH nodes with Item Sharing set to "ANY" are passed if user is a member of any of the CPs or any of the CPs are open groups. This is only partially handled by OG so we need to override here.
- *    - DH nodes with Item Sharing set to "ALL" are passed if user is a member of all CPs / CP is open group. This is not handled by OG at all so we override here.
+ *    - nodes with Item Sharing set to "ANY" are passed if user is a member of any of the CPs or any of the CPs are open groups. This is only partially handled by OG so we need to override here.
+ *    - nodes with Item Sharing set to "ALL" are passed if user is a member of all CPs / CP is open group. This is not handled by OG at all so we override here.
  * 2. In the search results, via the node grants system AND hook_search_api_query_alter
- *    - the grants system EXPANDS search results for DH nodes with Item Sharing set to "ANY"
- *      - mukurtu_protocol_field_node_access_records defines a custom grant 'mukurtu_dh_any_public_group' which is set on any DH node with Item Sharing set to "ANY" and also belonging to at least one Open CP
- *      - mukurtu_protocol_field_node_grants provides the 'mukurtu_dh_any_public_group' to all users
- *      - the reason we cannot, for the node views, only use the grants system not hook_node_access is because grants are OR'ed, not AND'ed (impossible to override this behaviour) whereas with the DH's set to "ALL", AND'ing is what we need
- *    - ma_search_api_search_api_query_alter RESTRICTS search results for DH nodes wih Item Sharing set to "ALL"
+ *    - the grants system EXPANDS search results for nodes with Item Sharing set to "ANY"
+ *      - mukurtu_protocol_field_node_access_records defines a custom grant 'mukurtu_nodes_in_cp_any_public_group' which is set on any DH node with Item Sharing set to "ANY" and also belonging to at least one Open CP
+ *      - mukurtu_protocol_field_node_grants provides the 'mukurtu_nodes_in_cp_any_public_group' to all users
+ *      - the reason we cannot, for the node views, only use the grants system not hook_node_access is because grants are OR'ed, not AND'ed (impossible to override this behaviour) whereas with the nodes with privacy set to "ALL", AND'ing is what we need
+ *    - ma_search_api_search_api_query_alter RESTRICTS search results for nodes wih Item Sharing set to "ALL"
  *
- * To summarize: 1. we need hook_node_access because the grants system cannot AND permissions. 2. We need the grants system because hook_node_access is not respected by search. 3. We need a hook_search_api_query_alter because its cleaner/simpler to restrict (DH = ALL) search results there than in the grants, 4. We cannot use hook_search_api_query_alter to expand (DH = ANY) search results so we use the grant for that.
+ * To summarize: 1. we need hook_node_access because the grants system cannot AND permissions. 2. We need the grants system because hook_node_access is not respected by search. 3. We need a hook_search_api_query_alter because its cleaner/simpler to restrict (privacy = ALL) search results there than in the grants, 4. We cannot use hook_search_api_query_alter to expand (privacy = ANY) search results so we use the grant for that.
  */
 
 /**
@@ -332,40 +457,55 @@ function mukurtu_protocol_field_node_access($node, $op, $account) {
     return NODE_ACCESS_IGNORE;
   }
 
-  if ($op == 'view' && $node->type=='digital_heritage') {
-
-    // Safeguard. This should never happen. All DH items should be in a group.
-    if (!$groups_on_node = og_get_entity_groups('node', $node)) {
+  // If collaboration tools feature is disabled, then disable view and edit access to all collaboration nodes.
+  if (in_array($node->type, ma_culturalprotocol_all_collab_node_types())) {
+    if (!module_exists('ma_collaboration_tools')) {
       return NODE_ACCESS_DENY;
     }
+  }
 
-    $groups_on_node = array_values($groups_on_node['node']);
+  // Viewing a node-in-cp node
+  if ($op == 'view') {
+    if (ma_cultural_protocol_node_type_can_have_cp($node->type)) {
 
-    // DH set to ANY
-    if ($node->field_item_privacy_setting['und'][0]['value'] == 'any') {
-      foreach ($groups_on_node as $group) {
-        if (og_is_member('node', $group)) {
-          return NODE_ACCESS_ALLOW; // Pass if user is a member of the group
+      // What to do if no protocol is set.
+      if (!$groups_on_node = og_get_entity_groups('node', $node)) {
+        if (ma_cultural_protocol_node_type_must_have_cp($node->type)) {
+          return NODE_ACCESS_DENY;  // Safeguard. This should never happen as the CP is a required field for these cases.
         }
-        $group_emw = entity_metadata_wrapper('node', $group);
-        if ($group_emw->group_access->value() == 0) {
-          return NODE_ACCESS_ALLOW; // Pass if it's an open group
-        }
+        return $node->status ? NODE_ACCESS_ALLOW : NODE_ACCESS_IGNORE;
       }
-      return NODE_ACCESS_DENY;
-    }
 
-    // DH set to ALL (default)
-    else {
-      foreach ($groups_on_node as $group) {
-        if (!og_is_member('node', $group)) { // Pass if user is a member of the group
+      $groups_on_node = array_values($groups_on_node['node']);
+
+      // privacy (Item Sharing Settings) set to ANY
+      if ($node->field_item_privacy_setting['und'][0]['value'] == 'any') {
+        foreach ($groups_on_node as $group) {
+          if (og_is_member('node', $group)) {
+            return $node->status ? NODE_ACCESS_ALLOW : NODE_ACCESS_IGNORE; // Pass if user is a member of the group
+          }
           $group_emw = entity_metadata_wrapper('node', $group);
-          if ($group_emw->group_access->value() <> 0) { // Pass if it's an open group
-            return NODE_ACCESS_DENY;
+          if ($group_emw->group_access->value() == 0) {
+            return $node->status ? NODE_ACCESS_ALLOW : NODE_ACCESS_IGNORE; // Pass if it's an open group
           }
         }
+        return NODE_ACCESS_DENY;
       }
-      return NODE_ACCESS_ALLOW;
+
+      // privacy (Item Sharing Settings) set to ALL. This is the default.
+      else {
+        foreach ($groups_on_node as $group) {
+          if (!og_is_member('node', $group, 'user', $account)) { // Pass if user is a member of the group
+            $group_emw = entity_metadata_wrapper('node', $group);
+            if (!empty($group_emw->group_access)) {
+              if ($group_emw->group_access->value() <> 0) { // Pass if it's an open group
+                return NODE_ACCESS_DENY;
+              }
+            }
+          }
+        }
+        return $node->status ? NODE_ACCESS_ALLOW : NODE_ACCESS_IGNORE;
+      }
     }
   }
 }
@@ -375,8 +515,8 @@ function mukurtu_protocol_field_node_access($node, $op, $account) {
  */
 function mukurtu_protocol_field_node_access_records($node) {
 
-  if ($node->type == 'digital_heritage') {
 
+  if (ma_cultural_protocol_node_type_can_have_cp($node->type)) {
     if ($node->field_item_privacy_setting['und'][0]['value'] == 'any') {
 
       if (!$cps = og_get_entity_groups('node', $node)) {
@@ -386,10 +526,10 @@ function mukurtu_protocol_field_node_access_records($node) {
       $cp_nids = array_values($cps['node']);
       foreach ($cp_nids as $cp_nid) {
         $cp_emw = entity_metadata_wrapper('node', $cp_nid);
-        if ($cp_emw->group_access->value() == 0) { // Open group
+        if (isset($cp_emw->group_access) AND $cp_emw->group_access->value() == 0) { // Open CP
           $grants = array();
           $grants[] = array(
-            'realm' => 'mukurtu_dh_any_public_group',
+            'realm' => 'mukurtu_nodes_in_cp_any_public_group',
             'gid' => 0,
             'grant_view' => 1,
             'grant_update' => 0,
@@ -401,8 +541,8 @@ function mukurtu_protocol_field_node_access_records($node) {
       }
     }
 
-    // The DH node is not in any Open groups, so delete existing grant that says otherwise in case it once was
-    node_access_write_grants($node, $grants = array(), 'mukurtu_dh_any_public_group', TRUE);
+    // The node is not in any Open groups, so delete existing grant that says otherwise in case it once was
+    node_access_write_grants($node, $grants = array(), 'mukurtu_nodes_in_cp_any_public_group', TRUE);
   }
 }
 
@@ -411,42 +551,56 @@ function mukurtu_protocol_field_node_access_records($node) {
  */
 function mukurtu_protocol_field_node_grants($account, $op) {
   // This grant is provided to everyone
-  $grants['mukurtu_dh_any_public_group'][] = 0;
+  $grants['mukurtu_nodes_in_cp_any_public_group'][] = 0;
   return $grants;
 }
 
 /**
  * Called by our patched og_node_access
- * Edit perms on DH nodes should be determined by our custom logic, same as view perms for DH nodes
+ * Edit perms on nodes-in-CP nodes should be determined by our custom logic, same as view perms
  * Patch required because on Update (but not View), OG's NODE_ACCESS_DENY overrides mukurtu_protocol_fields NODE_ACCESS_ALLOW
  */
-function mukurtu_protocol_field_update_dh_access ($node) {
+function mukurtu_protocol_field_update_node_in_cp_access ($node) {
+    global $user;
 
-  // Safeguard. This should never happen. All DH items should be in a group.
   if (!$groups_on_node = og_get_entity_groups('node', $node)) {
-    return NODE_ACCESS_DENY;
-  }
-
-  $groups_on_node = array_values($groups_on_node['node']);
-
-  // DH set to ANY
-  if ($node->field_item_privacy_setting['und'][0]['value'] == 'any') {
-    foreach ($groups_on_node as $group) {
-      if (in_array('protocol steward', og_get_user_roles('node', $group))) {
-        return NODE_ACCESS_ALLOW; // Pass if user is a Protocol Steward of the CP
-      }
-    }
-    return NODE_ACCESS_DENY;
-  }
-
-  // DH set to ALL (default)
-  else {
-    foreach ($groups_on_node as $group) {
-      if (!in_array('protocol steward', og_get_user_roles('node', $group))) {
-        return NODE_ACCESS_DENY; // Deny if user is not a Protocol Steward of the CP
-      }
+    if (ma_cultural_protocol_node_type_must_have_cp($node->type)) {
+      return NODE_ACCESS_DENY;  // Safeguard. This should never happen as the CP is a required field for these cases.
     }
     return NODE_ACCESS_ALLOW;
   }
 
+  $groups_on_node = array_values($groups_on_node['node']);
+
+  // privacy set to ANY
+  if ($node->field_item_privacy_setting[LANGUAGE_NONE][0]['value'] == 'any') {
+    foreach ($groups_on_node as $group) {
+        $user_roles = og_get_user_roles('node', $group);
+
+        if (in_array('protocol steward', $user_roles)) {
+            return NODE_ACCESS_ALLOW; // Pass if user is a Protocol Steward of the CP
+        }
+
+        // User is a contributor for the protocol AND the owner of the node
+        if(in_array('contributor', $user_roles) && $user->uid == $node->uid) {
+            return NODE_ACCESS_ALLOW;
+        }
+    }
+    return NODE_ACCESS_DENY;
+  }
+
+  // privacy set to ALL (default)
+  else {
+    foreach ($groups_on_node as $group) {
+        $user_roles = og_get_user_roles('node', $group);
+
+        if (!(in_array('protocol steward', $user_roles) || (in_array('contributor', $user_roles) && $user->uid == $node->uid))) {
+            return NODE_ACCESS_DENY; // Deny if user is not a Protocol Steward of the CP, or a contributor AND the owner
+        }
+    }
+    return NODE_ACCESS_ALLOW;
+  }
+
+  return NODE_ACCESS_IGNORE;
 }
+

@@ -1,0 +1,52 @@
+#breadcrumb {
+	.fullwidth;
+	background: linear-gradient(@mukurtu-breadcrumb-gradient-color, @mukurtu-breadcrumb-background-color);
+	height: 12px;
+	margin-bottom: 36px;
+
+	.breadcrumb {
+		margin-top: 12px;
+		padding-top: 2px;
+		background-color: @mukurtu-breadcrumb-background-color;
+		height: 36px;
+		border-radius: 0px;
+        color: @mukurtu-breadcrumb-non-link-color;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+		a {
+			color: @mukurtu-breadcrumb-link-color;
+
+			&:hover,
+			&.active {
+				color: @text-color;
+				text-decoration: none;
+			}
+		}
+
+		padding-left: @grid-gutter-width;
+		// Desktop
+		@media (min-width: @screen-md-min) {
+			padding-left: (@mukurtu-main-container-padding);
+		}
+
+		> li + li:before {
+			content: " >> ";
+			color: @mukurtu-breadcrumb-non-link-color;
+		}
+
+		li.first {
+			// Desktop
+			@media (min-width: @screen-md-min) {
+				padding-left: @grid-gutter-width;
+			}
+		}
+	}
+}
+
+section {
+    ol.breadcrumb {
+        display: none;
+    }
+}

@@ -14,6 +14,8 @@ Drupal.behaviors.jcarousel.attach = function(context, settings) {
     return;
   }
 
+  $("ul.jcarousel li").css("display", "");
+
   $.each(settings.jcarousel.carousels, function(key, options) {
     var $carousel = $(options.selector + ':not(.jcarousel-processed)', context);
 
@@ -46,12 +48,22 @@ Drupal.behaviors.jcarousel.attach = function(context, settings) {
       };
     }
 
+    // Add responsive behavior.
+    if (options.responsive  && !options.reloadCallback) {
+      options.vertical = false;
+      options.visible = null;
+      options.reloadCallback = Drupal.jcarousel.reloadCallback;
+    }
+
     // Add navigation to the carousel if enabled.
     if (!options.setupCallback) {
       options.setupCallback = function(carousel) {
         Drupal.jcarousel.setupCarousel(carousel);
         if (options.navigation) {
           Drupal.jcarousel.addNavigation(carousel, options.navigation);
+        }
+        if (options.responsive) {
+          carousel.reload();
         }
       };
       if (options.navigation && !options.itemVisibleInCallback) {
@@ -72,6 +84,24 @@ Drupal.behaviors.jcarousel.attach = function(context, settings) {
 };
 
 Drupal.jcarousel = {};
+Drupal.jcarousel.reloadCallback = function(carousel) {
+  // Set the clip and container to auto width so that they will fill
+  // the available space.
+  carousel.container.css('width', 'auto');
+  carousel.clip.css('width', 'auto');
+  var clipWidth = carousel.clip.width();
+  var containerExtra = carousel.container.width() - carousel.clip.outerWidth(true);
+  // Determine the width of an item.
+  var itemWidth = carousel.list.find('li').first().outerWidth(true);
+  var numItems = Math.floor(carousel.clip.width() / itemWidth) || 1;
+  // Set the new scroll number.
+  carousel.options.scroll = numItems;
+  var newClipWidth = numItems * itemWidth;
+  var newContainerWidth = newClipWidth + containerExtra;
+  // Resize the clip and container.
+  carousel.clip.width(newClipWidth);
+  carousel.container.width(newContainerWidth);
+};
 Drupal.jcarousel.ajaxLoadCallback = function(jcarousel, state) {
   // Check if the requested items already exist.
   if (state == 'init' || jcarousel.has(jcarousel.first, jcarousel.last)) {
@@ -147,9 +177,8 @@ Drupal.jcarousel.setupCarousel = function(carousel) {
   carousel.pageNumber = 1;
 
   // Disable the previous/next arrows if there is only one page.
-  if (carousel.pageCount == 1) {
-    carousel.buttonNext.addClass('jcarousel-next-disabled').attr('disabled', true);
-    carousel.buttonPrev.addClass('jcarousel-prev-disabled').attr('disabled', true);
+  if (carousel.options.wrap != 'circular' && carousel.pageCount == 1) {
+    carousel.buttons(false, false);
   }
 
   // Always remove the hard-coded display: block from the navigation.

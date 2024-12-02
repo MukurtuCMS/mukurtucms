@@ -1,2 +1,0 @@
-Drupal core has a .gitignore at site root that ignores sites/*/files. But we want sites/default/files in the rep so the end-user does not need to create it. We remove that line from Drupal's .gitignore file (TODO: make a patch out of that removal, and replace this file with that), add the files dir into the rep, and add a .gitignore within there so that files within it are ignored but the directory is included.
-

@@ -1,0 +1,56 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the FullCalendar module.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function fullcalendar_requirements($phase) {
+  $requirements = array();
+
+  if ($phase == 'runtime') {
+    $t = get_t();
+    $status = _fullcalendar_status();
+
+    if (!$status['fullcalendar_plugin']) {
+      $requirements['fullcalendar_plugin'] = array(
+        'title' => $t('FullCalendar plugin'),
+        'value' => $t('At least @a', array('@a' => FULLCALENDAR_MIN_PLUGIN_VERSION)),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => $t('You need to download the !fullcalendar and extract the entire contents of the archive into the %path folder of your server.', array('!fullcalendar' => l(t('FullCalendar plugin'), 'http://arshaw.com/fullcalendar/download'), '%path' => 'sites/all/libraries')),
+      );
+    }
+    else {
+      $plugin_version = fullcalendar_get_version();
+      if (version_compare(FULLCALENDAR_RECOMMENDED_PLUGIN_VERSION, $plugin_version) > 0) {
+        $plugin_version .= ' (Recommended version: ' . FULLCALENDAR_RECOMMENDED_PLUGIN_VERSION . ')';
+      }
+
+      $requirements['fullcalendar_plugin'] = array(
+        'title' => $t('FullCalendar plugin'),
+        'severity' => REQUIREMENT_OK,
+        'value' => $plugin_version,
+      );
+    }
+  }
+
+  return $requirements;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function fullcalendar_uninstall() {
+  variable_del('fullcalendar_path');
+  variable_del('fullcalendar_compression_type');
+}
+
+/**
+ * Force full cache clear to forget about old handlers and plugins.
+ */
+function fullcalendar_update_7200(&$sandbox) {
+  drupal_flush_all_caches();
+}

@@ -292,6 +292,10 @@ EOF;
     return $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'aggregator') . '/tests/aggregator_test_title_entities.xml';
   }
 
+  function getNoTitleSample() {
+    return $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'aggregator') . '/tests/aggregator_test_title_from_desc.xml';
+  }
+
   /**
    * Creates sample article nodes.
    *
@@ -418,7 +422,7 @@ class CategorizeFeedTestCase extends AggregatorTestCase {
   }
 
   /**
-   * Creates a feed and makes sure you can add more than one category to it.
+   * Creates a feed and makes sure you can add/delete categories to it.
    */
   function testCategorizeFeed() {
 
@@ -448,7 +452,31 @@ class CategorizeFeedTestCase extends AggregatorTestCase {
     // Assert the feed has two categories.
     $this->getFeedCategories($db_feed);
     $this->assertEqual(count($db_feed->categories), 2, 'Feed has 2 categories');
+
+    // Use aggregator_save_feed() to delete a category.
+    $category = reset($categories);
+    aggregator_save_category(array('cid' => $category->cid));
+
+    // Assert that category is deleted.
+    $db_category = db_query("SELECT COUNT(*) FROM {aggregator_category} WHERE cid = :cid", array(':cid' => $category->cid))->fetchField();
+    $this->assertFalse($db_category, format_string('The category %title has been deleted.', array('%title' => $category->title)));
+
+    // Assert that category has been removed from feed.
+    $categorized_feeds = db_query("SELECT COUNT(*) FROM {aggregator_category_feed} WHERE cid = :cid", array(':cid' => $category->cid))->fetchField();
+    $this->assertFalse($categorized_feeds, format_string('The category %title has been removed from feed %feed_title.', array('%title' => $category->title, '%feed_title' => $feed['title'])));
+
+    // Assert that no broken links (associated with the deleted category)
+    // appear on one of the other category pages.
+    $this->createSampleNodes();
+    $this->drupalGet('admin/config/services/aggregator');
+    $this->clickLink('update items');
+    $categories = $this->getCategories();
+    $category = reset($categories);
+    $this->drupalGet('aggregator/categories/' . $category->cid);
+    global $base_path;
+    $this->assertNoRaw('<a href="' . $base_path . 'aggregator/categories/"></a>,');
   }
+
 }
 
 /**
@@ -685,9 +713,21 @@ class CategorizeFeedItemTestCase extends AggregatorTestCase {
       }
     }
 
+    // Delete category from feed items when category is deleted.
+    $cid = reset($feed->categories);
+    $categories = $this->getCategories();
+    $category_title = $categories[$cid]->title;
+
+    // Delete category.
+    aggregator_save_category(array('cid' => $cid));
+
+    // Assert category has been removed from feed items.
+    $categorized_count = db_query("SELECT COUNT(*) FROM {aggregator_category_item} WHERE cid = :cid", array(':cid' => $cid))->fetchField();
+    $this->assertFalse($categorized_count, format_string('The category %title has been removed from feed items.', array('%title' => $category_title)));
     // Delete feed.
     $this->deleteFeed($feed);
   }
+
 }
 
 /**
@@ -837,15 +877,13 @@ class AggregatorCronTestCase extends AggregatorTestCase {
    */
   public function testCron() {
     // Create feed and test basic updating on cron.
-    global $base_url;
-    $key = variable_get('cron_key', 'drupal');
     $this->createSampleNodes();
     $feed = $this->createFeed();
-    $this->drupalGet($base_url . '/cron.php', array('external' => TRUE, 'query' => array('cron_key' => $key)));
+    $this->cronRun();
     $this->assertEqual(5, db_query('SELECT COUNT(*) FROM {aggregator_item} WHERE fid = :fid', array(':fid' => $feed->fid))->fetchField(), 'Expected number of items in database.');
     $this->removeFeedItems($feed);
     $this->assertEqual(0, db_query('SELECT COUNT(*) FROM {aggregator_item} WHERE fid = :fid', array(':fid' => $feed->fid))->fetchField(), 'Expected number of items in database.');
-    $this->drupalGet($base_url . '/cron.php', array('external' => TRUE, 'query' => array('cron_key' => $key)));
+    $this->cronRun();
     $this->assertEqual(5, db_query('SELECT COUNT(*) FROM {aggregator_item} WHERE fid = :fid', array(':fid' => $feed->fid))->fetchField(), 'Expected number of items in database.');
 
     // Test feed locking when queued for update.
@@ -856,7 +894,7 @@ class AggregatorCronTestCase extends AggregatorTestCase {
         'queued' => REQUEST_TIME,
       ))
       ->execute();
-    $this->drupalGet($base_url . '/cron.php', array('external' => TRUE, 'query' => array('cron_key' => $key)));
+    $this->cronRun();
     $this->assertEqual(0, db_query('SELECT COUNT(*) FROM {aggregator_item} WHERE fid = :fid', array(':fid' => $feed->fid))->fetchField(), 'Expected number of items in database.');
     db_update('aggregator_feed')
       ->condition('fid', $feed->fid)
@@ -864,7 +902,7 @@ class AggregatorCronTestCase extends AggregatorTestCase {
         'queued' => 0,
       ))
       ->execute();
-    $this->drupalGet($base_url . '/cron.php', array('external' => TRUE, 'query' => array('cron_key' => $key)));
+    $this->cronRun();
     $this->assertEqual(5, db_query('SELECT COUNT(*) FROM {aggregator_item} WHERE fid = :fid', array(':fid' => $feed->fid))->fetchField(), 'Expected number of items in database.');
   }
 }
@@ -873,6 +911,8 @@ class AggregatorCronTestCase extends AggregatorTestCase {
  * Tests rendering functionality in the Aggregator module.
  */
 class AggregatorRenderingTestCase extends AggregatorTestCase {
+  protected $admin_user;
+
   public static function getInfo() {
     return array(
       'name' => 'Checks display of aggregator items',
@@ -1031,4 +1071,16 @@ class FeedParserTestCase extends AggregatorTestCase {
     $this->assertResponse(200, format_string('Feed %name exists.', array('%name' => $feed->title)));
     $this->assertRaw("Quote&quot; Amp&amp;");
   }
+
+  /**
+   * Tests a feed with no title; the description should be used to generate one.
+   */
+  function testNoTitleSample() {
+    $feed = $this->createFeed($this->getNoTitleSample());
+    aggregator_refresh($feed);
+    $this->drupalGet('aggregator/sources/' . $feed->fid);
+    $this->assertResponse(200, format_string('Feed %name exists.', array('%name' => $feed->title)));
+    $this->assertRaw("This description should be used to generate a title. This description should be used to generate a title. This description should be used to generate a title. This description should be used to generate a title. This description should be used to...");
+  }
+
 }

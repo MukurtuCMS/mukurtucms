@@ -1,10 +1,17 @@
-@CHARSET "UTF-8";
+/**
+ * @file
+ * Stylesheet for the Rules module.
+ */
 
-.rules-show-js, html.js .rules-hide-js {
+@charset "utf-8";
+
+.rules-show-js,
+html.js .rules-hide-js {
   display: none;
 }
 
-.rules-hide-js, html.js .rules-show-js {
+.rules-hide-js,
+html.js .rules-show-js {
   display: block;
 }
 
@@ -15,12 +22,12 @@
 
 .rules-elements-table ul.rules-operations li {
   list-style: none;
-  float: left;
+  float: left; /* LTR */
 }
 
 .rules-elements-table ul.rules-operations a {
   background: none;
-  padding-left: 0px;
+  padding-left: 0px; /* LTR */
 }
 
 table tr.rules-elements-add {
@@ -38,7 +45,7 @@ tr.rules-elements-add td {
 }
 
 ul.rules-operations-add li {
-  float: left;
+  float: left; /* LTR */
   list-style-position: inside;
 }
 
@@ -55,14 +62,15 @@ ul.rules-operations-add li {
 /* Fix table drag weights to don't take extra space */
 .rules-elements-table .tabledrag-toggle-weight-wrapper {
   position: absolute;
-  right: 0px;
+  right: 0px; /* LTR */
 }
 
-.rules-elements-table caption, .rules-overview-table caption {
+.rules-elements-table caption,
+.rules-overview-table caption {
   font-size: 110%;
   font-weight: bold;
   padding-bottom: 0.5em;
-  text-align: left;
+  text-align: left; /* LTR */
 }
 
 .rules-overview-table {
@@ -85,8 +93,7 @@ ul.rules-operations-add li {
 .rules-debug-collapsible-link {
   position: relative;
   cursor: pointer;
-
-  /* The span element with the icon which opens the log, has a whitepsace.
+  /* The span element with the icon which opens the log, has a whitespace.
      Since we don't want the user to mark this white space, we prevent this
      using the this code.*/
   -moz-user-select: -moz-none;
@@ -106,7 +113,7 @@ div.rules-debug-log-head {
 
 .rules-debug-icon-open {
   position: relative;
-  float: left;
+  float: left; /* LTR */
 }
 
 .rules-debug-open-all {
@@ -115,7 +122,7 @@ div.rules-debug-log-head {
 }
 
 .rules-debug-log ul {
-  padding-left: 2em;
+  padding-left: 2em; /* LTR */
 }
 
 .rules-debug-log .rules-debug-warn {
@@ -140,7 +147,7 @@ div.rules-debug-log-head {
 }
 
 .rules-element-content {
-  float: left;
+  float: left; /* LTR */
 }
 
 form input.rules-switch-button {
@@ -168,7 +175,7 @@ ul.rules-autocomplete {
 }
 
 ul.rules-autocomplete div {
-  padding-left: 5px;
+  padding-left: 5px; /* LTR */
 }
 
 ul.rules-autocomplete a.ui-corner-all {
@@ -191,6 +198,6 @@ ul.rules-autocomplete .ui-corner-all {
 }
 
 /* IE 6 hack for max-height. */
-* html ul.rule-autocomplete{
+* html ul.rule-autocomplete {
   height: 23em;
 }

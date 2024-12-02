@@ -1,0 +1,25 @@
+From 84809059c3295d2cab9cb52a6f87ba1d27274f39 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Thu, 27 Apr 2023 08:41:46 -0700
+Subject: [PATCH] Array to bool conversion not supported in PHP 8
+
+---
+ .../entityreference/behavior/OgBehaviorHandler.class.php        | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plugins/entityreference/behavior/OgBehaviorHandler.class.php b/plugins/entityreference/behavior/OgBehaviorHandler.class.php
+index b49482c7..b61bc2eb 100644
+--- a/plugins/entityreference/behavior/OgBehaviorHandler.class.php
++++ b/plugins/entityreference/behavior/OgBehaviorHandler.class.php
+@@ -152,7 +152,7 @@ class OgBehaviorHandler extends EntityReference_BehaviorHandler_Abstract {
+    *   Array with all the differences, or an empty array if none found.
+    */
+   public function groupAudiencegetDiff($entity_type, $entity, $field, $instance, $langcode, $items) {
+-    $return = FALSE;
++    $return = [];
+ 
+     $field_name = $field['field_name'];
+     $wrapper = entity_metadata_wrapper($entity_type, $entity);
+-- 
+2.34.1
+

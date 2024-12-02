@@ -1,0 +1,69 @@
+diff --git a/modules/taxonomy/taxonomy.module b/modules/taxonomy/taxonomy.module
+index 981649d2..489a8a3b 100644
+--- a/modules/taxonomy/taxonomy.module
++++ b/modules/taxonomy/taxonomy.module
+@@ -1420,18 +1420,13 @@ function taxonomy_implode_tags($tags, $vid = NULL) {
+     if (!isset($vid) || $tag->vid == $vid) {
+       // Make sure we have a completed loaded taxonomy term.
+       if (isset($tag->name)) {
+-        // Commas and quotes in tag names are special cases, so encode 'em.
+-        if (strpos($tag->name, ',') !== FALSE || strpos($tag->name, '"') !== FALSE) {
+-          $typed_tags[] = '"' . str_replace('"', '""', $tag->name) . '"';
+-        }
+-        else {
+-          $typed_tags[] = $tag->name;
+-        }
++        // Mukurtu patch -- no special treatment for commas and quotes
++        $typed_tags[] = $tag->name;
+       }
+     }
+   }
+-  return implode(', ', $typed_tags);
+-}
++  // Mukurtu patch -- delimit by the semicolon instead of comma
++  return implode('; ', $typed_tags);}
+
+ /**
+  * Implements hook_field_info().
+@@ -1765,7 +1760,7 @@ function taxonomy_autocomplete_validate($element, &$form_state) {
+     }
+
+     // Translate term names into actual terms.
+-    $typed_terms = drupal_explode_tags($tags);
++    $typed_terms = ma_core_taxonomy_explode_tags($tags); // mukurtu patch
+     foreach ($typed_terms as $typed_term) {
+       // See if the term exists in the chosen vocabulary and return the tid;
+       // otherwise, create a new 'autocreate' term for insert/update.
+diff --git a/modules/taxonomy/taxonomy.pages.inc b/modules/taxonomy/taxonomy.pages.inc
+index 38b24b3b..fd64a86c 100644
+--- a/modules/taxonomy/taxonomy.pages.inc
++++ b/modules/taxonomy/taxonomy.pages.inc
+@@ -135,7 +135,7 @@ function taxonomy_autocomplete($field_name = '', $tags_typed = '') {
+   }
+
+   // The user enters a comma-separated list of tags. We only autocomplete the last tag.
+-  $tags_typed = drupal_explode_tags($tags_typed);
++  $tags_typed = ma_core_taxonomy_explode_tags($tags_typed); // mukurtu patch
+   $tag_last = drupal_strtolower(array_pop($tags_typed));
+
+   $term_matches = array();
+@@ -165,14 +165,15 @@ function taxonomy_autocomplete($field_name = '', $tags_typed = '') {
+       ->execute()
+       ->fetchAllKeyed();
+
+-    $prefix = count($tags_typed) ? drupal_implode_tags($tags_typed) . ', ' : '';
++    $prefix = count($tags_typed) ? drupal_implode_tags($tags_typed) . '; ' : '';
+
+     foreach ($tags_return as $tid => $name) {
+       $n = $name;
+       // Term names containing commas or quotes must be wrapped in quotes.
+-      if (strpos($name, ',') !== FALSE || strpos($name, '"') !== FALSE) {
+-        $n = '"' . str_replace('"', '""', $name) . '"';
+-      }
++      // Mukurtu patch, comment this out
++      // if (strpos($name, ';') !== FALSE || strpos($name, '"') !== FALSE) {
++      //   $n = '"' . str_replace('"', '""', $name) . '"';
++      // }
+       $term_matches[$prefix . $n] = check_plain($name);
+     }
+   }

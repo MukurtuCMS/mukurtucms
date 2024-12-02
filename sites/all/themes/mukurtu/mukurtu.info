@@ -1,0 +1,89 @@
+name = Mukurtu
+description = The default theme for Mukurtu.
+core = 7.x
+base theme = bootstrap
+
+
+;;;;;;;;;;;;;;;;;;;;;
+;; Regions
+;;;;;;;;;;;;;;;;;;;;;
+
+regions[navigation]     = 'Navigation'
+regions[header]         = 'Top Bar'
+regions[highlighted]    = 'Highlighted'
+regions[help]           = 'Help'
+regions[content]        = 'Content'
+regions[sidebar_first]  = 'Primary'
+regions[sidebar_second] = 'Secondary'
+regions[footer]         = 'Footer'
+regions[page_top]       = 'Page top'
+regions[page_bottom]    = 'Page bottom'
+
+
+;;;;;;;;;;;;;;;;;;;;;
+;; Stylesheets
+;;;;;;;;;;;;;;;;;;;;;
+
+;stylesheets[all][] = css/style.css
+;stylesheets[all][] = css/style-blue-gold.css
+stylesheets[all][] = font-awesome/css/font-awesome.min.css
+
+
+;;;;;;;;;;;;;;;;;;;;;
+;; Settings
+;;;;;;;;;;;;;;;;;;;;;
+settings[bootstrap_fluid_container] = 1
+settings[bootstrap_forms_smart_descriptions] = 1
+settings[bootstrap_forms_smart_descriptions_limit] = 1000
+settings[bootstrap_forms_smart_descriptions_allowed_tags] = 'b, br, code, em, i, kbd, span, strong'
+settings[bootstrap_tooltip_placement] => auto bottom
+settings[mukurtu_theme_color_scheme] = 'blue-gold'
+settings[mukurtu_theme_email_us_message] = 'Email us at'
+settings[mukurtu_theme_contact_email] = ''
+settings[mukurtu_theme_twitter_message] = ''
+settings[mukurtu_theme_twitter1] = ''
+settings[mukurtu_theme_twitter2] = ''
+settings[mukurtu_theme_copyright] = ''
+settings[mukurtu_theme_frontpage_layout] = 'large-hero'
+settings[mukurtu_theme_frontpage_hero_image] = ''
+
+; For information on choosing the desired method, please read the Drupal
+; Bootstrap sub-theme "how-to" documentation:
+; https://drupal.org/node/1978010
+
+; ;----------------------------------
+; ; METHOD 1: Bootstrap Source Files
+; ;----------------------------------
+;
+; ;;;;;;;;;;;;;;;;;;;;;
+; ;; Scripts
+; ;;;;;;;;;;;;;;;;;;;;;
+;
+scripts[] = js/masonry.pkgd.min.js
+scripts[] = js/scripts.js
+scripts[] = js/mukurturesize.js
+;scripts[] = 'bootstrap/js/affix.js'
+;scripts[] = 'bootstrap/js/alert.js'
+;scripts[] = 'bootstrap/js/button.js'
+;scripts[] = 'bootstrap/js/carousel.js'
+;scripts[] = 'bootstrap/js/collapse.js'
+;scripts[] = 'bootstrap/js/dropdown.js'
+;scripts[] = 'bootstrap/js/modal.js'
+;scripts[] = 'bootstrap/js/tooltip.js'
+;scripts[] = 'bootstrap/js/popover.js'
+;scripts[] = 'bootstrap/js/scrollspy.js'
+;scripts[] = 'bootstrap/js/tab.js'
+;scripts[] = 'bootstrap/js/transition.js'
+
+; Disable BootstrapCDN if using Bootstrap source files in your sub-theme.
+;settings[bootstrap_cdn] = ''
+;settings[bootstrap_tooltip_placement] = 'auto bottom'
+;settings[bootstrap_forms_smart_descriptions_limit] = 1000
+
+; ;-------------------------
+; ; METHOD 2: Bootstrap CDN
+; ;-------------------------
+;
+; Method 2 uses BootstrapCDN, the only thing you might need to provide here
+; is overrides to Bootstrap theme settings. Copy them here from the base theme
+; to override.

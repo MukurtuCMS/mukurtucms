@@ -1,0 +1,3 @@
+<?php
+
+include_once('mailcomment_default.features.inc');

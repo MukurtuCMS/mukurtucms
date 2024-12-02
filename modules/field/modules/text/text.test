@@ -9,6 +9,8 @@ class TextFieldTestCase extends DrupalWebTestCase {
   protected $instance;
   protected $admin_user;
   protected $web_user;
+  protected $field;
+  protected $field_name;
 
   public static function getInfo() {
     return array(
@@ -238,6 +240,8 @@ class TextFieldTestCase extends DrupalWebTestCase {
 }
 
 class TextSummaryTestCase extends DrupalWebTestCase {
+  protected $article_creator;
+
   public static function getInfo() {
     return array(
       'name' => 'Text summary',
@@ -379,6 +383,14 @@ class TextSummaryTestCase extends DrupalWebTestCase {
   }
 
   /**
+   * Test for the NULL value.
+   */
+  function testNullSentence() {
+    $summary = text_summary(NULL);
+    $this->assertNull($summary, 'text_summary() casts returned null');
+  }
+
+  /**
    * Calls text_summary() and asserts that the expected teaser is returned.
    */
   function callTextSummary($text, $expected, $format = NULL, $size = NULL) {
@@ -406,6 +418,10 @@ class TextSummaryTestCase extends DrupalWebTestCase {
 }
 
 class TextTranslationTestCase extends DrupalWebTestCase {
+  protected $format;
+  protected $admin;
+  protected $translator;
+
   public static function getInfo() {
     return array(
       'name' => 'Text translation',
@@ -424,6 +440,7 @@ class TextTranslationTestCase extends DrupalWebTestCase {
       'administer content types',
       'access administration pages',
       'bypass node access',
+      'administer fields',
       filter_permission_name($full_html_format),
     ));
     $this->translator = $this->drupalCreateUser(array('create article content', 'edit own article content', 'translate content'));

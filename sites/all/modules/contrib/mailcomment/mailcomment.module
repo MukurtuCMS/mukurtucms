@@ -1,0 +1,598 @@
+<?php
+/**
+ * Initial development by Jose A. Reyero, Tim Cullen, Ian Ward
+ * Development Seed, http://www.developmentseed.org
+ *
+ * @TODO:  consolidate message bounce functionality
+ */
+
+// Error code, no parameters
+define('MAILCOMMENT_ERROR_PARAMS', 1);
+// Error code, wrong signature
+define('MAILCOMMENT_ERROR_SIGNATURE', 2);
+// Error code, expired signature
+define('MAILCOMMENT_ERROR_EXPIRED', 3);
+// Error code, no valid user
+define('MAILCOMMENT_ERROR_USER', 4);
+
+// Filter modes
+define('MAILCOMMENT_FILTER_NONE', 0);
+define('MAILCOMMENT_FILTER_BASIC', 1);
+define('MAILCOMMENT_FILTER_AGGRESSIVE', 2);
+
+/**
+ * Implements hook_menu().
+ */
+function mailcomment_menu() {
+  $items['admin/config/system/mailcomment'] = array(
+    'title' => 'Mail Comment',
+    'description' => 'Configure automatic mail responses.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mailcomment_admin_settings'),
+    'access callback' => 'mailcomment_access_admin_page',
+  );
+  $items['mailcomment/redirect'] = array(
+    'title' => 'Mail Comment',
+    'description' => 'Redirect Mail Comment links to original message.',
+    'page callback' => 'mailcomment_message_redirect',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+function mailcomment_access_admin_page() {
+  $notification_exists   = module_exists('notifications');
+  $message_notify_exists = module_exists('message_notify');
+
+  global $user;
+  if ($notification_exists) {
+    return user_access('administer notifications', $user);
+  }
+  if ($message_notify_exists) {
+    return user_access('administer message subscribe', $user);
+  }
+  return FALSE;
+}
+
+
+/**
+ * Admin settings form
+ */
+function mailcomment_admin_settings() {
+  $form['mailcomment_mailbox'] = array(
+    '#title' => t('Reply-To address'),
+    '#type' => 'textfield',
+    '#default_value' => variable_get('mailcomment_mailbox', variable_get('site_mail', '')),
+    '#description' => t('E-mail account used to set Reply-To for outgoing e-mail notifications.'),
+  );
+  // Expiration time
+  $period = drupal_map_assoc(array(60, 3600, 10800, 21600, 32400, 43200, 86400, 172800, 259200, 604800, 1209600, 2419200), 'format_interval');
+  $period[0] = t('Never');
+
+  $form['mailcomment_expiration'] = array(
+    '#title' => t('Expiration time'),
+    '#type' => 'select',
+    '#options' => $period,
+    '#required' => TRUE,
+    '#default_value' => variable_get('mailcomment_expiration', 0),
+    '#description' => t('Time after which the signature of outgoing e-mails expires and responses won\'t be accepted anymore.'),
+  );
+
+  $form['filter_options'] = array(
+    '#title' => t('Message filtering'),
+    '#type' => 'fieldset',
+    '#collapsible' => TRUE,
+  );
+
+  $form['filter_options']['mailcomment_import_filter_mode'] = array(
+    '#title' => t('Filter mode'),
+    '#type' => 'radios',
+    '#default_value' => variable_get('mailcomment_import_filter_mode', MAILCOMMENT_FILTER_NONE),
+    '#options' => array(
+      MAILCOMMENT_FILTER_NONE => t('No import filter. Leave messages as-is.'),
+      MAILCOMMENT_FILTER_BASIC => t('Basic import filter: Filter signatures and below custom reply separator.'),
+      MAILCOMMENT_FILTER_AGGRESSIVE => t('Aggressive: Filter below custom reply separator and common mail client text strings.'),
+    ),
+    '#description' => t('Should messages be filtered during import? If <em>No import filter</em> is selected, messages will be stored in the database as they are received.'),
+  );
+
+  $form['filter_options']['mailcomment_reply_text'] = array(
+    '#title' => t('Reply text'),
+    '#type' => 'textfield',
+    '#default_value' => variable_get('mailcomment_reply_text', t('((( Reply ABOVE this LINE to POST a COMMENT )))')),
+    '#description' => t('Text to separate reply from the rest of the e-mail. Leave blank to disable.'),
+  );
+  $form['filter_options']['mailcomment_insert_reply_text'] = array(
+    '#title' => t('Insert reply to text'),
+    '#type' => 'checkbox',
+    '#default_value' => variable_get('mailcomment_insert_reply_text', 1),
+    '#description' => t('If this box is checked, mail comment will insert the text specified as the Reply text at the top of messages sent. You may uncheck this box and insert the text manually into a messaging template (for example, above the footer).'),
+  );
+
+  $form['mailcomment_error_bounce'] = array(
+    '#title' => t('Bounce rejected emails'),
+    '#type' => 'checkbox',
+    '#default_value' => variable_get('mailcomment_error_bounce', 1),
+    '#description' => t('If this box is checked, a reply will be sent for wrong emails with some information about the cause of rejection.'),
+  );
+
+  $form['mailcomment_server_string'] = array(
+    '#title' => t('Server string for Message Id'),
+    '#type' => 'textfield',
+    '#default_value' => variable_get('mailcomment_server_string', $_SERVER['HTTP_HOST']),
+    '#description' => t('Server name to be used in Message Id\'s. It will be included in outgoing emails and checked on responses.'),
+  );
+
+  $form['mailcomment_alter_subjects'] = array(
+    '#type' => 'radios',
+    '#title' => t('Use mailing list-style subjects'),
+    '#description' => t('When enabled this setting will alter the subjects of outgoing messages to look more like subjects used by mailing lists.  For
+      example the subject will look like "[My Site] Subject of Message".  This style makes message threading work better in certain email clients that
+      do not pay attention to the in-reply-to header parameter.'),
+    '#default_value' => variable_get('mailcomment_alter_subjects', 1),
+    '#options' => array(t('Off'), t('On')),
+  );
+  return system_settings_form($form);
+}
+
+/**
+ * Implements hook_coder_review_ignore().
+ */
+function mailcomment_coder_review_ignore() {
+  return array(
+    'path' => drupal_get_path('module', 'mailcomment'),
+    'line prefix' => drupal_get_path('module', 'mailcomment'),
+  );
+}
+
+/**
+ * Handle errors and bounce mail when authentication or validation fail
+ *
+ * We handle the incoming email carefully and don't add any user data in the response
+ * because everything in the mail can be forged.
+ *
+ * @param $error
+ *   Error code
+ * @param $node
+ *   Node object
+ * @param $header
+ *   Message headers
+ */
+function mailcomment_error($error, $node, $header, $params = array()) {
+  $text_vars = array(
+    '!site' => variable_get('site_name', 'Drupal'),
+    '@subject' => $header->subject,
+    '@to' => $header->toaddress,
+    '@from' => $header->fromaddress,
+  );
+  $reply = !empty($header->reply_to[0]->mailbox) ? $header->reply_to[0]->mailbox . '@' . $header->reply_to[0]->host
+    : $header->from[0]->mailbox . '@' . $header->from[0]->host;
+
+  $message = array();
+
+  switch ($error) {
+    case MAILCOMMENT_ERROR_SIGNATURE:
+      watchdog('mailcomment', 'Received an email without signed parameters from @from: @subject', $text_vars, WATCHDOG_WARNING);
+      break;
+    case MAILCOMMENT_ERROR_EXPIRED:
+      watchdog('mailcomment', 'Received an email with a expired signature from @from: @subject', $text_vars);
+      break;
+    case MAILCOMMENT_ERROR_USER:
+      watchdog('mailcomment', 'Received an e-mail without a valid user id from @from: @subject', $text_vars, WATCHDOG_WARNING);
+      break;
+    case MAILCOMMENT_ERROR_PARAMS:
+    default:
+      watchdog('mailcomment', 'Received an email with no parameters from @from: @subject', $text_vars, WATCHDOG_WARNING);
+      break;
+  }
+
+  // Send out bounce mail only if the mail address is valid and the feature is enabled.
+  // @ TODO Reply using the original messaging mail method used.
+  if ($reply && variable_get('mailcomment_error_bounce', 1) && valid_email_address($reply)) {
+    if ($node->uid && ($account = user_load($node->uid))) {
+      $language = user_preferred_language($account);
+    }
+    else {
+      $language = language_default();
+    }
+    $params['error'] = $error;
+    $params['text_vars'] = $text_vars;
+    drupal_mail('mailcomment', 'bounce', $reply, $language, $params);
+  }
+}
+
+/**
+ * Implements hook_mail().
+ */
+function mailcomment_mail($key, &$message, $params) {
+  $language = $message['language'];
+  $text_vars = $params['text_vars'];
+  $message['subject'] = t('There was a problem with your email to !site (@subject)', $text_vars, $language->language);
+  // The error code will determine the main text
+  switch ($params['error']) {
+    case MAILCOMMENT_ERROR_SIGNATURE:
+      $text[] = t('The email you sent to @to was rejected because there was a signature error.', $text_vars, $language->language);
+      break;
+    case MAILCOMMENT_ERROR_EXPIRED:
+      $text[] = t('The email you sent to @to was rejected because it was sent after the allowed response time for the original email.', $text_vars, $language->language);
+      break;
+    case MAILCOMMENT_ERROR_USER:
+      $text[] = t('The email you sent to @to was rejected because we couldn\'t authenticate it.', $text_vars, $language->language);
+      break;
+    case MAILCOMMENT_ERROR_PARAMS:
+    default:
+      $text[] = t('The email you sent to @to was rejected because there was a validation error.', $text_vars, $language->language);
+      break;
+
+  }
+  // More explanatory information
+  $text[] = ''; // Blank line
+  $text[] = t('In order for emails to be accepted by !site:', $text_vars, $language->language);
+  $text[] = t('- They must be sent in reply to a valid notification email.', array(), $language->language);
+  $text[] = t('- The reply must be done from the same email address the notification was sent to.', array(), $language->language);
+  if ($expire = variable_get('mailcomment_expiration', 0)) {
+    $text[] = t('- You can only reply within the time allotted by the system which is @expiration', array('@expiration' => format_interval($expire, 2, $language->language)), $language->language);
+  }
+
+  // Add node link if we have it
+  if (!empty($params['nid'])) {
+    $text[] = ''; // Blank line
+    $text[] = t('You may post comments directly by visiting !node-url', array('!node-url' =>  url('node/' . $params['nid'], NULL, NULL, TRUE)), $language->language);
+  }
+  $message['body'] = implode("\n", $text);
+}
+
+/**
+ * Build messageid embedding the parameters
+ *
+ * Not all chars are valid for our message-id, as some of them cause the PHP imap
+ * functions to retrieve an empty In-Reply-To header.
+ *
+ * Valid formats: numbers separated by dots
+ */
+function mailcomment_build_messageid($params) {
+  $elements = array($params['uid'], $params['nid'], $params['cid'], $params['time']);
+  // Add signature
+  $elements[] = mailcomment_signature($elements);
+
+  return '<' . implode('.', $elements) . '@' . variable_get('mailcomment_server_string', 'example.com') . '>';
+}
+
+/**
+ * Determines whether the mail comment signature exists in the body
+ *
+ * @param $body
+ *   raw email body
+ *
+ * @return
+ *   String signature or FALSE if not found.
+ */
+function _mailcomment_get_signature($body) {
+  // Grab the server string and make it regex-friendly
+  $server = str_replace('.', '\.', variable_get('mailcomment_server_string', 'example.com'));
+  // Check for a signature match
+  if (preg_match("/([0-9]+\.){4}[a-z0-9]+@" . $server . "/is", $body, $matches)) {
+    // We have a match for the messageid and the mailcomment domain string so we are good
+    return $matches[0];
+  }
+  // No matches found so assume we have no messageid and node->threading is not set
+  return FALSE;
+}
+
+/**
+ * Redirect request to a node and comment anchor
+ *
+ * A link is added to the message body which contains the mail comment signature.
+ * If this link is clicked it will reach this callback which will redirect the request
+ * to the original node and comment anchor, if applicable.
+ *
+ * @param $string
+ *   String - the mail comment signature
+ */
+function mailcomment_message_redirect($string) {
+  $options = array();
+  $params = mailcomment_parse_messageparams(str_replace(array("<", ">"), "", $string));
+  $params['cid'] ? $fragment = 'comment-' . $params['cid'] : $fragment = NULL;
+  $option['fragment'] = $fragment;
+  drupal_goto('node/' . $params['nid'], $options);
+}
+
+/**
+ * Returns Message-ID for the immediate ancestor of a comment.
+ *
+ * The parent node is considered an ancestor with a cid value of zero.
+ *
+ * @param $nid
+ *   Primary key of comment for which ancestors are sought.
+ * @param $cid
+ *   Primary key of comment for which ancestors are sought.
+ */
+function mailcomment_mail_comment_ancestor_message_id($nid, $cid) {
+  $msg_ids = array();
+  if ($cid != 0) {
+    // Every comment has a node ancestor.
+    $pid = db_query("SELECT pid from {comment} WHERE cid = :cid", array(':cid' => $cid))->fetchField();
+    if ($pid) {
+      // A positive pid means this is a comment.  If it's 0 that's a node.
+      $query = "SELECT uid, nid, cid, created as time FROM {comment} WHERE cid = :cid";
+      $result = db_query($query, array(':cid' => $pid))->fetchAssoc();
+      return mailcomment_build_messageid($result);
+    }
+    else {
+      $query = "SELECT uid, nid, 0 as cid, created as time FROM {node} WHERE nid = :nid";
+      $result = db_query($query, array(':nid' => $nid))->fetchAssoc();
+      return mailcomment_build_messageid($result);
+    }
+  }
+  return '';
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function mailcomment_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'mailhandler') {
+    return 'plugins/' . $plugin;
+  }
+}
+
+/**
+ * Alter mapping sources.
+ *
+ * Use this hook to add additional mapping sources for any parser. Allows for
+ * registering a callback to be invoked at mapping time.
+ *
+ * my_callback(FeedsImportBatch $batch, $key)
+ *
+ * @see my_source_get_source()
+ * @see locale_feeds_parser_sources_alter()
+ */
+function mailcomment_feeds_parser_sources_alter(&$sources, $content_type) {
+  $sources['parent_nid'] = array(
+    'name' => t('Parent NID'),
+    'description' => t('Parent NID of comment'),
+    'callback' => 'mailcomment_source_get_source',
+  );
+  $sources['parent_cid'] = array(
+    'name' => t('Parent CID'),
+    'description' => t('Parent CID of comment'),
+    'callback' => 'mailcomment_source_get_source',
+  );
+}
+
+/**
+ * Callback specified in hook_feeds_parser_sources_alter().
+ *
+ * To be invoked on mapping time.
+ *
+ * @param $source
+ *   The FeedsSource object being imported.
+ * @param $result
+ *   The FeedsParserResult object being mapped from.
+ * @param $key
+ *   The key specified in the $sources array in
+ *   hook_feeds_parser_sources_alter().
+ *
+ * @return
+ *   The value to be extracted from the source.
+ *
+ * @see hook_feeds_parser_sources_alter()
+ * @see locale_feeds_get_source()
+ */
+function mailcomment_source_get_source($source, FeedsParserResult $result, $key) {
+  $item = $result->currentItem();
+  $identifier = _mailcomment_get_signature(rawurldecode($item['body_original']));
+  if (!$identifier) {
+    // Failed to find signature in body -- replicate mailhandler functionality to find node->threading
+    if (!empty($item['header']->references)) {
+      // we want the final element in references header, watching out for white space
+      $identifier = drupal_substr(strrchr($item['header']->references, '<'), 0);
+    }
+    elseif (!empty($item['header']->in_reply_to)) {
+      // Some MUAs send more info in this header.
+      $identifier = str_replace(strstr($item['header']->in_reply_to, '>'), '>', $item['header']->in_reply_to);
+    }
+    if (isset($identifier)) {
+      $identifier = rtrim(ltrim($identifier, '<'), '>');
+    }
+  }
+  $params = mailcomment_check_messageparams($identifier);
+  switch ($key) {
+    case 'parent_nid':
+      return $params['nid'];
+    case 'parent_cid':
+      return $params['cid'];
+  }
+}
+
+/**
+ * Gets the mail comment parameters based on mail comment signature
+ *
+ * It will check the digital signature and only return parameters if they match
+ *
+ * @param $identifier
+ *   String - the mail comment signature string
+ *
+ * @return
+ *   Array of parameters.
+ */
+function mailcomment_check_messageparams($identifier) {
+  if ($params = mailcomment_parse_messageparams($identifier)) {
+    $signature = $params['signature'];
+    unset($params['signature']);
+    // Check digital signature and expiration time if set
+    if ($signature && $signature == mailcomment_signature($params)) {
+      // Check signature has not expired
+      if (($expire = variable_get('mailcomment_expiration', 0)) && $params['time'] + $expire < REQUEST_TIME) {
+        $params['error'] = MAILCOMMENT_ERROR_EXPIRED;
+      }
+      return $params;
+    }
+    else {
+      $params['error'] = MAILCOMMENT_ERROR_SIGNATURE;
+    }
+  }
+  else {
+    $params['error'] = MAILCOMMENT_ERROR_PARAMS;
+    return $params;
+  }
+}
+
+/**
+ * Parse message id into parameters
+ *
+ * The message id should have this form:
+ *   uid.nid.cid.time.signature@server string
+ * @param $messageid
+ *   Incoming message id
+ *
+ * @return
+ *   Array of mail comment parameters parsed from signature string
+ */
+function mailcomment_parse_messageparams($messageid) {
+  $params = array();
+  $parts = explode('@', $messageid);
+  if (count($parts) == 2 && $parts[1] == variable_get('mailcomment_server_string', 'example.com')) {
+    $parts = explode('.', $parts[0]);
+    if (count($parts) == 5) {
+      $params['uid'] = $parts[0];
+      $params['nid'] = $parts[1];
+      $params['cid'] = $parts[2];
+      $params['time'] = $parts[3];
+      $params['signature'] = $parts[4];
+    }
+  }
+  return $params;
+}
+
+/**
+ * Produce / verify digital signature
+ */
+function mailcomment_signature($params) {
+  $params[] = drupal_get_private_key();
+  return md5(implode('-', $params));
+}
+
+/**
+ * Implements hook_feeds_after_parse().
+ *
+ * Apply filters before writing to database.
+ */
+function mailcomment_feeds_after_parse(FeedsSource $source, FeedsParserResult $result) {
+  foreach ($result->items as &$message) {
+    $message['body_original'] = $message['body_html'];
+  }
+  switch (variable_get('mailcomment_import_filter_mode', 0)) {
+    case MAILCOMMENT_FILTER_BASIC:
+      foreach ($result->items as &$message) {
+        $message['body_html'] = _mailcomment_filter_basic($message['body_html']);
+      }
+      break;
+    case MAILCOMMENT_FILTER_AGGRESSIVE:
+      foreach ($result->items as &$message) {
+        $message['body_text'] = _mailcomment_filter_aggressive($message['body_text']);
+        $message['body_html'] = _mailcomment_filter_aggressive($message['body_html']);
+      }
+      break;
+  }
+}
+
+/**
+ * Implements hook_filter_info().
+ */
+function mailcomment_filter_info() {
+  $filters['mailcomment_basic'] = array(
+    'title' => t('Mail Comment basic message cleaner'),
+    'description' => t('Attempt to remove email client gunk at bottom of emails, like "On Jan 26, 2009, John Doe wrote:"?'),
+    'process callback' => '_mailcomment_basic_filter_process',
+    );
+  $filters['mailcomment_extra'] = array(
+    'title' => t('Mail Comment extra message cleaner'),
+    'description' => t('A more aggressive version of the message cleaner'),
+    'process callback' => '_mailcomment_extra_filter_process',
+    );
+  return $filters;
+}
+
+/**
+ * Filter callback.
+ */
+function _mailcomment_basic_filter_process($text, $filter, $format, $langcode, $cache, $cache_id) {
+  return _mailcomment_filter_basic($text);
+}
+
+/**
+ * Filter callback.
+ */
+function _mailcomment_extra_filter_process($text, $filter, $format, $langcode, $cache, $cache_id) {
+  return _mailcomment_filter_aggressive($text);
+}
+
+/**
+ * Filter a message for signature in a simple way.
+ *
+ * @param $text
+ *   Text to filter.
+ * @return
+ *   A filtered string.
+ */
+function _mailcomment_filter_basic($text) {
+  // Get the offset of the last two line breaks and substring.
+  $search = preg_match_all("/<br\s*\/*><br\s*\/*>|\r\n\r\n|\n\n[^<br\s*\/*><br\s*\/*>|\r\n\r\n|\n\n]+$/m", $text, $matches, PREG_OFFSET_CAPTURE);
+  if (!empty($matches[0])) {
+    $key = max(array_keys($matches[0]));
+    $offset = $matches[0][$key][1];
+    $text = trim(drupal_substr($text, 0, $offset));
+  }
+
+  if ($marker = variable_get('mailcomment_reply_text', t('((( Reply ABOVE this LINE to POST a COMMENT )))'))) {
+    $search = preg_match_all("/[\> ]*" . preg_quote($marker) . "/", $text, $matches, PREG_OFFSET_CAPTURE);
+    if (!empty($matches[0])) {
+      $key = max(array_keys($matches[0]));
+      $offset = $matches[0][$key][1];
+      $text = trim(drupal_substr($text, 0, $offset));
+    }
+  }
+
+  return $text;
+}
+
+/**
+ * Aggressively filter a message for quotes and signatures.
+ *
+ * @param $text
+ *   Text to filter.
+ * @return
+ *   A filtered string.
+ */
+function _mailcomment_filter_aggressive($text) {
+  $delimiters = array();
+
+  $delimiters = array(
+    "On \d{1,2}[\/\-]{1}\d{1,2}[\/\-]{1}\d{1,2},", // Gmail form 1
+    "On \w{3}, \w{3} \d{1,2}, \d{4} at \d{1,2}:\d{1,2} [AP]M", // Gmail form 1
+    "On \w{3}, \w{3} \d{1,2}, \d{4} at \d{1,2}:\d{1,2} [AP]M", // Gmail form 2
+    "On \d{1,2}\/\d{1,2}\/\d{4} \d{1,2}:\d{1,2} [AP]M,", // Thunderbird
+    "On [A-Z][a-z]{2} [0-9]{1,2}, [0-9]{4}, at [0-9]{1,2}:[0-9]{2} [AP]M, [a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4} wrote", // Mac mail form 1
+    "On [A-Z][a-z]{2} [0-9]{1,2}, [0-9]{4}, at [0-9]{1,2}:[0-9]{2} [AP]M,", // Mac mail form 2
+    "On \d{1,2} \w{3} \d{4}, at \d{1,2}:\d{2} [AP]M, [a-zA-Z0-9._%-]+@?[a-zA-Z0-9.-]*[\.]?[a-zA-Z]{0,4} wrote:", // Mac mail v4.2
+    "-----\s?Original Message\s?-----", // Outlook Express
+    "From:(\s*)[A-Za-z0-9._%+-]+@[A-Za-z0-9._%+-]+\.[A-Za-z]{2,3}(\s*)\[mailto:[A-Za-z0-9._%+-]+@[A-Za-z0-9._%+-]+\.[A-Za-z]{2,3}\]", // Outlook legacy
+    "[_]*\nFrom:", // Yahoo + Outlook web
+    "From:.*Sent:.*To:.*Subject:", // Fallback
+  );
+
+  if ($marker = variable_get('mailcomment_reply_text', t('((( Reply ABOVE this LINE to POST a COMMENT )))'))) {
+    $delimiters[] = '[\> ]*' . preg_quote($marker);
+  }
+
+  $expression = '/(' . implode('|', $delimiters) . ')/';
+
+  if (preg_match($expression, $text, $matches, PREG_OFFSET_CAPTURE)) {
+    $text = trim(drupal_substr($text, 0, $matches[0][1]));
+  }
+
+  return $text;
+}

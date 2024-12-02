@@ -1,0 +1,52 @@
+<?php
+/**
+ * @file
+ * Code for the Open Atrium News feature.
+ */
+
+include_once 'oa_news.features.inc';
+/**
+ * @file
+ * Code for the OpenAtrium News layout.
+ */
+
+/**
+ * Implements hook_theme()
+ */
+function oa_news_theme() {
+  $displays = array('oa_recent_news');
+  $theme = array();
+  foreach ($displays as $display) {
+    $key = 'views_view_fields__open_atrium_news__' . $display;
+    $filename = str_replace('_', '-', $key);
+    $theme[$key] = array(
+      'template'  => $filename,
+      'base hook' => 'views_view_fields',
+      'preprocess functions' => array(
+        'template_preprocess',
+        'template_preprocess_views_view_fields',
+        'oa_core_preprocess_views_view_fields',
+      ),
+      'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL),
+      'path' => drupal_get_path('module', 'oa_news') . '/templates',
+    );
+  }
+  return $theme;
+}
+
+/**
+ * Implements hook_preprocess_views_view_fields().
+ * Perform field-level replacement/processing here
+ */
+function oa_news_preprocess_views_view_fields(&$vars) {
+  $view = $vars['view'];
+  $vars['display'] = $vars['view']->current_display;
+  if ($view->name == 'open_atrium_news') {
+    foreach ($vars['fields'] as $id => $field) {
+      if ($id == 'body') {
+        $vars['body_summary'] = oa_core_trim_text($field->content, 'node/' . $vars['row']->nid . '/view');
+      }
+    }
+
+  }
+}

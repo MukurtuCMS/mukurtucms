@@ -108,10 +108,16 @@ function search_api_facetapi_facetapi_facet_info(array $searcher_info) {
         $field['key'] = $key;
         // Determine which, if any, of the field type-specific options will be
         // used for this field.
-        $type = isset($field['entity_type']) ? $field['entity_type'] : $field['type'];
-        $type_settings += array($type => array());
+        if (isset($field['entity_type'])) {
+          $type = $inner_type = $field['entity_type'];
+        }
+        else {
+          $type = $field['type'];
+          $inner_type = search_api_extract_inner_type($type);
+        }
+        $type_settings += array($inner_type => array());
 
-        $facet_info[$key] = $type_settings[$type] + array(
+        $facet_info[$key] = $type_settings[$inner_type] + array(
           'label' => $field['name'],
           'description' => t('Filter by @type.', array('@type' => $field['name'])),
           'allowed operators' => array(
@@ -125,7 +131,7 @@ function search_api_facetapi_facetapi_facet_info(array $searcher_info) {
           'map options' => array(),
           'field type' => $type,
         );
-        if ($type === 'date') {
+        if ($inner_type === 'date') {
           $facet_info[$key]['description'] .= ' ' . t('(Caution: This may perform very poorly for large result sets.)');
         }
         $facet_info[$key]['map options'] += array(
@@ -203,12 +209,88 @@ function search_api_facetapi_search_api_query_alter($query) {
   if ($index->server()->supportsFeature('search_api_facets')) {
     // This is the main point of communication between the facet system and the
     // search back-end - it makes the query respond to active facets.
+    search_api_facetapi_current_search_path($query);
     $searcher = 'search_api@' . $index->machine_name;
     $adapter = facetapi_adapter_load($searcher);
     if ($adapter) {
       $adapter->addActiveFilters($query);
     }
   }
+}
+
+/**
+ * Implements hook_date_formats().
+ */
+function search_api_facetapi_date_formats() {
+  return array(
+    array(
+      'type' => 'search_api_facetapi_' . FACETAPI_DATE_YEAR,
+      'format' => 'Y',
+      'locales' => array(),
+    ),
+    array(
+      'type' => 'search_api_facetapi_' . FACETAPI_DATE_MONTH,
+      'format' => 'F Y',
+      'locales' => array(),
+    ),
+    array(
+      'type' => 'search_api_facetapi_' . FACETAPI_DATE_DAY,
+      'format' => 'F j, Y',
+      'locales' => array(),
+    ),
+    array(
+      'type' => 'search_api_facetapi_' . FACETAPI_DATE_HOUR,
+      'format' => 'H:__',
+      'locales' => array(),
+    ),
+    array(
+      'type' => 'search_api_facetapi_' . FACETAPI_DATE_MINUTE,
+      'format' => 'H:i',
+      'locales' => array(),
+    ),
+    array(
+      'type' => 'search_api_facetapi_' . FACETAPI_DATE_SECOND,
+      'format' => 'H:i:s',
+      'locales' => array(),
+    ),
+  );
+}
+
+/**
+ * Implements hook_date_format_types().
+ */
+function search_api_facetapi_date_format_types() {
+  return array(
+    'search_api_facetapi_' . FACETAPI_DATE_YEAR => t('Search facets - Years'),
+    'search_api_facetapi_' . FACETAPI_DATE_MONTH => t('Search facets - Months'),
+    'search_api_facetapi_' . FACETAPI_DATE_DAY => t('Search facets - Days'),
+    'search_api_facetapi_' . FACETAPI_DATE_HOUR => t('Search facets - Hours'),
+    'search_api_facetapi_' . FACETAPI_DATE_MINUTE => t('Search facets - Minutes'),
+    'search_api_facetapi_' . FACETAPI_DATE_SECOND => t('Search facets - Seconds'),
+  );
+}
+
+/**
+ * Helper function that statically stores the Search API's base path. Can
+ * either be used to store or retrieve the base path.
+ *
+ * This static store is used in SearchApiFacetapiAdapter::getSearchPath() in
+ * order to retrieve the current search base path. Just relying on
+ * search_api_current_search() to retrieve the current query is not enough, as
+ * the path might be requested before the query is finally executed and stored.
+ *
+ * @param SearchApiQueryInterface $query
+ *   When storing the base base, the query that is executed. Else NULL.
+ *
+ * @return
+ *   The Search API's base path.
+ */
+function search_api_facetapi_current_search_path(SearchApiQueryInterface $query = NULL) {
+  $path = &drupal_static(__FUNCTION__, '');
+  if ($query && $query->getOption('search_api_base_path')) {
+    $path = $query->getOption('search_api_base_path');
+  }
+  return $path;
 }
 
 /**
@@ -340,13 +422,13 @@ function search_api_facetapi_facet_map_callback(array $values, array $options = 
     $lower = isset($map[$range['lower']]) ? $map[$range['lower']] : $range['lower'];
     $upper = isset($map[$range['upper']]) ? $map[$range['upper']] : $range['upper'];
     if ($lower == '*' && $upper == '*') {
-      $map[$value] =  t('any');
+      $map[$value] = t('any');
     }
     elseif ($lower == '*') {
-      $map[$value] = "< $upper";
+      $map[$value] = "≤ $upper";
     }
     elseif ($upper == '*') {
-      $map[$value] = "> $lower";
+      $map[$value] = "≥ $lower";
     }
     else {
       $map[$value] = "$lower – $upper";
@@ -456,6 +538,62 @@ function search_api_facetapi_search_api_admin_index_fields_submit($form, &$form_
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter() for views_exposed_form().
+ *
+ * Custom integration for facets. When a Views exposed filter is modified on a
+ * search results page, any facets which have been already selected will be
+ * removed. This (optionally) adds hidden fields for each facet so their values
+ * are retained.
+ */
+function search_api_facetapi_form_views_exposed_form_alter(array &$form, array &$form_state) {
+  if (empty($form_state['view'])) {
+    return;
+  }
+  $view = $form_state['view'];
+
+  // Check if this is a Search API-based view and if the "Preserve facets"
+  // option is enabled. ("search_api_multi" would be the exact base table name,
+  // not just a prefix, but since it's just 16 characters long, we can still use
+  // this check to make the condition less complex.)
+  $base_table_prefix = substr($view->base_table, 0, 17);
+  if (in_array($base_table_prefix, array('search_api_index_', 'search_api_multi'))
+      && _search_api_preserve_views_facets($view)) {
+    // Get query parameters.
+    $query_parameters = drupal_get_query_parameters();
+
+    // Check if any facet query parameters are provided.
+    if (!empty($query_parameters['f'])) {
+      // Iterate through facet query parameters.
+      foreach ($query_parameters['f'] as $key => $value) {
+        // Add hidden form field for facet parameter.
+        $form['f[' . $key . ']'] = array(
+          '#type' => 'hidden',
+          '#value' => $value,
+          '#weight' => -1,
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Checks whether "Preserve facets" option is enabled on the given view.
+ *
+ * If the view display is overridden, use its configuration. Otherwise, use the
+ * default configuration.
+ *
+ * @param view $view
+ *   The search view.
+ *
+* @return bool
+*   TRUE if "Preserve facets" is enabled, FALSE otherwise.
+*/
+function _search_api_preserve_views_facets(view $view) {
+  $query_options = $view->display_handler->get_option('query');
+  return !empty($query_options['options']['preserve_facet_query_args']);
+}
+
+/**
  * Computes the granularity of a date facet filter.
  *
  * @param $filter
@@ -532,16 +670,12 @@ function search_api_facetapi_map_date(array $values, array $options = array()) {
       continue;
     }
 
-    // For years, the URL value is already the label.
-    if ($granularity == FACETAPI_DATE_YEAR) {
-      $map[$value] = $value;
-      continue;
-    }
-
     // Otherwise, parse the timestamp from the known format and format it as a
     // label.
     $format = search_api_facetapi_date_get_granularity_format($granularity);
-    $date = DateTime::createFromFormat($format, $value);
+    // Use the "!" modifier to make the date parsing independent of the current
+    // date/time. (See #2678856.)
+    $date = DateTime::createFromFormat('!' . $format, $value);
     if (!$date) {
       continue;
     }
@@ -568,17 +702,16 @@ function search_api_facetapi_map_date(array $values, array $options = array()) {
  */
 function search_api_facetapi_format_timestamp($timestamp, $precision = FACETAPI_DATE_YEAR) {
   $formats = array(
-    FACETAPI_DATE_YEAR => 'Y',
-    FACETAPI_DATE_MONTH => 'F Y',
-    FACETAPI_DATE_DAY => 'F j, Y',
-    FACETAPI_DATE_HOUR => 'H:__',
-    FACETAPI_DATE_MINUTE => 'H:i',
-    FACETAPI_DATE_SECOND => 'H:i:s',
+    FACETAPI_DATE_YEAR,
+    FACETAPI_DATE_MONTH,
+    FACETAPI_DATE_DAY,
+    FACETAPI_DATE_HOUR,
+    FACETAPI_DATE_MINUTE,
+    FACETAPI_DATE_SECOND,
   );
 
-  if (!isset($formats[$precision])) {
+  if (!in_array($precision, $formats)) {
     $precision = FACETAPI_DATE_YEAR;
   }
-
-  return format_date($timestamp, 'custom', $formats[$precision]);
+  return format_date($timestamp, 'search_api_facetapi_' . $precision);
 }

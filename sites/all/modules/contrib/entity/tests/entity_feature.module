@@ -23,9 +23,9 @@ function entity_feature_default_entity_test_type() {
     'weight' => 0,
   ));
   $types['test2'] = entity_create('entity_test_type', array(
-      'name' => 'test2',
-      'label' => 'label2',
-      'weight' => 2,
+    'name' => 'test2',
+    'label' => 'label2',
+    'weight' => 2,
   ));
 
   return $types;

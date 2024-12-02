@@ -1,0 +1,171 @@
+<?php
+
+/**
+ * @file
+ * The EckEntityTranslationTest class.
+ */
+
+/**
+ * Test translations on an ECK object.
+ *
+ * @todo Do any other scenarios need to be tested?
+ */
+class EckEntityTranslationTest extends EckTestHelper {
+
+  /**
+   * Meta data about these tests.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'ECK translation test',
+      'description' => 'Test translations on an ECK object, including when it is attached to another entity using EntityReference.',
+      'group' => 'eck',
+      'dependencies' => array(
+        'ctools',
+        'entity',
+        'entity_translation',
+        'entityreference',
+      ),
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(array $modules = array()) {
+    $modules[] = 'eck';
+    $modules[] = 'entity_translation';
+    $modules[] = 'entityreference';
+
+    parent::setUp($modules);
+
+    // Log in as user 1.
+    $this->loginUser1();
+
+    // Create multiple languages.
+    $this->setupLocales();
+  }
+
+  /**
+   * Test translating an entity type.
+   */
+  public function testTranslations() {
+    $entity_type = 'test_entity';
+    $bundle = $entity_type;
+    $languages = array(
+      'fr' => 'French',
+      'es' => 'Spanish',
+    );
+
+    // Create a test entity type.
+    $this->createEntityType();
+
+    // Enable translation for this entity type.
+    $this->enableEntityTypeTranslation($entity_type);
+
+    // Add a field.
+    $this->addField();
+
+    // Create a test entity.
+    $title = $this->randomSentence(4);
+    $field_body = $this->randomSentence(NULL, TRUE);
+    $args = array(
+      'title' => $title,
+      'field_body[en][0][value]' => 'English: ' . $field_body,
+    );
+    $this->verbose($args);
+    $entity_id = $this->createEntity($entity_type, $bundle, $args);
+
+    // Confirm the translation functionality is available.
+    $this->drupalGet("{$entity_type}/{$bundle}/{$entity_id}");
+    $this->assertResponse(200);
+    $this->assertLink(t('Translate'));
+    $this->assertLinkByHref("{$entity_type}/{$bundle}/{$entity_id}/translate");
+    $this->drupalGet("{$entity_type}/{$bundle}/{$entity_id}/translate");
+    $this->assertResponse(200);
+    $this->assertText(strip_tags(t('Translations of %label', array('%label' => $title))));
+
+    // Translate the entity into the other languages.
+    foreach ($languages as $langcode => $language) {
+      $this->drupalGet("{$langcode}/{$entity_type}/{$bundle}/{$entity_id}/edit/add/en/{$langcode}");
+      $this->assertResponse(200);
+      $args = array(
+        "field_body[{$langcode}][0][value]" => $language . ': ' . $field_body,
+      );
+      $this->drupalPost(NULL, $args, t('Save'));
+      $this->assertResponse(200);
+    }
+
+    // Test the entity when it's loaded from each language prefix.
+    foreach ($languages as $langcode => $language) {
+      $this->drupalGet("{$langcode}/{$entity_type}/{$bundle}/{$entity_id}");
+      $this->assertResponse(200);
+      $this->assertText($title);
+      $this->assertText($language . ': ' . $field_body);
+    }
+    // The English version didn't have a URL prefix.
+    $this->drupalGet("{$entity_type}/{$bundle}/{$entity_id}");
+    $this->assertResponse(200);
+    $this->assertText($title);
+    $this->assertText('English: ' . $field_body);
+
+    // Make the content type translatable.
+    $this->enableContentTypeTranslation();
+
+    // Add a reference field to a content type. This field is not translatable
+    // as the individual entities themselves will be translated.
+    $this->addReferenceFieldToNode();
+
+    // Create a node that has a reference field which points to the ECK object.
+    $body = $this->randomSentence(NULL, TRUE);
+    $args = array(
+      'language' => 'en',
+      'body' => array(
+        'en' => array(
+          array('value' => 'English: ' . $body),
+        ),
+      ),
+      'field_reference' => array(
+        'und' => array(
+          array('target_id' => $entity_id),
+        ),
+      ),
+    );
+    $node = $this->drupalCreateNode($args);
+    $this->verbose($node);
+    $this->drupalGet('node/' . $node->nid);
+    $this->assertText('English: ' . $body);
+    $this->assertText('English: ' . $field_body);
+
+    // Open the node edit form to see what it's like.
+    $this->drupalGet('node/' . $node->nid . '/edit');
+
+    // Translate the node.
+    $this->drupalGet('node/' . $node->nid . '/translate');
+    $this->assertResponse(200);
+    foreach ($languages as $langcode => $language) {
+      $this->drupalGet("{$langcode}/node/{$node->nid}/edit/add/en/{$langcode}");
+      $this->assertResponse(200);
+      $args = array(
+        "body[{$langcode}][0][value]" => $language . ': ' . $body,
+      );
+      $this->drupalPost(NULL, $args, t('Save'));
+      $this->assertResponse(200);
+    }
+
+    // Check each language to make sure both the body field and the ECK body
+    // field are present.
+    foreach ($languages as $langcode => $language) {
+      $this->drupalGet("{$langcode}/node/{$node->nid}");
+      $this->assertResponse(200);
+      $this->assertText($language . ': ' . $body);
+      $this->assertText($language . ': ' . $field_body);
+    }
+    // The English version didn't have a URL prefix.
+    $this->drupalGet("node/{$node->nid}");
+    $this->assertResponse(200);
+    $this->assertText('English: ' . $body);
+    $this->assertText('English: ' . $field_body);
+  }
+
+}

@@ -24,19 +24,23 @@ function _ctools_entity_access(&$entity_info, $entity_type) {
       // Sad panda, we don't use Entity API, lets manually add access callbacks.
       $entity_info['access callback'] = 'ctools_metadata_no_hook_node_access';
       break;
+
     case 'user':
       $entity_info['access callback'] = 'ctools_metadata_user_access';
       break;
+
     case 'comment':
       if (module_exists('comment')) {
         $entity_info['access callback'] = 'ctools_metadata_comment_access';
       }
       break;
+
     case 'taxonomy_term':
       if (module_exists('taxonomy')) {
         $entity_info['access callback'] = 'ctools_metadata_taxonomy_access';
       }
       break;
+
     case 'taxonomy_vocabulary':
       if (module_exists('taxonomy')) {
         $entity_info['access callback'] = 'ctools_metadata_taxonomy_access';
@@ -64,7 +68,7 @@ function _ctools_entity_access(&$entity_info, $entity_type) {
  *
  * @throws EntityMalformedException
  *
- * @return boolean
+ * @return bool
  *   TRUE if access is allowed, FALSE otherwise.
  */
 function ctools_metadata_no_hook_node_access($op, $node = NULL, $account = NULL) {
@@ -95,7 +99,7 @@ function ctools_metadata_no_hook_node_access($op, $node = NULL, $account = NULL)
 /**
  * Access callback for the user entity.
  */
-function ctools_metadata_user_access($op, $entity = NULL, $account = NULL, $entity_type) {
+function ctools_metadata_user_access($op, $entity, $account , $entity_type) {
   $account = isset($account) ? $account : $GLOBALS['user'];
   // Grant access to the users own user account and to the anonymous one.
   if (isset($entity) && $op != 'delete' && (($entity->uid == $account->uid && $entity->uid) || (!$entity->uid && $op == 'view'))) {
@@ -139,7 +143,8 @@ function ctools_metadata_comment_access($op, $entity = NULL, $account = NULL) {
 /**
  * Access callback for the taxonomy entities.
  */
-function ctools_metadata_taxonomy_access($op, $entity = NULL, $account = NULL, $entity_type) {
+function ctools_metadata_taxonomy_access($op, $entity, $account, $entity_type) {
+
   if ($entity_type == 'taxonomy_vocabulary') {
     return user_access('administer taxonomy', $account);
   }

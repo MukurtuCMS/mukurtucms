@@ -28,6 +28,9 @@ CKEDITOR.editorConfig = function(config) {
   // config.protectedSource.push(/<code>[\s\S]*?<\/code>/gi);
   config.extraPlugins = '';
 
+  // Insert all Smiley image paths as relative or they may fail on SSL pages.
+  config.smiley_path = window.CKEDITOR_BASEPATH + 'plugins/smiley/images/';
+
   /*
     * Append here extra CSS rules that should be applied into the editing area.
     * Example:
@@ -58,6 +61,11 @@ CKEDITOR.editorConfig = function(config) {
   if (Drupal.settings.ckeditor.theme == "marinelli") {
     config.bodyClass = 'singlepage';
     config.bodyId = 'primary';
+  }
+
+  // Make CKEditor's edit area as high as the textarea would be.
+  if (this.element.$.rows > 0) {
+    config.height = this.element.$.rows * 20 + 'px';
   }
 }
 
@@ -100,3 +108,21 @@ Drupal.settings.cke_toolbar_DrupalFull = [
   ['Maximize', 'ShowBlocks'],
   ['DrupalBreak', 'DrupalPageBreak']
 ];
+
+/**
+* To enable browser native spell checker uncomment (default) first of following two lines.
+* The second line (is a default setting and can leave commented) allows access to browser context menu with ctrl-right-click
+* otherwise there is no access to the browser context menu without further config changes
+*/
+CKEDITOR.config.disableNativeSpellChecker = false;
+// CKEDITOR.config.browserContextMenuOnCtrl = true;
+
+/** NOT TESTED
+* For browser default context menu on right-click rather than ctrl-right-click
+* Note: Disabling CKEditor's context menu may render it impossible to work with tables
+* uncomment following lines;
+* three plugins need to be removed because scayt depends on menubutton which depends on contextmenu
+*/
+// config.browserContextMenuOnCtrl = false;
+// config.removePlugins = 'scayt,menubutton,contextmenu';
+

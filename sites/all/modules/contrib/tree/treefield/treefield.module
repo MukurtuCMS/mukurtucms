@@ -1,0 +1,110 @@
+<?php
+
+class TreeFieldMissingProviderException extends Exception {}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function treefield_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'entityreference') {
+    return $module . '/' . $plugin;
+  }
+}
+
+/**
+ * Simple routing function for metadata defined by the treefield behaviors.
+ */
+function _treefield_metadata_router_get($item, $options, $name, $type, $info) {
+  $field = field_info_field($info['field_name']);
+  // Get the parent (the field), and its parent (the entity).
+  $field_wrapper = $info['parent'];
+  $field_wrapper_info = $field_wrapper->info();
+  $entity_wrapper = $field_wrapper_info['parent'];
+
+  $entity_type = $entity_wrapper->type();
+  $bundle = $entity_wrapper->getBundle();
+
+  $instance = field_info_instance($entity_type, $info['field_name'], $bundle);
+  $handler = _entityreference_get_behavior_handler($info['behavior'], $field, $instance);
+  $function = 'metadata_' . $name . '_get';
+  return $handler->$function($item, $options, $name, $type, $info, $field);
+}
+
+/**
+ * Custom entity_metadata_field_verbatim_get().
+ *
+ * @return array
+ *   Empty data structure when the field is empty, verbatim array otherwise.
+ */
+function _treefield_metadata_field_verbatim_get($entity, array $options, $name, $entity_type, &$context) {
+  $item = entity_metadata_field_verbatim_get($entity, $options, $name, $entity_type, $context);
+  if ($item) {
+    return $item;
+  }
+  else {
+    return array('target_id' => NULL, 'weight' => NULL, 'depth' => NULL);
+  }
+}
+
+/**
+ * Setter callback for the parent property.
+ */
+function _treefield_metadata_parent_set(&$data, $name, $value, $langcode, $type, $info) {
+  $data['target_id'] = $value;
+}
+
+
+/**
+ * Implements hook_preprocess_views_view_table().
+ *
+ * TODO: explain the purpose of this implementation.
+ */
+function treefield_preprocess_views_view_table(&$vars) {
+  $treefield_view = FALSE;
+  foreach ($vars['view']->field as $field_name => $field) {
+    if ($field instanceof treefield_views_handler_field_draggable) {
+      $treefield_view = TRUE;
+      break;
+    }
+  }
+  if (!$treefield_view) {
+    return;
+  }
+
+  // Add table class.
+  $vars['classes_array'][] = 'draggable';
+
+  // Add row class.
+  foreach ($vars['row_classes'] as &$row_classes) {
+    $row_classes[] = 'draggable';
+  }
+
+  foreach ($vars['rows'] as $row_id => &$row) {
+    $values = $vars['view']->result[$row_id];
+    $indentation = theme('indentation', array('size' => $values->{$field->aliases['depth']}));
+
+    reset($row);
+    $first_column = key($row);
+    $row[$first_column] = $indentation . $row[$first_column];
+  }
+
+  $vars['attributes_array']['id'] = drupal_html_id('treefield-table');
+  drupal_add_tabledrag($vars['attributes_array']['id'], 'order', 'sibling', 'treefield-weight');
+  drupal_add_tabledrag($vars['attributes_array']['id'], 'match', 'parent', 'treefield-parent', 'treefield-parent', 'treefield-id');
+  drupal_add_tabledrag($vars['attributes_array']['id'], 'depth', 'group', 'treefield-depth');
+}
+
+/**
+ * Implements hook_field_update_forbid().
+ *
+ * Forbid updates that would change cardinality to non-1 on treefields.
+ */
+function treefield_field_update_forbid($field, $prior_field, $has_data) {
+  if ($field['type'] != 'entityreference'
+    || empty($field['settings']['handler_settings']['behaviors']['treefield_sql']['status'])) {
+    return;
+  }
+  if ($field['cardinality'] != 1) {
+    throw new FieldUpdateForbiddenException("Cannot update a tree field with cardinality not equal to one.");
+  }
+}

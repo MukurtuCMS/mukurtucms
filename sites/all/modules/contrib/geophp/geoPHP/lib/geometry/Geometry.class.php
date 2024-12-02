@@ -226,7 +226,7 @@ abstract class Geometry
         foreach ($geometry as $item) {
           $geom = $geom->union($item->geos());
         }
-        return geoPHP::geosToGeometry($geos);
+        return geoPHP::geosToGeometry($geom);
       }
       else {
         return geoPHP::geosToGeometry($this->geos()->union($geometry->geos()));
@@ -330,17 +330,17 @@ abstract class Geometry
   }
 
   public function coordinateDimension() {
-    // geoPHP only supports 2-dimentional space
+    // geoPHP only supports 2-dimensional space
     return 2;
   }
 
   public function z() {
-    // geoPHP only supports 2-dimentional space
+    // geoPHP only supports 2-dimensional space
     return NULL;
   }
 
   public function m() {
-    // geoPHP only supports 2-dimentional space
+    // geoPHP only supports 2-dimensional space
     return NULL;
   }
 

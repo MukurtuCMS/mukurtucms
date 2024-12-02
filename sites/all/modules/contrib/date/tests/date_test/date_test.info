@@ -1,0 +1,12 @@
+name = "Date module tests"
+description = "Support module for date related testing."
+package = Date/Time
+core = 7.x
+hidden = TRUE
+dependencies[] = date:date
+
+; Information added by Drupal.org packaging script on 2023-01-14
+version = "7.x-2.14"
+core = "7.x"
+project = "date"
+datestamp = "1673711079"

@@ -2,12 +2,7 @@
 // Ensure the $ alias is owned by jQuery.
 (function($) {
 
-// randomly lock a pane.
-// @debug only
 Drupal.settings.Panels = Drupal.settings.Panels || {};
-Drupal.settings.Panels.RegionLock = {
-  10: { 'top': false, 'left': true, 'middle': true }
-}
 
 Drupal.PanelsIPE = {
   editors: {},
@@ -15,9 +10,11 @@ Drupal.PanelsIPE = {
     $('a.pane-delete:not(.pane-delete-processed)', context)
       .addClass('pane-delete-processed')
       .click(function() {
-        if (confirm('Remove this pane?')) {
+        if (confirm(Drupal.t('Remove this pane?'))) {
           $(this).parents('div.panels-ipe-portlet-wrapper').fadeOut('medium', function() {
+            var $sortable = $(this).closest('.ui-sortable');
             $(this).empty().remove();
+            $sortable.trigger('sortremove');
           });
           $(this).parents('div.panels-ipe-display-container').addClass('changed');
         }
@@ -29,16 +26,31 @@ Drupal.PanelsIPE = {
 
 Drupal.behaviors.PanelsIPE = {
   attach: function(context) {
+    // Remove any old editors.
+    for (var i in Drupal.PanelsIPE.editors) {
+      if (Drupal.settings.PanelsIPECacheKeys.indexOf(i) === -1) {
+        // Clean-up a little bit and remove it.
+        Drupal.PanelsIPE.editors[i].editing = false;
+        Drupal.PanelsIPE.editors[i].changed = false;
+        delete Drupal.PanelsIPE.editors[i];
+      }
+    }
+
+    // Initialize new editors.
     for (var i in Drupal.settings.PanelsIPECacheKeys) {
       var key = Drupal.settings.PanelsIPECacheKeys[i];
       $('div#panels-ipe-display-' + key + ':not(.panels-ipe-processed)')
         .addClass('panels-ipe-processed')
         .each(function() {
+          // If we're replacing an old IPE, clean it up a little.
+          if (Drupal.PanelsIPE.editors[key]) {
+            Drupal.PanelsIPE.editors[key].editing = false;
+          }
           Drupal.PanelsIPE.editors[key] = new DrupalPanelsIPE(key);
           Drupal.PanelsIPE.editors[key].showContainer();
         });
     }
-    $('.panels-ipe-hide-bar').once('panels-ipe-hide-bar-processed').click(function() {
+    $('.panels-ipe-hide-bar').once('panels-ipe-hide-bar').click(function() {
       Drupal.PanelsIPE.editors[key].hideContainer();
     });
     Drupal.PanelsIPE.bindClickDelete(context);
@@ -71,6 +83,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
     items: 'div.panels-ipe-portlet-wrapper',
     handle: 'div.panels-ipe-draghandle',
     cancel: '.panels-ipe-nodrag',
+    tolerance: 'pointer',
     dropOnEmpty: true
   }, cfg.sortableOptions || {});
 
@@ -89,6 +102,22 @@ function DrupalPanelsIPE(cache_key, cfg) {
     // re-display it.
     if (ipe.topParent && ipe.topParent.hasClass('panels-ipe-editing') && ipe.container.is(':not(visible)')) {
       ipe.showContainer();
+    }
+  });
+
+
+  // If a user navigates away from a locked IPE, cancel the lock in the background.
+  $(window).bind('beforeunload', function() {
+    if (!ipe.editing) {
+      return;
+    }
+
+    if (ipe.topParent && ipe.topParent.hasClass('changed')) {
+      ipe.changed = true;
+    }
+
+    if (ipe.changed) {
+      return Drupal.t('This will discard all unsaved changes. Are you sure?');
     }
   });
 
@@ -170,6 +199,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
   };
 
   this.initEditing = function(formdata) {
+    ipe.editing = true;
     ipe.topParent = $('div#panels-ipe-display-' + cache_key);
     ipe.backup = this.topParent.clone();
 
@@ -190,9 +220,11 @@ function DrupalPanelsIPE(cache_key, cfg) {
 
     $('div.panels-ipe-sort-container', ipe.topParent).bind('sortstop', this.enableRegions);
 
+    // Refresh the control jQuery object.
+    ipe.control = $(ipe.control.selector);
     $('.panels-ipe-form-container', ipe.control).append(formdata);
 
-    $('input:submit:not(.ajax-processed)', ipe.control).addClass('ajax-processed').each(function() {
+    $('input:submit:not(.ajax-processed), button:not(.ajax-processed)', ipe.control).addClass('ajax-processed').each(function() {
       var element_settings = {};
 
       element_settings.url = $(this.form).attr('action');
@@ -210,18 +242,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
     // it clears out inline styles.
     $('.panels-ipe-on').show();
     ipe.showForm();
-    ipe.topParent.addClass('panels-ipe-editing');
-
-    //Reposition the "Add new pane" button
-    $('.panels-ipe-newblock').each(function() {
-      var link_width_half = parseInt($(this).children('a').outerWidth() / 2);
-
-      $(this).css('margin-left', '-' + link_width_half + 'px');
-
-      $(this).css('margin-top', '-' + parseInt($(this).children('a').outerHeight() / 2) + 'px');
-
-      $(this).parents('.panels-ipe-placeholder').find('h3').css('width', parseInt(($(this).parents('.panels-ipe-placeholder').width() / 2) - link_width_half) + 'px');
-    });
+    $('body').add(ipe.topParent).addClass('panels-ipe-editing');
 
   };
 
@@ -246,18 +267,22 @@ function DrupalPanelsIPE(cache_key, cfg) {
   };
 
   this.endEditing = function() {
+    ipe.editing = false;
     ipe.lockPath = null;
-    $('.panels-ipe-form-container', ipe.control).empty();
+    $('.panels-ipe-form-container').empty();
     // Re-show all the IPE non-editing meta-elements
     $('div.panels-ipe-off').show('fast');
+
+    // Refresh the container and control jQuery objects.
+    ipe.container = $(ipe.container.selector);
+    ipe.control = $(ipe.control.selector);
 
     ipe.showButtons();
     // Re-hide all the IPE meta-elements
     $('div.panels-ipe-on').hide();
-    if (ipe.topParent) {
-      ipe.topParent.removeClass('panels-ipe-editing');
-      $('div.panels-ipe-sort-container', ipe.topParent).sortable("destroy");
-    }
+
+    $('.panels-ipe-editing').removeClass('panels-ipe-editing');
+    $('div.panels-ipe-sort-container.ui-sortable', ipe.topParent).sortable("destroy");
   };
 
   this.saveEditing = function() {
@@ -273,7 +298,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
           val += id;
         }
       });
-      $('input[name="panel[pane][' +  region + ']"]', ipe.control).val(val);
+      $('[name="panel[pane][' +  region + ']"]', ipe.control).val(val);
     });
   }
 
@@ -287,6 +312,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
       // @todo this isn't ideal but I can't seem to figure out how to keep an unprocessed backup
       // that will later get processed.
       $('.ctools-use-modal-processed', ipe.topParent).removeClass('ctools-use-modal-processed');
+      $('.panels-ipe-hide-bar-processed', ipe.topParent).removeClass('panels-ipe-hide-bar-processed');
       $('.pane-delete-processed', ipe.topParent).removeClass('pane-delete-processed');
       ipe.topParent.fadeIn('medium');
       Drupal.attachBehaviors();
@@ -310,7 +336,7 @@ function DrupalPanelsIPE(cache_key, cfg) {
 
   this.createSortContainers = function() {
     $('div.panels-ipe-region', this.topParent).each(function() {
-      $('div.panels-ipe-portlet-marker', this).parent()
+      $(this).children('div.panels-ipe-portlet-marker').parent()
         .wrapInner('<div class="panels-ipe-sort-container" />');
 
       // Move our gadgets outside of the sort container so that sortables
@@ -318,9 +344,6 @@ function DrupalPanelsIPE(cache_key, cfg) {
       $('div.panels-ipe-portlet-static', this).each(function() {
         $(this).prependTo($(this).parent().parent());
       });
-
-      // Also remove the last panel separator.
-      $('div.panel-separator', this).filter(':last').remove();
     });
   }
 
@@ -334,11 +357,19 @@ $(function() {
       Drupal.PanelsIPE.editors[data.key].initEditing(data.data);
       Drupal.PanelsIPE.editors[data.key].lockPath = data.lockPath;
     }
+    Drupal.attachBehaviors();
+
   };
 
   Drupal.ajax.prototype.commands.IPEsetLockState = function(ajax, data, status) {
     if (Drupal.PanelsIPE.editors[data.key]) {
       Drupal.PanelsIPE.editors[data.key].lockPath = data.lockPath;
+    }
+  };
+
+  Drupal.ajax.prototype.commands.addNewPane = function(ajax, data, status) {
+    if (Drupal.PanelsIPE.editors[data.key]) {
+      Drupal.PanelsIPE.editors[data.key].changed = true;
     }
   };
 
@@ -366,12 +397,45 @@ $(function() {
     }
   };
 
+  Drupal.ajax.prototype.commands.insertNewPane = function(ajax, data, status) {
+    IPEContainerSelector = '#panels-ipe-regionid-' + data.regionId + ' div.panels-ipe-sort-container';
+    firstPaneSelector = IPEContainerSelector + ' div.panels-ipe-portlet-wrapper:first';
+    // Insert the new pane before the first existing pane in the region, if
+    // any.
+    if ($(firstPaneSelector).length) {
+      insertData = {
+        'method': 'before',
+        'selector': firstPaneSelector,
+        'data': data.renderedPane,
+        'settings': null
+      }
+      Drupal.ajax.prototype.commands.insert(ajax, insertData, status);
+    }
+    // Else, insert it as a first child of the container. Doing so might fall
+    // outside of the wrapping markup for the style, but it's the best we can
+    // do.
+    else {
+      insertData = {
+        'method': 'prepend',
+        'selector': IPEContainerSelector,
+        'data': data.renderedPane,
+        'settings': null
+      }
+      Drupal.ajax.prototype.commands.insert(ajax, insertData, status);
+    }
+  };
+
   /**
    * Override the eventResponse on ajax.js so we can add a little extra
    * behavior.
    */
   Drupal.ajax.prototype.ipeReplacedEventResponse = Drupal.ajax.prototype.eventResponse;
   Drupal.ajax.prototype.eventResponse = function (element, event) {
+    if (element.ipeCancelThis) {
+      element.ipeCancelThis = null;
+      return false;
+    }
+
     if ($(this.element).attr('id') == 'panels-ipe-cancel') {
       if (!Drupal.PanelsIPE.editors[this.element_settings.ipe_cache_key].cancelEditing()) {
         return false;
@@ -404,7 +468,7 @@ $(function() {
 
   Drupal.ajax.prototype.ipeReplacedBeforeSerialize = Drupal.ajax.prototype.beforeSerialize;
   Drupal.ajax.prototype.beforeSerialize = function (element_settings, options) {
-    if ($(this.element).attr('id') == 'panels-ipe-save') {
+    if ($(this.element).hasClass('panels-ipe-save')) {
       Drupal.PanelsIPE.editors[this.element_settings.ipe_cache_key].saveEditing();
     };
     return this.ipeReplacedBeforeSerialize(element_settings, options);

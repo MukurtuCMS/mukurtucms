@@ -4,9 +4,19 @@
  * @file
  * Provide relationship handler for reference fields.
  */
+
+/**
+ * Default class for handler relationship.
+ *
+ * @codingStandardsIgnoreStart
+ */
 class references_handler_relationship extends views_handler_relationship {
 
-  function option_definition() {
+  /**
+   * Option Definition.
+   */
+  public function option_definition() {
+    // @codingStandardsIgnoreEnd
     $options = parent::option_definition();
     $options['delta'] = array('default' => -1);
 
@@ -15,12 +25,15 @@ class references_handler_relationship extends views_handler_relationship {
 
   /**
    * Add a delta selector for multiple fields.
+   *
+   * @codingStandardsIgnoreStart
    */
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
+    // @codingStandardsIgnoreEnd
     parent::options_form($form, $form_state);
 
     $field = field_info_field($this->definition['field_name']);
-    
+
     // Only add the delta selector if the field is multiple.
     if ($field['cardinality']) {
       $max_delta = ($field['cardinality'] == FIELD_CARDINALITY_UNLIMITED) ? 10 : $field['cardinality'];
@@ -39,9 +52,15 @@ class references_handler_relationship extends views_handler_relationship {
     }
   }
 
-  function ensure_my_table() {
+  /**
+   * Function to ensure my table.
+   *
+   * @codingStandardsIgnoreStart
+   */
+  public function ensure_my_table() {
+    // @codingStandardsIgnoreEnd
     $field = field_info_field($this->definition['field_name']);
-    
+
     if (!isset($this->table_alias)) {
       $join = $this->get_join();
       if ($this->options['delta'] != -1 && $field['cardinality']) {
@@ -55,4 +74,5 @@ class references_handler_relationship extends views_handler_relationship {
     }
     return $this->table_alias;
   }
+
 }

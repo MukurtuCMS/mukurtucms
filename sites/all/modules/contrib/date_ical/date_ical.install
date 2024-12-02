@@ -1,0 +1,125 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the date_ical module.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function date_ical_requirements($phase) {
+  $requirements = array();
+
+  // Ensure translations don't break at install time.
+  $t = get_t();
+
+  if ($phase == 'runtime') {
+    if (!function_exists('libraries_detect')) {
+      $requirements['date_ical'] = array(
+        'title' => $t('Date iCal'),
+        'value' => $t('Libraries module is not installed.'),
+        'description' => $t('Date iCal 2.x and above require the Libraries module. Please install it from !here.',
+          array('!here' => l('here', 'http://www.drupal.org/project/libraries'))
+        ),
+        'severity' => REQUIREMENT_ERROR,
+      );
+      // Return immediately, since we can't even attempt to determine if iCalcreator is installed.
+      return $requirements;
+    }
+
+    $library = libraries_detect('iCalcreator');
+    if ($library && !empty($library['installed'])) {
+      $requirements['date_ical'] = array(
+        'title' => $t('Date iCal'),
+        'value' => $t('iCalcreator library is installed, version: @version found', array('@version' => $library['version'])),
+        'severity' => REQUIREMENT_OK,
+      );
+    }
+    else {
+      $requirements['date_ical'] = array(
+        'title' => $t('Date iCal'),
+        'value' => $t('iCalcreator library could not be found, check the installation instructions for the Date iCal module.'),
+        'description' => $t('The error message was: @error<br>!error_message',
+          array('@error' => $library['error'], '!error_message' => $library['error message'])
+        ),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+  }
+
+  return $requirements;
+}
+
+/**
+ * Implements of hook_enable().
+ */
+function date_ical_enable() {
+  cache_clear_all('plugins:feeds:plugins', 'cache');
+}
+
+/*****************************************************************************
+ *                              UPDATE HOOKS
+ ****************************************************************************/
+
+/**
+ * Migrates all iCal feed importers for from Date iCal 2.x to 3.0.
+ *
+ * <br>
+ * PLEASE NOTE: If any of your importers are defined by Features, you'll need
+ * to update their feature(s) to match.
+ */
+function date_ical_update_7300() {
+  // Rebuild the registry immediately, so that we don't get fatal errors when
+  // Drupal attempts to instantiate the old feeds plugin classes.
+  registry_rebuild();
+  cache_clear_all('plugins:feeds:plugins', 'cache');
+
+  // Update all the importers which used DateIcalIcalcreatorParser to use
+  // DateiCalFeedsParser instead.
+  $importer_data = ctools_export_load_object('feeds_importer', 'all');
+  foreach ($importer_data as $key => $value) {
+    $importer = feeds_importer($key);
+    $importer_config = $importer->getConfig();
+    $needs_update = ($importer_config['parser']['plugin_key'] == 'DateIcalIcalcreatorParser');
+
+    $processor = $importer->processor;
+    $processor_config = $processor->getconfig();
+    // Also update importers which use the new parser, but have un-capitalized
+    // sources. This can happen if the user didn't run the update, and then
+    // manually fixed the warning they saw, without fixing their sources.
+    if ($importer_config['parser']['plugin_key'] == 'DateiCalFeedsParser'
+        && !empty($processor_config['mappings'][0]['source'])) {
+      $needs_update = (strtoupper($processor_config['mappings'][0]['source']) != $processor_config['mappings'][0]['source']);
+    }
+
+    if ($needs_update) {
+      $importer->setPlugin('DateiCalFeedsParser');
+
+      // Source keys are now capitalized, so we need to update the mappings.
+      foreach ($processor_config['mappings'] as &$mapping) {
+        $mapping['source'] = strtoupper($mapping['source']);
+      }
+      $processor->setConfig($processor_config);
+
+      $importer->save();
+
+      // When this importer object got created, a warning was issued about its
+      // parser plugin being missing. We corrected that warning above, so we
+      // should clear it out to avoid potential confusion.
+      $messages = drupal_get_messages('warning');
+      foreach ($messages['warning'] as $warning) {
+        // Calling drupal_get_messages() removed *every* warning from the
+        // message queue, so we need to re-issue any warnings that aren't
+        // about missing Feeds plugins.
+        if (strpos($warning, 'Missing Feeds plugin') === FALSE) {
+          drupal_set_message($warning, 'warning');
+        }
+      }
+      $t = get_t();
+      $importer_link = l($key, "admin/structure/feeds/$key");
+      drupal_set_message($t('Date iCal updated the parser plugin for !importer.
+        If that importer is defined by a feature, you will need to update that feature to match.', array('!importer' => $importer_link))
+      );
+    }
+  }
+}

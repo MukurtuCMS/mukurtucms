@@ -1,0 +1,44 @@
+/**
+ * @file
+ * Right-to-Left stylesheet for the Rules module.
+ */
+
+.rules-elements-table ul.rules-operations li {
+  float: right;
+}
+
+.rules-elements-table ul.rules-operations a {
+  padding-right: 0px;
+}
+
+ul.rules-operations-add li {
+  float: right;
+}
+
+.rules-elements-table .tabledrag-toggle-weight-wrapper {
+  right: auto;
+  left: 0px;
+}
+
+.rules-elements-table caption,
+.rules-overview-table caption {
+  text-align: right;
+}
+
+.rules-debug-icon-open {
+  float: right;
+}
+
+.rules-debug-log ul {
+  padding-left: 0;
+  padding-right: 2em;
+}
+
+.rules-element-content {
+  float: right;
+}
+
+ul.rules-autocomplete div {
+  padding-left: 0;
+  padding-right: 5px;
+}

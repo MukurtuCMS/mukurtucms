@@ -122,7 +122,7 @@ function entity_delete_log_views_default_views() {
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
-  $handler->display->display_options['empty']['area']['content'] = 'There are no records of entities being deleted. Visit the <a href="/admin/config/entity-delete-log">Entity Delete Log Settings</a> to select which entity types will be logged when deleted.';
+  $handler->display->display_options['empty']['area']['content'] = 'There are no records of entities being deleted. Visit the <a href="/admin/config/system/entity-delete-log">Entity Delete Log Settings</a> to select which entity types will be logged when deleted.';
   $handler->display->display_options['empty']['area']['format'] = 'full_html';
   /* Relationship: Entity Delete Log: Acting User Account */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';

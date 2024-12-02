@@ -1,0 +1,364 @@
+diff --git a/scald_feeds.module b/scald_feeds.module
+index 13f1780..c90ce7d 100644
+--- a/scald_feeds.module
++++ b/scald_feeds.module
+@@ -21,7 +21,6 @@ function scald_feeds_feeds_processor_targets_alter(&$targets, $entity_type, $bun
+       );
+     }
+   }
+-
+ }
+
+ /**
+@@ -40,16 +39,22 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
+   if (!is_array($value)) {
+     $value = array($value);
+   }
++
+   foreach ($value as $k => $v) {
+-    if (!($v instanceof FeedsEnclosure)) {
+-      if (is_string($v)) {
+-        $value[$k] = new FeedsEnclosure($v, file_get_mimetype($v));
+-      }
+-      else {
+-        unset($value[$k]);
++    if(!empty($value[$k])) {
++      if (!($v instanceof FeedsEnclosure)) {
++	if (is_string($v)) {
++	  $value[$k] = new FeedsEnclosure($v, file_get_mimetype($v));
++	}
++	else {
++	  unset($value[$k]);
++	}
+       }
++    } else {
++      unset($value[$k]);
+     }
+   }
++
+   if (empty($value)) {
+     return;
+   }
+@@ -65,90 +70,276 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
+     $data[$entity_type] = $entity;
+   }
+
+-  $destination = 'public://';
+   // Populate entity.
+-  $i = 0;
++  $i = isset($entity->{$target}[LANGUAGE_NONE])?count($entity->{$target}[LANGUAGE_NONE]):0;
+   $field = isset($entity->$target) ? $entity->$target : array();
++
+   foreach ($value as $v) {
+-    try {
+-      $file = $v->getFile($destination);
++    // First check if we are given a scald ID
++    $existing_sid = FALSE;
++    if(is_numeric($v->getValue())) {
++        $atom = scald_atom_load($v->getValue());
++        if($atom) {
++            $existing_sid = $atom->sid;
++        }
+     }
+-    catch (Exception $e) {
+-      watchdog_exception('Feeds', $e, nl2br(check_plain($e)));
++
++    // Check if using a GUID for an existing scald atom previously imported by feeds
++    if($existing_sid == FALSE) {
++        $existing_sid = scald_feeds_lookup_atom_by_guid($v->getValue());
+     }
+-    if ($file) {
+-      $file = (array) $file;
+-      $sid = _scald_feeds_save_atom($file, $file['filename']);
+-      $field['und'][$i] = array(
+-        'sid' => $sid,
++
++    // Search for a previously imported matching scald atom and use that if found.
++    if($existing_sid == FALSE) {
++      $type = _scald_feeds_get_provider_by_mime_type($v->getMimeType());
++      $existing_sid = scald_feeds_fetch_matching_atom($v->getValue(), $type);
++    }
++
++    if($existing_sid) {
++      $field[LANGUAGE_NONE][$i] = array(
++        'sid' => $existing_sid,
+       );
+       if ($info['cardinality'] == 1) {
+         break;
+       }
+       $i++;
+     }
++    else {
++      $sid = _scald_feeds_save_atom($v->getValue(), $type, urldecode(basename($v->getValue())));
++
++      $field[LANGUAGE_NONE][$i] = array(
++					'sid' => $sid,
++        );
++        if ($info['cardinality'] == 1) {
++          break;
++        }
++        $i++;
++    }
+   }
++
+   $entity->{$target} = $field;
+ }
+
++function _scald_feeds_copy_fields($form, &$atom) {
++  $basic_fields = array(
++			'field_scald_description',
++			'field_scald_headline',
++			'field_licence_std_cc',
++			'field_rights',
++			'field_scald_location',
++			'field_scald_creator'
++			);
++
++  foreach($basic_fields as $field) {
++    if(isset($form[$field])){
++      $atom->{$field} = $form[$field];
++    }
++  }
++
++  if(isset($form['field_scald_geo_location'][LANGUAGE_NONE][0]['geom']['#default_value']['lat']) && isset($form['field_scald_geo_location'][LANGUAGE_NONE][0]['geom']['#default_value']['lon'])) {
++    $atom->{'field_scald_geo_location'}[LANGUAGE_NONE][0]['input_format'] = 'lat/lon';
++    $atom->{'field_scald_geo_location'}[LANGUAGE_NONE][0]['geom']['lat'] = $form['field_scald_geo_location'][LANGUAGE_NONE][0]['geom']['#default_value']['lat'];
++    $atom->{'field_scald_geo_location'}[LANGUAGE_NONE][0]['geom']['lon'] = $form['field_scald_geo_location'][LANGUAGE_NONE][0]['geom']['#default_value']['lon'];
++  }
++
++  if (isset($form['field_scald_created'][LANGUAGE_NONE][0]['#default_value'])) {
++    $value1 = str_replace('T', ' ', $form['field_scald_created'][LANGUAGE_NONE][0]['#default_value']['value']);
++    $value2 = str_replace('T', ' ', $form['field_scald_created'][LANGUAGE_NONE][0]['#default_value']['value2']);
++    $atom->field_scald_created[LANGUAGE_NONE] = array(array('value' => $value1, 'value2' => $value2));
++  }
++
++  if(isset($form['scald_tags'])) {
++    foreach($form['scald_tags'][LANGUAGE_NONE] as $index => $tag) {
++      $scald_tags = taxonomy_get_term_by_name($tag, 'scald_tags');
++
++      if(!isset($atom->scald_tags[LANGUAGE_NONE])) {
++	$atom->scald_tags[LANGUAGE_NONE] = array();
++      }
++
++      if(empty($scald_tags)) {
++	$scald_tag_vocab = taxonomy_vocabulary_machine_name_load('scald_tags');
++
++	if($scald_tag_vocab != FALSE) {
++	  $new_scald_tag = new stdClass();
++	  $new_scald_tag->name = $tag;
++	  $new_scald_tag->vid = $scald_tag_vocab->vid;
++	  taxonomy_term_save($new_scald_tag);
++	  $atom->scald_tags[LANGUAGE_NONE][] = json_decode(json_encode($new_scald_tag), true);
++	}
++      } else {
++	foreach($scald_tags as $tag) {
++	  $atom->scald_tags[LANGUAGE_NONE][] = json_decode(json_encode($tag), true);
++	}
++      }
++    }
++  }
++}
++
+ /**
+  * Saves a Scald Atom programmatically from a file.
+  */
+-function _scald_feeds_save_atom($file, $title = NULL) {
+-  if (is_numeric($file)) {
+-    $file = (array) file_load($file);
++function _scald_feeds_save_atom($file, $type, $title = NULL) {
++  $atoms = array(new ScaldAtom($type, 'scald_' . $type));
++
++  // Skip atom type the user isn't allowed to create.
++  if (!scald_action_permitted($atoms[0], 'create')) {
++    return FALSE;
++  }
++
++  if(valid_url($file, TRUE)) {
++    $data = drupal_http_request($file);
++    $temp_file = file_unmanaged_save_data($data->data);
++  } else {
++    $temp_file = file_unmanaged_copy($file);
+   }
+-  elseif (!is_object($file) && !is_array($file)) {
++
++  if($temp_file === FALSE) {
+     return FALSE;
+   }
+
+-  $file_array = (array) $file;
+-  if (!isset($file_array['filename'])) {
+-    $file = file_load($file_array['fid']);
+-    $file_array = (array) $file;
++  $providers = scald_atom_providers();
++  $sources = $providers[$type];
++  $source = key($sources);
++
++  $form_state = array(
++			   'values' =>  array(
++					      'file' => array( array ('name' => $title, 'tmppath' => $temp_file))
++					      ),
++			   'scald' => array( 'type' => $type, 'source' => isset($source) ? $source : NULL, 'atoms' => array($atoms[0])),
++			   'ajax' => 0
++			   );
++  $form = array('atom0' => array('#entity' =>  $atoms[0], '#parents' => array('atom0')));
++  $form['#entity_type'] = 'scald_atom';
++  $form_id = 'scald_atom_add_form_options';
++
++  $add_form_function = 'scald_' . $type . '_scald_add_form';
++  if(function_exists($add_form_function)) {
++    $add_form_function($form, $form_state);
++  } else {
++    return FALSE;
+   }
+-  $type = _scald_feeds_get_provider_by_file($file_array);
+-  $atom = new ScaldAtom($type, 'scald_' . $type);
+-  $atom->base_id = $file_array['fid'];
+-  $atom->title = !empty($title) ? $title : $file_array['filename'];
+-  $file_array['display'] = TRUE;
+-  $target = '';
+-  switch ($type) {
+-    case 'file':
+-      $target = 'scald_file';
+-      break;
+
+-    case 'image':
+-    case 'video':
+-      $target = 'scald_thumbnail';
+-      break;
++  $fill_form_function = 'scald_' . $type . '_scald_add_form_fill';
++  if(function_exists($fill_form_function)) {
++    $fill_form_function($atoms, $form, $form_state);
++  } else {
++    return FALSE;
+   }
+
+-  $atom->{$target} = array(
+-    LANGUAGE_NONE => array(
+-      0 => $file_array,
+-    ),
+-  );
+-  return scald_atom_save($atom);
++  drupal_alter('form', $form, $form_state, $form_id);
++
++  // The atom should really be built using entity_form_submit_build_entity...
++  _scald_feeds_copy_fields($form['atom0'], $atoms[0]);
++
++  $atoms[0]->scald_file[LANGUAGE_NONE][0]['display'] = TRUE;
++
++  return scald_atom_save($atoms[0]);
+ }
+
++
+ /**
+  * Suggests a Scald provider for the given file.
+  *
+- * Chooses from file, image and video.
++ * Chooses from file, audio, image and video.
+  */
+-function _scald_feeds_get_provider_by_file($file) {
++function _scald_feeds_get_provider_by_mime_type($mime_type) {
+   $type = 'file';
+
+-  $fi = new finfo(FILEINFO_MIME);
+-  $mime = $fi->buffer(file_get_contents($file['uri']));
+-
+-  if (strpos($mime, 'image/') === 0) {
++  if (strpos($mime_type, 'audio/') === 0) {
++    $type = 'audio';
++  }
++  if (strpos($mime_type, 'image/') === 0) {
+     $type = 'image';
+   }
+-  elseif (strpos($mime, 'video/') === 0) {
++  elseif (strpos($mime_type, 'video/') === 0) {
+     $type = 'video';
+   }
+
+   return $type;
+ }
++
++/**
++ * Looks up an atom by GUID, assumes SQL storage backend.
++ *
++ * @param string $guid
++ *   The Feeds GUID to compare against.
++ *
++ * @return int|FALSE
++ *   The atom id, or FALSE if one was not found.
++ */
++function scald_feeds_lookup_atom_by_guid($guid) {
++  return db_select('feeds_item')
++    ->fields('feeds_item', array('entity_id'))
++    ->condition('entity_type', 'scald_atom')
++    ->condition('guid', $guid)
++    ->execute()
++    ->fetchField();
++}
++
++
++/**
++ * Looks for an existing imported atom that is equivalent to a newly created atom using the new file.
++ * This is to avoid creating duplicate atoms on repeated feed imports.
++ *
++ * @param string $filename
++ *   The full path & filename of the file to compare
++ *
++ * @return int|FALSE
++ *   The atom id, or FALSE if one was not found.
++ */
++function scald_feeds_fetch_matching_atom($filename, $type) {
++  global $user;
++
++  $scald_query = array( 'title' => basename($filename),
++			'type' => $type,
++			'publisher' => $user->uid);
++  $sids = scald_search($scald_query, FALSE);
++
++  if(!$sids) {
++    return FALSE;
++  }
++
++  foreach ($sids as $sid) {
++    $atom = scald_atom_load($sid);
++
++    switch ($type) {
++    case 'file':
++      scald_file_scald_fetch($atom, 'atom');
++      break;
++    case 'image':
++      scald_image_scald_fetch($atom, 'atom');
++      break;
++    case 'audio':
++      scald_audio_scald_fetch($atom, 'atom');
++      break;
++    case 'video':
++      scald_video_scald_fetch($atom, 'atom');
++      break;
++    }
++
++    // For external files, save file to a temporary directory to compare on.
++    $external_file = 0;
++    if (strtolower(substr($filename, 0, 4) == 'http')) {
++      $external_file = 1;
++      $file_contents = file_get_contents($filename);
++      $filename = drupal_tempnam('temporary://', 'file');
++      file_put_contents($filename, $file_contents);
++    }
++
++    $new_file_filesize = filesize($filename);
++    $new_file_md5 = md5_file($filename);
++
++    if ($external_file) {
++      unlink($filename);
++    }
++
++    if (filesize($atom->file_source) == $new_file_filesize &&
++	md5_file($atom->file_source) == $new_file_md5 &&
++	$atom->changed == $atom->created) {
++
++      return $sid;
++    }
++  }
++
++  return FALSE;
++}

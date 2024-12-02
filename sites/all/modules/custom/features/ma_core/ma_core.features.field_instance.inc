@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_core.features.field_instance.inc
@@ -10,7 +11,7 @@
 function ma_core_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'node-article-body'
+  // Exported field_instance: 'node-article-body'.
   $field_instances['node-article-body'] = array(
     'bundle' => 'article',
     'default_value' => NULL,
@@ -40,6 +41,8 @@ function ma_core_field_default_field_instances() {
     'required' => FALSE,
     'settings' => array(
       'context' => '',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'display_summary' => TRUE,
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
@@ -57,12 +60,14 @@ function ma_core_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-article-field_category'
+  // Exported field_instance: 'node-article-field_category'.
   $field_instances['node-article-field_category'] = array(
     'bundle' => 'article',
-    'default_value' => NULL,
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => array(),
     'deleted' => 0,
-    'description' => NULL,
+    'description' => '',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -79,25 +84,39 @@ function ma_core_field_default_field_instances() {
         'weight' => 10,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_category',
     'label' => 'Tags',
-    'required' => FALSE,
+    'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'module' => 'taxonomy',
+      'active' => 0,
+      'module' => 'options',
       'settings' => array(
+        'apply_chosen' => '',
         'autocomplete_path' => 'taxonomy/autocomplete',
         'size' => 60,
+        'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
+      'type' => 'options_select',
       'weight' => -4,
     ),
   );
 
-  // Exported field_instance: 'node-article-field_image'
+  // Exported field_instance: 'node-article-field_image'.
   $field_instances['node-article-field_image'] = array(
     'bundle' => 'article',
     'deleted' => 0,
@@ -130,6 +149,8 @@ function ma_core_field_default_field_instances() {
     'required' => FALSE,
     'settings' => array(
       'alt_field' => TRUE,
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_image' => 0,
       'file_directory' => 'field/image',
       'file_extensions' => 'png gif jpg jpeg',
@@ -150,9 +171,11 @@ function ma_core_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-article-field_tags'
+  // Exported field_instance: 'node-article-field_tags'.
   $field_instances['node-article-field_tags'] = array(
     'bundle' => 'article',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => 'Enter a comma-separated list of words to describe your content.',
@@ -172,25 +195,39 @@ function ma_core_field_default_field_instances() {
         'weight' => 10,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_tags',
     'label' => 'Tags',
-    'required' => FALSE,
+    'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'allow_add_onfly' => 0,
+        'show_voc_terms_page_link' => 0,
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'module' => 'taxonomy',
+      'active' => 1,
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_path' => 'taxonomy/autocomplete',
-        'size' => 60,
+        'apply_chosen' => '',
+        'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
+      'type' => 'options_select',
       'weight' => -4,
     ),
   );
 
-  // Exported field_instance: 'node-article-field_test_assets'
+  // Exported field_instance: 'node-article-field_test_assets'.
   $field_instances['node-article-field_test_assets'] = array(
     'bundle' => 'article',
     'default_value' => NULL,
@@ -218,6 +255,8 @@ function ma_core_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 1,
       'mee_enabled' => 1,
       'text_processing' => 0,
@@ -234,7 +273,7 @@ function ma_core_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-page-body'
+  // Exported field_instance: 'node-page-body'.
   $field_instances['node-page-body'] = array(
     'bundle' => 'page',
     'default_value' => NULL,
@@ -273,6 +312,8 @@ function ma_core_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'display_summary' => 0,
       'dnd_enabled' => 1,
       'mee_enabled' => 0,
@@ -291,7 +332,7 @@ function ma_core_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-page-field_media_asset'
+  // Exported field_instance: 'node-page-field_media_asset'.
   $field_instances['node-page-field_media_asset'] = array(
     'bundle' => 'page',
     'default_value' => NULL,
@@ -303,6 +344,7 @@ function ma_core_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
+          'override' => 0,
         ),
         'type' => 'title',
         'weight' => 1,
@@ -326,6 +368,8 @@ function ma_core_field_default_field_instances() {
     'label' => 'Media Asset',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'referencable_types' => array(
         'audio' => 'audio',
         'file' => 0,

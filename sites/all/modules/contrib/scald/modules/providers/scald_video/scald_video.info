@@ -1,0 +1,11 @@
+name = Scald Video
+description = Provides Video atoms from video files.
+package = Scald Providers
+core = 7.x
+dependencies[] = scald
+
+; Information added by Drupal.org packaging script on 2022-01-24
+version = "7.x-1.13"
+core = "7.x"
+project = "scald"
+datestamp = "1643054108"

@@ -1,0 +1,1517 @@
+<?php
+
+/**
+ * @file
+ * Paragraphs hooks and common functions.
+ *
+ * Paragraphs allows you to embed multiple entity bundles in field.
+ */
+
+define('PARAGRAPHS_RECURSION_LIMIT', 20);
+define('PARAGRAPHS_DEFAULT_TITLE', 'Paragraph');
+define('PARAGRAPHS_DEFAULT_TITLE_MULTIPLE', 'Paragraphs');
+define('PARAGRAPHS_DEFAULT_EDIT_MODE', 'open');
+define('PARAGRAPHS_DEFAULT_EDIT_MODE_OVERRIDE', 1);
+define('PARAGRAPHS_DEFAULT_ADD_MODE', 'select');
+
+// Modules should return this value from hook_paragraphs_item_access() to allow
+// access to a paragraphs item.
+define('PARAGRAPHS_ITEM_ACCESS_ALLOW', 'allow');
+
+// Modules should return this value from hook_paragraphs_item_access() to deny
+// access to a paragraphs item.
+define('PARAGRAPHS_ITEM_ACCESS_DENY', 'deny');
+
+// Modules should return this value from hook_paragraphs_item_access() to not
+// affect paragraphs item access.
+define('PARAGRAPHS_ITEM_ACCESS_IGNORE', NULL);
+
+
+// Separate some Field API parts in different files.
+require_once dirname(__FILE__) . '/paragraphs.field_formatter.inc';
+require_once dirname(__FILE__) . '/paragraphs.field_widget.inc';
+require_once dirname(__FILE__) . '/paragraphs.node_clone.inc';
+
+/**
+ * Loads a paragraphs item.
+ *
+ * @param int $item_id
+ *   The paragraphs item ID.
+ * @param bool $reset
+ *   Should we reset the entity cache?
+ *
+ * @return ParagraphsItemEntity
+ *   The paragraphs item entity or FALSE.
+ */
+function paragraphs_item_load($item_id, $reset = FALSE) {
+  $result = paragraphs_item_load_multiple(array($item_id), array(), $reset);
+  return $result ? reset($result) : FALSE;
+}
+
+/**
+ * Loads a paragraphs revision.
+ *
+ * @param int $revision_id
+ *   The paragraphs revision ID.
+ *
+ * @return ParagraphsItemEntity
+ *   The paragraphs item entity or FALSE.
+ */
+function paragraphs_item_revision_load($revision_id) {
+  return entity_revision_load('paragraphs_item', $revision_id);
+}
+
+/**
+ * Loads paragraphs items.
+ *
+ * @param array $ids
+ *   An array of paragraphs item IDs or FALSE to load all.
+ * @param array|bool $conditions
+ *   Should we reset the entity cache?
+ * @param bool $reset
+ *   Should we reset the entity cache?
+ *
+ * @return ParagraphsItemEntity[]
+ *   An array of paragraphs item entities.
+ */
+function paragraphs_item_load_multiple(array $ids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('paragraphs_item', $ids, $conditions, $reset);
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function paragraphs_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'panelizer' && $plugin == 'entity') {
+    return 'plugins/panelizer/entity';
+  }
+}
+
+/**
+ * Implements hook_entity_info().
+ */
+function paragraphs_entity_info() {
+  $return['paragraphs_item'] = array(
+    'label' => t('Paragraphs item'),
+    'label callback' => 'entity_class_label',
+    'uri callback' => 'entity_class_uri',
+    'entity class' => 'ParagraphsItemEntity',
+    'controller class' => 'EntityAPIController',
+    'base table' => 'paragraphs_item',
+    'revision table' => 'paragraphs_item_revision',
+    'fieldable' => TRUE,
+    // For integration with Redirect module.
+    // @see http://drupal.org/node/1263884
+    'redirect' => FALSE,
+    'entity keys' => array(
+      'id' => 'item_id',
+      'revision' => 'revision_id',
+      'bundle' => 'bundle',
+      'field_name' => 'field_name',
+      'language' => 'langcode',
+    ),
+    'module' => 'paragraphs',
+    'view modes' => array(
+      'full' => array(
+        'label' => t('Full content'),
+        'custom settings' => FALSE,
+      ),
+      'paragraphs_editor_preview' => array(
+        'label' => t('Paragraphs Editor Preview'),
+        'custom settings' => TRUE,
+      ),
+    ),
+    'bundle keys' => array(
+      'bundle' => 'bundle',
+    ),
+    'access callback' => 'paragraphs_item_access',
+    'metadata controller class' => 'ParagraphsItemMetadataController',
+  );
+
+  $bundles = paragraphs_bundle_load();
+
+  // Add info about the bundles. We do not use field_info_fields() but directly
+  // use field_read_fields() as field_info_fields() requires built entity info
+  // to work.
+  foreach ($bundles as $machine_name => $bundle) {
+    $return['paragraphs_item']['bundles'][$bundle->bundle] = array(
+      'label' => $bundle->name,
+      'admin' => array(
+        'path' => 'admin/structure/paragraphs/%paragraphs_bundle',
+        'real path' => 'admin/structure/paragraphs/' . strtr($machine_name, array('_' => '-')),
+        'bundle argument' => 3,
+        'access arguments' => array('administer paragraphs bundles'),
+      ),
+    );
+  }
+
+  if (module_exists('entitycache')) {
+    $return['paragraphs_item']['field cache'] = FALSE;
+    $return['paragraphs_item']['entity cache'] = TRUE;
+  }
+
+  return $return;
+}
+
+/**
+ * Access check for paragraphs.
+ *
+ * Most of the time the access callback is on the host entity.
+ * In some cases you want specific access checks on paragraphs.
+ * You can do this by implementing hook_paragraphs_item_access().
+ *
+ * @return bool
+ *   Whether the user has access to a paragraphs item.
+ */
+function paragraphs_item_access($op, $entity, $account, $entity_type) {
+  // If no user object is supplied, the access check is for the current user.
+  if (empty($account)) {
+    $account = $GLOBALS['user'];
+  }
+  $permissions = &drupal_static(__FUNCTION__, array());
+
+  // If the $op was not one of the supported ones, we return access denied.
+  if (!in_array($op, array('view', 'update', 'delete', 'create'), TRUE)) {
+    return FALSE;
+  }
+
+  // When we have no entity, create a generic cid.
+  if (empty($entity)) {
+    $cid = 'all_entities:' . $op;
+  }
+  // When OP is create, or the entity is new, the bundle is the cache key.
+  elseif ($op == 'create' || (isset($entity->is_new) && $entity->is_new)) {
+    $cid = $entity->bundle;
+  }
+  // Else our cid is entity specific.
+  else {
+    $cid = $entity->item_id . '_' . $entity->revision_id;
+  }
+
+  // If we've already checked access for this bundle, user and op, return from
+  // cache. Otherwise, we are optimistic and consider that the user can
+  // view / update / delete or create a paragraph.
+  if (isset($permissions[$account->uid][$cid][$op])) {
+    return $permissions[$account->uid][$cid][$op];
+  }
+
+  // We grant access to the paragraph item if both of these conditions are met:
+  // - No modules say to deny access.
+  // - At least one module says to grant access.
+  // If no module specified either allow or deny, we always allow.
+  $access = module_invoke_all('paragraphs_item_access', $entity, $op, $account);
+  if (in_array(PARAGRAPHS_ITEM_ACCESS_DENY, $access, TRUE)) {
+    $user_access_permission = FALSE;
+  }
+  elseif (in_array(PARAGRAPHS_ITEM_ACCESS_ALLOW, $access, TRUE)) {
+    $user_access_permission = TRUE;
+  }
+  else {
+    // Deny access by default.
+    $user_access_permission = FALSE;
+  }
+
+  // Store the result of the permission in our matrix.
+  $permissions[$account->uid][$cid][$op] = $user_access_permission;
+
+  return $permissions[$account->uid][$cid][$op];
+}
+
+/**
+ * Implements hook_paragraphs_item_access().
+ */
+function paragraphs_paragraphs_item_access(ParagraphsItemEntity $entity, $op, $account) {
+  $permissions = &drupal_static(__FUNCTION__, array());
+  $parent_permissions = &drupal_static(__FUNCTION__ . '_parents', array());
+
+  if (!in_array($op, array('view', 'update', 'delete', 'create'), TRUE)) {
+    // If there was no bundle to check against, or the $op was not one of the
+    // supported ones, we return access denied.
+    return PARAGRAPHS_ITEM_ACCESS_IGNORE;
+  }
+
+  $check_parent_op = $op;
+
+  // Update/Delete/Create access requires update access on the parent.
+  if (in_array($op, array('update', 'delete', 'create'), TRUE)) {
+    $check_parent_op = 'update';
+  }
+
+  // When we have no entity, create a generic cid.
+  if (empty($entity)) {
+    $cid = 'all_entities:' . $op;
+  }
+  // When OP is create, or the entity is new, the bundle is the cache key.
+  elseif ($op == 'create' || (isset($entity->is_new) && $entity->is_new)) {
+    $cid = $entity->bundle;
+  }
+  // Else our cid is entity specific.
+  else {
+    $cid = $entity->item_id . '_' . $entity->revision_id;
+  }
+
+  // Check if we cached permission check.
+  if (isset($permissions[$account->uid][$cid][$op])) {
+    return $permissions[$account->uid][$cid][$op];
+  }
+
+  if (empty($entity)) {
+    // Ignore access when we don't have a host entity.
+    $permissions[$account->uid][$cid][$op] = PARAGRAPHS_ITEM_ACCESS_IGNORE;
+  }
+  elseif ($host_entity = $entity->hostEntity()) {
+    $host_entity_info = entity_get_info($entity->hostEntityType());
+    $host_id_key = $host_entity_info['entity keys']['id'];
+
+    $parent_cid = $entity->hostEntityType() . '_' . implode('_', entity_extract_ids($entity->hostEntityType(), $host_entity));
+
+    // Check if we have an ID key set. If not then the parent entity is new and
+    // we check for create access.
+    if (!isset($host_entity->{$host_id_key}) || empty($host_entity->{$host_id_key})) {
+      $check_parent_op = 'create';
+      $host_entity->is_new = TRUE;
+    }
+
+    if (isset($parent_permissions[$account->uid][$parent_cid][$check_parent_op])) {
+      return $parent_permissions[$account->uid][$parent_cid][$check_parent_op];
+    }
+
+    // We need to use node_access over node's entity_access permission check
+    // because entity_access will fallback to checking revision permissions when
+    // trying to update paragraph items in a node revision.
+    if ($entity->hostEntityType() == 'node') {
+      // We assume that any node without a nid is being created and check
+      // permissions against the node bundle.
+      if (!isset($host_entity->nid) && node_access($check_parent_op, $entity->hostEntityBundle())) {
+        $permissions[$account->uid][$cid][$op] = PARAGRAPHS_ITEM_ACCESS_ALLOW;
+      }
+      elseif (isset($host_entity->nid) && node_access($check_parent_op, $host_entity)) {
+        $permissions[$account->uid][$cid][$op] = PARAGRAPHS_ITEM_ACCESS_ALLOW;
+      }
+      else {
+        $permissions[$account->uid][$cid][$op] = PARAGRAPHS_ITEM_ACCESS_DENY;
+      }
+    }
+    else {
+      if (entity_access($check_parent_op, $entity->hostEntityType(), $host_entity)) {
+        $permissions[$account->uid][$cid][$op] = PARAGRAPHS_ITEM_ACCESS_ALLOW;
+        $parent_permissions[$account->uid][$parent_cid][$check_parent_op] = PARAGRAPHS_ITEM_ACCESS_ALLOW;
+      }
+      else {
+        // Deny access as parent entity access failed.
+        $permissions[$account->uid][$cid][$op] = PARAGRAPHS_ITEM_ACCESS_DENY;
+        $parent_permissions[$account->uid][$parent_cid][$check_parent_op] = PARAGRAPHS_ITEM_ACCESS_DENY;
+      }
+    }
+  }
+  else {
+    // Ignore access when we don't have a host entity.
+    $permissions[$account->uid][$cid][$op] = PARAGRAPHS_ITEM_ACCESS_IGNORE;
+  }
+
+  return $permissions[$account->uid][$cid][$op];
+}
+
+/**
+ * Implements hook_permission().
+ */
+function paragraphs_permission() {
+  $perms = array(
+    'administer paragraphs bundles' => array(
+      'title' => t('Administer paragraphs bundles'),
+      'description' => t('Is able to administer paragraph bundles for the Paragraphs module'),
+    ),
+  );
+  return $perms;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function paragraphs_menu() {
+  $items = array();
+  $items['admin/structure/paragraphs'] = array(
+    'title' => 'Paragraph Bundles',
+    'description' => 'Manage Paragraph bundles',
+    'page callback' => 'paragraphs_admin_bundle_overview',
+    'access arguments' => array('administer paragraphs bundles'),
+    'file' => 'paragraphs.admin.inc',
+  );
+
+  $items['admin/structure/paragraphs/list'] = array(
+    'title' => 'List',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+
+  $items['admin/structure/paragraphs/add'] = array(
+    'title' => 'Add Paragraph Bundle',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('paragraphs_admin_bundle_form'),
+    'access arguments' => array('administer paragraphs bundles'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'paragraphs.admin.inc',
+  );
+
+  $items['admin/structure/paragraphs/%paragraphs_bundle'] = array(
+    'title' => 'Edit paragraph bundle',
+    'title callback' => 'paragraphs_bundle_title_callback',
+    'title arguments' => array(3),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('paragraphs_admin_bundle_form', 3),
+    'access arguments' => array('administer paragraphs bundles'),
+    'file' => 'paragraphs.admin.inc',
+  );
+
+  $items['admin/structure/paragraphs/%paragraphs_bundle/edit'] = array(
+    'title' => 'Edit',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $items['admin/structure/paragraphs/%paragraphs_bundle/delete'] = array(
+    'title' => 'Delete Paragraph Bundle',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('paragraphs_admin_bundle_delete_form', 3),
+    'access arguments' => array('administer paragraphs bundles'),
+    'file' => 'paragraphs.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_field_info().
+ */
+function paragraphs_field_info() {
+  $info = array();
+  $info['paragraphs'] = array(
+    'label' => t('Paragraphs'),
+    'description' => t('Paragraphs field using the paragraph bundles.'),
+    'instance_settings' => array(
+      'title' => PARAGRAPHS_DEFAULT_TITLE,
+      'title_multiple' => PARAGRAPHS_DEFAULT_TITLE_MULTIPLE,
+      'allowed_bundles' => array(),
+      'bundle_weights' => array(),
+    ),
+    'default_widget' => 'paragraphs_hidden',
+    'default_formatter' => 'paragraphs_view',
+    'settings' => array(),
+    'property_type' => 'paragraphs_item',
+    'property_callbacks' => array('paragraphs_entity_metadata_property_callback'),
+  );
+  return $info;
+}
+
+/**
+ * Implements hook_form_field_ui_field_edit_form_alter().
+ */
+function paragraphs_form_field_ui_field_edit_form_alter(&$form, $form_state) {
+  if ($form['#field']['type'] == 'paragraphs') {
+    $form['#theme'] = array('paragraphs_bundle_settings_form');
+    array_unshift($form['#submit'], 'paragraphs_bundle_settings_form_submit');
+  }
+}
+
+/**
+ * Submit callback for paragraphs bundle settings form.
+ *
+ * @see paragraphs_form_field_ui_field_edit_form_alter
+ */
+function paragraphs_bundle_settings_form_submit($form, &$form_state) {
+  $bundle_settings = array();
+  $bundle_weights = array();
+  if (isset($form_state['values']['instance']['settings']['allowed_bundles_table'])) {
+    $bundle_settings_table = $form_state['values']['instance']['settings']['allowed_bundles_table'];
+    uasort($bundle_settings_table, 'drupal_sort_weight');
+    foreach ($bundle_settings_table as $machine_name => $value) {
+      $bundle_settings[$machine_name] = (($value['enabled'] === 1) ? $machine_name : -1);
+      $bundle_weights[$machine_name] = $value['weight'];
+    }
+  }
+
+  $form_state['values']['instance']['settings']['allowed_bundles'] = $bundle_settings;
+  $form_state['values']['instance']['settings']['bundle_weights'] = $bundle_weights;
+
+  unset($form_state['values']['instance']['settings']['allowed_bundles_table']);
+}
+
+/**
+ * Implements hook_field_instance_settings_form().
+ */
+function paragraphs_field_instance_settings_form($field, $instance) {
+
+  $settings = $instance['settings'];
+  $bundles = array();
+  $_bundles = paragraphs_bundle_load();
+  $form_delta = count($_bundles) * 2;
+  $max_weight = 0;
+  $weights = array();
+
+  foreach ($_bundles as $machine_name => $bundle) {
+    $bundles[$machine_name] = $bundle->name;
+    if (isset($settings['bundle_weights'][$machine_name])) {
+      $weights[$machine_name] = $settings['bundle_weights'][$machine_name];
+      if ($settings['bundle_weights'][$machine_name] > $max_weight) {
+        $max_weight = $settings['bundle_weights'][$machine_name];
+      }
+    }
+  }
+
+  $max_weight++;
+
+  $element['allowed_bundles_table'] = array(
+    '#tree' => TRUE,
+    '#prefix' => '<label>' . t('Allowed Paragraph bundles') . '</label>',
+    '#suffix' => '<div class="description">' . t('If no bundle is selected, all the bundles will be available.') . '</div>',
+  );
+
+  $weight = 1;
+  foreach ($_bundles as $machine_name => $bundle) {
+
+    $enabled = FALSE;
+    if (isset($settings['allowed_bundles'][$machine_name]) && $settings['allowed_bundles'][$machine_name] === $machine_name) {
+      $enabled = TRUE;
+    }
+
+    $element['allowed_bundles_table'][$machine_name] = array(
+      'enabled' => array(
+        '#type' => 'checkbox',
+        '#title' => check_plain($bundle->name) . ' <em>(' . check_plain($bundle->label) . ')</em>',
+        '#title_display' => 'after',
+        '#default_value' => $enabled,
+      ),
+      'weight' => array(
+        '#type' => 'weight',
+        '#title' => t('Weight'),
+        '#default_value' => (isset($weights[$machine_name]) ? $weights[$machine_name] : $weight + $max_weight),
+        '#delta' => $form_delta,
+        '#title_display' => 'invisible',
+      ),
+    );
+    $element['allowed_bundles_table'][$machine_name]['#weight'] = $element['allowed_bundles_table'][$machine_name]['weight']['#default_value'];
+    $weight++;
+  }
+
+  $element['title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Item Title'),
+    '#description' => t('Label to appear as title on the button as "Add new [title]", this label is translatable'),
+    '#default_value' => isset($settings['title']) ? $settings['title'] : PARAGRAPHS_DEFAULT_TITLE,
+    '#required' => TRUE,
+  );
+
+  $element['title_multiple'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Plural Item Title'),
+    '#description' => t('Title in its plural form.'),
+    '#default_value' => isset($settings['title_multiple']) ? $settings['title_multiple'] : PARAGRAPHS_DEFAULT_TITLE_MULTIPLE,
+    '#required' => TRUE,
+  );
+
+  $element['default_edit_mode'] = array(
+    '#type' => 'select',
+    '#title' => t('Default edit mode'),
+    '#description' => t('The default edit mode the paragraph item is in. Preview will render the paragraph in the preview view mode.'),
+    '#options' => array(
+      'open' => t('Open'),
+      'closed' => t('Closed'),
+      'preview' => t('Preview'),
+    ),
+    '#default_value' => isset($settings['default_edit_mode']) ? $settings['default_edit_mode'] : PARAGRAPHS_DEFAULT_EDIT_MODE,
+    '#required' => TRUE,
+  );
+
+  $elements_exists = module_exists('elements');
+  $element['default_edit_mode_override'] = array(
+    // If the Elements module is installed then use a real number field.
+    '#type' => $elements_exists ? 'numberfield' : 'textfield',
+    '#title' => t('Edit mode override'),
+    '#title_display' => 'invisible',
+    '#field_prefix' => t('Force items to display as "Open" when there are less then'),
+    '#field_suffix' => t('items.'),
+    '#default_value' => (isset($settings['default_edit_mode_override']) && !empty($settings['default_edit_mode_override'])) ? $settings['default_edit_mode_override'] : PARAGRAPHS_DEFAULT_EDIT_MODE_OVERRIDE,
+    '#states' => array(
+      // Hide the settings when the the default edit mode is set to "Open.".
+      'invisible' => array(
+        ':input[name="instance[settings][default_edit_mode]"]' => array('value' => 'open'),
+      ),
+    ),
+    '#size' => 2,
+    '#maxlength' => 2,
+      // Specify width, since size property isn't supported on number fields.
+    '#attributes' => $elements_exists ? array('style' => 'width:3em') : array(),
+    '#min' => 1,
+    '#max' => 99,
+  );
+  if (!$elements_exists) {
+    $element['default_edit_mode_override']['#element_validate'] = array('element_validate_integer_positive');
+  }
+
+  $element['add_mode'] = array(
+    '#type' => 'select',
+    '#title' => t('Add mode'),
+    '#description' => t('The way to add new paragraphs.'),
+    '#options' => array(
+      'select' => t('Select List'),
+      'button' => t('Buttons'),
+    ),
+    '#default_value' => isset($settings['add_mode']) ? $settings['add_mode'] : PARAGRAPHS_DEFAULT_ADD_MODE,
+    '#required' => TRUE,
+  );
+
+  if (!count($bundles)) {
+    $link = l(t('here'), 'admin/structure/paragraphs/add', array('query' => drupal_get_destination()));
+    $element['allowed_bundles_explain'] = array(
+      '#type' => 'markup',
+      '#markup' => t('You did not add any paragraph bundles yet, click !here to add one.', array('!here' => $link)),
+    );
+  }
+
+  $element['fieldset'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Default value'),
+    '#collapsible' => FALSE,
+    // As field_ui_default_value_widget() does, we change the #parents so that
+    // the value below is writing to $instance in the right location.
+    '#parents' => array('instance'),
+  );
+  // Be sure to set the default value to NULL, for example to repair old fields
+  // that still have one.
+  $element['fieldset']['default_value'] = array(
+    '#type' => 'value',
+    '#value' => NULL,
+  );
+  $element['fieldset']['content'] = array(
+    '#pre' => '<p>',
+    '#markup' => t('To specify a default value, configure it via the regular default value setting of each field that is part of the paragraph bundle. To do so, go to the <a href="!url">Manage fields</a> screen of the paragraph bundle.', array('!url' => url('admin/structure/paragraphs'))),
+    '#suffix' => '</p>',
+  );
+  return $element;
+}
+
+/**
+ * Theme function for paragraphs bundle settings form.
+ *
+ * @see paragraphs_form_field_ui_field_edit_form_alter
+ */
+function theme_paragraphs_bundle_settings_form($variables) {
+  $form = $variables['form'];
+
+  // Initialize the variable which will store our table rows.
+  $rows = array();
+
+  uasort($form['instance']['settings']['allowed_bundles_table'], 'element_sort');
+
+  // Iterate over each element in our $form['example_items'] array.
+  foreach (element_children($form['instance']['settings']['allowed_bundles_table']) as $id) {
+
+    // Before we add our 'weight' column to the row, we need to give the
+    // element a custom class so that it can be identified in the
+    // drupal_add_tabledrag call.
+    //
+    // This could also have been done during the form declaration by adding
+    // '#attributes' => array('class' => 'example-item-weight'),
+    // directy to the 'weight' element in tabledrag_example_simple_form().
+    $form['instance']['settings']['allowed_bundles_table'][$id]['weight']['#attributes']['class'] = array('paragraphs-bundle-item-weight');
+
+    // We are now ready to add each element of our $form data to the $rows
+    // array, so that they end up as individual table cells when rendered
+    // in the final table.  We run each element through the drupal_render()
+    // function to generate the final html markup for that element.
+    $rows[] = array(
+      'data' => array(
+
+        // Add our 'enabled' column.
+        drupal_render($form['instance']['settings']['allowed_bundles_table'][$id]['enabled']),
+
+        // Add our 'weight' column.
+        drupal_render($form['instance']['settings']['allowed_bundles_table'][$id]['weight']),
+      ),
+
+      // To support the tabledrag behaviour, we need to assign each row of the
+      // table a class attribute of 'draggable'. This will add the 'draggable'
+      // class to the <tr> element for that row when the final table is
+      // rendered.
+      'class' => array('draggable'),
+    );
+  }
+
+  // We now define the table header values.  Ensure that the 'header' count
+  // matches the final column count for your table.
+  $header = array(t('Bundle'), t('Weight'));
+
+  // We also need to pass the drupal_add_tabledrag() function an id which will
+  // be used to identify the <table> element containing our tabledrag form.
+  // Because an element's 'id' should be unique on a page, make sure the value
+  // you select is NOT the same as the form ID used in your form declaration.
+  $table_id = drupal_html_id('paragraphs-bundle-table');
+
+  // We can render our tabledrag table for output.
+  $output = theme('table', array(
+    'header' => $header,
+    'rows' => $rows,
+    'attributes' => array('id' => $table_id),
+  ));
+
+  $form['instance']['settings']['allowed_bundles_table']['#markup'] = $output;
+
+  // And then render any remaining form elements (such as our submit button).
+  $output = drupal_render_children($form);
+
+  // We now call the drupal_add_tabledrag() function in order to add the
+  // tabledrag.js goodness onto our page.
+  //
+  // For a basic sortable table, we need to pass it:
+  // - the $table_id of our <table> element,
+  // - the $action to be performed on our form items ('order'),
+  // - a string describing where $action should be applied ('siblings'),
+  // - and the class of the element containing our 'weight' element.
+  drupal_add_tabledrag($table_id, 'order', 'sibling', 'paragraphs-bundle-item-weight');
+
+  return $output;
+}
+
+/**
+ * Implements hook_field_settings_form().
+ */
+function paragraphs_field_settings_form($field, $instance) {
+
+  $form = array();
+  return $form;
+}
+
+/**
+ * Implements hook_field_presave().
+ *
+ * Support saving paragraph items in @code $item['entity'] @endcode. This
+ * may be used to seamlessly create paragraph items during host-entity
+ * creation or to save changes to the host entity and its collections at once.
+ */
+function paragraphs_field_presave($host_entity_type, $host_entity, $field, $instance, $langcode, &$items) {
+  $top_host = $host_entity;
+  while (method_exists($top_host, 'hostEntity')) {
+    $top_host = $top_host->hostEntity();
+  }
+
+  // Prevent workbench moderation from deleting paragraphs on node_save()
+  // during workbench_moderation_store(), when $host_entity->revision == 0.
+  if (!empty($top_host->workbench_moderation['updating_live_revision'])) {
+    return;
+  }
+
+  foreach ($items as $key => &$item) {
+    // In case the entity has been changed / created, save it and set the id.
+    // If the host entity creates a new revision, save new item-revisions as
+    // well.
+    $entity = FALSE;
+    if (isset($item['entity'])) {
+      $entity = paragraphs_field_get_entity($item);
+    }
+    elseif (isset($item['revision_id'])) {
+      $entity = paragraphs_item_revision_load($item['revision_id']);
+    }
+
+    if ($entity) {
+      $entity->setHostEntity($host_entity_type, $host_entity, $langcode, FALSE);
+
+      // If the host entity supports revisions and is saved as new revision, do
+      // the same for the item.
+      if (!empty($host_entity->revision)) {
+        $entity->revision = TRUE;
+        $is_default = entity_revision_is_default($host_entity_type, $host_entity);
+        // If an entity type does not support saving non-default entities,
+        // assume it will be saved as default.
+        if (!isset($is_default) || $is_default) {
+          $entity->default_revision = TRUE;
+          $entity->archived = FALSE;
+        }
+      }
+
+      if (isset($entity->removed) && $entity->removed) {
+        unset($items[$key]);
+      }
+      else {
+        $entity->save(TRUE);
+
+        $item = array(
+          'value' => $entity->item_id,
+          'revision_id' => $entity->revision_id,
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_update().
+ *
+ * Care about removed paragraph items.
+ */
+function paragraphs_field_update($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  // Prevent workbench moderation from deleting paragraphs on node_save() during
+  // workbench_moderation_store(), when $host_entity->revision == 0.
+  if (!empty($entity->workbench_moderation['updating_live_revision'])) {
+    return;
+  }
+  // Prevent State Flow Entity from deleting paragraphs on node_save()
+  // when adding new paragraphs item and a published revision of the node exist.
+  // @see state_flow_entity_exit().
+  if (!empty($entity->state_flow) && isset($entity->revision) && $entity->revision === FALSE) {
+    return;
+  }
+
+  $items_original = !empty($entity->original->{$field['field_name']}[$langcode]) ? $entity->original->{$field['field_name']}[$langcode] : array();
+  $original_by_id = array_flip(paragraphs_field_item_to_ids($items_original));
+
+  foreach ($items as $item) {
+    unset($original_by_id[$item['value']]);
+  }
+
+  // If there are removed items, care about deleting the item entities.
+  if ($original_by_id) {
+    $ids = array_flip($original_by_id);
+
+    // If we are creating a new revision, the old-items should be kept but get
+    // marked as archived now.
+    if (!empty($entity->revision)) {
+      db_update('paragraphs_item')
+        ->fields(array('archived' => 1))
+        ->condition('item_id', $ids, 'IN')
+        ->execute();
+    }
+    else {
+      // Delete unused paragraph items now.
+      foreach (paragraphs_item_load_multiple($ids) as $item) {
+        $item->setHostEntity($entity_type, $entity, $langcode, FALSE);
+        $item->deleteRevision(TRUE);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_delete().
+ */
+function paragraphs_field_delete($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  if ($field['type'] == 'paragraphs') {
+    // Also delete all embedded entities.
+    if ($ids = paragraphs_field_item_to_ids($items)) {
+      // We filter out entities that are still being referenced by other
+      // host-entities. This should never be the case, but it might happen e.g.
+      // when modules clone a node without knowing about paragraphs.
+      $entity_info = entity_get_info($entity_type);
+      $entity_id_name = $entity_info['entity keys']['id'];
+      $field_column = key($field['columns']);
+
+      // Extra check to make sure our field exists.
+      if (is_scalar($field)) {
+        $field_definition = field_info_field($field['field_name']);
+        if (!empty($field_definition)) {
+          foreach ($ids as $id_key => $id) {
+            $query = new EntityFieldQuery();
+            $entities = $query
+              ->fieldCondition($field['field_name'], $field_column, $id)
+              ->execute();
+            unset($entities[$entity_type][$entity->$entity_id_name]);
+
+            if (!empty($entities[$entity_type])) {
+              // Filter this $id out.
+              unset($ids[$id_key]);
+            }
+          }
+        }
+      }
+
+      entity_delete_multiple('paragraphs_item', $ids);
+    }
+  }
+}
+
+/**
+ * Implements hook_field_delete_revision().
+ */
+function paragraphs_field_delete_revision($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  if ($field['type'] == 'paragraphs') {
+    foreach ($items as $item) {
+      if (!empty($item['revision_id'])) {
+        if ($paragraphs_item = paragraphs_item_revision_load($item['revision_id'])) {
+          $paragraphs_item->setHostEntity($entity_type, $entity, $langcode, FALSE);
+          $paragraphs_item->deleteRevision(TRUE);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Get an array of paragraph item IDs stored in the given field items.
+ */
+function paragraphs_field_item_to_ids($items) {
+  $ids = array();
+  foreach ($items as $item) {
+    if (!empty($item['value'])) {
+      $ids[] = $item['value'];
+    }
+  }
+  return $ids;
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function paragraphs_field_is_empty($item, $field) {
+  // Item is empty when we removed it.
+  if (isset($item['entity']) && ((isset($item['entity']->removed) && $item['entity']->removed) || (isset($item['entity']->confirmed_removed) && $item['entity']->confirmed_removed))) {
+    return TRUE;
+  }
+  if (!empty($item['value'])) {
+    return FALSE;
+  }
+  elseif (isset($item['entity']) && ($instances = field_info_instances('paragraphs_item', $item['entity']->bundle)) && !empty($instances)) {
+    // With a valid instance we can re-use the "field is empty" hook.
+    return paragraphs_item_is_empty($item['entity']);
+  }
+  elseif (isset($item['entity'])) {
+    // Because of hook_entity_view_alter, the content comes from a view but not
+    // stored in a field.
+    return FALSE;
+  }
+  return TRUE;
+}
+
+/**
+ * Determines whether a paragraphs field item is empty.
+ */
+function paragraphs_item_is_empty(ParagraphsItemEntity $item) {
+  $instances = field_info_instances('paragraphs_item', $item->bundle);
+  $is_empty = TRUE;
+
+  foreach ($instances as $instance) {
+    $field_name = $instance['field_name'];
+    $field = field_info_field($field_name);
+
+    // Determine the list of languages to iterate on.
+    $languages = field_available_languages('paragraphs_item', $field);
+
+    foreach ($languages as $langcode) {
+      if (!empty($item->{$field_name}[$langcode])) {
+        // If at least one paragraph is not empty; the
+        // paragraph item is not empty.
+        foreach ($item->{$field_name}[$langcode] as $field_item) {
+          if (!module_invoke($field['module'], 'field_is_empty', $field_item, $field)) {
+            $is_empty = FALSE;
+          }
+        }
+      }
+    }
+  }
+
+  // Allow other modules a chance to alter the value before returning.
+  drupal_alter('paragraphs_is_empty', $is_empty, $item);
+  return $is_empty;
+}
+
+/**
+ * Load a specific bundle or a list of bundles.
+ *
+ * @param string|null $name
+ *   The machine name or list of bundles to load when null.
+ * @param bool $rebuild
+ *   Whether to use cache or not.
+ *
+ * @return array|object|bool
+ *   The bundle, a list of bundles, or FALSE when not found.
+ */
+function paragraphs_bundle_load($name = NULL, $rebuild = FALSE) {
+  $cid = 'paragraphs_bundles';
+  $bundles = array();
+
+  // Load bundles from static or from Drupal cache.
+  $_bundles = &drupal_static($cid);
+  if (isset($_bundles) && !$rebuild) {
+    $bundles = $_bundles;
+  }
+  else {
+    $_bundles = cache_get($cid);
+    if ($_bundles && !$rebuild) {
+      $bundles = $_bundles->data;
+    }
+    else {
+      $query = db_select('paragraphs_bundle', 'pb')
+        ->fields('pb')
+        ->orderBy('pb.bundle', 'ASC');
+      foreach ($query->execute() as $bundle_object) {
+        $bundles[$bundle_object->bundle] = $bundle_object;
+      }
+      cache_set($cid, $bundles);
+    }
+    $_bundles = $bundles;
+  }
+
+  if ($name) {
+    $name = strtr($name, array('-' => '_'));
+    if (isset($bundles[$name])) {
+      return $bundles[$name];
+    }
+    return FALSE;
+  }
+  else {
+    return $bundles;
+  }
+}
+
+/**
+ * Menu load callback to scrub a paragraphs bundle from the URL safe equivalent.
+ */
+function paragraphs_panelizer_bundle_name_load($name) {
+  if (($bundle = paragraphs_bundle_load($name))) {
+    return $bundle->bundle;
+  }
+}
+
+/**
+ * Function to create or update an paragraphs bundle.
+ *
+ * @param object $bundle
+ *   The object of the bundle to create/update.
+ *
+ * @return int
+ *   SAVED_UPDATED when updated, SAVED_NEW when created.
+ *
+ * @throws Exception
+ */
+function paragraphs_bundle_save($bundle) {
+  $is_existing = (bool) db_query_range('SELECT 1 FROM {paragraphs_bundle} WHERE bundle = :bundle', 0, 1, array(':bundle' => $bundle->bundle))->fetchField();
+
+  $fields = array(
+    'bundle' => (string) $bundle->bundle,
+    'name' => (string) $bundle->name,
+    'label' => (string) $bundle->label,
+    'description' => (string) $bundle->description,
+    'locked' => (int) $bundle->locked,
+  );
+
+  if ($is_existing) {
+    db_update('paragraphs_bundle')
+      ->fields($fields)
+      ->condition('bundle', $bundle->bundle)
+      ->execute();
+    $status = SAVED_UPDATED;
+  }
+  else {
+    db_insert('paragraphs_bundle')
+      ->fields($fields)
+      ->execute();
+
+    $status = SAVED_NEW;
+  }
+
+  paragraphs_bundle_load(NULL, TRUE);
+  entity_info_cache_clear();
+  variable_set('menu_rebuild_needed', TRUE);
+  return $status;
+}
+
+/**
+ * Function to delete a bundle.
+ *
+ * @param string $bundle_machine_name
+ *   Machine name of the bundle to delete.
+ */
+function paragraphs_bundle_delete($bundle_machine_name) {
+  $bundle = paragraphs_bundle_load($bundle_machine_name);
+  if ($bundle) {
+    db_delete('paragraphs_bundle')
+      ->condition('bundle', $bundle->bundle)
+      ->execute();
+    field_attach_delete_bundle('paragraphs_item', $bundle->bundle);
+    paragraphs_bundle_load(NULL, TRUE);
+    entity_info_cache_clear();
+    variable_set('menu_rebuild_needed', TRUE);
+  }
+}
+
+/**
+ * Entity property info setter callback for the host entity property.
+ *
+ * As the property is of type entity, the value will be passed as a wrapped
+ * entity.
+ */
+function paragraphs_item_set_host_entity($item, $property_name, $wrapper) {
+  if (empty($item->is_new)) {
+    throw new EntityMetadataWrapperException('The host entity may be set only during creation of a paragraphs item.');
+  }
+  $item->setHostEntity($wrapper->type(), $wrapper->value());
+}
+
+/**
+ * Entity property info getter callback for the host entity property.
+ *
+ * As the property is of type 'entity', we have to return a wrapped entity.
+ */
+function paragraphs_item_get_host_entity($item) {
+  // We need to call hostEntity() first, because it sets the hostEntityType.
+  $entity = $item->hostEntity();
+  return entity_metadata_wrapper($item->hostEntityType(), $entity);
+}
+
+/**
+ * Callback for generating entity metadata property info for a field instance.
+ *
+ * @see paragraphs_field_info()
+ */
+function paragraphs_entity_metadata_property_callback(&$info, $entity_type, $field, $instance, $field_type) {
+  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$field['field_name']];
+
+  $property['field_name'] = $field['field_name'];
+  $property['getter callback'] = 'paragraphs_field_property_get';
+  $property['setter callback'] = 'paragraphs_field_property_set';
+}
+
+/**
+ * Entity property info getter callback for the paragraph items.
+ *
+ * Like entity_metadata_field_property_get(), but additionally supports getting
+ * not-yet saved collection items from @code $item['entity'] @endcode.
+ */
+function paragraphs_field_property_get($entity, array $options, $name, $entity_type, $info) {
+  $field = field_info_field($name);
+  $langcode = field_language($entity_type, $entity, $name, isset($options['language']) ? $options['language']->language : NULL);
+  $values = array();
+  if (isset($entity->{$name}[$langcode])) {
+    foreach ($entity->{$name}[$langcode] as $delta => $data) {
+      // Wrappers do not support multiple entity references being revisions or
+      // not yet saved entities. In the case of a single reference we can return
+      // the entity object though.
+      if ($field['cardinality'] == 1) {
+        $values[$delta] = paragraphs_field_get_entity($data);
+      }
+      elseif (isset($data['value'])) {
+        $values[$delta] = $data['value'];
+      }
+    }
+  }
+  // For an empty single-valued field, we have to return NULL.
+  return $field['cardinality'] == 1 ? ($values ? reset($values) : NULL) : $values;
+}
+
+/**
+ * Entity property info setter callback for the paragraph items.
+ *
+ * Like entity_metadata_field_property_set(), but supports setting items with
+ * revision identifiers.
+ */
+function paragraphs_field_property_set($entity, $name, $value, $langcode, $entity_type) {
+  $field = field_info_field($name);
+  $columns = array_keys($field['columns']);
+  $langcode = entity_metadata_field_get_language($entity_type, $entity, $field, $langcode);
+  $values = $field['cardinality'] == 1 ? array($value) : (array) $value;
+
+  $items = array();
+  foreach ($values as $delta => $value) {
+    if (isset($value)) {
+      if ($value instanceof ParagraphsItemEntity) {
+        $items[$delta][$columns[0]] = $value->item_id;
+        $items[$delta][$columns[1]] = $value->revision_id;
+      }
+      elseif (is_array($value) && isset($value['value']) && isset($value['revision_id'])) {
+        $items[$delta][$columns[0]] = $value['value'];
+        $items[$delta][$columns[1]] = $value['revision_id'];
+      }
+      else {
+        $item = paragraphs_item_load($value);
+        $items[$delta][$columns[0]] = $item->item_id;
+        $items[$delta][$columns[1]] = $item->revision_id;
+      }
+    }
+  }
+  $entity->{$name}[$langcode] = $items;
+  // Empty the static field language cache, so the field system picks up any
+  // possible new languages.
+  drupal_static_reset('field_language');
+}
+
+/**
+ * Gets a paragraphs item entity for a given field item.
+ *
+ * @param string $field_name
+ *   (optional) If given and there is no entity yet, a new entity object is
+ *   created for the given item.
+ *
+ * @return object|bool
+ *   The entity object or FALSE.
+ */
+function paragraphs_field_get_entity(&$item, $bundle = NULL, $field_name = NULL) {
+  if (isset($item['entity'])) {
+    return $item['entity'];
+  }
+  elseif (isset($item['value'])) {
+    // By default always load the default revision, so caches get used.
+    $entity = paragraphs_item_load($item['value']);
+    if ($entity && $entity->revision_id != $item['revision_id']) {
+      // A non-default revision is a referenced, so load this one.
+      $entity = paragraphs_item_revision_load($item['revision_id']);
+    }
+    return $entity;
+  }
+  elseif (!isset($item['entity']) && isset($bundle) && isset($field_name)) {
+    $item['entity'] = entity_create('paragraphs_item', array('bundle' => $bundle, 'field_name' => $field_name));
+    return $item['entity'];
+  }
+  return FALSE;
+}
+
+/**
+ * Returns HTML for an individual form element.
+ *
+ * Combine multiple values into a table with drag-n-drop reordering.
+ * TODO : convert to a template.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - element: A render element representing the form element.
+ *
+ * @return string
+ *   An html string.
+ *
+ * @ingroup themeable
+ */
+function theme_paragraphs_field_multiple_value_form(array $variables) {
+  $element = $variables['element'];
+  $output = '';
+  $instance = $element['#instance'];
+
+  if (!isset($instance['settings']['title'])) {
+    $instance['settings']['title'] = PARAGRAPHS_DEFAULT_TITLE;
+  }
+  if (!isset($instance['settings']['title_multiple'])) {
+    $instance['settings']['title_multiple'] = PARAGRAPHS_DEFAULT_TITLE_MULTIPLE;
+  }
+
+  $add_mode = (isset($instance['settings']['add_mode']) ? $instance['settings']['add_mode'] : PARAGRAPHS_DEFAULT_ADD_MODE);
+
+  $required = !empty($element['#required']) ? theme('form_required_marker', $variables) : '';
+
+  // Sort items according to '_weight' (needed when the form comes back after
+  // preview or failed validation)
+  $items = array();
+  foreach (element_children($element) as $key) {
+    if ($key === 'add_more') {
+      $add_more_button = &$element[$key];
+    }
+    elseif ($key === 'add_more_type') {
+      $add_more_button_type = &$element[$key];
+    }
+    else {
+      if (!isset($element[$key]['#access']) || $element[$key]['#access']) {
+        $items[] = &$element[$key];
+      }
+    }
+  }
+  usort($items, '_field_sort_items_value_helper');
+
+  // If the field can hold more than one item, display it as a draggable table.
+  if ($element['#cardinality'] != 1) {
+    $table_id = drupal_html_id($element['#field_name'] . '_values');
+    $order_class = $element['#field_name'] . '-' . $table_id . '-delta-order';
+
+    $header = array(
+      array(
+        'data' => '<label>' . t('!title !required', array('!title' => $element['#title'], '!required' => $required)) . '</label>',
+        'colspan' => 2,
+        'class' => array('field-label'),
+      ),
+      t('Order'),
+    );
+    $rows = array();
+
+    // Add the items as table rows.
+    foreach ($items as $key => $item) {
+      $item['_weight']['#attributes']['class'] = array($order_class);
+      $delta_element = drupal_render($item['_weight']);
+      $cells = array(
+        array('data' => '', 'class' => array('field-multiple-drag')),
+        drupal_render($item),
+        array('data' => $delta_element, 'class' => array('delta-order')),
+      );
+      $class = !empty($item['#bundle']) ? array('draggable', drupal_html_class('paragraphs_item_type_' . $item['#bundle'])) : array();
+      $rows[] = array(
+        'data' => $cells,
+        'class' => $class,
+      );
+    }
+
+    $field_content = theme('table', array(
+      'header' => $header,
+      'rows' => $rows,
+      'attributes' => array(
+        'id' => $table_id,
+        'class' => array('field-multiple-table'),
+      ),
+    ));
+
+    drupal_add_tabledrag($table_id, 'order', 'sibling', $order_class);
+  }
+  // If the field can only hold one item, display it without the table wrapper.
+  else {
+    $value_id = drupal_html_id($element['#field_name'] . '_value');
+    $field_content = '<label for="' . $value_id . '">' . t('!title !required', array('!title' => $element['#title'], '!required' => $required)) . '</label>';
+    if (count($items)) {
+      // We don't need to render a weight field when there can only be one item.
+      unset($items[0]['_weight']);
+      $field_content .= '<div id="' . $value_id . '">' . drupal_render($items[0]) . '</div>';
+    }
+  }
+
+  $output = '<div class="form-item">';
+  if (count($items)) {
+    $output .= $field_content;
+  }
+  else {
+    $replacements = array(
+      '@title_multiple' => t('@title', array('@title' => $instance['settings']['title_multiple'])),
+      '@title' => t('@title', array('@title' => $instance['settings']['title'])),
+    );
+
+    if (count($element['#select_bundles']) === 1) {
+      if ($element['#cardinality'] == 1) {
+        $add_text = t('The @title has not been added yet. Press the button below to add it.', $replacements);
+      }
+      else {
+        $add_text = t('No @title_multiple added yet. Press the button below to add one.', $replacements);
+      }
+    }
+    elseif ($add_mode == 'button') {
+      $add_text = t('No @title_multiple added yet. Select a @title type and press a button below to add one.', $replacements);
+    }
+    else {
+      $add_text = t('No @title_multiple added yet. Select a @title type and press the button below to add one.', $replacements);
+    }
+
+    $output .= '<label>' . t('!title !required', array('!title' => $element['#title'], '!required' => $required)) . "</label>";
+    $output .= '<p><em>' . $add_text . '</em></p>';
+  }
+  $output .= $element['#description'] ? '<div class="description">' . $element['#description'] . '</div>' : '';
+  $output .= '<div class="clearfix">' . drupal_render($add_more_button_type) . drupal_render($add_more_button) . '</div>';
+  $output .= '</div>';
+
+  return $output;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function paragraphs_theme() {
+  return array(
+    'paragraphs_field_multiple_value_form' => array(
+      'render element' => 'element',
+    ),
+    'paragraphs_bundle_settings_form' => array(
+      'render element' => 'form',
+    ),
+    'paragraphs_items' => array(
+      'render element' => 'element',
+      'template' => 'paragraphs-items',
+      'path' => drupal_get_path('module', 'paragraphs') . '/theme',
+      'file' => 'paragraphs.theme.inc',
+    ),
+    'paragraphs_item' => array(
+      'render element' => 'elements',
+      'template' => 'paragraphs-item',
+      'path' => drupal_get_path('module', 'paragraphs') . '/theme',
+      'file' => 'paragraphs.theme.inc',
+    ),
+    'paragraphs_admin_overview' => array(
+      'variables' => array('bundle' => NULL),
+      'file' => 'paragraphs.admin.inc',
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_create_field().
+ */
+function paragraphs_field_create_field($field) {
+  if ($field['type'] == 'paragraphs') {
+
+    // Clear caches.
+    entity_info_cache_clear();
+    // Do not directly issue menu rebuilds here to avoid potentially multiple
+    // rebuilds. Instead, let menu_get_item() issue the rebuild on the next
+    // request.
+    variable_set('menu_rebuild_needed', TRUE);
+  }
+}
+
+/**
+ * Implements hook_field_delete_field().
+ */
+function paragraphs_field_delete_field($field) {
+  if ($field['type'] == 'paragraphs') {
+
+    // Clear caches.
+    entity_info_cache_clear();
+    // Do not directly issue menu rebuilds here to avoid potentially multiple
+    // rebuilds. Instead, let menu_get_item() issue the rebuild on the next
+    // request.
+    variable_set('menu_rebuild_needed', TRUE);
+  }
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function paragraphs_views_api() {
+  return array(
+    'api' => '3.0-alpha1',
+    'path' => drupal_get_path('module', 'paragraphs') . '/views',
+  );
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function paragraphs_module_implements_alter(&$implementations, $hook) {
+  switch ($hook) {
+    case 'field_attach_form':
+      // We put the implementation of field_attach_form implementation of
+      // paragraphs at the end, so it has a chance to disable the implementation
+      // of entity_translation that provides the form changes that will break
+      // paragraphs.
+      $group = $implementations['paragraphs'];
+      unset($implementations['paragraphs']);
+      $implementations['paragraphs'] = $group;
+      break;
+  }
+}
+
+/**
+ * Implements hook_field_attach_form().
+ */
+function paragraphs_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
+
+  // We make sure paragraphs don't use the entity translation defaults, as those
+  // are not implemented properly yet in paragraphs. So we better show an empty
+  // initial field for a translation of an existing entity, than making
+  // paragraphs break completely.
+  // A proper implementation of entity_translation has still to be discussed.
+  // @see https://drupal.org/node/2152931
+  list(, , $bundle) = entity_extract_ids($entity_type, $entity);
+
+  foreach (field_info_instances($entity_type, $bundle) as $instance) {
+
+    $field_name = $instance['field_name'];
+    $field_info = field_info_field($field_name);
+
+    if ($field_info['type'] == 'paragraphs') {
+      if (isset($form[$field_name])) {
+        $element = &$form[$field_name];
+
+        // Remove the entity_translation preparion for the element. This way we
+        // avoid that there will be form elements that do not have a
+        // corresponding form state for the field.
+        if (!empty($element['#process'])) {
+          $key = array_search('entity_translation_prepare_element', $element['#process']);
+
+          if ($key !== FALSE) {
+            unset($element['#process'][$key]);
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_prepare_translation().
+ *
+ * @see field_attach_prepare_translation()
+ */
+function paragraphs_field_prepare_translation($entity_type, $entity, $field, $instance, $langcode, &$items, $source_entity, $source_langcode) {
+  if (!module_exists("paragraphs_i18n")) {
+    list($id, ,) = entity_extract_ids($entity_type, $entity);
+
+    // field_attach_prepare_translation() copied the entity ids from the source,
+    // as we need a new entity for a new translation, we cannot reuse that.
+    // @todo clone existing paragraphs to new translation
+    if (empty($id)) {
+      $items = array();
+    }
+  }
+  else {
+    paragraphs_i18n_field_prepare_translation($entity_type, $entity, $field, $instance, $langcode, $items, $source_entity, $source_langcode);
+  }
+}
+
+/**
+ * Implements hook_features_api().
+ */
+function paragraphs_features_api() {
+  return array(
+    'paragraphs' => array(
+      'name' => t('Paragraphs Bundles'),
+      'feature_source' => TRUE,
+      'default_hook' => 'paragraphs_info',
+      'file' => drupal_get_path('module', 'paragraphs') . '/paragraphs.features.inc',
+    ),
+  );
+}
+
+/**
+ * Implements hook_bundle_copy_info().
+ */
+function paragraphs_bundle_copy_info() {
+  return array(
+    'paragraphs_item' => array(
+      'bundle_export_callback' => 'paragraphs_bundle_load',
+      'bundle_save_callback' => 'paragraphs_bundle_save',
+      'export_menu' => array(
+        'path' => 'admin/structure/paragraphs/export',
+        'access arguments' => 'administer content types',
+      ),
+      'import_menu' => array(
+        'path' => 'admin/structure/paragraphs/import',
+        'access arguments' => 'administer content types',
+      ),
+    ),
+  );
+}
+
+/**
+ * Helper to ensure entitycache table.
+ */
+function paragraphs_ensure_entitycache_table() {
+  if (module_exists('entitycache') && !db_table_exists('cache_entity_paragraphs_item')) {
+    drupal_load('module', 'entitycache');
+    $cache_schema = drupal_get_schema_unprocessed('system', 'cache');
+    $cache_schema['description'] = 'Cache table used to store paragraphs_item entity records.';
+    db_create_table('cache_entity_paragraphs_item', $cache_schema);
+  }
+}
+
+/**
+ * Helper to remove entitycache table.
+ */
+function paragraphs_remove_entitycache_table() {
+  if (db_table_exists('cache_entity_paragraphs_item')) {
+    db_drop_table('cache_entity_paragraphs_item');
+  }
+}
+
+/**
+ * Implements hook_modules_installed().
+ */
+function paragraphs_modules_installed($modules) {
+  if (in_array('entitycache', $modules)) {
+    paragraphs_ensure_entitycache_table();
+  }
+}
+
+/**
+ * Implements hook_modules_uninstalled().
+ */
+function paragraphs_modules_uninstalled($modules) {
+  if (in_array('entitycache', $modules)) {
+    paragraphs_remove_entitycache_table();
+  }
+}

@@ -1,0 +1,11 @@
+name = "Elysia Cron"
+description = "Extended cron support with crontab-like scheduling and other features."
+core = 7.x
+
+configure = admin/config/system/cron
+
+; Information added by Drupal.org packaging script on 2022-08-01
+version = "7.x-2.9"
+core = "7.x"
+project = "elysia_cron"
+datestamp = "1659341804"

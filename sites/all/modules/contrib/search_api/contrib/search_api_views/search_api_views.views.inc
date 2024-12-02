@@ -11,7 +11,6 @@
 function search_api_views_views_data() {
   try {
     $data = array();
-    $entity_types = entity_get_info();
     foreach (search_api_index_load_multiple(FALSE) as $index) {
       // Fill in base data.
       $key = 'search_api_index_' . $index->machine_name;
@@ -25,12 +24,8 @@ function search_api_views_views_data() {
         'help' => t('Use the %name search index for filtering and retrieving data.', array('%name' => $index->name)),
         'query class' => 'search_api_views_query',
       );
-      if (isset($entity_types[$index->getEntityType()])) {
-        $table['table'] += array(
-          'entity type' => $index->getEntityType(),
-          'skip entity load' => TRUE,
-        );
-      }
+      $table['table']['entity type'] = $index->getEntityType();
+      $table['table']['skip entity load'] = TRUE;
 
       try {
         $wrapper = $index->entityWrapper(NULL, FALSE);
@@ -104,6 +99,7 @@ function search_api_views_views_data() {
       $table['search_api_relevance']['title'] = t('Relevance');
       $table['search_api_relevance']['help'] = t('The relevance of this search result with respect to the query.');
       $table['search_api_relevance']['field']['type'] = 'decimal';
+      $table['search_api_relevance']['field']['float'] = TRUE;
       $table['search_api_relevance']['field']['handler'] = 'entity_views_handler_field_numeric';
       $table['search_api_relevance']['field']['click sortable'] = TRUE;
       $table['search_api_relevance']['sort']['handler'] = 'SearchApiViewsHandlerSort';
@@ -224,6 +220,9 @@ function _search_api_views_add_handlers($id, array $field, EntityMetadataWrapper
       $table[$id]['filter']['vocabulary'] = $vocabulary;
     }
   }
+  elseif (in_array($inner_type, array('integer', 'decimal', 'duration', 'string', 'uri'))) {
+    $table[$id]['filter']['handler'] = 'SearchApiViewsHandlerFilterNumeric';
+  }
   else {
     $table[$id]['filter']['handler'] = 'SearchApiViewsHandlerFilter';
   }
@@ -287,6 +286,16 @@ function search_api_views_views_plugins() {
       'use more' => TRUE,
       'accept attachments' => TRUE,
       'admin' => t('Facets block'),
+    );
+  }
+
+  if (module_exists('views_content_cache')) {
+    $ret['cache']['search_api_views_content_cache'] = array(
+      'title' => t('Search-specific content-based'),
+      'help' => t("Cache Search API views based on content updates. (Requires Views Content Cache)"),
+      'base' => $bases,
+      'handler' => 'SearchApiViewsContentCache',
+      'uses options' => TRUE,
     );
   }
 

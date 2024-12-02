@@ -1,0 +1,207 @@
+.node-type-cultural-protocol-group,
+.node-type-community {
+    // No top level shadow divider on community pages
+    .page-header {
+        background: none;
+    }
+}
+
+.node-cultural-protocol-group.view-mode-full,
+.node-community.view-mode-full {
+    .col-sm-9 {
+        >.field {
+            padding-top: 30px;
+            padding-bottom: 30px;
+        }
+    }
+
+    // Full width banner image
+    .field-name-field-protocol-image,
+    .field-name-field-community-image {
+        .fullwidth;
+        img {
+            width: 100%;
+        }
+    }
+
+    // Description
+    .field-name-body {
+        font-size: 16px;
+        color: @text-color;
+
+        // Desktop
+        @media (min-width: @screen-md-min) {
+            font-size: 18px;
+        }
+    }
+
+    // Recent Digital Heritage
+    .field-name-protocol-dh-items,
+    .field-name-community-dh-items {
+        .label-above {
+            font-weight: bold;
+            letter-spacing: @mukurtu-expanded-letter-spacing;
+            text-transform: uppercase;
+            font-size: 18px;
+            padding-bottom: 20px;
+        }
+    }
+
+    // Sidebar
+    .metadata-wrapper {
+        >.field {
+            .metadata-field-padding;
+
+            margin-top: 20px;
+            border-top: 5px solid @brand-secondary;
+            border-radius: 0px;
+            background-color: @mukurtu-navbar-collapse-bg;
+            padding-top: 0px;
+            padding-bottom: 20px;
+
+            h2,
+            .block-title,
+            .label-above {
+                .metadata-field-label;
+            }
+
+            .label-above {
+                padding-top: 20px;
+            }
+
+            a {
+                .mukurtu-standard-link;
+            }
+
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                margin-left: @grid-gutter-width;
+            }
+
+            .views-row {
+                padding-bottom: 12px;
+            }
+        }
+
+        .field-name-og-group-ref {
+            .textformatter-list {
+                padding-left: 0px;
+                padding-top: 10px;
+                list-style-type: none;
+            }
+        }
+
+
+        .field-name-community-membership-status {
+            .primary-color-link-container;
+            .chevron-right-middle;
+
+            border-top: none;
+            background-color: @mukurtu-community-membership-status-color;
+            padding-top: 20px;
+
+            &:hover {
+                background-color: @mukurtu-navbar-default-link-hover-bg;
+            }
+
+            span,
+            a {
+                .metadata-field-label;
+                color: #fff;
+            }
+        }
+    }
+
+    // Footer
+    // Contains links like "Add Members", "Manage Members"
+    .view-community-dh-items .view-footer {
+        text-align: center;
+    }
+    .view-footer {
+        padding-top: 20px;
+
+        .btn {
+            border: none;
+        }
+
+        .btn-default,
+        .btn-default:hover {
+            background-color: inherit;
+            padding: 5px 0;
+        }
+
+        a {
+            .arrow-right;
+            .mukurtu-standard-link;
+            padding-right: 15px;
+            font-weight: bold;
+        }
+    }
+}
+
+.view-community-dh-items {
+    .views-row {
+        .chevron-right;
+        background-position: 99% 25%;
+    }
+}
+
+.page-communities {
+    .view-communities {
+        .views-row {
+            padding-bottom: 30px;
+        }
+    }
+
+    .node-community.view-mode-thumbed {
+        clear: left;
+        border-style: solid;
+        border-width: 1px;
+        border-color: @mukurtu-view-row-divider-color;
+
+        .field-name-title {
+            position: absolute;
+            background-color: @brand-primary;
+            padding: 10px;
+            padding-left: 20px;
+            z-index: 1;
+
+            &:hover,
+            &:focus {
+                background-color: @mukurtu-navbar-default-link-hover-bg;
+            }
+
+            h3 {
+                margin-top: 11px;
+            }
+
+            a {
+                color: #fff;
+                font-weight: bold;
+                letter-spacing: @mukurtu-expanded-letter-spacing;
+                background: url(@mukurtu-arrow-right-path) no-repeat 0% 50%;
+                background-position: center right;
+                padding-right: 15px;
+
+                &:hover,
+                &:focus {
+                    text-decoration: none;
+                }
+            }
+        }
+    }
+}
+
+// Group Member Pager.
+.view-group-members {
+  .pagination {
+    width: 100%;
+
+    li, li.first, li.active {
+      a, span {
+        background: transparent;
+        font-size: 12px;
+      }
+    }
+  }
+}

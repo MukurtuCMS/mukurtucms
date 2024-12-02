@@ -10,6 +10,9 @@
  */
 class FeedsMapperPathTestCase extends FeedsMapperTestCase {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Mapper: Path',
@@ -18,6 +21,9 @@ class FeedsMapperPathTestCase extends FeedsMapperTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp(array('path'));
   }
@@ -139,6 +145,9 @@ class FeedsMapperPathTestCase extends FeedsMapperTestCase {
     $this->assertAliasCount($aliases);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function assertAliasCount($aliases) {
     $in_db = db_select('url_alias', 'a')
       ->fields('a')
@@ -148,6 +157,7 @@ class FeedsMapperPathTestCase extends FeedsMapperTestCase {
 
     $this->assertEqual(count($in_db), count($aliases), 'Correct number of aliases in db.');
   }
+
 }
 
 /**
@@ -155,6 +165,9 @@ class FeedsMapperPathTestCase extends FeedsMapperTestCase {
  */
 class FeedsMapperPathPathautoTestCase extends FeedsMapperTestCase {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Mapper: Path with pathauto',
@@ -164,6 +177,9 @@ class FeedsMapperPathPathautoTestCase extends FeedsMapperTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp(array('pathauto'));
   }
@@ -224,6 +240,9 @@ class FeedsMapperPathPathautoTestCase extends FeedsMapperTestCase {
     $this->assertAliasCount($aliases);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function assertAliasCount($aliases) {
     $in_db = db_query("SELECT * FROM {url_alias} WHERE alias IN (:aliases)", array(':aliases' => $aliases))->fetchAll();
     $this->assertEqual(count($in_db), count($aliases), 'Correct number of aliases in db.');

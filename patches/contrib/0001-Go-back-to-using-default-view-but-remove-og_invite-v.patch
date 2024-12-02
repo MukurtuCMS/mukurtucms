@@ -1,0 +1,33 @@
+From 0c0a1cbe763f14fd3adc2a6fa7b2d9f22e8e341f Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Tue, 20 Feb 2018 10:49:41 -0800
+Subject: [PATCH] Go back to using default view, but remove og_invite view
+ change
+
+---
+ sites/all/modules/contrib/og_invite/og_invite.module | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/sites/all/modules/contrib/og_invite/og_invite.module b/sites/all/modules/contrib/og_invite/og_invite.module
+index e2d8281..b5c516a 100644
+--- a/og_invite.module
++++ b/og_invite.module
+@@ -176,6 +176,7 @@ The @sitename team.', $body_params);
+  *
+  * Remove invitations from the group members admin view.
+  */
++/*
+ function og_invite_views_pre_view(&$view, &$display_id, &$args) {
+   list($view_name, $display) = explode(':', variable_get('og_ui_admin_people_view', 'og_members_admin:default'));
+   if ($view->name == $view_name && $view->current_display == $display) {
+@@ -192,6 +193,7 @@ function og_invite_views_pre_view(&$view, &$display_id, &$args) {
+     ));
+   }
+ }
++*/
+
+ /**
+  * Implements hook_form_FORM_ID_alter().
+--
+2.7.4
+

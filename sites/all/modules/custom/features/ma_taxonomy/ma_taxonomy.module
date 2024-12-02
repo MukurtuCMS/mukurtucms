@@ -1,0 +1,35 @@
+<?php
+/**
+ * @file
+ * Code for the Mukurtu Taxonomy feature.
+ */
+
+include_once 'ma_taxonomy.features.inc';
+
+function ma_taxonomy_get_browse_url($term) {
+    $path = drupal_get_path_alias('taxonomy/term/' . $term->tid);
+    $term_string = substr($path, strripos($path, '/') + 1);
+    return "/digital-heritage/{$term->vocabulary_machine_name}/{$term_string}";
+}
+
+/**
+ * Find a term by name/vocabulary name. Auto create if it doesn't exist.
+ */
+function ma_taxonomy_term_from_name($vocabulary_name, $name) {
+  // Does term exist already?
+  $terms = taxonomy_get_term_by_name($name, $vocabulary_name);
+  if (!empty($terms)) {
+    return current($terms);
+  } else {
+    // Auto-create
+    $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_name);
+    if ($vocabulary) {
+      $term = new stdClass();
+      $term->name = $name;
+      $term->vid = $vocabulary->vid;
+      taxonomy_term_save($term);
+      return $term;
+    }
+  }
+  return NULL;
+}

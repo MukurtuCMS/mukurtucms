@@ -23,7 +23,7 @@ class InsertQuery_sqlite extends InsertQuery {
     if (!$this->preExecute()) {
       return NULL;
     }
-    if (count($this->insertFields)) {
+    if (count($this->insertFields) || !empty($this->fromQuery)) {
       return parent::execute();
     }
     else {
@@ -36,7 +36,10 @@ class InsertQuery_sqlite extends InsertQuery {
     $comments = $this->connection->makeComment($this->comments);
 
     // Produce as many generic placeholders as necessary.
-    $placeholders = array_fill(0, count($this->insertFields), '?');
+    $placeholders = array();
+    if (!empty($this->insertFields)) {
+      $placeholders = array_fill(0, count($this->insertFields), '?');
+    }
 
     // If we're selecting from a SelectQuery, finish building the query and
     // pass it back, as any remaining options are irrelevant.
@@ -99,16 +102,15 @@ class UpdateQuery_sqlite extends UpdateQuery {
 
 /**
  * SQLite specific implementation of DeleteQuery.
- *
- * When the WHERE is omitted from a DELETE statement and the table being deleted
- * has no triggers, SQLite uses an optimization to erase the entire table content
- * without having to visit each row of the table individually.
- *
- * Prior to SQLite 3.6.5, SQLite does not return the actual number of rows deleted
- * by that optimized "truncate" optimization.
  */
 class DeleteQuery_sqlite extends DeleteQuery {
   public function execute() {
+    // When the WHERE is omitted from a DELETE statement and the table being
+    // deleted has no triggers, SQLite uses an optimization to erase the entire
+    // table content without having to visit each row of the table individually.
+    // Prior to SQLite 3.6.5, SQLite does not return the actual number of rows
+    // deleted by that optimized "truncate" optimization. But we want to return
+    // the number of rows affected, so we calculate it directly.
     if (!count($this->condition)) {
       $total_rows = $this->connection->query('SELECT COUNT(*) FROM {' . $this->connection->escapeTable($this->table) . '}')->fetchField();
       parent::execute();

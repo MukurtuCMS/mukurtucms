@@ -8,12 +8,16 @@ define('SIMPLETEST_SCRIPT_COLOR_PASS', 32); // Green.
 define('SIMPLETEST_SCRIPT_COLOR_FAIL', 31); // Red.
 define('SIMPLETEST_SCRIPT_COLOR_EXCEPTION', 33); // Brown.
 
+define('SIMPLETEST_SCRIPT_EXIT_SUCCESS', 0);
+define('SIMPLETEST_SCRIPT_EXIT_FAILURE', 1);
+define('SIMPLETEST_SCRIPT_EXIT_EXCEPTION', 2);
+
 // Set defaults and get overrides.
 list($args, $count) = simpletest_script_parse_args();
 
 if ($args['help'] || $count == 0) {
   simpletest_script_help();
-  exit;
+  exit(($count == 0) ? SIMPLETEST_SCRIPT_EXIT_FAILURE : SIMPLETEST_SCRIPT_EXIT_SUCCESS);
 }
 
 if ($args['execute-test']) {
@@ -30,7 +34,7 @@ else {
 drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
 if (!module_exists('simpletest')) {
   simpletest_script_print_error("The simpletest module must be enabled before this script can run.");
-  exit;
+  exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
 }
 
 if ($args['clean']) {
@@ -39,11 +43,11 @@ if ($args['clean']) {
   echo "\nEnvironment cleaned.\n";
 
   // Get the status messages and print them.
-  $messages = array_pop(drupal_get_messages('status'));
-  foreach ($messages as $text) {
+  $messages = drupal_get_messages('status');
+  foreach ($messages['status'] as $text) {
     echo " - " . $text . "\n";
   }
-  exit;
+  exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
 }
 
 // Load SimpleTest files.
@@ -64,7 +68,7 @@ if ($args['list']) {
       echo " - " . $info['name'] . ' (' . $class . ')' . "\n";
     }
   }
-  exit;
+  exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
 }
 
 $test_list = simpletest_script_get_test_list();
@@ -78,7 +82,7 @@ simpletest_script_reporter_init();
 $test_id = db_insert('simpletest_test_id')->useDefaults(array('test_id'))->execute();
 
 // Execute tests.
-simpletest_script_execute_batch($test_id, simpletest_script_get_test_list());
+$status = simpletest_script_execute_batch($test_id, simpletest_script_get_test_list());
 
 // Retrieve the last database prefix used for testing and the last test class
 // that was run from. Use the information to read the lgo file in case any
@@ -100,7 +104,7 @@ if ($args['xml']) {
 simpletest_clean_results_table($test_id);
 
 // Test complete, exit.
-exit;
+exit($status);
 
 /**
  * Print help text.
@@ -138,9 +142,13 @@ All arguments are long options.
   --all       Run all available tests.
 
   --class     Run tests identified by specific class names, instead of group names.
+              A specific test method can be added, for example,
+              'UserAccountLinksUnitTests::testDisabledAccountLink'.
 
   --file      Run tests identified by specific file names, instead of group names.
               Specify the path and the extension (i.e. 'modules/user/user.test').
+
+  --directory Run all tests found within the specified file directory.
 
   --xml       <path>
 
@@ -149,6 +157,31 @@ All arguments are long options.
   --color     Output text format results with color highlighting.
 
   --verbose   Output detailed assertion messages in addition to summary.
+
+  --fail-only When paired with --verbose, do not print the detailed messages
+              for passing tests.
+
+  --cache     (Experimental) Cache result of setUp per installation profile.
+              This will create one cache entry per profile and is generally safe
+              to use.
+              To clear all cache entries use --clean.
+
+  --cache-modules
+
+              (Experimental) Cache result of setUp per installation profile and
+              installed modules. This will create one copy of the database
+              tables per module-combination and therefore this option should not
+              be used when running all tests. This is most useful for local
+              development of individual test cases. This option implies --cache.
+              To clear all cache entries use --clean.
+
+  --ci-parallel-node-index
+
+              The index of the job in the job set.
+
+  --ci-parallel-node-total
+
+              The total number of instances of this job running in parallel.
 
   <test1>[,<test2>[,<test3> ...]]
 
@@ -190,13 +223,19 @@ function simpletest_script_parse_args() {
     'all' => FALSE,
     'class' => FALSE,
     'file' => FALSE,
+    'directory' => '',
     'color' => FALSE,
     'verbose' => FALSE,
+    'cache' => FALSE,
+    'cache-modules' => FALSE,
     'test_names' => array(),
+    'fail-only' => FALSE,
     // Used internally.
     'test-id' => 0,
     'execute-test' => '',
     'xml' => '',
+    'ci-parallel-node-index' => 1,
+    'ci-parallel-node-total' => 1,
   );
 
   // Override with set values.
@@ -222,7 +261,7 @@ function simpletest_script_parse_args() {
       else {
         // Argument not found in list.
         simpletest_script_print_error("Unknown argument '$arg'.");
-        exit;
+        exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
       }
     }
     else {
@@ -235,7 +274,7 @@ function simpletest_script_parse_args() {
   // Validate the concurrency argument
   if (!is_numeric($args['concurrency']) || $args['concurrency'] <= 0) {
     simpletest_script_print_error("--concurrency must be a strictly positive integer.");
-    exit;
+    exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
   }
 
   return array($args, $count);
@@ -257,6 +296,10 @@ function simpletest_script_init($server_software) {
     // '_' is an environment variable set by the shell. It contains the command that was executed.
     $php = $php_env;
   }
+  elseif (defined('PHP_BINARY') && $php_env = PHP_BINARY) {
+    // 'PHP_BINARY' specifies the PHP binary path during script execution. Available since PHP 5.4.
+    $php = $php_env;
+  }
   elseif ($sudo = getenv('SUDO_COMMAND')) {
     // 'SUDO_COMMAND' is an environment variable set by the sudo program.
     // Extract only the PHP interpreter, not the rest of the command.
@@ -265,7 +308,7 @@ function simpletest_script_init($server_software) {
   else {
     simpletest_script_print_error('Unable to automatically determine the path to the PHP interpreter. Supply the --php command line argument.');
     simpletest_script_help();
-    exit();
+    exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
   }
 
   // Get URL from arguments.
@@ -295,7 +338,11 @@ function simpletest_script_init($server_software) {
   if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
     // Ensure that any and all environment variables are changed to https://.
     foreach ($_SERVER as $key => $value) {
-      $_SERVER[$key] = str_replace('http://', 'https://', $_SERVER[$key]);
+      // The first time this script runs $_SERVER['SERVER_SOFTWARE'] will be
+      // NULL, so avoid errors from str_replace().
+      if (!empty($_SERVER[$key])) {
+        $_SERVER[$key] = str_replace('http://', 'https://', $_SERVER[$key]);
+      }
     }
   }
 
@@ -309,6 +356,8 @@ function simpletest_script_init($server_software) {
  */
 function simpletest_script_execute_batch($test_id, $test_classes) {
   global $args;
+
+  $total_status = SIMPLETEST_SCRIPT_EXIT_SUCCESS;
 
   // Multi-process execution.
   $children = array();
@@ -325,7 +374,7 @@ function simpletest_script_execute_batch($test_id, $test_classes) {
 
       if (!is_resource($process)) {
         echo "Unable to fork test process. Aborting.\n";
-        exit;
+        exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
       }
 
       // Register our new child.
@@ -345,27 +394,49 @@ function simpletest_script_execute_batch($test_id, $test_classes) {
       if (empty($status['running'])) {
         // The child exited, unregister it.
         proc_close($child['process']);
-        if ($status['exitcode']) {
+        if ($status['exitcode'] == SIMPLETEST_SCRIPT_EXIT_FAILURE) {
+          if ($status['exitcode'] > $total_status) {
+            $total_status = $status['exitcode'];
+          }
+        }
+        elseif ($status['exitcode']) {
+          $total_status = $status['exitcode'];
           echo 'FATAL ' . $test_class . ': test runner returned a non-zero error code (' . $status['exitcode'] . ').' . "\n";
         }
+
+        // Remove this child.
         unset($children[$cid]);
       }
     }
   }
+  return $total_status;
 }
 
 /**
  * Bootstrap Drupal and run a single test.
  */
 function simpletest_script_run_one_test($test_id, $test_class) {
+  global $args;
+
   try {
     // Bootstrap Drupal.
     drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
 
     simpletest_classloader_register();
 
-    $test = new $test_class($test_id);
-    $test->run();
+    if (strpos($test_class, '::') > 0) {
+      list($class_name, $method) = explode('::', $test_class, 2);
+      $methods = array($method);
+    }
+    else {
+      $class_name = $test_class;
+      // Use empty array to run all the test methods.
+      $methods = array();
+    }
+    $test = new $class_name($test_id);
+    $test->useSetupInstallationCache = !empty($args['cache']);
+    $test->useSetupModulesCache = !empty($args['cache-modules']);
+    $test->run($methods);
     $info = $test->getInfo();
 
     $had_fails = (isset($test->results['#fail']) && $test->results['#fail'] > 0);
@@ -374,11 +445,14 @@ function simpletest_script_run_one_test($test_id, $test_class) {
     simpletest_script_print($info['name'] . ' ' . _simpletest_format_summary_line($test->results) . "\n", simpletest_script_color_code($status));
 
     // Finished, kill this runner.
-    exit(0);
+    if ($had_fails || $had_exceptions) {
+      exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
+    }
+    exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
   }
   catch (Exception $e) {
     echo (string) $e;
-    exit(1);
+    exit(SIMPLETEST_SCRIPT_EXIT_EXCEPTION);
   }
 }
 
@@ -397,6 +471,13 @@ function simpletest_script_command($test_id, $test_class) {
   if ($args['color']) {
     $command .= ' --color';
   }
+  if ($args['cache-modules']) {
+    $command .= ' --cache --cache-modules';
+  }
+  elseif ($args['cache']) {
+    $command .= ' --cache';
+  }
+
   $command .= " --php " . escapeshellarg($php) . " --test-id $test_id --execute-test " . escapeshellarg($test_class);
   return $command;
 }
@@ -421,8 +502,16 @@ function simpletest_script_get_test_list() {
       // Check for valid class names.
       $test_list = array();
       foreach ($args['test_names'] as $test_class) {
-        if (class_exists($test_class)) {
-          $test_list[] = $test_class;
+        list($class_name, $method) = explode('::', $test_class, 2);
+        if (class_exists($class_name)) {
+          if (empty($method) || method_exists($class_name, $method)) {
+            $test_list[] = $test_class;
+          } else {
+            $all_methods = get_class_methods($class_name);
+            simpletest_script_print_error('Test method not found: ' . $test_class);
+            simpletest_script_print_alternatives($method, $all_methods, 6);
+            exit(1);
+          }
         }
         else {
           $groups = simpletest_test_get_all();
@@ -430,9 +519,9 @@ function simpletest_script_get_test_list() {
           foreach ($groups as $group) {
             $all_classes = array_merge($all_classes, array_keys($group));
           }
-          simpletest_script_print_error('Test class not found: ' . $test_class);
-          simpletest_script_print_alternatives($test_class, $all_classes, 6);
-          exit(1);
+          simpletest_script_print_error('Test class not found: ' . $class_name);
+          simpletest_script_print_alternatives($class_name, $all_classes, 6);
+          exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
         }
       }
     }
@@ -451,6 +540,51 @@ function simpletest_script_get_test_list() {
         }
       }
     }
+    elseif ($args['directory']) {
+      // Extract test case class names from specified directory.
+      // Find all tests in the PSR-X structure; Drupal\$extension\Tests\*.php
+      // Since we do not want to hard-code too many structural file/directory
+      // assumptions about PSR-0/4 files and directories, we check for the
+      // minimal conditions only; i.e., a '*.php' file that has '/Tests/' in
+      // its path.
+      // Ignore anything from third party vendors, and ignore template files used in tests.
+      // And any api.php files.
+      $ignore = array('nomask' => '/vendor|\.tpl\.php|\.api\.php/');
+      $files = array();
+      if ($args['directory'][0] === '/') {
+        $directory = $args['directory'];
+      }
+      else {
+        $directory = DRUPAL_ROOT . "/" . $args['directory'];
+      }
+      $file_list = file_scan_directory($directory, '/\.php|\.test$/', $ignore);
+      foreach ($file_list as $file) {
+        // '/Tests/' can be contained anywhere in the file's path (there can be
+        // sub-directories below /Tests), but must be contained literally.
+        // Case-insensitive to match all Simpletest and PHPUnit tests:
+        //   ./lib/Drupal/foo/Tests/Bar/Baz.php
+        //   ./foo/src/Tests/Bar/Baz.php
+        //   ./foo/tests/Drupal/foo/Tests/FooTest.php
+        //   ./foo/tests/src/FooTest.php
+        // $file->filename doesn't give us a directory, so we use $file->uri
+        // Strip the drupal root directory and trailing slash off the URI
+        $filename = substr($file->uri, strlen(DRUPAL_ROOT)+1);
+        if (stripos($filename, '/Tests/')) {
+          $files[drupal_realpath($filename)] = 1;
+        } else if (stripos($filename, '.test')){
+          $files[drupal_realpath($filename)] = 1;
+        }
+      }
+
+      // Check for valid class names.
+      foreach ($all_tests as $class_name) {
+        $refclass = new ReflectionClass($class_name);
+        $classfile = $refclass->getFileName();
+        if (isset($files[$classfile])) {
+          $test_list[] = $class_name;
+        }
+      }
+    }
     else {
       // Check for valid group names and get all valid classes in group.
       foreach ($args['test_names'] as $group_name) {
@@ -460,7 +594,7 @@ function simpletest_script_get_test_list() {
         else {
           simpletest_script_print_error('Test group not found: ' . $group_name);
           simpletest_script_print_alternatives($group_name, array_keys($groups));
-          exit(1);
+          exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
         }
       }
     }
@@ -468,8 +602,14 @@ function simpletest_script_get_test_list() {
 
   if (empty($test_list)) {
     simpletest_script_print_error('No valid tests were specified.');
-    exit;
+    exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
   }
+
+  if ((int) $args['ci-parallel-node-total'] > 1) {
+    $tests_per_job = ceil(count($test_list) / $args['ci-parallel-node-total']);
+    $test_list = array_slice($test_list, ($args['ci-parallel-node-index'] - 1) * $tests_per_job, $tests_per_job);
+  }
+
   return $test_list;
 }
 
@@ -496,9 +636,14 @@ function simpletest_script_reporter_init() {
   }
   else {
     echo "Tests to be run:\n";
-    foreach ($test_list as $class_name) {
-      $info = call_user_func(array($class_name, 'getInfo'));
-      echo " - " . $info['name'] . ' (' . $class_name . ')' . "\n";
+    foreach ($test_list as $test_name) {
+      if (strpos($test_name, '::') > 0) {
+        list($test_class, $method) = explode('::', $test_name, 2);
+        $info = call_user_func(array($test_class, 'getInfo'));
+      } else {
+        $info = call_user_func(array($test_name, 'getInfo'));
+      }
+      echo " - " . $info['name'] . ' (' . $test_name . ')' . "\n";
     }
     echo "\n";
   }
@@ -607,7 +752,7 @@ function simpletest_script_reporter_display_results() {
     $results = db_query("SELECT * FROM {simpletest} WHERE test_id = :test_id ORDER BY test_class, message_id", array(':test_id' => $test_id));
     $test_class = '';
     foreach ($results as $result) {
-      if (isset($results_map[$result->status])) {
+      if (isset($results_map[$result->status]) && (!$args['fail-only'] || $result->status !== 'pass')) {
         if ($result->test_class != $test_class) {
           // Display test class every time results are for new test class.
           echo "\n\n---- $result->test_class ----\n\n\n";
@@ -663,7 +808,7 @@ function simpletest_script_print_error($message) {
  */
 function simpletest_script_print($message, $color_code) {
   global $args;
-  if ($args['color']) {
+  if (!empty($args['color'])) {
     echo "\033[" . $color_code . "m" . $message . "\033[0m";
   }
   else {

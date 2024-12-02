@@ -72,6 +72,14 @@ function mee_schema() {
 }
 
 /**
+ * Implements hook_install().
+ */
+function mee_install() {
+  // default mee storage format to 'embed_div' - see mee_update_7002
+  variable_set('mee_store_format', 'embed_div');
+}
+
+/**
  * Upgrade MEE module to 7.x.
  */
 function mee_update_7000() {
@@ -157,4 +165,43 @@ function mee_update_7001(&$sandbox) {
   }
 
   $sandbox['#finished'] = $finished;
+}
+
+/**
+ * Explicitly default mee storage format to 'sas' for existing sites.
+ */
+function mee_update_7002() {
+  if (variable_get('mee_store_format', 'undefined') == 'undefined') {
+    variable_set('mee_store_format', 'sas');
+  }
+}
+
+/**
+ * Update plugins paths in CKEditor profiles.
+ */
+function mee_update_7003() {
+  if(module_exists('ckeditor')) {
+    module_load_include('inc', 'ckeditor', 'includes/ckeditor.lib');
+    $profiles_list = ckeditor_profile_input_formats();
+    $plugins_list = ckeditor_load_plugins();
+    foreach ($profiles_list AS $_profile => $_inputs) {
+      $changed = FALSE;
+      $profile = ckeditor_profile_load($_profile);
+      if (!isset($profile->settings['loadPlugins'])) continue;
+      foreach (array_keys((array) $profile->settings['loadPlugins']) as $plugin_name) {
+        if (in_array($plugin_name, array('dnd', 'dndck4'))) {
+          $profile->settings['loadPlugins'][$plugin_name] = $plugins_list[$plugin_name];
+          $changed = TRUE;
+        }
+      }
+      if ($changed === TRUE) {
+        db_update('ckeditor_settings')
+            ->fields(array(
+              'settings' => serialize($profile->settings)
+            ))
+            ->condition('name', $profile->name, '=')
+            ->execute();
+      }
+    }
+  }
 }

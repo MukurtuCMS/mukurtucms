@@ -50,12 +50,14 @@ function feeds_tamper_ui_menu() {
 
   $items['admin/structure/feeds/%feeds_importer/tamper/%feeds_tamper_plugin_instance/edit'] = array(
     'title callback' => 'feeds_tamper_ui_edit_title',
+    'title arguments' => array(5),
     'page arguments' => array('feeds_tamper_ui_edit_plugin_form', 5),
     'access arguments' => array(NULL, 5),
   ) + $defaults;
 
   $items['admin/structure/feeds/%feeds_importer/tamper/%feeds_tamper_plugin_instance/delete'] = array(
     'title callback' => 'feeds_tamper_ui_delete_title',
+    'title arguments' => array(5),
     'page arguments' => array('feeds_tamper_ui_delete_form', 5),
     'access arguments' => array(NULL, 5),
   ) + $defaults;

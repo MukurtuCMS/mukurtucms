@@ -6,8 +6,7 @@ version = VERSION
 core = 7.x
 files[] = translation.test
 
-; Information added by Drupal.org packaging script on 2015-10-21
-version = "7.41"
+; Information added by Drupal.org packaging script on 2024-11-20
+version = "7.102"
 project = "drupal"
-datestamp = "1445457729"
-
+datestamp = "1732133210"

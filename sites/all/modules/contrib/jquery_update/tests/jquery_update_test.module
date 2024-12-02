@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * @file
+ * Module to help test jQuery Update.
+ */
+
+/**
+ * Implements hook_init().
+ */
+function jquery_update_test_init() {
+  // Add libraries so that the script tags appear in basic pages.
+  drupal_add_library('system', 'ui.autocomplete');
+  drupal_add_library('system', 'jquery.form');
+  drupal_add_library('system', 'cookie');
+}
+
+/**
+ * Implements hook_menu().
+ */
+function jquery_update_test_menu() {
+  $items['jquery-update-test/drupal-add-js'] = array(
+    'title' => 'drupal_add_js()',
+    'page callback' => 'jquery_update_test_drupal_add_js',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Menu callback to output return value of drupal_add_js().
+ */
+function jquery_update_test_drupal_add_js() {
+  drupal_json_output(drupal_add_js());
+}

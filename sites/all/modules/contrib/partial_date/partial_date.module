@@ -1,0 +1,1921 @@
+<?php
+
+/**
+ * @file
+ * Defines a date element that allows for any combination of date granularity
+ * settings.
+ *
+ * Some of the core time handling code was inspired by the zend framework's
+ * Zend_Date class:
+ *
+ * @see
+ * http://framework.zend.com/code/filedetails.php?repname=Zend+Framework&path=%2Ftrunk%2Flibrary%2FZend%2FDate%2FDateObject.php&peg=22321
+ */
+
+/**
+ * TODO, account for that fact that there is no year 0 in the Gregorian calendar
+ *  AD 1 = year 1, 1 BC = year 0, 2 BC = year −1,
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function partial_date_menu() {
+  $counter = 0;
+  foreach (partial_date_format_types() as $type => $label) {
+    if (!$counter) {
+      $items['admin/config/regional/date-time/partial-date-formats'] = array(
+        'title' => t('Partial date formats'),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('partial_date_format_settings_form', $type),
+        'access arguments' => array('administer site configuration'),
+        'type' => MENU_LOCAL_TASK,
+        'file' => 'partial_date.pages.inc',
+      );
+      $items['admin/config/regional/date-time/partial-date-formats/' . $type] = array(
+        'title' => $label,
+        'type' => MENU_DEFAULT_LOCAL_TASK,
+        'weight' => $counter++,
+      );
+    }
+    else {
+      $items['admin/config/regional/date-time/partial-date-formats/' . $type] = array(
+        'title' => $label,
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('partial_date_format_settings_form', $type),
+        'access arguments' => array('administer site configuration'),
+        'type' => $counter ? MENU_LOCAL_TASK : MENU_DEFAULT_LOCAL_TASK,
+        'file' => 'partial_date.pages.inc',
+        'weight' => $counter++,
+      );
+    }
+  }
+  return $items;
+}
+
+################################################################################
+#                                                                              #
+#  Field API Hooks & Helpers: Fields                                           #
+#                                                                              #
+#  --------------------------------------------------------------------------  #
+#                                                                              #
+#  Implements:                                                                 #
+#   * hook_field_info()                                                        #
+#   * hook_field_settings_form()                                               #
+#   * hook_field_instance_settings_form()                                      #
+#   * hook_field_load()                                                        #
+#   * hook_field_validate()                                                    #
+#   * hook_field_is_empty()                                                    #
+#   * hook_field_presave()                                                     #
+#                                                                              #
+#  Helpers:                                                                    #
+#   * partial_date_field_estimates_default_settings()                          #
+#                                                                              #
+#     Provides the default lists for some of the date range lists.             #
+#                                                                              #
+#   * partial_date_field_estimates_settings_form()                             #
+#                                                                              #
+#     Shared field and instance FAPI elements for for date range lists.        #
+#                                                                              #
+#   * partial_date_field_estimates_validate_parse_options()                    #
+#                                                                              #
+#     Shared field and instance setting for for date component range lists.    #
+#                                                                              #
+#   * partial_date_field_estimates()                                           #
+#                                                                              #
+#     Helper function to load the estimate options from the field              #
+#                                                                              #
+#   * partial_date_field_populate_components()                                 #
+#                                                                              #
+#     Helper for hook_field_presave() to populate any missing values prior to  #
+#     generating the float date value estimates. (The fake timestamp columns). #
+#                                                                              #
+#   * partial_date_field_presave_generate_storage_date()                       #
+#                                                                              #
+#     Helper for hook_field_presave() to ensure that all of the columns are    #
+#     set in the correct position and names for the storage engine.            #
+#                                                                              #
+#   * partial_date_field_validate_year()                                       #
+#                                                                              #
+#     Helper for hook_field_validate() to test that the year in within range.  #
+#                                                                              #
+################################################################################
+
+/**
+ * Implements hook_field_info().
+ */
+function partial_date_field_info() {
+  module_load_include('admin.inc', 'partial_date');
+  return _partial_date_field_info();
+}
+
+/**
+ * Property info callback function.
+ */
+function partial_date_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
+  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$field['field_name']];
+
+  $property['getter callback'] = 'entity_metadata_field_verbatim_get';
+  $property['setter callback'] = 'entity_metadata_field_verbatim_set';
+  unset($property['query callback']);
+
+  $property['property info']['timestamp'] = array(
+    'type' => 'integer',
+    'label' => t('Timestamp'),
+    'setter callback' => 'entity_property_verbatim_set',
+  );
+
+  $property['property info']['txt_short'] = array(
+    'type' => 'text',
+    'label' => t('Short description of the date'),
+    'setter callback' => 'entity_property_verbatim_set',
+  );
+
+  $property['property info']['txt_long'] = array(
+    'type' => 'text',
+    'label' => t('Long description of the date'),
+    'setter callback' => 'entity_property_verbatim_set',
+  );
+
+  $property['property info']['year'] = array(
+    'type' => 'integer',
+    'label' => t('Year'),
+    'setter callback' => 'entity_property_verbatim_set',
+  );
+
+  $property['property info']['month'] = array(
+    'type' => 'integer',
+    'label' => t('Month'),
+    'setter callback' => 'entity_property_verbatim_set',
+  );
+
+  $property['property info']['day'] = array(
+    'type' => 'integer',
+    'label' => t('Day'),
+    'setter callback' => 'entity_property_verbatim_set',
+  );
+
+  $property['property info']['hour'] = array(
+    'type' => 'integer',
+    'label' => t('Hour'),
+    'setter callback' => 'entity_property_verbatim_set',
+  );
+
+  $property['property info']['minute'] = array(
+    'type' => 'integer',
+    'label' => t('Minute'),
+    'setter callback' => 'entity_property_verbatim_set',
+  );
+
+  $property['property info']['second'] = array(
+    'type' => 'integer',
+    'label' => t('Second'),
+    'setter callback' => 'entity_property_verbatim_set',
+  );
+
+  if ($field_type['property_type'] == 'partial_date_range') {
+    $property['property info']['timestamp_to'] = array(
+      'type' => 'integer',
+      'label' => t('Timestamp (to)'),
+      'setter callback' => 'entity_property_verbatim_set',
+    );
+
+    $property['property info']['year_to'] = array(
+      'type' => 'integer',
+      'label' => t('Year (to)'),
+      'setter callback' => 'entity_property_verbatim_set',
+    );
+
+    $property['property info']['month_to'] = array(
+      'type' => 'integer',
+      'label' => t('Month (to)'),
+      'setter callback' => 'entity_property_verbatim_set',
+    );
+
+    $property['property info']['day_to'] = array(
+      'type' => 'integer',
+      'label' => t('Day (to)'),
+      'setter callback' => 'entity_property_verbatim_set',
+    );
+
+    $property['property info']['hour_to'] = array(
+      'type' => 'integer',
+      'label' => t('Hour (to)'),
+      'setter callback' => 'entity_property_verbatim_set',
+    );
+
+    $property['property info']['minute_to'] = array(
+      'type' => 'integer',
+      'label' => t('Minute (to)'),
+      'setter callback' => 'entity_property_verbatim_set',
+    );
+
+    $property['property info']['second_to'] = array(
+      'type' => 'integer',
+      'label' => t('Second (to)'),
+      'setter callback' => 'entity_property_verbatim_set',
+    );
+  }
+}
+
+/**
+ * Implements hook_field_settings_form().
+ */
+function partial_date_field_settings_form($field, $instance, $has_data) {
+  module_load_include('admin.inc', 'partial_date');
+  // Badly name, includes minimal components too.
+  return partial_date_field_estimates_settings_form($field['settings'], $field, $instance, $has_data);
+}
+
+/**
+ * Implements hook_field_load().
+ */
+function partial_date_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
+  $has_range = strpos($field['type'], '_range');
+  $estimates = partial_date_field_estimates($field);
+
+  foreach ($entities as $id => $entity) {
+    foreach ($items[$id] as $delta => &$item) {
+      $settings = $instances[$id]['widget']['settings'];
+
+      // Generate a cleaner array based storage of the values.
+      $item['data'] = empty($item['data']) ? array() : unserialize($item['data']);
+
+      $item['from'] = array();
+      if ($has_range) {
+        $item['to'] = array();
+      }
+      $item['check_approximate'] = empty($item['data']['check_approximate']) ? 0 : 1;
+
+      foreach (partial_date_components() as $key => $title) {
+        $item['from'][$key] = $item[$key];
+        // Clear auto-populated estimate values.
+        if (!empty($item['data'][$key . '_estimate_from_used'])) {
+          $item['from'][$key] = '';
+        }
+
+        unset($item[$key]);
+        if ($key != 'timezone') {
+          $item['from'][$key . '_estimate'] = isset($item['data'][$key . '_estimate']) ? $item['data'][$key . '_estimate'] : '';
+          _partial_date_expand_estimate($key, $item['from'], $estimates);
+        }
+        if ($has_range) {
+          $item['to'][$key] = $item[$key . '_to'];
+          unset($item[$key . '_to']);
+          // Clear auto-populated estimate values.
+          if (!empty($item['data'][$key . '_estimate_to_used'])) {
+            $item['to'][$key] = '';
+          }
+
+          if ($key != 'timezone') {
+            $item['to'][$key . '_estimate'] = isset($item['data'][$key . '_to_estimate']) ? $item['data'][$key . '_to_estimate'] : '';
+            _partial_date_expand_estimate($key, $item['to'], $estimates, FALSE);
+          }
+        }
+      }
+    }
+  }
+}
+
+function _partial_date_expand_estimate($key, &$item, $estimates, $is_start = TRUE) {
+  $item[$key . '_estimate_label'] = '';
+  $item[$key . '_estimate_value'] = NULL;
+
+  $value = $item[$key . '_estimate'];
+  if (!empty($value)) {
+    if (!empty($estimates[$key][$value])) {
+      $item[$key . '_estimate_label'] = $estimates[$key][$value];
+    }
+    list($start, $end) = explode('|', $value);
+    $item[$key . '_estimate_value'] = $is_start ? $start : $end;
+  }
+}
+
+/**
+ * Helper function to load the estimate options from the field or instance
+ * settings.
+ */
+function partial_date_field_estimates($field) {
+  if (!empty($field['settings']['estimates'])) {
+    return $field['settings']['estimates'];
+  }
+  return FALSE;
+}
+
+/**
+ * Implements hook_field_presave().
+ */
+function partial_date_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  module_load_include('admin.inc', 'partial_date');
+  _partial_date_field_presave($entity_type, $entity, $field, $instance, $langcode, $items);
+}
+
+/**
+ * Implements hook_field_validate().
+ *
+ * Possible error codes:
+ * - 'xxxx': The partial_date year is not valid
+ *
+ * @see partial_date_field_widget_error().
+ */
+function partial_date_field_validate($obj_type, $object, $field, $instance, $langcode, $items, &$errors) {
+  module_load_include('admin.inc', 'partial_date');
+  _partial_date_field_validate($obj_type, $object, $field, $instance, $langcode, $items, $errors);
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function partial_date_field_is_empty($item, $field) {
+  if ((isset($item['_remove']) && $item['_remove']) || !is_array($item)) {
+    return TRUE;
+  }
+  foreach (array('from', 'to') as $base) {
+    if (empty($item[$base])) {
+      continue;
+    }
+    foreach (partial_date_components() as $key => $label) {
+      if ($key == 'timezone') {
+        continue;
+      }
+      if (isset($item[$base][$key]) && strlen($item[$base][$key])) {
+        return FALSE;
+      }
+      if (isset($item[$base][$key . '_estimate']) && strlen($item[$base][$key . '_estimate'])) {
+        return FALSE;
+      }
+    }
+  }
+
+  return !((isset($item['txt_short']) && strlen($item['txt_short'])) ||
+         (isset($item['txt_long']) && strlen($item['txt_long'])));
+}
+
+################################################################################
+#  ---------------------------------                                           #
+#  Field API Hooks & Helpers: Widget                                           #
+#  ---------------------------------                                           #
+#                                                                              #
+#  Implements:                                                                 #
+#   * hook_field_widget_info()                                                 #
+#   * hook_field_widget_settings_form()                                        #
+#   * hook_field_widget_form()                                                 #
+#   * hook_field_widget_error()                                                #
+#                                                                              #
+#  Helpers:                                                                    #
+#   * partial_date_field_widget_reduce_date_components()                                             #
+#     This reduces all possible widget components into a singular array of     #
+#     components. Returns FALSE if empty.                                      #
+#                                                                              #
+################################################################################
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function partial_date_field_widget_info() {
+  return array(
+    'partial_date' => array(
+      'label' => t('Partial date'),
+      'field types' => array('partial_date', 'partial_date_range'),
+      'settings' => array(
+        'tz_handling' => 'none',
+        'theme_overrides' => array(
+          'check_approximate' => 0,
+          'txt_short' => 0,
+          'txt_long' => 0,
+          'range_inline' => 0,
+        ),
+        'granularity' => array(
+          'from' => drupal_map_assoc(array_keys(partial_date_components())),
+          'to' => drupal_map_assoc(array_keys(partial_date_components())),
+        ),
+        'estimates' => array(
+          'from' => array_combine(array_keys(partial_date_components(array('timezone'))), array_fill(0, 6, '')),
+          'to' => array_combine(array_keys(partial_date_components(array('timezone'))), array_fill(0, 6, '')),
+        ),
+        'increments' => array(
+          'second' => 1,
+          'minute' => 1,
+        ),
+        'hide_remove' > 0,
+        // @todo: i18n support here.
+        'help_txt' => array(),
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_settings_form().
+ */
+function partial_date_field_widget_settings_form($field, $instance) {
+  module_load_include('admin.inc', 'partial_date');
+  return _partial_date_field_widget_settings_form($field, $instance);
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function partial_date_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $base) {
+  module_load_include('admin.inc', 'partial_date');
+  return _partial_date_field_widget_form($form, $form_state, $field, $instance, $langcode, $items, $delta, $base);
+}
+
+/**
+ * Implements hook_field_widget_error().
+ *
+ * @see partial_date_field_validate().
+ */
+function partial_date_field_widget_error($element, $error, $form, &$form_state) {
+  switch ($error['error']) {
+    case 'partial_date_incomplete_from':
+    case 'partial_date_incomplete_to':
+      $base_key = strpos($error['error'], 'from') ? 'from' : 'to';
+      if (isset($error['partial_date_component']) && isset($element[$base_key][$error['partial_date_component']])) {
+        form_error($element[$base_key][$error['partial_date_component']], $error['message']);
+      }
+      else {
+        form_error($element[$base_key], $error['message']);
+      }
+      break;
+
+    case 'partial_date_incomplete_txt_short':
+    case 'partial_date_incomplete_txt_long':
+      $base_key = strpos($error['error'], 'from') ? 'from' : 'to';
+      form_error($element['year_to'], $error['message']);
+      break;
+
+    default:
+      form_error($element['from'], $error['message']);
+      break;
+  }
+}
+
+/**
+ * Helper function to assign the correct components into an array that the
+ * formatters can use.
+ */
+function partial_date_field_widget_reduce_date_components($item, $is_start = TRUE, $is_approx = FALSE) {
+  if (empty($item)) {
+    return FALSE;
+  }
+  $components = array();
+  foreach (partial_date_components() as $key => $title) {
+    if (!empty($item[$key . '_estimate'])) {
+      list($start, $end) = explode('|', $item[$key . '_estimate']);
+      $components[$key] = $is_start ? $start : $end;
+      $components[$key . '_estimate'] = $item[$key . '_estimate'];
+      // We hit this on save, so we can not rely on the load set.
+      if (isset($item[$key . '_estimate_label'])) {
+        $components[$key . '_estimate_label'] = $item[$key . '_estimate_label'];
+        $components[$key . '_estimate_value'] = $item[$key . '_estimate_value'];
+      }
+      if (isset($item[$key . '_estimate_value'])) {
+        $components[$key . '_estimate_value'] = $item[$key . '_estimate_value'];
+      }
+    }
+    else {
+      $components[$key] = isset($item[$key]) && strlen($item[$key]) ? $item[$key] : NULL;;
+    }
+  }
+  // No easy way to test a 0 value :{
+  $has_data = FALSE;
+  foreach ($components as $key => $value) {
+    if (strlen($value)) {
+      $has_data = TRUE;
+      break;
+    }
+  }
+  if (!$has_data) {
+    return FALSE;
+  }
+  return $components;
+}
+
+################################################################################
+#  ------------------------------------                                        #
+#  Field API Hooks & Helpers: Formatter                                        #
+#  ------------------------------------                                        #
+#                                                                              #
+#  Implements:                                                                 #
+#   * hook_field_formatter_info()                                              #
+#   * hook_field_formatter_settings_form()                                     #
+#   * hook_field_formatter_settings_summary()                                  #
+#   * hook_field_formatter_view()                                              #
+#                                                                              #
+#  Helpers:                                                                    #
+#   * partial_date_format_default_options()                                    #
+#     Default formatter options for the supported format types.                #
+#                                                                              #
+#   * partial_date_format_types()                                              #
+#     The core format types implemented by the module. Since we are not with   #
+#     complete dates, we can not fallback on the standard PHP formatters.      #
+#                                                                              #
+#   * partial_date_generate_date()                                             #
+#     Generates an example date item for deminstration of format only.         #
+#     This may not represent the parameters that are passed in.                #
+#                                                                              #
+#   * partial_date_txt_override_options()                                      #
+#     Formatter options on how to use the date descriptions.                   #
+#                                                                              #
+#   * partial_date_estimate_handling_options()                                 #
+#     Formatter options on how to display the estimate values.                 #
+#                                                                              #
+################################################################################
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function partial_date_field_formatter_info() {
+  module_load_include('admin.inc', 'partial_date');
+  return _partial_date_field_formatter_info();
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function partial_date_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  module_load_include('pages.inc', 'partial_date');
+  return _partial_date_field_formatter_settings_form($field, $instance, $view_mode, $form, $form_state);
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function partial_date_field_formatter_settings_summary($field, $instance, $view_mode) {
+  module_load_include('admin.inc', 'partial_date');
+  return _partial_date_field_formatter_settings_summary($field, $instance, $view_mode);
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ *
+ * This handles any text override options before passing the values onto the
+ * partial_date_render() or partial_date_render_range().
+ */
+function partial_date_field_formatter_view($object_type, $object, $field, $instance, $langcode, $items, $display) {
+  $has_range = strpos($field['type'], 'range');
+  $widget_settings = $instance['widget']['settings'];
+
+  $element = array();
+  foreach ($items as $delta => $item) {
+    $override = FALSE;
+    if (!is_array($item)) {
+      continue;
+    }
+    $item += array(
+      'txt_short' => NULL,
+      'txt_long' => NULL,
+      'check_approximate' => 0,
+    );
+    switch ($display['settings']['use_override']) {
+      case 'short':
+        if (strlen($item['txt_short'])) {
+          $override = $item['txt_short'];
+        }
+        break;
+      case 'long':
+        if (strlen($item['txt_long'])) {
+          $override = $item['txt_long'];
+        }
+        break;
+
+      case 'long_short':
+        if (strlen($item['txt_long'])) {
+          $override = $item['txt_long'];
+        }
+        elseif (strlen($item['txt_short'])) {
+          $override = $item['txt_short'];
+        }
+
+      case 'short_long':
+        if (strlen($item['txt_short'])) {
+          $override = $item['txt_short'];
+        }
+        elseif (strlen($item['txt_long'])) {
+          $override = $item['txt_long'];
+        }
+        break;
+    }
+
+    if ($override !== FALSE) {
+      $element[$delta] = array('#markup' => check_plain($override));
+    }
+    else {
+      $to = $from = FALSE;
+      // The additonal "Approximate only" checkbox.
+      $display['settings']['is_approximate'] = FALSE;
+      if (!empty($widget_settings['theme_overrides']['check_approximate'])) {
+        $display['settings']['is_approximate']  = !empty($item['check_approximate']);
+      }
+      if (isset($item['from'])) {
+        $from = partial_date_field_widget_reduce_date_components($item['from'], TRUE);
+      }
+      if (isset($item['to'])) {
+        $to = partial_date_field_widget_reduce_date_components($item['to'], FALSE);
+      }
+
+      $markup = '';
+      if ($to && $from) {
+        $markup = partial_date_render_range($from, $to, $display['settings']);
+      }
+      elseif ($to xor $from) {
+        $markup = partial_date_render($from ? $from : $to, $display['settings']);
+      }
+      unset($display['settings']['is_approximate']);
+      if ($markup) {
+        $element[$delta] = array('#markup' => $markup);
+      }
+    }
+  }
+
+  return $element;
+}
+
+function partial_date_render_range($from = NULL, $to = NULL, $settings = array()) {
+  if (empty($from) && empty($to)) {
+    return '';
+  }
+  // TODO: Make this configurable.
+  $settings += array(
+    'reduce' => TRUE,
+    'format' => 'short',
+  );
+  $settings['component_settings'] += partial_date_format_settings($settings['format']);
+  if ($settings['reduce']) {
+    partial_date_reduce_range_values($from, $to);
+  }
+
+  $from = partial_date_render($from, $settings);
+  $to = partial_date_render($to, $settings);
+
+  if ($to && $from) {
+    return theme('partial_date_range', array('from' => $from, 'to' => $to, 'settings' => $settings));
+  }
+  // One or both will be empty.
+  return $from . $to;
+}
+
+function partial_date_render($item, $settings = array()) {
+  if (empty($item)) {
+    return '';
+  }
+  $settings += array(
+    'format' => 'short',
+    'component_settings' => array(),
+    'is_approximate' => 0,
+  );
+  if ($settings['format'] != 'custom') {
+    $settings['component_settings'] = partial_date_format_settings($settings['format']);
+  }
+
+  return theme('partial_date', array(
+    'item' => $item,
+    'settings' => $settings['component_settings'],
+    'format' => $settings['format'],
+    'is_approximate' => $settings['is_approximate'],
+  ));
+}
+
+function partial_date_format_types($add_custom = FALSE) {
+  $formats = &drupal_static(__FUNCTION__);
+  if (!$formats) {
+    $formats = variable_get('partial_date_format_types', array(
+      'short' => t('Short', array(), array('context' => 'datetime')),
+      'medium' => t('Medium', array(), array('context' => 'datetime')),
+      'long' => t('Long', array(), array('context' => 'datetime')),
+    ));
+    $formats['custom'] = t('Custom', array(), array('context' => 'datetime'));
+  }
+  if (!$add_custom) {
+    $clone = $formats;
+    unset($formats['custom']);
+    return $clone;
+  }
+  return $formats;
+}
+
+function partial_date_format_settings($type) {
+  $settings = &drupal_static(__FUNCTION__, array());
+  if (!isset($settings[$type])) {
+    $settings[$type] = variable_get('partial_date_format_' . $type, partial_date_format_default_options($type));
+  }
+  return $settings[$type];
+}
+
+/**
+ * Provides the default settiings for the partial date formats.
+ */
+function partial_date_format_default_options($format) {
+  $formats = array(
+    'short' => array(
+      'display' => array(
+        'year' => 'estimate_label',
+        'month' => 'estimate_label',
+        'day' => 'estimate_label',
+        'hour' => 'estimate_label',
+        'minute' => 'estimate_label',
+        'second' => 'none',
+        'timezone' => 'none',
+      ),
+      'components' => array(
+        'approx' => array('value' => '', 'weight' => -1),
+        'year' => array('format' => 'y-ce', 'weight' => 0, 'empty' => ''),
+        'month' => array('format' => 'm', 'weight' => 1, 'empty' => ''),
+        'day' => array('format' => 'j', 'weight' => 2, 'empty' => ''),
+        'hour' => array('format' => 'H', 'weight' => 3, 'empty' => ''),
+        'minute' => array('format' => 'i', 'weight' => 4, 'empty' => ''),
+        'second' => array('format' => 's', 'weight' => 5, 'empty' => ''),
+        'timezone' => array('format' => 'T', 'weight' => 6, 'empty' => ''),
+        'c1' => array('value' => '', 'weight' => 7),
+        'c2' => array('value' => '', 'weight' => 8),
+        'c3' => array('value' => '', 'weight' => 9),
+      ),
+      'separator' => array(
+        'date' => '/',
+        'time' => ':',
+        'datetime' => ' ',
+        'other' => ' ',
+        'range' => '',
+      ),
+      'meridiem' => 'a',
+      'year_designation' => 'ce',
+    ),
+    'medium' => array(
+      'display' => array(
+        'year' => 'estimate_label',
+        'month' => 'estimate_label',
+        'day' => 'estimate_label',
+        'hour' => 'estimate_label',
+        'minute' => 'estimate_label',
+        'second' => 'estimate_label',
+        'timezone' => 'date_only',
+      ),
+      'components' => array(
+        'approx' => array('value' => '', 'weight' => -1),
+        'year' => array('format' => 'Y-ce', 'weight' => 0, 'empty' => ''),
+        'month' => array('format' => 'M', 'weight' => 1, 'empty' => ''),
+        'day' => array('format' => 'j-S', 'weight' => 2, 'empty' => ''),
+        'hour' => array('format' => 'h', 'weight' => 3, 'empty' => ''),
+        'minute' => array('format' => 'i', 'weight' => 4, 'empty' => ''),
+        'second' => array('format' => 's', 'weight' => 5, 'empty' => ''),
+        'timezone' => array('format' => 'T', 'weight' => 6, 'empty' => ''),
+        'c1' => array('value' => '', 'weight' => 7),
+        'c2' => array('value' => '', 'weight' => 8),
+        'c3' => array('value' => '', 'weight' => 9),
+      ),
+      'separator' => array(
+        'date' => ' ',
+        'time' => ':',
+        'datetime' => ' ',
+        'other' => ' ',
+        'range' => '',
+      ),
+      'meridiem' => 'a',
+      'year_designation' => 'ce',
+    ),
+    'long' => array(
+      'display' => array(
+        'year' => 'estimate_label',
+        'month' => 'estimate_label',
+        'day' => 'estimate_label',
+        'hour' => 'estimate_label',
+        'minute' => 'estimate_label',
+        'second' => 'estimate_label',
+        'timezone' => 'date_only',
+      ),
+      'components' => array(
+        'approx' => array('value' => '', 'weight' => -1),
+        'year' => array('format' => 'Y-ce', 'weight' => 0, 'empty' => ''),
+        'month' => array('format' => 'F', 'weight' => 1, 'empty' => ''),
+        'day' => array('format' => 'j-S', 'weight' => 2, 'empty' => ''),
+        'hour' => array('format' => 'h', 'weight' => 3, 'empty' => ''),
+        'minute' => array('format' => 'i', 'weight' => 4, 'empty' => ''),
+        'second' => array('format' => 's', 'weight' => 5, 'empty' => ''),
+        'timezone' => array('format' => 'e', 'weight' => 6, 'empty' => ''),
+        'c1' => array('value' => '', 'weight' => 7),
+        'c2' => array('value' => '', 'weight' => 8),
+        'c3' => array('value' => '', 'weight' => 9),
+      ),
+      'separator' => array(
+        'date' => ' ',
+        'time' => ':',
+        'datetime' => ', ',
+        'other' => ' ',
+        'range' => '',
+      ),
+      'meridiem' => 'a',
+      'year_designation' => 'ce',
+    ),
+  );
+
+  if (isset($formats[$format])) {
+    return $formats[$format];
+  }
+  return $formats['short'];
+}
+
+function partial_date_txt_override_options() {
+  return array(
+    'none' => t('Use date only', array(), array('context' => 'datetime')),
+    'short' => t('Use short description', array(), array('context' => 'datetime')),
+    'long' => t('Use long description', array(), array('context' => 'datetime')),
+    'long_short' => t('Use long or short description', array(), array('context' => 'datetime')),
+    'short_long' => t('Use short or long description', array(), array('context' => 'datetime')),
+  );
+}
+
+################################################################################
+#  --------------------------                                                  #
+#  Theming related functions:                                                  #
+#  --------------------------                                                  #
+#                                                                              #
+#  Implements:                                                                 #
+#   * hook_theme()                                                             #
+#                                                                              #
+#  Theming functions:                                                          #
+#   * theme_partial_date()                                                     #
+#   * theme_partial_date_long_date_format()                                    #
+#   * theme_partial_date_medium_date_format()                                  #
+#   * theme_partial_date_short_date_format()                                   #
+#                                                                              #
+#  Helpers:                                                                    #
+#   * partial_date_reduce_range_values()                                       #
+#     Reduces the from date component array so that individual components that #
+#     are common to both are not repeated.                                     #
+#                                                                              #
+################################################################################
+
+/**
+ * Implements hook_theme().
+ */
+function partial_date_theme() {
+  return array(
+    'partial_date_element' => array(
+      'render element' => 'element',
+    ),
+    'partial_date_range_inline_element' => array(
+      'render element' => 'element',
+      'file' => 'partial_date.theme.inc',
+    ),
+    'partial_date' => array(
+      'variables' => array('item' => NULL, 'format' => 'short', 'settings' => array()),
+    ),
+    'partial_date_range' => array(
+      'variables' => array('from' => NULL, 'to' => NULL, 'settings' => array()),
+    ),
+    'partial_date_format_settings_form' => array(
+      'render element' => 'form',
+      'file' => 'partial_date.pages.inc',
+    ),
+    'partial_date_inline_form_element' => array(
+      'render element' => 'element',
+      'file' => 'partial_date.theme.inc',
+    ),
+  );
+}
+
+
+/**
+ * The theme wrapper for a single date component.
+ * todo: floating support.
+ */
+function theme_partial_date_element($variables) {
+  $element = $variables['element'];
+  return '<div class="partial-date-element clearfix">' . drupal_render_children($element) . '</div>';
+}
+
+function theme_partial_date_range($variables) {
+  $to = $variables['to'];
+  $from = $variables['from'];
+  $settings = $variables['settings'];
+  $separator = '';
+  if (!empty($settings['component_settings'])
+    && !empty($settings['component_settings']['separator'])
+    && !empty($settings['component_settings']['separator']['range'])) {
+    $separator = $settings['component_settings']['separator']['range'];
+  }
+  if (!strlen($separator)) {
+    $separator = t(' to ', array(), array('context' => 'datetime'));
+  }
+  return t('@from@separator@to', array('@from' => $from, '@to' => $to, '@separator' => $separator));
+}
+
+/**
+ * TODO
+ *
+ * Template preprocess function to add theme suggestions for the various
+ * partial date format types.
+ */
+
+/**
+ * The partial date theme callback.
+ *
+ * Allows easy override of the format if required.
+ */
+function theme_partial_date($variables) {
+  $item = $variables['item'];
+  $settings = $variables['settings'];
+  $settings['format'] = $variables['format'];
+  $settings['is_approximate'] = !empty($variables['is_approximate']);
+  return partial_date_format($item, $settings);
+}
+
+function partial_date_reduce_range_values(&$from, &$to) {
+  // Reduce dates on granularity values.
+  foreach (array_keys(partial_date_components()) as $key) {
+    // Excat match as we need to compare '' to 0.
+    if (!isset($from[$key]) && !isset($to[$key])) {
+      continue;
+    }
+    elseif ((isset($from[$key]) || !isset($to[$key])) || $from[$key] !== $to[$key]) {
+      break;
+    }
+    $from[$key] = NULL;
+  }
+}
+
+################################################################################
+#  --------------------------                                                  #
+#  Element Related Functions:                                                  #
+#  --------------------------                                                  #
+#                                                                              #
+#  Implements:                                                                 #
+#   * hook_element_info()                                                      #
+#                                                                              #
+#  Helpers:                                                                    #
+#   * partial_date_element_validate()                                          #
+#     Element #element_validate callback.                                      #
+#                                                                              #
+#   * partial_date_element_process()                                           #
+#     Element #process callback.                                               #
+#                                                                              #
+################################################################################
+
+/**
+ * Implements hook_element_info().
+ *
+ * Provides a singular element that can handle all of the implemented partial
+ * date components; datetime granularility and timezone components.
+ */
+function partial_date_element_info() {
+  $types = array();
+  $types['partial_datetime_element'] = array(
+    '#input' => TRUE,
+    '#element_validate' => array('partial_date_element_validate'),
+    '#process' => array('partial_date_element_process'),
+    '#theme' => 'partial_date_element',
+    '#theme_wrappers' => array('form_element'),
+  );
+  return $types;
+}
+
+/**
+ * TODO: Validates the date type to stop dates like February 30, 2006.
+ */
+function partial_date_element_validate($element, $form_state) {
+  module_load_include('admin.inc', 'partial_date');
+  _partial_date_element_validate($element);
+}
+
+/**
+ * Roll out a single date element.
+ */
+function partial_date_element_process($element) {
+  module_load_include('admin.inc', 'partial_date');
+  return _partial_date_element_process($element);
+}
+
+################################################################################
+#  ------------------                                                          #
+#  Views Integration:                                                          #
+#  ------------------                                                          #
+################################################################################
+
+/**
+ * Implements hook_views_api().
+ */
+function partial_date_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'partial_date') . '/includes',
+  );
+}
+
+################################################################################
+#  ----------------------                                                      #
+#  API related functions:                                                      #
+#  ----------------------                                                      #
+#                                                                              #
+#  Note: It would be great to move these to the date_api.                      #
+#                                                                              #
+#  Main functions include:                                                     #
+#   * partial_date_components()                                                #
+#     Returns the date and time values used by the module.                     #
+#     This controls almost everything, from defining the schema to controlling #
+#     the output of the formatters.                                            #
+#                                                                              #
+#   * partial_date_day_ordinal_suffix()                                        #
+#     Returns the translated English ordinal suffix for a given day.           #
+#                                                                              #
+#   * partial_date_granularity_field_options()                                 #
+#     Returns select options for various components.                           #
+#                                                                              #
+#   * partial_date_is_leap_year()                                              #
+#     Checks to see if the specified year is a leap year.                      #
+#                                                                              #
+#   * partial_date_mktime()                                                    #
+#     Returns a timestamp (int / float) based on the available components.     #
+#                                                                              #
+#   * partial_date_month_abbreviations()                                       #
+#     Returns an option list of month abbreviations.                           #
+#                                                                              #
+#   * partial_date_month_matrix()                                              #
+#     Returns the valid month lengths based of the specified year.             #
+#                                                                              #
+#   * partial_date_timezone_handling_correlation()                             #
+#     Forces a given timezone into the specified timezone handling option.     #
+#                                                                              #
+#   * partial_date_timezone_option_is_selectable()                             #
+#     Determines if the timezone component should be rendered.                 #
+#                                                                              #
+#   * partial_date_timezone_handling_options()                                 #
+#     Returns an option list of supported timezone handling options.           #
+#                                                                              #
+#   * partial_date_year_designation_decorator()                                #
+#     Returns the year with the appropriative designation added.               #
+#                                                                              #
+#   * partial_date_year_designation_options()                                  #
+#     Returns an option list of supported year designations.                   #
+#                                                                              #
+################################################################################
+
+/**
+ * The minimum year that the module supports.
+ *
+ * Modifying this will alter how new timestamps are stored in the database.
+ *
+ * Setting to the something huge like 999999999999 should be OK, which would
+ * be needed for things like the scienific age of the universe. +/- 2000 years
+ * do not calculate leap years etc, and use a fixed number of seconds per year
+ * based on the length of the tropical year in 2000.
+ *
+ * @var int
+ */
+define('PD2_YEAR_MIN', -999999999999);
+
+/**
+ * The maximum year that the module supports.
+ *
+ * Modifying this will alter how new timestamps are stored in the database.
+ *
+ * @var int
+ */
+define('PD2_YEAR_MAX', 999999999999);
+
+/**
+ * The number of seconds for a tropical year in 2000.
+ *
+ * Outside of the 1AD to 3999AD, leap years are ignored and a set number of
+ * seconds per year are used to calculate the number seconds per year for the
+ * timestamp estimations. This is a float column, so the percision of this
+ * should be calculated to decide if this can be reduced even more.
+ *
+ * @var int
+ */
+define('PD2_SEC_PER_YEAR', 31556925);
+
+/**
+ * These are the core components that always exist, but are shown or hidden
+ * depending on the selected field settings.
+ */
+function partial_date_components(array $excluded_components = NULL) {
+  static $components = NULL;
+  if (!isset($components)) {
+    $components = array(
+      'year' => t('Year', array(), array('context' => 'datetime')),
+      'month' => t('Month', array(), array('context' => 'datetime')),
+      'day' => t('Day', array(), array('context' => 'datetime')),
+      'hour' => t('Hour', array(), array('context' => 'datetime')),
+      'minute' => t('Minute', array(), array('context' => 'datetime')),
+      'second' => t('Second', array(), array('context' => 'datetime')),
+      'timezone' => t('Timezone', array(), array('context' => 'datetime')),
+    );
+  }
+  if ($excluded_components) {
+    return array_diff_key($components, array_flip($excluded_components));
+  }
+
+  return $components;
+}
+
+/**
+ * Returns a translated array of timezone handling options.
+ *
+ * Currently, this is a copy of the Dates module options.
+ */
+function partial_date_timezone_handling_options() {
+  return array(
+    'none' => t('No timezone conversion'),
+    'date' => t('User selectable', array(), array('context' => 'datetime')),
+    'site' => t("Site's timezone"),
+    'user' => t("User's account timezone"),
+    'utc' => t('UTC', array(), array('context' => 'datetime')),
+  );
+}
+
+/**
+ * Helper function to control how and if the timezone component should be
+ * rendered.
+ */
+function partial_date_timezone_option_is_selectable($tz_handling) {
+  return ($tz_handling == 'none' || $tz_handling == 'date');
+}
+
+/**
+ * Helper function to determine the correct timezone based on the timezone
+ * handling options used.
+ *
+ * @param string $timezone
+ *   Current timezone from the database or widget.
+ *
+ * @param string $tz_handling
+ *   The timezone handling options that needs enforcing.
+ */
+function partial_date_timezone_handling_correlation($timezone = '', $tz_handling = 'none') {
+  global $user;
+
+  // Override or return unchanged depending on the set action.
+  switch ($tz_handling) {
+    case 'utc':
+      return 'UTC';
+
+    case 'site':
+      return variable_get('date_default_timezone', @date_default_timezone_get());
+
+    case 'user':
+      if (variable_get('configurable_timezones', 1) && !empty($user->timezone)) {
+        return $user->timezone;
+      }
+      else {
+        return variable_get('user_default_timezone', DRUPAL_USER_TIMEZONE_DEFAULT) ? '' : variable_get('date_default_timezone', '');
+      }
+
+    case 'date':
+    case 'none':
+      // Parse the existing timezone.
+      $timezone = isset($timezone) ? $timezone : '';
+      switch ($timezone) {
+        case '--user--':
+        case '--site--':
+          $timezone = partial_date_timezone_handling_correlation($timezone, trim($timezone, '-'));
+          break;
+
+      }
+      return $timezone;
+
+    default:
+      return '';
+
+  }
+}
+
+/**
+ * Returns option lists for the various components, with the exception of year
+ * which is not supported.
+ *
+ * @param string $type
+ *   One of the date granularity keys: year, month, day, etc.
+ * @param array $options
+ *   Additional values to prefix onto the options list.
+ */
+function partial_date_granularity_field_options($type, $options = array(), $increment = 1) {
+  switch ($type) {
+    case 'second':
+    case 'minute':
+      return $options + date_minutes('i', FALSE, $increment);
+
+    case 'hour':
+      return $options + drupal_map_assoc(range(0, 23));
+
+    case 'day':
+      return $options + drupal_map_assoc(range(1, 31));
+
+    case 'month':
+      return $options + drupal_map_assoc(range(1, 12), 'map_month');
+
+    case 'timezone':
+      // Ref: Date API module
+      return $options + date_timezone_names(TRUE);
+
+    case 'year':
+    default:
+      return $options;
+  }
+}
+
+/**
+ * Maps out the valid month ranges for a given year.
+ *
+ * @param int $year
+ * @return array
+ *   Note, there is no array index.
+ */
+function partial_date_month_matrix($year = NULL) {
+  if ($year && partial_date_is_leap_year($year)) {
+    return array(31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
+  }
+  return array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
+}
+
+/**
+ * Returns a translated array of short month names.
+ */
+function partial_date_month_abbreviations($month) {
+  static $month_names;
+  if (empty($month_names)) {
+    $month_names = array(
+      1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'May', 6 => 'Jun',
+      7 => 'Jul', 8 => 'Aug', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dec');
+    foreach ($month_names as $key => $month_name) {
+      $month_names[$key] = t($month_name, array(), array('context' => 'datetime'));
+    }
+  }
+  if ($month) {
+    return $month_names[$month];
+  }
+  return $month_names;
+}
+
+/**
+ * Returns a translated array of month names.
+ */
+function partial_date_month_names($month) {
+  static $month_names;
+  if (empty($month_names)) {
+    $month_names = array(
+      1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April', 5 => 'May',
+      6 => 'June', 7 => 'July', 8 => 'August', 9 => 'September',
+      10 => 'October', 11 => 'November', 12 => 'December');
+
+    foreach ($month_names as $key => $month_name) {
+      $month_names[$key] = t($month_name, array(), array('context' => 'datetime'));
+    }
+  }
+  if ($month) {
+    return $month_names[$month];
+  }
+  return $month_names;
+}
+
+/**
+ * Returns a translated array of weekday names.
+ */
+function partial_date_weekday_name_abbreviations($week_day_number, $length = 3) {
+  $name = partial_date_weekday_names($week_day_number);
+  if (drupal_strlen($name) > $length) {
+    return drupal_substr($name, 0, $length);
+  }
+  return $name;
+}
+
+/**
+ * Returns a translated array of weekday names.
+ */
+function partial_date_weekday_names($week_day_number) {
+  static $day_names;
+  if (empty($day_names)) {
+    $day_names = array(
+      0 => 'Sunday', 1 => 'Monday', 2 => 'Tuesday', 3 => 'Wednesday',
+      4 => 'Thursday', 5 => 'Friday', 6 => 'Saturday');
+
+    foreach ($day_names as $key => $day_name) {
+      $day_names[$key] = t($day_name, array(), array('context' => 'datetime'));
+    }
+  }
+  if ($week_day_number) {
+    return $day_names[$week_day_number];
+  }
+  return $day_names;
+}
+
+/**
+ * Decorates a year with the given year designations.
+ *
+ * As there is no year 0, so an empty year will return an empty string.
+ */
+function partial_date_year_designation_decorator($year, $designation = 'ce') {
+  static $designation_suffixes;
+  if (empty($designation_suffixes)) {
+    $designation_suffixes = array(
+      'BC' => 'BC',
+      'AD' => 'AD',
+      'BCE' => 'BCE',
+      'CE' => 'CE',
+    );
+    foreach ($designation_suffixes as $key => $designation_suffix) {
+      $designation_suffixes[$key] = t($designation_suffix, array(), array('context' => 'datetime'));
+    }
+  }
+
+  if (empty($year) || !is_numeric($year)) {
+    return '';
+  }
+  switch ($designation) {
+    case 'ce':
+      return $year > 0 ? $designation_suffixes['CE'] : $designation_suffixes['BCE'];
+
+    case 'bce':
+      return $year > 0 ? '' : $designation_suffixes['BCE'];
+
+    case 'ad':
+      return $year > 0 ? $designation_suffixes['AD'] : $designation_suffixes['BC'];
+
+    case 'bc':
+      return $year > 0 ? '' : $designation_suffixes['BC'];
+
+    case 'sign':
+    default:
+      return '';
+  }
+}
+
+/**
+ * Returns a translated ordinal suffix for a given day of the month.
+ */
+function partial_date_day_ordinal_suffix($day) {
+  if (empty($day)) {
+    return '';
+  }
+  static $suffixes;
+  if (empty($suffixes)) {
+    $suffixes = array(
+      'st' => 'st',
+      'nd' => 'nd',
+      'rd' => 'rd',
+      'th' => 'th',
+    );
+    foreach ($suffixes as $key => $suffix) {
+      $suffixes[$key] = t($suffix, array(), array('context' => 'datetime'));
+    }
+  }
+
+  switch (($day = abs($day)) % 100) {
+    case 11:
+    case 12:
+    case 13:
+      return $suffixes['th'];
+
+    default:
+      switch ($day % 10) {
+        case 1:
+          return $suffixes['st'];
+
+        case 2:
+          return $suffixes['nd'];
+
+        case 3:
+          return $suffixes['rd'];
+
+        default:
+          return $suffixes['th'];
+      }
+  }
+}
+
+/**
+ * Returns true, if given $year is a leap year.
+ *
+ * @param  integer $year
+ * @return boolean true, if year is leap year
+ */
+function partial_date_is_leap_year($year) {
+  if (empty($year)) {
+    return FALSE;
+  }
+
+   if ($year < 1582) {
+    // pre Gregorio XIII - 1582
+    return $year % 4 == 0;
+   }
+   else {
+     // post Gregorio XIII - 1582
+     return (($year % 4 == 0) && ($year % 100 != 0)) || ($year % 400 == 0);
+   }
+}
+
+/**
+ * Generates a numeric date string.
+ */
+function partial_date_float(array $c) {
+  foreach (partial_date_components(array('timezone')) as $key => $label) {
+    if (!isset($c[$key]) || !strlen($c[$key])) {
+      $c[$key] = 0;
+    }
+    elseif ($key != 'year' && $key != 'month') {
+      // Increment hours, minutes and seconds to allow the module to distintish
+      // between 0 meaning unset and 1 to 24/60 being the actual values.
+      // Day is incremented to provide a buffer to add / remove the timezone.
+      $c[$key] = $c[$key] + 1;
+    }
+  }
+
+  $date = abs($c['year'])
+      . sprintf('%02s', $c['month'])  // 0 or 1-12
+      . sprintf('%02s', $c['day']) // 0 or 2-32
+      . sprintf('%02s', $c['hour']) // 0 or 1-24
+      . sprintf('%02s', $c['minute']) // 0 or 1-60
+      . sprintf('%02s', $c['second']); // 0 or 1-60
+  return ((float) ltrim($date, '0')) * ($c['year'] >= 0 ? 1.0 : -1.0);
+}
+
+/**
+ * Creates a timestamp based on the available components.
+ *
+ * Copied from Zend_Date. Significantly modified.
+ *
+ * @param array $components
+ *   An array of all the defined date components including timezone.
+ *
+ * @return  integer|float
+ *   An approx. timestamp (number of seconds elapsed relative to 1970/01/01 00:00:00 GMT/UTC)
+ */
+function partial_date_mktime(array $components) {
+  $components = array_intersect_key($components, partial_date_components());
+  extract($components, EXTR_SKIP);
+
+  if ((1901 < $year) and ($year < 2038)) {
+    $oldzone = @date_default_timezone_get();
+    if ($timezone && ($timezone != $oldzone)) {
+      date_default_timezone_set($timezone);
+    }
+    $result = @mktime($hour, $minute, $second, $month, $day, $year);
+    if ($timezone && ($timezone != $oldzone)) {
+      date_default_timezone_set($oldzone);
+    }
+    if ($result !== FALSE) {
+      return $result;
+    }
+  }
+
+        // Get approx. offset
+# Error in float pre 1900 probably makes this pointless
+#        if ($gmt !== true) {
+#          $tz = new DateTimeZone($timezone);
+#          $second += $tz->getOffset(date_create('2000-01-01 00:00 GMT'));
+#        }
+
+  // date to integer
+  $day   = intval($day);
+  $month = intval($month);
+  $year  = intval($year);
+  $_monthTable = partial_date_month_matrix();
+
+  if ($month > 12) {
+    $overlap = floor($month / 12);
+    $year   += $overlap;
+    $month  -= $overlap * 12;
+  }
+  else {
+    $overlap = ceil((1 - $month) / 12);
+    $year   -= $overlap;
+    $month  += $overlap * 12;
+  }
+
+  $date = 0;
+  // correct months > 12 and months < 1
+  if ($year < -99999 || $year > 99999) {
+    // Calculate the average number of seconds in a year.
+    $seconds_in_year = ($year - 1970) * PD2_SEC_PER_YEAR;
+
+    $leapyear = partial_date_is_leap_year($year);
+    for ($mcount = 0; $mcount < ($month - 1); $mcount++) {
+      $date += $_monthTable[$mcount];
+      if (($leapyear === true) and ($mcount == 1)) {
+          $date++;
+      }
+    }
+    $date += $day - 1;
+    $date = (($date * 86400) + ($hour * 3600) + ($minute * 60) + $second + $seconds_in_year);
+  }
+  elseif ($year >= 1970) {
+    // Date is after UNIX epoch
+    // go through leapyears
+    // add months from latest given year
+    for ($count = 1970; $count <= $year; $count++) {
+      $leapyear = partial_date_is_leap_year($count);
+      if ($count < $year) {
+        $date += 365;
+        if ($leapyear === true) {
+            $date++;
+        }
+      }
+      else {
+        for ($mcount = 0; $mcount < ($month - 1); $mcount++) {
+          $date += $_monthTable[$mcount];
+          if (($leapyear === true) and ($mcount == 1)) {
+              $date++;
+          }
+        }
+      }
+    }
+
+    $date += $day - 1;
+    $date = (($date * 86400) + ($hour * 3600) + ($minute * 60) + $second);
+  }
+  else {
+    // Date is before UNIX epoch
+    // go through leapyears
+    // add months from latest given year
+    for ($count = 1969; $count >= $year; $count--) {
+      $leapyear = partial_date_is_leap_year($count);
+      if ($count > $year) {
+        $date += 365;
+        if ($leapyear === true) {
+          $date++;
+        }
+      }
+      else {
+        for ($mcount = 11; $mcount > ($month - 1); $mcount--) {
+          $date += $_monthTable[$mcount];
+          if (($leapyear === true) and ($mcount == 2)) {
+            $date++;
+          }
+        }
+      }
+    }
+
+    $date += ($_monthTable[$month - 1] - $day);
+    $date = -(($date * 86400) + (86400 - (($hour * 3600) + ($minute * 60) + $second)));
+
+    // gregorian correction for 5.Oct.1582
+    if ($date < -12220185600) {
+        $date += 864000;
+    }
+    elseif ($date < -12219321600) {
+        $date  = -12219321600;
+    }
+  }
+  return $date;
+}
+
+
+/**
+ * Function used by uasort to sort structured arrays by weight.
+ */
+function partial_date_sort($a, $b) {
+  $a_weight = (is_array($a) && isset($a['weight'])) ? $a['weight'] : 0;
+  $b_weight = (is_array($b) && isset($b['weight'])) ? $b['weight'] : 0;
+  if ($a_weight == $b_weight) {
+    return 0;
+  }
+  return ($a_weight < $b_weight) ? -1 : 1;
+}
+
+/**
+ * Returns any configured separators for two components.
+ */
+function _partial_date_component_separator($a, $b, $separators = array()) {
+  if ($a === FALSE) {
+    return;
+  }
+  $a_type = _partial_date_component_type($a);
+  $b_type = _partial_date_component_type($b);
+  if (!$a_type || !$b_type) {
+    $key = 'other';
+  }
+  elseif ($a_type == $b_type) {
+    $key = $a_type;
+  }
+  else {
+    $key = 'datetime';
+  }
+  return isset($separators[$key]) ? $separators[$key] : FALSE;
+
+}
+/**
+ * Helper function to determine the component type for inserting the component
+ * separator.
+ *
+ * @return mixed
+ *   One of date, time or FALSE.
+ */
+function _partial_date_component_type($key) {
+  switch ($key) {
+    case 'year':
+    case 'month':
+    case 'day':
+      return 'date';
+
+    case 'hour':
+    case 'minute':
+    case 'second':
+      return 'time';
+
+    case 'timezone':
+    default:
+      return FALSE;
+  }
+}
+
+
+function _partial_date_render_component($key, $item, $field, $format) {
+  switch ($field) {
+    case 'none':
+      return '';
+
+    case 'date_only':
+      return isset($item[$key]) ? $item[$key] : '';
+
+    case 'estimate_label':
+    case 'estimate_range': // Start (single or from dates) or End (to dates) of estimate range
+    case 'estimate_component': // Date component with fallback to estimate component
+    case 'date_or':
+
+    default:
+      return $field;
+  }
+}
+
+function partial_date_format($item, array $settings = array()) {
+  $components = array();
+  uasort($settings['components'], 'partial_date_sort');
+  // Skip unless we have a 12 hour format, then enforce it.
+  if (isset($settings['components']['hour'])
+      && ($settings['components']['hour'] == 'h' || $settings['components']['hour'] == 'g')) {
+    if (empty($settings['meridiem'])) {
+      $settings['meridiem'] = 'a';
+    }
+  }
+  else {
+    $settings['meridiem'] = '';
+  }
+
+  // Hide year designation if no valid year.
+  if (empty($item['year'])) {
+    $settings['year_designation'] = '';
+  }
+  elseif (!isset($settings['year_designation'])) {
+    $settings['year_designation'] = 'ce';
+  }
+
+  if (empty($settings['is_approximate']) || !isset($settings['is_approximate'])) {
+    $settings['components']['approx'] = '';
+  }
+
+  $valid_components = partial_date_components();
+  $last_type = FALSE;
+  foreach ($settings['components'] as $type => $component) {
+    $bypass_component = FALSE;
+
+    if (isset($valid_components[$type])) {
+      $markup = '';
+      // Value is determined by the $settings['display]
+      // If estimate, use this other use value
+      $display_type = empty($settings['display'][$type]) ? 'estimate_label' : $settings['display'][$type];
+      $estimate = empty($item[$type . '_estimate']) ? FALSE : $item[$type . '_estimate'];
+      $value = isset($item[$type]) && strlen($item[$type]) ? $item[$type] : FALSE;
+      // If no estimate, switch to the date only formating option.
+      if (!$estimate && ($display_type == 'date_or' || strpos($display_type, 'estimate_') === 0)) {
+        $display_type = 'date_only';
+      }
+
+      switch ($display_type) {
+        case 'none':
+          // We need to avoid adding an empty option.
+          $bypass_component = TRUE;
+          break;
+
+        case 'date_only':
+          if ($value !== FALSE) {
+            $markup = partial_date_format_component($value, $component['format'], $item, $settings);
+          }
+          break;
+
+        case 'date_or':
+          if ($value !== FALSE) {
+            $markup = partial_date_format_component($value, $component['format'], $item, $settings);
+            break;
+          }
+          // Fall through
+
+        case 'estimate_label':
+          $markup = $item[$type . '_estimate_label'];
+          // We no longer have a date / time like value.
+          $type = 'other';
+          break;
+
+        case 'estimate_range':
+          list($start, $end) = explode('|', $item[$type . '_estimate']);
+          $start = partial_date_format_component($start, $component['format'], $item, $settings);
+          $end = partial_date_format_component($end, $component['format'], $item, $settings);
+          if (strlen($start) && strlen($end)) {
+            $markup = t('@estimate_start to @estimate_end', array('@estimate_start' => $start, '@estimate_end' => $end));
+          }
+          elseif (strlen($start) xor strlen($end)) {
+            $markup = strlen($start) ? $start : $end;
+          }
+          break;
+
+        case 'estimate_component':
+          $markup = partial_date_format_component($item[$type . '_estimate_value'], $component['format'], $item, $settings);
+          break;
+
+      }
+
+      if ($bypass_component) {
+        continue;
+      }
+
+      if (!strlen($markup)) {
+        if (isset($component['empty']) && strlen($component['empty'])) {
+          // What do we get? If numeric, assume a date / time component, otherwise
+          // we can assume that we no longer have a date / time like value.
+          $markup = $component['empty'];
+          if (!is_numeric($markup)) {
+            $type = 'other';
+          }
+        }
+      }
+      if (strlen($markup)) {
+        if ($separator = _partial_date_component_separator($last_type, $type, $settings['separator'])) {
+          $components[] = $separator;
+        }
+        $components[] = $markup;
+        $last_type = $type;
+      }
+    }
+    elseif (isset($component['value']) && strlen($component['value'])) {
+      if ($separator = _partial_date_component_separator($last_type, $type, $settings['separator'])) {
+        $components[] = $separator;
+      }
+      $components[] = $component['value'];
+      $last_type = $type;
+    }
+
+  }
+  return implode('', $components);
+}
+
+function partial_date_format_component($value, $format, &$date, $additional = array()) {
+
+  $additional += array(
+    'year_designation' => 'ce',
+  );
+  // If dealing with 12 hour times, recalculate the value.
+  if ($format == 'h' || $format == 'g') {
+    if ($value > 12) {
+      $value -= 12;
+    }
+    elseif ($value == 0) {
+      $value = '12';
+    }
+    if (empty($additional['meridiem'])) {
+      $additional['meridiem'] = 'a';
+    }
+  }
+  else {
+    $additional['meridiem'] = '';
+  }
+
+  // Add suffixes for year and time formats
+  $suffix = '';
+  switch ($format) {
+    case 'd-S':
+    case 'j-S':
+      $suffix = partial_date_day_ordinal_suffix($value);
+      break;
+
+    case 'y-ce':
+    case 'Y-ce':
+      $suffix = partial_date_year_designation_decorator($value, $additional['year_designation']);
+      if (!empty($suffix) && !empty($value)) {
+        $value = abs($value);
+      }
+      break;
+  }
+
+  switch ($format) {
+    case 'y-ce':
+    case 'y':
+      return (strlen($value) > 2 ?  substr($value, - 2) : $value) . $suffix;
+
+    case 'F':
+      return partial_date_month_names($value) . $suffix;
+
+    case 'M':
+      return partial_date_month_abbreviations($value) . $suffix;
+
+    // Numeric representation of the day of the week  0 (for Sunday) through 6 (for Saturday)
+    case 'w':
+      if (!empty($date['year']) && !empty($date['month'])) {
+        return partial_date_day_of_week($date['year'], $date['month'], $value) . $suffix;
+      }
+      return '';
+
+    // A full textual representation of the day of the week.
+    case 'l':
+    // A textual representation of a day, three letters.
+    case 'D':
+      if (!empty($date['year']) && !empty($date['month'])) {
+        $day = partial_date_day_of_week($date['year'], $date['month'], $value);
+        if ($format == 'D') {
+          return partial_date_weekday_name_abbreviations($day, 3) . $suffix;
+        }
+        else {
+          return partial_date_weekday_names($day) . $suffix;
+        }
+      }
+      return '';
+
+    case 'n':
+    case 'j':
+    case 'j-S':
+    case 'g':
+    case 'G':
+      return intval($value) . $suffix;
+
+    case 'd-S':
+    case 'd':
+    case 'h':
+    case 'H':
+    case 'i':
+    case 's':
+    case 'm':
+      return sprintf('%02s', $value) . $suffix;
+
+    case 'Y-ce':
+    case 'Y':
+    case 'e':
+      return $value . $suffix;
+
+    case 'T':
+      try {
+        $tz = new DateTimeZone($value);
+        $transitions = $tz->getTransitions();
+        return $transitions[0]['abbr']  . $suffix;
+      }
+      catch (Exception $e) {}
+      return '';
+
+
+    // Todo: implement
+    // Year types
+    // ISO-8601 year number
+    case 'o':
+
+    // Day types
+    // The day of the year
+    case 'z':
+    // ISO-8601 numeric representation of the day of the week
+    case 'N':
+
+    // Timezone offsets
+    // Whether or not the date is in daylight saving time
+    case 'I':
+    // Difference to Greenwich time (GMT) in hours
+    case 'O':
+    // Difference to Greenwich time (GMT) with colon between hours and minutes
+    case 'P':
+    // Timezone offset in seconds
+    case 'Z':
+
+    default:
+      return '';
+  }
+}
+
+/**
+ * Gets day of week, 0 = Sunday through 6 = Saturday.
+ *
+ * Pope Gregory removed 10 days - October 5 to October 14 - from the year 1582
+ * and proclaimed that from that time onwards 3 days would be dropped from the
+ * calendar every 400 years.
+ *
+ * Thursday, October 4, 1582 (Julian) was followed immediately by Friday,
+ * October 15, 1582 (Gregorian).
+ *
+ * @see PEAR::Date_Calc
+ */
+function partial_date_day_of_week($year, $month, $day) {
+  $greg_correction = 0;
+  if ($year < 1582 || ($year == 1582 && ($month < 10 || ($month == 10 && $day < 15)))) {
+    $greg_correction = 3;
+  }
+
+  if ($month > 2) {
+    $month -= 2;
+  }
+  else {
+    $month += 10;
+    $year--;
+  }
+
+  $day = floor((13 * $month - 1) / 5) +
+         $day + ($year % 100) +
+         floor(($year % 100) / 4) +
+         floor(($year / 100) / 4) - 2 *
+         floor($year / 100) + 77 + $greg_correction;
+
+  return $day - 7 * floor($day / 7);
+}

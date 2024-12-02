@@ -241,7 +241,7 @@ function popup_filter_ajax_getdeltas($module){
 
 
 function popup_filter_ajax_getdisplays($view_name){
-
+  $options = '';
   if (module_exists('views')){
     $view = views_get_view($view_name);
     if (is_array($view->display)){

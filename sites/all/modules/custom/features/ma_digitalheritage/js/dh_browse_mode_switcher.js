@@ -55,7 +55,7 @@ Drupal.behaviors.my_custom_behavior = {
 
           $.cookie('dh_browse_mode', 'grid-view', {path: "/"}); // set the cookie to grid mode
 
-          $('.view-digital-heritage-grid-list .view-content').masonry();
+          //$('.view-digital-heritage-grid-list .view-content').masonry();
 
           if (originalViewMode == "map-view") {
             location.reload();
@@ -72,7 +72,7 @@ Drupal.behaviors.my_custom_behavior = {
           $(".view").removeClass("grid-view"); // removes .grid-view from the view class
           $.cookie('dh_browse_mode', 'list-view', {path: "/"}); // set the cookie to list-view
 
-          $('.view-digital-heritage-grid-list .view-content').masonry('destroy');
+          //$('.view-digital-heritage-grid-list .view-content').masonry('destroy');
 
           if (originalViewMode == "map-view") {
             location.reload();

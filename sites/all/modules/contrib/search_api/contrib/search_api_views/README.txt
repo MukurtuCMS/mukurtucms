@@ -24,6 +24,37 @@ When these are present, the normal keywords should be ignored and the related
 items be returned as results instead. Sorting, filtering and range restriction
 should all work normally.
 
+"Random sort" feature
+---------------------
+This module defines the "Random sort" feature (feature key:
+"search_api_random_sort") that allows to randomly sort the results returned by a
+search. With a server supporting this, you can use the "Global: Random" sort to
+sort the view's results randomly. Every time the query is run a different
+sorting will be provided.
+
+For developers:
+A service class that wants to support this feature has to check for a
+"search_api_random" field in the search query's sorts and insert a random sort
+in that position. If the query is sorted in this way, then the
+"search_api_random_sort" query option can contain additional options for the
+random sort, as an associative array with any of the following keys:
+- seed: A numeric seed value to use for the random sort.
+
+"BETWEEN operator" feature
+--------------------------
+This module defines the "BETWEEN operator" feature (feature key:
+"search_api_between") that adds the "BETWEEN" and "NOT BETWEEN" filter
+operators to search queries. If your search server supports this feature, you
+can use the "Is between" and "Is not between" operators when adding Views
+filters for numeric, string or date types.
+
+For developers:
+A service class that wants to support this feature has to accept "BETWEEN" and
+"NOT BETWEEN" as additional $operator values in query conditions. The value in
+both cases is an array with the keys 0 and 1, with the value under key 0 being
+the lower and the value under key 1 being the upper bound for the range in which
+the field's value should ("BETWEEN") or should not ("NOT BETWEEN") be.
+
 "Facets block" display
 ----------------------
 Most features should be clear to users of Views. However, the module also
@@ -105,6 +136,12 @@ Caution: For letting users use fulltext searches, always use the "Search:
 Fulltext search" filter or contextual filter – using a normal filter on a
 fulltext field won't parse the search keys, which means multiple words will only
 be found when they appear as that exact phrase.
+
+- Preserve facets while using filters
+This is another option under "Advanced" > "Query settings", only available when
+the Search Facets module is installed. When enabled, facet filters are persisted
+when submitting an exposed filters form. When disabled (the default), exposed
+filters will override and reset the selected facet filters.
 
 FAQ: Why „*Indexed* Node“?
 --------------------------

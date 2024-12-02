@@ -1,0 +1,14 @@
+diff --git a/scald.module b/scald.module
+index 5311bd0..f86cb61 100644
+--- a/scald.module
++++ b/scald.module
+@@ -1445,6 +1445,9 @@ function scald_render($sid, $context, $options = array(), $rebuild = FALSE) {
+     $content['#suffix'] .= '<!-- END scald=' . $atom->sid . ' -->';
+   }
+
++  // Mukurtu added hook for content warnings
++  drupal_alter('scald_display', $content, $atom, $context);
++
+   // Only cache the Atom if Contexts, etc. have not indicated that the rendering
+   // is not cacheable (e.g. it contains the current user's username).
+   if (!$atom->rendered->nocache) {

@@ -20,8 +20,7 @@ abstract class MediaBrowserPlugin implements MediaBrowserPluginInterface {
   protected $info;
 
   /**
-   * The parameters for the current media browser from
-   * media_get_browser_params().
+   * The parameters for current media browser from media_get_browser_params().
    *
    * @var array
    */
@@ -83,4 +82,5 @@ abstract class MediaBrowserPlugin implements MediaBrowserPluginInterface {
    *   Renderable array.
    */
   abstract public function view();
+
 }

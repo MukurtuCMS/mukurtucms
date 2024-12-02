@@ -24,7 +24,7 @@ class ModuleUpdater extends Updater implements DrupalUpdaterInterface {
    * found on your system, and if there was a copy in sites/all, we'd see it.
    */
   public function getInstallDirectory() {
-    if ($relative_path = drupal_get_path('module', $this->name)) {
+    if ($this->isInstalled() && ($relative_path = drupal_get_path('module', $this->name))) {
       $relative_path = dirname($relative_path);
     }
     else {
@@ -34,7 +34,7 @@ class ModuleUpdater extends Updater implements DrupalUpdaterInterface {
   }
 
   public function isInstalled() {
-    return (bool) drupal_get_path('module', $this->name);
+    return (bool) drupal_get_filename('module', $this->name, NULL, FALSE);
   }
 
   public static function canUpdateDirectory($directory) {
@@ -46,31 +46,6 @@ class ModuleUpdater extends Updater implements DrupalUpdaterInterface {
 
   public static function canUpdate($project_name) {
     return (bool) drupal_get_path('module', $project_name);
-  }
-
-  /**
-   * Return available database schema updates one a new version is installed.
-   */
-  public function getSchemaUpdates() {
-    require_once DRUPAL_ROOT . '/includes/install.inc';
-    require_once DRUPAL_ROOT . '/includes/update.inc';
-
-    if (_update_get_project_type($project) != 'module') {
-      return array();
-    }
-    module_load_include('install', $project);
-
-    if (!$updates = drupal_get_schema_versions($project)) {
-      return array();
-    }
-    $updates_to_run = array();
-    $modules_with_updates = update_get_update_list();
-    if ($updates = $modules_with_updates[$project]) {
-      if ($updates['start']) {
-        return $updates['pending'];
-      }
-    }
-    return array();
   }
 
   /**
@@ -109,7 +84,7 @@ class ThemeUpdater extends Updater implements DrupalUpdaterInterface {
    * found on your system, and if there was a copy in sites/all, we'd see it.
    */
   public function getInstallDirectory() {
-    if ($relative_path = drupal_get_path('theme', $this->name)) {
+    if ($this->isInstalled() && ($relative_path = drupal_get_path('theme', $this->name))) {
       $relative_path = dirname($relative_path);
     }
     else {
@@ -119,7 +94,7 @@ class ThemeUpdater extends Updater implements DrupalUpdaterInterface {
   }
 
   public function isInstalled() {
-    return (bool) drupal_get_path('theme', $this->name);
+    return (bool) drupal_get_filename('theme', $this->name, NULL, FALSE);
   }
 
   static function canUpdateDirectory($directory) {

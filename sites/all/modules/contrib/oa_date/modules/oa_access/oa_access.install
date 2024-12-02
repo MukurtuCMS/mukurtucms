@@ -1,0 +1,70 @@
+<?php
+/**
+ * @file
+ * Install hooks for the Open Atrium Access module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function oa_access_schema() {
+  $schema = array();
+  $schema['oa_access'] = array(
+    'description' => 'Stores the permissions assigned to Groups or Teams.',
+    'fields' => array(
+      'nid' => array(
+        'description' => 'The primary identifier for a node.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'permission' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'A single permission granted to the role identified by rid.',
+      ),
+      'module' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The module declaring the permission.',
+      ),
+    ),
+    'primary key' => array('nid', 'permission'),
+    'indexes' => array(
+      'nid' => array('nid'),
+      'permission' => array('permission'),
+    ),
+    'foreign keys' => array(
+      'node' => array(
+        'table' => 'node',
+        'columns' => array('nid' => 'nid'),
+      ),
+    ),
+  );
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function oa_access_install() {
+  // By default, we want Space admins to be able to administer oa_access.
+  $og_roles = array_flip(og_roles('node', 'oa_space'));
+  $og_admin_rid = $og_roles[OG_ADMINISTRATOR_ROLE];
+  og_role_grant_permissions($og_admin_rid, array('administer oa_access permissions'));
+}
+
+/**
+ * Give Space admins permission to administer oa_access permissions.
+ */
+function oa_access_update_7001() {
+  // By default, we want Space admins to be able to administer oa_access.
+  $og_roles = array_flip(og_roles('node', 'oa_space'));
+  $og_admin_rid = $og_roles[OG_ADMINISTRATOR_ROLE];
+  og_role_grant_permissions($og_admin_rid, array('administer oa_access permissions'));
+}

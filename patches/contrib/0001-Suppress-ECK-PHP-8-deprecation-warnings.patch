@@ -1,0 +1,56 @@
+From 88e3bf120dfcb20ab4c520f6c3e80e3903753485 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Thu, 27 Apr 2023 08:38:21 -0700
+Subject: [PATCH] Suppress ECK PHP 8 deprecation warnings
+
+---
+ eck/eck.classes.inc | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/eck.classes.inc b/eck.classes.inc
+index 9fc52c7b..d23cad5e 100644
+--- a/eck.classes.inc
++++ b/eck.classes.inc
+@@ -168,6 +168,7 @@ class DBObject implements Iterator {
+   /**
+    * From Iterator Interface.
+    */
++  #[\ReturnTypeWillChange]
+   public function rewind() {
+     $this->position = 0;
+   }
+@@ -175,6 +176,7 @@ class DBObject implements Iterator {
+   /**
+    * From Iterator Interface.
+    */
++  #[\ReturnTypeWillChange]
+   public function current() {
+     return $this->data[$this->key()];
+   }
+@@ -182,6 +184,7 @@ class DBObject implements Iterator {
+   /**
+    * From Iterator Interface.
+    */
++  #[\ReturnTypeWillChange]
+   public function key() {
+     return $this->vars[$this->position];
+   }
+@@ -189,6 +192,7 @@ class DBObject implements Iterator {
+   /**
+    * From Iterator Interface.
+    */
++  #[\ReturnTypeWillChange]
+   public function next() {
+     ++$this->position;
+   }
+@@ -196,6 +200,7 @@ class DBObject implements Iterator {
+   /**
+    * From Iterator Interface.
+    */
++  #[\ReturnTypeWillChange]
+   public function valid() {
+     if (in_array($this->position, array_keys($this->vars))) {
+       return TRUE;
+-- 
+2.34.1
+

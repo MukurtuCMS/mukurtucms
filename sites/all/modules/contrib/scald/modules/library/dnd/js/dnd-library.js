@@ -18,8 +18,8 @@ Drupal.dnd = {
   // Keep track of the last focused textarea.
   lastFocus: null,
 
-  // Setting for the qTip v2 library
-  qTipSettings: {
+  // Default settings for the qTip v2 library
+  defaultqTipSettings: {
     position: {
       my: 'right center',
       at: 'left center'
@@ -64,9 +64,12 @@ Drupal.dnd = {
     atom_ids = [].concat(atom_ids);
 
     for (var i= 0, len=atom_ids.length; i<len; i++) {
-      // Remove atom from the list if it is already available.
-      if ((atom_ids[i] in Drupal.dnd.Atoms) && (context in Drupal.dnd.Atoms[atom_ids[i]].contexts)) {
-        delete atom_ids[i];
+      // Check if the atom is already available and has a contexts property.
+      if ((atom_ids[i] in Drupal.dnd.Atoms) && (typeof Drupal.dnd.Atoms[atom_ids[i]].contexts !== 'undefined')) {
+        // Remove atom from the list if the required context is already available in the atom's contexts property.
+        if (context in Drupal.dnd.Atoms[atom_ids[i]].contexts) {
+          delete atom_ids[i];
+        }
       }
     }
 
@@ -74,7 +77,7 @@ Drupal.dnd = {
     atom_ids = atom_ids.filter(Number);
 
     if (atom_ids.length) {
-      $.getJSON(Drupal.settings.basePath + 'atom/fetch/' + atom_ids.join() + '?context=' + context, function(data) {
+      $.getJSON(Drupal.settings.basePath + Drupal.settings.pathPrefix + 'atom/fetch/' + atom_ids.join() + '?context=' + context, function(data) {
         for (var atom_id in data) {
           if (Drupal.dnd.Atoms[atom_id]) {
             // Merge old data into the new return atom.
@@ -103,8 +106,16 @@ Drupal.dnd = {
 
   // Convert HTML to SAS. We consider there is no nested elements.
   html2sas: function(text) {
-    text = text.replace(/<!-- (scald=(\d+):([a-z_]+)) -->[\r\n\s\S]*?<!-- END scald=\2 -->/g, '[$1]');
+    text = text.replace(/<!-- (scald=(\d+):([a-z_]+))(.*) -->[\r\n\s\S]*?<!-- END scald=\2 -->/g, '[$1$4]');
     return text;
+  },
+
+  // Salvage data from HTML comment and return the SAS representation.
+  htmlcomment2sas: function(text) {
+    var matches = text.match(/<!-- (scald=(\d+):([a-z_]+))([^>]*) -->/);
+    if (matches && matches.length) {
+      return '[' + matches[1] + matches[4] + ']';
+    }
   },
 
   // Convert SAS to HTML.
@@ -162,10 +173,10 @@ Drupal.dnd = {
    * Insert an atom in the current RTE or textarea.
    */
   insertAtom: function(sid) {
-    var cke = Drupal.ckeditorInstance;
-    if (cke) {
-      var markup = Drupal.theme('scaldEmbed', Drupal.dnd.Atoms[sid]);
-      cke.insertElement(CKEDITOR.dom.element.createFromHtml(markup));
+    var editor = Drupal.ckeditorInstance;
+    if (editor && editor.dndInsertAtom) {
+      // Defer to the correct method given the plugin used by this editor.
+      editor.dndInsertAtom(sid);
     }
     else if (Drupal.dnd.lastFocus) {
       var markup = Drupal.dnd.Atoms[sid].sas;
@@ -212,7 +223,8 @@ Drupal.theme.prototype.scaldEmbed = function(atom, context, options) {
 
   // If there are options, update the SAS representation.
   if (options) {
-    output = output.replace(/<!-- scald=\d+(.+?) -->/, '<!-- scald=' + atom.sid + ':' + context + ' ' + JSON.stringify(options) + ' -->');
+    options = (typeof options === 'string') ? options.trim() : JSON.stringify(options);
+    output = output.replace(/<!-- scald=\d+(.+?) -->/, '<!-- scald=' + atom.sid + ':' + context + ' ' + options + ' -->');
   }
 
   return output;
@@ -247,6 +259,7 @@ attach: function(context, settings) {
 
 renderLibrary: function(data, editor) {
   var library_wrapper = $(this);
+  var sidebarWidth = $(this).outerWidth();
 
   // Save the current status
   var dndStatus = {
@@ -268,7 +281,7 @@ renderLibrary: function(data, editor) {
   }
   library_wrapper.find('.summary .toggle').click(function() {
     // We toggle class only when animation finishes to avoid flash back.
-    scald_menu.animate({left: scald_menu.hasClass('search-on') ? '-42px' : '-256px'}, function() {
+    scald_menu.animate({left: scald_menu.hasClass('search-on') ? '-42px' : '-'+(sidebarWidth-20)+'px'}, function() {
       $(this).toggleClass('search-on');
     });
     // When display search, we certainly want to display the library, too.
@@ -278,7 +291,7 @@ renderLibrary: function(data, editor) {
   });
   library_wrapper.find('.scald-anchor').click(function() {
     // We toggle class only when animation finishes to avoid flash back.
-    library_wrapper.animate({right: library_wrapper.hasClass('library-on') ? '-276px' : '0'}, function() {
+    library_wrapper.animate({right: library_wrapper.hasClass('library-on') ? '-'+sidebarWidth+'px' : '0'}, function() {
       library_wrapper.toggleClass('library-on');
     });
   });
@@ -292,7 +305,15 @@ renderLibrary: function(data, editor) {
 
     // And add a nice preview behavior if qTip is present
     if ($.prototype.qtip) {
-      var settings = $.extend(Drupal.dnd.qTipSettings, {
+      if (Drupal.settings.dnd.qTipSettings === '') {
+        Drupal.settings.dnd.qTipSettings = Drupal.dnd.defaultqTipSettings;
+      }
+      else {
+        if (typeof Drupal.settings.dnd.qTipSettings !== 'object') {
+          Drupal.settings.dnd.qTipSettings = JSON.parse(Drupal.settings.dnd.qTipSettings);
+        }
+      }
+      var settings = $.extend(Drupal.settings.dnd.qTipSettings, {
         content: {
           text: Drupal.dnd.Atoms[atom_id].preview
         }
@@ -342,14 +363,9 @@ renderLibrary: function(data, editor) {
         return Drupal.dnd.insertAtom($(this).data('atom-id'));
       })
       .bind('dragstart', function(e) {
-        var dt = e.originalEvent.dataTransfer, id = e.target.id, $this = $(this);
-        var $img;
-        if ($this.is('img')) {
-          $img = $this;
-        }
-        else {
-          $this.find('img');
-        }
+        var dt = e.originalEvent.dataTransfer, $this = $(this);
+        // Mukurtu patch to allow dragging of div elements in addition to img elements.
+        var $img = ($this.is('img') || $this.is('div')) ? $this : $this.find('img');
         var id = $img.data('atom-id');
         dt.dropEffect = 'copy';
         dt.setData("Text", Drupal.dnd.Atoms[id].sas);
@@ -365,11 +381,12 @@ renderLibrary: function(data, editor) {
         return true;
       })
       .bind('dragend', function(e) {
+        delete Drupal.dnd.currentAtom;
         return true;
       });
   });
   // Makes pager links refresh the library instead of opening it in the browser window
-  library_wrapper.find('.pager a').click(function() {
+  library_wrapper.find('.pager a, .pagination a').click(function() {
     $.getJSON(this.href, function(data) {
       Drupal.behaviors.dndLibrary.renderLibrary.call(library_wrapper.get(0), data, $(editor));
     });

@@ -1,0 +1,15 @@
+/**
+ * @file
+ *   This file contains the basic theming
+ *   for the YouTube Search Grid.
+ */
+.youtube-result-item-id {
+  display: none;
+}
+.youtube-result-item {
+  width: 50%;
+  float: left;
+  cursor: pointer;
+  height: 140px;
+  padding-top: 10px;
+}

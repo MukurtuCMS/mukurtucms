@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_digitalheritage.features.inc
@@ -10,30 +11,21 @@
 function ma_digitalheritage_default_cer() {
   $items = array();
   $items['node:digital_heritage:field_book_parent*node:digital_heritage:field_book_children'] = entity_import('cer', '{
-    "identifier" : "node:digital_heritage:field_book_parent*node:digital_heritage:field_book_children",
     "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
     "cer_enabled" : { "und" : [ { "value" : "1" } ] },
-    "cer_weight" : { "und" : [ { "value" : "0" } ] },
     "cer_left" : { "und" : [ { "path" : "node:digital_heritage:field_book_parent" } ] },
     "cer_right" : { "und" : [ { "path" : "node:digital_heritage:field_book_children" } ] },
+    "cer_weight" : { "und" : [ { "value" : "0" } ] },
+    "identifier" : "node:digital_heritage:field_book_parent*node:digital_heritage:field_book_children",
     "rdf_mapping" : []
   }');
   $items['node:digital_heritage:field_community_record_parent*node:digital_heritage:field_community_record_children'] = entity_import('cer', '{
-    "identifier" : "node:digital_heritage:field_community_record_parent*node:digital_heritage:field_community_record_children",
     "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
     "cer_enabled" : { "und" : [ { "value" : "1" } ] },
-    "cer_weight" : { "und" : [ { "value" : "0" } ] },
     "cer_left" : { "und" : [ { "path" : "node:digital_heritage:field_community_record_parent" } ] },
     "cer_right" : { "und" : [ { "path" : "node:digital_heritage:field_community_record_children" } ] },
-    "rdf_mapping" : []
-  }');
-  $items['node:digital_heritage:field_related_dh_items*node:digital_heritage:field_related_dh_items'] = entity_import('cer', '{
-    "identifier" : "node:digital_heritage:field_related_dh_items*node:digital_heritage:field_related_dh_items",
-    "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
-    "cer_enabled" : { "und" : [ { "value" : "1" } ] },
     "cer_weight" : { "und" : [ { "value" : "0" } ] },
-    "cer_left" : { "und" : [ { "path" : "node:digital_heritage:field_related_dh_items" } ] },
-    "cer_right" : { "und" : [ { "path" : "node:digital_heritage:field_related_dh_items" } ] },
+    "identifier" : "node:digital_heritage:field_community_record_parent*node:digital_heritage:field_community_record_children",
     "rdf_mapping" : []
   }');
   return $items;
