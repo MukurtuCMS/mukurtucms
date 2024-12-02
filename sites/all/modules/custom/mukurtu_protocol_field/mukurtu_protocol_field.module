@@ -58,6 +58,7 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
       }
       $node = $form['#node'];
       $allowed_protocols = ma_cultural_protocol_get_cps_user_can_post_to();
+
       $privacy_setting = $node->field_item_privacy_setting[LANGUAGE_NONE][0]['value'] ?? 'all';
       if ($privacy_setting == 'all') {
         foreach ($node->og_group_ref[LANGUAGE_NONE] as $delta => $value) {
@@ -76,7 +77,6 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
         foreach ($node->og_group_ref[LANGUAGE_NONE] as $delta => $value) {
           if (isset($allowed_protocols[$value['target_id']])) {
             $disable_field = FALSE;
-            $form['og_group_ref']['#access'] = TRUE;
             $form['field_item_privacy_setting']['#access'] = TRUE;
           }
         }

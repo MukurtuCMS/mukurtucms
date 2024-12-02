@@ -59,11 +59,15 @@ function ma_person_paragraphs_info() {
     'person_relationship_bundle' => array(
       'name' => 'Related Person',
       'bundle' => 'person_relationship_bundle',
+      'label' => '',
+      'description' => '',
       'locked' => '1',
     ),
     'text_section' => array(
       'name' => 'Text Section',
       'bundle' => 'text_section',
+      'label' => '',
+      'description' => '',
       'locked' => '1',
     ),
   );

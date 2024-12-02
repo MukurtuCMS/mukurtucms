@@ -43,12 +43,21 @@ function ma_scald_image_styles_alter(&$data) {
 
   if (!isset($data['large']['storage']) || $data['large']['storage'] == IMAGE_STORAGE_DEFAULT) {
     $data['large']['effects'] = array_values($data['large']['effects']);
-    $data['large']['effects'][0]['weight'] = -1;
+    $data['large']['effects'][0]['weight'] = -2;
   }
 
   if (!isset($data['large']['storage']) || $data['large']['storage'] == IMAGE_STORAGE_DEFAULT) {
     $data['large']['effects'] = array_values($data['large']['effects']);
     $data['large']['effects'][1] = array(
+      'data' => array(),
+      'name' => 'imagecache_autorotate',
+      'weight' => -1,
+    );
+  }
+
+  if (!isset($data['large']['storage']) || $data['large']['storage'] == IMAGE_STORAGE_DEFAULT) {
+    $data['large']['effects'] = array_values($data['large']['effects']);
+    $data['large']['effects'][2] = array(
       'data' => array(
         'height' => 480,
         'upscale' => 0,
@@ -75,22 +84,92 @@ function ma_scald_image_styles_alter(&$data) {
 
   if (!isset($data['medium']['storage']) || $data['medium']['storage'] == IMAGE_STORAGE_DEFAULT) {
     $data['medium']['effects'] = array_values($data['medium']['effects']);
+    $data['medium']['effects'][0]['name'] = 'imagecache_autorotate';
+  }
+
+  if (!isset($data['medium']['storage']) || $data['medium']['storage'] == IMAGE_STORAGE_DEFAULT) {
+    $data['medium']['effects'] = array_values($data['medium']['effects']);
+    $data['medium']['effects'][0]['weight'] = -2;
+  }
+
+  if (!isset($data['medium']['storage']) || $data['medium']['storage'] == IMAGE_STORAGE_DEFAULT) {
+    $data['medium']['effects'] = array_values($data['medium']['effects']);
     $data['medium']['effects'][1] = array(
+      'data' => array(
+        'height' => 220,
+        'upscale' => 1,
+        'width' => 220,
+      ),
+      'name' => 'image_scale',
+      'weight' => 0,
+    );
+  }
+
+  if (!isset($data['medium']['storage']) || $data['medium']['storage'] == IMAGE_STORAGE_DEFAULT) {
+    $data['medium']['effects'] = array_values($data['medium']['effects']);
+    $data['medium']['effects'][2] = array(
       'data' => array(),
       'name' => 'imagecache_autorotate',
       'weight' => -1,
     );
+  }
+
+  if (!isset($data['medium']['storage']) || $data['medium']['storage'] == IMAGE_STORAGE_DEFAULT) {
+    unset($data['medium']['effects'][0]['data']['height']);
+  }
+
+  if (!isset($data['medium']['storage']) || $data['medium']['storage'] == IMAGE_STORAGE_DEFAULT) {
+    unset($data['medium']['effects'][0]['data']['upscale']);
+  }
+
+  if (!isset($data['medium']['storage']) || $data['medium']['storage'] == IMAGE_STORAGE_DEFAULT) {
+    unset($data['medium']['effects'][0]['data']['width']);
   }
   }
   if (isset($data['thumbnail'])) {
 
   if (!isset($data['thumbnail']['storage']) || $data['thumbnail']['storage'] == IMAGE_STORAGE_DEFAULT) {
     $data['thumbnail']['effects'] = array_values($data['thumbnail']['effects']);
+    $data['thumbnail']['effects'][0]['name'] = 'imagecache_autorotate';
+  }
+
+  if (!isset($data['thumbnail']['storage']) || $data['thumbnail']['storage'] == IMAGE_STORAGE_DEFAULT) {
+    $data['thumbnail']['effects'] = array_values($data['thumbnail']['effects']);
+    $data['thumbnail']['effects'][0]['weight'] = -2;
+  }
+
+  if (!isset($data['thumbnail']['storage']) || $data['thumbnail']['storage'] == IMAGE_STORAGE_DEFAULT) {
+    $data['thumbnail']['effects'] = array_values($data['thumbnail']['effects']);
     $data['thumbnail']['effects'][1] = array(
+      'data' => array(
+        'height' => 100,
+        'upscale' => 1,
+        'width' => 100,
+      ),
+      'name' => 'image_scale',
+      'weight' => 0,
+    );
+  }
+
+  if (!isset($data['thumbnail']['storage']) || $data['thumbnail']['storage'] == IMAGE_STORAGE_DEFAULT) {
+    $data['thumbnail']['effects'] = array_values($data['thumbnail']['effects']);
+    $data['thumbnail']['effects'][2] = array(
       'data' => array(),
       'name' => 'imagecache_autorotate',
       'weight' => -1,
     );
+  }
+
+  if (!isset($data['thumbnail']['storage']) || $data['thumbnail']['storage'] == IMAGE_STORAGE_DEFAULT) {
+    unset($data['thumbnail']['effects'][0]['data']['height']);
+  }
+
+  if (!isset($data['thumbnail']['storage']) || $data['thumbnail']['storage'] == IMAGE_STORAGE_DEFAULT) {
+    unset($data['thumbnail']['effects'][0]['data']['upscale']);
+  }
+
+  if (!isset($data['thumbnail']['storage']) || $data['thumbnail']['storage'] == IMAGE_STORAGE_DEFAULT) {
+    unset($data['thumbnail']['effects'][0]['data']['width']);
   }
   }
 }

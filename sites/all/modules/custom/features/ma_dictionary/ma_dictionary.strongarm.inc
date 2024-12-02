@@ -326,10 +326,10 @@ function ma_dictionary_strongarm() {
       'display' => array(),
       'form' => array(
         'path' => array(
-          'weight' => '4',
+          'weight' => '3',
         ),
         'redirect' => array(
-          'weight' => '3',
+          'weight' => '2',
         ),
         'title' => array(
           'weight' => '1',

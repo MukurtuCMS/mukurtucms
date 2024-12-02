@@ -131,6 +131,8 @@ function ma_dictionary_paragraphs_info() {
     'dictionary_word_bundle' => array(
       'name' => 'Dictionary Word Bundle',
       'bundle' => 'dictionary_word_bundle',
+      'label' => '',
+      'description' => '',
       'locked' => '1',
     ),
   );

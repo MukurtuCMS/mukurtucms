@@ -670,6 +670,17 @@ function mukurtu_splash_block_site_config() {
       ];
     }
 
+    if (module_exists('mukurtu_migration_prep')) {
+      $items[] = [
+        'title' => 'View Migration Preparation Summary',
+        'href' => '/admin/reports/migration/summary',
+        'localized_options' => [
+          'attributes' => ['class' => ['opic-dashboard-content', 'overlay-exclude']],
+        ],
+        'description' => t("A reporting listing any steps needed to prepare your site for migration to Mukurtu CMS v4."),
+      ];
+    }
+
     $content = ['content' => $items];
     $markup = theme('admin_block_content', $content);
 

@@ -40,7 +40,6 @@ function ma_scald_ds_fields_info($entity_type) {
  * Implements hook_scald_atom_access().
  */
 function ma_scald_scald_atom_access($atom, $action, $account = NULL) {
-
   switch ($action) {
 
     // When viewing atoms, respect its protocols.
@@ -48,6 +47,7 @@ function ma_scald_scald_atom_access($atom, $action, $account = NULL) {
     // DENY if groups are set but they have access to none of them.
     case 'view':
       $group_wrapper = entity_metadata_wrapper('scald_atom', $atom);
+      $field_item_privacy_setting_info = field_info_instance('scald_atom', 'field_item_privacy_setting', $group_wrapper->getBundle());
       if (!isset($group_wrapper->field_scald_protocol)) {
         return SCALD_ATOM_ACCESS_ALLOW;
       } else {
@@ -59,14 +59,31 @@ function ma_scald_scald_atom_access($atom, $action, $account = NULL) {
       }
 
       if ($groups = $group_wrapper->field_scald_protocol->value()) {
-        foreach ($groups as $group) {
-          if (node_access('view', $group, $account)) {
-            return SCALD_ATOM_ACCESS_ALLOW;
+        $sharing_setting = $field_item_privacy_setting_info ? ($group_wrapper->field_item_privacy_setting->value() ?? 'any') : 'any';
+        if ($sharing_setting === 'any') {
+          foreach ($groups as $group) {
+            if (node_access('view', $group, $account)) {
+              return SCALD_ATOM_ACCESS_ALLOW;
+            }
           }
         }
+
+        if ($sharing_setting === 'all') {
+          foreach ($groups as $group) {
+            if (!node_access('view', $group, $account)) {
+              return SCALD_ATOM_ACCESS_DENY;
+            }
+          }
+          return SCALD_ATOM_ACCESS_ALLOW;
+        }
+
         return SCALD_ATOM_ACCESS_DENY;
       }
       return SCALD_ATOM_ACCESS_IGNORE;
+    case 'update':
+      // For some reason Scald uses edit instead of update?
+      // Call entity access on edit, otherwise VBOs won't work as expected.
+      return entity_access('edit', 'scald_atom', $atom, $account);
 
     // Handle very specific scald delete access cases
     case 'delete':
@@ -160,65 +177,67 @@ function ma_scald_atom_load($sid, $account = NULL) {
 // Return an array of content where the given atom is referenced
 // TODO: This can be an expensive function. We might be able to extend the scald_index module to catch the
 // elements it misses.
-function ma_scald_get_atom_references($atom) {
-    if(is_string($atom) && is_numeric($atom)) {
-        $atom = scald_atom_load($atom);
+function ma_scald_get_atom_references($atom, $include_embeds = TRUE) {
+  if (is_string($atom) && is_numeric($atom)) {
+    $atom = scald_atom_load($atom);
+  }
+
+  if (!isset($atom->sid)) {
+    return [];
+  }
+
+  // Get all atom reference field names
+  $fields = field_info_fields();
+  foreach ($fields as $key => $field) {
+    if ($field['type'] != 'atom_reference') {
+      unset($fields[$key]);
     }
+  }
+  $field_names = array_keys($fields);
 
-    if(!isset($atom->sid)) {
-        return array();
+  // For each atom reference field, check if this particular atom is being referenced
+  $references = [];
+  foreach ($field_names as $field_name) {
+    $query = new EntityFieldQuery();
+    $query->fieldCondition($field_name, 'sid', $atom->sid, "=")
+      ->addMetaData('account', user_load(1));
+    $result = $query->execute();
+
+    if (!empty($result)) {
+      foreach ($result as $entity_type_name => $entity_type) {
+        $references[$entity_type_name] = array_merge(isset($references[$entity_type_name]) ? $references[$entity_type_name] : [], array_keys($entity_type));
+      }
     }
+  }
 
-    // Get all atom reference field names
-    $fields = field_info_fields();
-    foreach($fields as $key => $field) {
-        if($field['type'] != 'atom_reference') {
-            unset($fields[$key]);
-        }
-    }
-    $field_names = array_keys($fields);
-
-    // For each atom reference field, check if this particular atom is being referenced
-    $references = array();
-    foreach($field_names as $field_name) {
-        $query = new EntityFieldQuery();
-        $query->fieldCondition($field_name, 'sid', $atom->sid, "=")
-            ->addMetaData('account', user_load(1));
-        $result = $query->execute();
-
-        if(!empty($result)) {
-            foreach($result as $entity_type_name => $entity_type) {
-                $references[$entity_type_name] = array_merge(isset($references[$entity_type_name]) ? $references[$entity_type_name] : array(), array_keys($entity_type));
-            }
-        }
-    }
-
-    // Atoms can also be references in DnD fields, check those now
+  // Atoms can also be references in DnD fields, check those now
+  if ($include_embeds) {
     $scald_dnd_fields = ma_scald_get_dnd_enabled_scald_fields();
 
-    foreach($scald_dnd_fields as $entity_type_name => $entity_type) {
-        foreach($entity_type as $bundle_name => $bundle) {
-            foreach($bundle as $field_name) {
-                $query = new EntityFieldQuery();
-                $query->entityCondition('entity_type', $entity_type_name)
-                    ->entityCondition('bundle', $bundle_name)
-                    ->fieldCondition($field_name, 'value', "%[scald={$atom->sid}:%", 'like')
-                    ->addMetaData('account', user_load(1));
-                $result = $query->execute();
-                if(!empty($result)) {
-                    foreach($result as $entity_type_name => $entity_type) {
-                        $references[$entity_type_name] = array_merge(isset($references[$entity_type_name]) ? $references[$entity_type_name] : array(), array_keys($entity_type));
-                    }
-                }
+    foreach ($scald_dnd_fields as $entity_type_name => $entity_type) {
+      foreach ($entity_type as $bundle_name => $bundle) {
+        foreach ($bundle as $field_name) {
+          $query = new EntityFieldQuery();
+          $query->entityCondition('entity_type', $entity_type_name)
+            ->entityCondition('bundle', $bundle_name)
+            ->fieldCondition($field_name, 'value', "%[scald={$atom->sid}:%", 'like')
+            ->addMetaData('account', user_load(1));
+          $result = $query->execute();
+          if (!empty($result)) {
+            foreach ($result as $entity_type_name => $entity_type) {
+              $references[$entity_type_name] = array_merge(isset($references[$entity_type_name]) ? $references[$entity_type_name] : [], array_keys($entity_type));
             }
+          }
         }
+      }
     }
+  }
 
-    foreach($references as $entity_type_name => $entity_type) {
-        $references[$entity_type_name] = array_unique($references[$entity_type_name]);
-    }
+  foreach ($references as $entity_type_name => $entity_type) {
+    $references[$entity_type_name] = array_unique($references[$entity_type_name]);
+  }
 
-    return $references;
+  return $references;
 }
 
 
@@ -466,46 +485,223 @@ return FALSE;';
 }
 
 /**
- * Implements hook_views_query_alter
+ * Delete all records in our custom protocol access table for a given atom.
+ */
+function ma_scald_clear_protocol_access($atom) {
+  if ($sid = $atom->sid ?? NULL) {
+    db_delete('scald_protocol_access')->condition('sid', $sid)->execute();
+  }
+}
+
+/**
+ * Given an array of protocol IDs (nids), return the corresponding
+ * protocol set ID.
+ */
+function ma_scald_get_protocol_set_id(array $protocol_ids) {
+  $protocol_set = ma_scald_format_protocol_ids($protocol_ids);
+
+  // Check if the protocol set exists.
+  $result = db_select('mukurtu_protocol_map', 'mpm')
+    ->fields('mpm', ['protocol_set_id'])
+    ->condition('protocol_set', $protocol_set, '=')
+    ->execute()->fetchAssoc();
+
+  if (!empty($result)) {
+    return $result['protocol_set_id'];
+  }
+
+  // It doesn't exist, we need to insert it.
+  return db_insert('mukurtu_protocol_map')
+    ->fields(['protocol_set' => $protocol_set])
+    ->execute();
+}
+
+/**
+  * Get a list of all compound protocol sets in use on the site.
+  */
+function ma_scald_get_compound_protocols() {
+  $compoundProtocols = [];
+
+  $query = db_select('mukurtu_protocol_map', 'mpm')
+  ->fields('mpm', ['protocol_set_id', 'protocol_set']);
+  $result = $query->execute()->fetchAll();
+  foreach ($result as $ps) {
+    if (mb_strpos($ps->protocol_set, '|') !== false) {
+      $compoundProtocols[$ps->protocol_set_id] = explode('|', $ps->protocol_set);
+    }
+  }
+
+  return $compoundProtocols;
+}
+
+/**
+ * Return an array of protocol set IDs the current user has access to.
+ */
+function ma_scald_get_current_user_protocol_sets() {
+  $protocol_sets = [];
+
+  // No protocols protocol set.
+  $no_protocols_set = (int) ma_scald_get_protocol_set_id([]);
+  $protocol_sets[$no_protocols_set] = $no_protocols_set;
+
+  // User has access to all open protocols.
+  $open_protocol_ids = ma_cultural_protocol_get_open_protocol_ids();
+  foreach ($open_protocol_ids as $pid) {
+    $protocol_sets[$pid] = (int) ma_scald_get_protocol_set_id([$pid]);
+  }
+
+  // User has access to each single protocol they are a member of.
+  $protocol_memberships = ma_cultural_protocol_get_cps_for_user(['member']);
+  $protocol_memberships_ids = array_keys($protocol_memberships);
+  foreach ($protocol_memberships_ids as $pid) {
+    $protocol_sets[$pid] = (int) ma_scald_get_protocol_set_id([$pid]);
+  }
+
+  // Search the entire protocol table for combinations of protocols
+  // that the user is a member of. This is potentially slow, but it's faster
+  // than computing the super set of user protocols.
+  $all_protocol_ids_with_view_access = array_merge($open_protocol_ids, $protocol_memberships_ids);
+  foreach (ma_scald_get_compound_protocols() as $set_id => $set_protocol_ids) {
+    $in_all = TRUE;
+    foreach ($set_protocol_ids as $set_protocol_id) {
+      if (!in_array($set_protocol_id, $all_protocol_ids_with_view_access)) {
+        $in_all = FALSE;
+        break;
+      }
+    }
+
+    if ($in_all) {
+      $protocol_sets[$set_id] = (int) $set_id;
+    }
+  }
+
+  return $protocol_sets;
+}
+
+/**
+ * For a given atom, update our custom protocol access table based on the atom's
+ * protocols and sharing setting.
+ */
+function ma_scald_insert_protocol_access($atom) {
+  $entity = entity_metadata_wrapper('scald_atom', $atom);
+  $field_item_privacy_setting_info = field_info_instance('scald_atom', 'field_item_privacy_setting', $entity->getBundle());
+  $sharing_setting = $field_item_privacy_setting_info ? ($entity->field_item_privacy_setting->value() ?? 'any') : 'any';
+  $protocol_ids = $entity->field_scald_protocol->raw() ?? [];
+
+  $permitted_protocol_sets = [];
+
+  if ($sharing_setting === 'all') {
+    // Find the protocol set ID that represents the set of all required
+    // protocols.
+    if ($set_id = ma_scald_get_protocol_set_id($protocol_ids)) {
+      $permitted_protocol_sets[] = $set_id;
+    }
+  }
+
+  if ($sharing_setting === 'any') {
+    // In the case of 'any', each singular protocol will map to an individual
+    // protocol set. If the user has any of them, that is sufficent.
+    foreach ($protocol_ids as $protocol_id) {
+      if ($set_id = ma_scald_get_protocol_set_id([$protocol_id])) {
+        $permitted_protocol_sets[] = $set_id;
+      }
+    }
+  }
+
+  // Empty protocols for scald means open to all. Add the set that represents
+  // that.
+  if (empty($protocol_ids)) {
+    $permitted_protocol_sets[] = ma_scald_get_protocol_set_id([]);
+  }
+
+  // Associate the permitted IDs with the scald atom.
+  foreach ($permitted_protocol_sets as $permitted_protocol_set) {
+    db_insert('scald_protocol_access')
+      ->fields([
+        'sid' => $atom->sid,
+        'protocol_set_id' => $permitted_protocol_set
+        ])
+      ->execute();
+  }
+}
+
+/**
+ * Take an array of group IDs and return a string suitable for DB comnparison.
+ */
+function ma_scald_format_protocol_ids($protocol_ids) {
+  // Let's force them to integers, just to be safe.
+  $protocol_ids = array_map(fn($p) => (int) $p, $protocol_ids);
+
+  // Hardcode no protocols to a "0". No protocols has the same meaning for all
+  // atoms, open access.
+  if (empty($protocol_ids)) {
+    return '0';
+  }
+
+  // Sort them ascending and delimit with '|'. This is critical. Our comparison
+  // in the views query expects this.
+  // @see ma_scald_views_query_alter
+  sort($protocol_ids);
+  return implode( '|', $protocol_ids);
+}
+
+/**
+ * Implements hook_scald_atom_insert().
+ */
+function ma_scald_scald_atom_insert($atom) {
+  ma_scald_clear_protocol_access($atom);
+  ma_scald_insert_protocol_access($atom);
+}
+
+/**
+ * Implements hook_scald_atom_update().
+ */
+function ma_scald_scald_atom_update($atom) {
+  ma_scald_clear_protocol_access($atom);
+  ma_scald_insert_protocol_access($atom);
+}
+
+/**
+ * Implements hook_scald_atom_delete().
+ */
+function ma_scald_scald_atom_delete($atom) {
+  ma_scald_clear_protocol_access($atom);
+}
+
+/**
+ * Implements hook_views_query_alter().
  */
 function ma_scald_views_query_alter(&$view, &$query) {
-    if($view->name == 'scald_library') {
-        // Filter out Scald atoms that are blocked by protocol in the DND scald view
-        // Note that this isn't actually enforcing protocols, we are just trying to avoid the scald
-        // access denied message in the dnd toolbar.
+  // For views gathering scald atoms, filter based on protocol access.
+  if ($view->base_table == 'scald_atoms') {;
+    $user_protocol_sets = ma_scald_get_current_user_protocol_sets();
 
-        // Get the groups the user has view rights to
-        $groups = og_get_groups_by_user(NULL, 'node');
+    // Join our custom protocol access table to the scald table on sid.
+    $join = new views_join();
+    $join->construct('scald_protocol_access', 'scald_atoms', 'sid', 'sid');
+    $query->add_relationship('scald_protocol_access', $join, 'scald_atoms');
 
-        // Join, to bring in the scald protocol field
-        $join = new views_join;
-        $join->construct('field_data_field_scald_protocol', 'scald_atoms', 'sid', 'entity_id');
-        $query->add_relationship('field_data_field_scald_protocol', $join, 'scald_atoms');
+    $whereUserHasProtocolSet = [
+      'conditions' => [],
+      'args' => [],
+      'type' => 'OR'
+    ];
 
-        // Initial condition for all scald atoms without a protocol (effectively open to all)
-        $query->where[] =
-                array('conditions' =>
-                      array(array(
-                          'field' => 'field_data_field_scald_protocol.field_scald_protocol_target_id',
-                          'value' => NULL,
-                          'operator' => 'IS NULL'
-                      )),
-                      'args' => array(),
-                      'type' => 'OR'
-                );
-
-        $query_results = array_keys($query->where);
-        $conditions_key = end($query_results);
-
-        // Add an 'or' condition for each protocol the user can view
-        foreach($groups as $group) {
-            $query->where[$conditions_key]['conditions'][] = array(
-                          'field' => 'field_data_field_scald_protocol.field_scald_protocol_target_id',
-                          'value' => $group,
-                          'operator' => '='
-            );
-        }
+    // Add an 'or' condition for each protocol set the user can view.
+    foreach ($user_protocol_sets as $protocol_set_id) {
+      $whereUserHasProtocolSet['conditions'][] = [
+        'field' => 'scald_protocol_access.protocol_set_id',
+        'value' => $protocol_set_id,
+        'operator' => '='
+      ];
     }
+
+    $query->where[] = $whereUserHasProtocolSet;
+
+    // We need distinct here as most scald atoms have multiple valid protocol
+    // sets. We'd get duplicates otherwise.
+    $query->distinct = TRUE;
+  }
 }
 
 /**
@@ -939,4 +1135,133 @@ function ma_scald_node_view($node, $view_mode) {
 
   }
 
+}
+
+/**
+ * Implements hook_action_info().
+ */
+function ma_scald_action_info() {
+  return [
+    'ma_scald_duplicate_content_protocol_action' => [
+      'type' => 'scald_atom',
+      'label' => t('Duplicate Cultural Protocols from Item'),
+      'configurable' => FALSE,
+      'behavior' => ['views_property', 'changes_property'],
+    ],
+  ];
+}
+
+/**
+ * Action for ma_scald_duplicate_content_protocol_action.
+ */
+function ma_scald_duplicate_content_protocol_action(&$atom, &$context) {
+  $atom_entity = entity_metadata_wrapper('scald_atom', $atom);
+
+  // Get entities referencing the atom.
+  $refs = ma_scald_get_atom_references($atom, FALSE);
+
+  // Remove paragraph references, we don't care about them in this context.
+  if (isset($refs['paragraphs_item'])) {
+    unset($refs['paragraphs_item']);
+  }
+
+  // Filter out communities and protocols, we don't count these for this kind of
+  // reference as they don't have our normal content protocol fields.
+  if (isset($refs['node'])) {
+    $query = db_select('node', 'n')
+      ->fields('n', ['nid'])
+      ->condition('n.nid', $refs['node'], 'IN')
+      ->condition('n.type', ['community', 'protocol'], 'NOT IN');
+    $refs['node'] = $query->execute()->fetchCol();
+  }
+
+  // Fail if there are no node references.
+  $types = array_keys($refs);
+  if (!in_array('node', $types) || empty($refs['node'])) {
+    drupal_set_message(t("@title (@sid): Could not find any valid items referencing this media. You must set the protocol fields manually.", [
+      '@title' => $atom->title,
+      '@sid' => $atom->sid,
+    ]), 'error');
+    return;
+  }
+
+  // Fail if there are multiple nodes and/or multiple types. We have no way of
+  // knowing which we should duplicate from.
+  if (count($refs['node']) > 1 || count($types) > 1) {
+    drupal_set_message(t("@title (@sid): This media is referenced by multiple items. You must set the protocol fields manually.", [
+      '@title' => $atom->title,
+      '@sid' => $atom->sid,
+    ]), 'error');
+    return;
+  }
+
+  $nid = $refs['node'][0] ?? NULL;
+  if ($nid == NULL) {
+    return;
+  }
+  if ($node = node_load($nid)) {
+    // Check if the node has our protocol fields.
+    $instances = field_info_instances('node', $node->type);
+    if (!isset($instances['field_item_privacy_setting']) || !isset($instances['og_group_ref'])) {
+      drupal_set_message(t("@title (@sid): Could not find any valid items referencing this media. You must set the protocol fields manually.", [
+        '@title' => $atom->title,
+        '@sid' => $atom->sid,
+      ]), 'error');
+      return;
+    }
+
+    // Fail if the user can't update the owning node. We don't want them to
+    // deny themselves access to their own media.
+    if (!node_access('update', $node)) {
+      drupal_set_message(t("@title (@sid): You do not have access to the referencing item. You must set the protocol fields manually.", [
+        '@title' => $atom->title,
+        '@sid' => $atom->sid,
+      ]), 'error');
+      return;
+    }
+
+    // Get the node's protocol settings.
+    $containing_content = entity_metadata_wrapper('node', $node);
+    $sharing = $containing_content->field_item_privacy_setting->value() ?? NULL;
+    // Fail if for some reason the content doesn't have a sharing setting set.
+    if (!$sharing) {
+      drupal_set_message(t("@title (@sid): Could not find any valid items referencing this media. You must set the protocol fields manually.", [
+        '@title' => $atom->title,
+        '@sid' => $atom->sid,
+      ]), 'error');
+      return;
+    }
+
+    $protocol_ids = $containing_content->og_group_ref->raw() ?? [];
+
+    // Owning content must have valid protocol settings to duplicate to the
+    // scald atom.
+    if ($sharing !== 'any' && $sharing !== 'all') {
+      drupal_set_message(t("@title (@sid): Item has invalid sharing settings", [
+        '@title' => $atom->title,
+        '@sid' => $atom->sid,
+      ]), 'error');
+      return;
+    }
+
+    if (empty($protocol_ids)) {
+      drupal_set_message(t("@title (@sid): Item does not have any cultural protocols", [
+        '@title' => $atom->title,
+        '@sid' => $atom->sid,
+      ]), 'error');
+      return;
+    }
+
+    // Duplicate the protocol settings.
+    $atom_entity->field_item_privacy_setting->set($sharing);
+    $atom_entity->field_scald_protocol->set($protocol_ids);
+    try {
+      scald_atom_save($atom);
+    } catch (Exception $e) {
+      drupal_set_message(t("@title (@sid): Failed to set cultural protocols", [
+        '@title' => $atom->title,
+        '@sid' => $atom->sid,
+      ]), 'error');
+    }
+  }
 }
