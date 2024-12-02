@@ -21,9 +21,9 @@ projects[drupal][patch][] = core/ignore_files_dir_contents_but_include_files_dir
 ; Mukurtu custom default.settings.php.
 projects[drupal][patch][] = core/mukurtu_custom_default_settings_file.patch
 
-; TODO: the latest Drupal 7 update incorporates these patches.
-; However, this patch cannot be deleted entirely: there are some Mukurtu patches
-; that must remain.
+; The Drupal side of this multipatch has been incorporated as of Drupal 7.102.
+; However, this multipatch cannot be deleted entirely because there are some
+; Mukurtu patches that must remain.
 ; Multipatch combination of 3 separate custom patches from before this was cleaned up in drush patchfile:
 ; 1150608_use_comma_for_tax_delimiter_and_allow_quotes.patch
 ; 109315810-Change-delimiter-from-comma-to-semi-colon.patch

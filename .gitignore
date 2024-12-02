@@ -7,3 +7,6 @@ sites/*/private
 
 # Ignore ddev config.
 .ddev/*
+
+# Ignore VS Code config.
+.vscode/*
