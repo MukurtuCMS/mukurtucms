@@ -1,3 +1,12 @@
+## Mukurtu 3.0.6
+- Updated to Drupal 7.102
+- Updated jQuery Update module to 7.x-4.1
+- Fixed bug on deleting collections
+
+#### Manual Upgrade Steps
+This version requires a database update.
+- database update: `drush updb`
+
 ## Mukurtu 3.0.5
 - Updated to Drupal 7.97
 - Contrib module updates
