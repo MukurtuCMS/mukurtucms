@@ -332,6 +332,32 @@ class Services_Soundcloud
     }
 
     /**
+     * Retrieve access token using grant type client credentials
+     *
+     * @param string $code        Optional OAuth code returned from the service provider
+     * @param array  $postData    Optional post data
+     * @param array  $curlOptions Optional cURL options
+     *
+     * @return mixed
+     *
+     * @access public
+     * @see Soundcloud::_getAccessToken()
+     */
+    function accessTokenCC($code = null, $postData = array(), $curlOptions = array())
+    {
+        $defaultPostData = array(
+            'code' => $code,
+            'client_id' => $this->_clientId,
+            'client_secret' => $this->_clientSecret,
+            'redirect_uri' => $this->_redirectUri,
+            'grant_type' => 'client_credentials'
+        );
+        $postData = array_filter(array_merge($defaultPostData, $postData));
+
+        return $this->_getAccessToken($postData, $curlOptions);
+    }
+
+    /**
      * Refresh access token
      *
      * @param string $refreshToken The token to refresh

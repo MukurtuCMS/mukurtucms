@@ -557,6 +557,24 @@ function ma_cultural_protocol_get_cps_for_user($roles, $community_nid = NULL, $i
 }
 
 /**
+ * Returns an array of all published open cultural protocol IDs.
+ */
+function ma_cultural_protocol_get_open_protocol_ids() {
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'cultural_protocol_group')
+    ->fieldCondition('group_access', 'value', '0')
+    ->propertyCondition('status', NODE_PUBLISHED);
+
+  $result = $query->execute();
+
+  if (isset($result['node'])) {
+    return array_keys($result['node']);
+  }
+  return [];
+}
+
+/**
  * Collab Pages functions shared with cultural protocol feature. Included here because ma_collaboration_tools can be disabled.
  */
 
@@ -604,6 +622,8 @@ function _ma_cultural_protocol_get_node_types_in_cps() {
     'optional' => [
       'collection',
       'dictionary_word',
+      'word_list',
+      'person',
     ],
     'required' => [
       'digital_heritage',
@@ -654,4 +674,164 @@ function ma_culturalprotocol_follow_unfollow($entity) {
   if (module_exists('ma_collaboration_tools')) {
     return ma_collaboration_tools_follow_unfollow($entity);
   }
+}
+
+/**
+ * Implements hook_action_info().
+ */
+function ma_culturalprotocol_action_info() {
+  return [
+    'ma_culturalprotocol_set_node_protocol_action' => [
+      'type' => 'node',
+      'label' => t('Set Cultural Protocols for Content'),
+      'configurable' => TRUE,
+    ],
+    'ma_culturalprotocol_set_atom_protocol_action' => [
+      'type' => 'scald_atom',
+      'label' => t('Set Cultural Protocols for Scald Atoms'),
+      'configurable' => TRUE,
+    ],
+  ];
+}
+
+/**
+ * Form for ma_culturalprotocol_set_node_protocol_action.
+ */
+function ma_culturalprotocol_set_node_protocol_action_form($settings, &$form_state) {
+  $form_description = t('Select the cultural protocol settings to apply to the content. Any existing cultural protocol settings on the content will be replaced with what you select here.');
+  return ma_culturalprotocol_get_set_protocol_form($form_description);
+}
+
+/**
+ * Form for ma_culturalprotocol_set_atom_protocol_action.
+ */
+function ma_culturalprotocol_set_atom_protocol_action_form($settings, &$form_state) {
+  $form_description = t('Select the cultural protocol settings to apply to the Atom(s). Any existing cultural protocol settings will be replaced with what you select here.');
+  return ma_culturalprotocol_get_set_protocol_form($form_description);
+}
+
+function ma_culturalprotocol_get_set_protocol_form($description) {
+  $allowed_protocols = ma_cultural_protocol_get_cps_user_can_post_to();
+  $protocol_ids = array_keys($allowed_protocols);
+  $protocol_nodes = node_load_multiple($protocol_ids);
+
+  $options = [];
+  foreach ($protocol_nodes as $protocol) {
+    $access_value = $protocol->group_access[LANGUAGE_NONE][0]['value'] ?? NULL;
+    if (is_null($access_value)) {
+      continue;
+    }
+    $community_name = t("[Unknown Community]");
+    if ($community_id = $protocol->og_group_ref[LANGUAGE_NONE][0]['target_id'] ?? NULL) {
+      if ($community = node_load($community_id)) {
+        $community_name = $community->title;
+      }
+    }
+    $access_text = $access_value == 0 ? 'Open' : 'Strict';
+    $options[$protocol->nid] = "$community_name: {$protocol->title} ($access_text)";
+  }
+
+  asort($options);
+
+  $sharing_options = [
+    'any' => t('This item may be shared with members of ANY protocol listed.'),
+    'all' => t('This item may only be shared with members belonging to ALL the protocols listed.'),
+  ];
+
+  $form = [];
+  $form['description'] = [
+    '#markup' => "<div><strong>$description</strong></div><br>",
+  ];
+  $form['sharing'] = [
+    '#type' => 'select',
+    '#title' => 'Sharing Setting',
+    '#options' => $sharing_options,
+  ];
+  $form['protocols'] = [
+    '#type' => 'checkboxes',
+    '#title' => 'Select Cultural Protocols',
+    '#options' => $options,
+  ];
+
+  return $form;
+}
+
+
+function ma_culturalprotocol_set_protocol_form_validate($form, &$form_state) {
+  $allowed_protocol_options = ma_cultural_protocol_get_cps_user_can_post_to();
+  $allowed_protocol_ids = array_keys($allowed_protocol_options);
+
+  $protocol_values = $form_state['values']['protocols'] ?? [];
+  $protocols = array_filter($protocol_values, fn($p) => ((int) $p) > 0);
+  $protocol_ids = array_keys($protocols);
+  $invalid_protocol_ids = array_diff($protocol_ids, $allowed_protocol_ids);
+  if (empty($protocols)) {
+    form_set_error('protocols', t("At least one cultural protocol must be selected."));
+  }
+
+  if (!empty($invalid_protocol_ids)) {
+    form_set_error('protocols', t("Please select cultural protocols you have permission to apply."));
+  }
+
+  $sharing_value = $form_state['values']['sharing'] ?? NULL;
+  if (!in_array($sharing_value, ['any', 'all'])) {
+    form_set_error('sharing', t("Select a valid sharing setting."));
+  }
+}
+
+
+/**
+ * Validation for ma_culturalprotocol_set_node_protocol_action.
+ */
+function ma_culturalprotocol_set_node_protocol_action_validate($form, &$form_state) {
+  ma_culturalprotocol_set_protocol_form_validate($form, $form_state);
+}
+
+/**
+ * Validation for ma_culturalprotocol_set_atom_protocol_action.
+ */
+function ma_culturalprotocol_set_atom_protocol_action_validate($form, &$form_state) {
+  ma_culturalprotocol_set_protocol_form_validate($form, $form_state);
+}
+
+/**
+ * Submit handler for ma_culturalprotocol_set_node_protocol_action.
+ */
+function ma_culturalprotocol_set_node_protocol_action_submit($form, &$form_state) {
+  $values = [];
+  $protocol_values = $form_state['values']['protocols'] ?? [];
+  $values['protocols'] = array_filter($protocol_values, fn($p) => ((int) $p) > 0);
+  $values['sharing'] = $form_state['values']['sharing'];
+
+  return $values;
+}
+
+/**
+ * Submit handler for ma_culturalprotocol_set_atom_protocol_action.
+ */
+function ma_culturalprotocol_set_atom_protocol_action_submit($form, &$form_state) {
+  $values = [];
+  $protocol_values = $form_state['values']['protocols'] ?? [];
+  $values['protocols'] = array_filter($protocol_values, fn($p) => ((int) $p) > 0);
+  $values['sharing'] = $form_state['values']['sharing'];
+
+  return $values;
+}
+
+/**
+ * Action for ma_culturalprotocol_set_node_protocol_action.
+ */
+function ma_culturalprotocol_set_node_protocol_action(&$entity, $context) {
+  $content = entity_metadata_wrapper('node', $entity);
+  $content->field_item_privacy_setting->set($context['sharing']);
+  $content->og_group_ref->set($context['protocols']);
+}
+
+/**
+ * Action for ma_culturalprotocol_set_atom_protocol_action.
+ */
+function ma_culturalprotocol_set_atom_protocol_action(&$entity, $context) {
+  $content = entity_metadata_wrapper('scald_atom', $entity);
+  $content->field_item_privacy_setting->set($context['sharing']);
+  $content->field_scald_protocol->set($context['protocols']);
 }

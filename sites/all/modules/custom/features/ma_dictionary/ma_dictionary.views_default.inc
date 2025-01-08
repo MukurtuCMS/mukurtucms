@@ -498,6 +498,8 @@ function ma_dictionary_views_default_views() {
     t('Term ID'),
     t('.'),
     t(','),
+    t('1'),
+    t('@count'),
     t('Language'),
     t('Language Community'),
     t('Not created. <a href=\'/node/add/language-community/[tid]\'>Create [name] Language Community</a>'),
