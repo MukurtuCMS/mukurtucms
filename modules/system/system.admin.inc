@@ -1651,6 +1651,12 @@ function system_cron_settings() {
     '#default_value' => variable_get('cron_safe_threshold', DRUPAL_CRON_DEFAULT_THRESHOLD),
     '#options' => array(0 => t('Never')) + drupal_map_assoc(array(3600, 10800, 21600, 43200, 86400, 604800), 'format_interval'),
   );
+  $form['cron']['cron_detailed_logging'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Detailed cron logging'),
+    '#default_value' => variable_get('cron_detailed_logging', DRUPAL_CRON_DETAILED_LOGGING),
+    '#description' => t('Run times of individual cron jobs will be written to watchdog'),
+  );
 
   return system_settings_form($form);
 }
@@ -2315,7 +2321,7 @@ function system_clean_url_settings($form, &$form_state) {
     $form_state['redirect'] = url('admin/config/search/clean-urls');
     $form['clean_url_description'] = array(
       '#type' => 'markup',
-      '#markup' => '<p>' . t('Use URLs like <code>example.com/user</code> instead of <code>example.com/?q=user</code>.'),
+      '#markup' => '<p>' . t('Use URLs like <code>example.com/user</code> instead of <code>example.com/?q=user</code>.') . '</p>',
     );
     // Explain why the user is seeing this page and what to expect after
     // clicking the 'Run the clean URL test' button.
@@ -2391,7 +2397,8 @@ function system_run_cron() {
  * Menu callback: return information about PHP.
  */
 function system_php() {
-  phpinfo(~ (INFO_VARIABLES | INFO_ENVIRONMENT));
+  $phpinfo_flags = variable_get('sa_core_2023_004_phpinfo_flags', ~(INFO_VARIABLES | INFO_ENVIRONMENT));
+  phpinfo($phpinfo_flags);
   drupal_exit();
 }
 

@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * @return array
+ */
+function _resumable_download_variables() {
+  return array(
+    'resumable_download_max_speed' => 0,
+    'resumable_download_part_speed' => 0,
+  );
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function resumable_download_uninstall() {
+  _resumable_download_variables_del(_resumable_download_variables());
+}
+
+/**
+ * Implements hook_install().
+ */
+function resumable_download_install() {
+  _resumable_download_variables_set(_resumable_download_variables());
+}
+
+function _resumable_download_variables_set($variables) {
+  foreach ($variables as $key=>$val) {
+    variable_set($key,$val);
+  }
+}
+
+function _resumable_download_variables_del($variables) {
+  $variables = array_keys($variables);
+  foreach ($variables as $variable) {
+    variable_del($variable);
+  }
+}

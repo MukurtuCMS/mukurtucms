@@ -144,10 +144,7 @@ class UserRegistrationTestCase extends DrupalWebTestCase {
     variable_set('configurable_timezones', 1);
     variable_set('date_default_timezone', 'Europe/Brussels');
 
-    // Check that the account information fieldset's options are not displayed
-    // is a fieldset if there is not more than one fieldset in the form.
     $this->drupalGet('user/register');
-    $this->assertNoRaw('<fieldset id="edit-account"><legend>Account information</legend>', 'Account settings fieldset was hidden.');
 
     $edit = array();
     $edit['name'] = $name = $this->randomName();
@@ -371,6 +368,13 @@ class UserLoginTestCase extends DrupalWebTestCase {
     // A login with the correct password should also result in a flood error
     // message.
     $this->assertFailedLogin($user1, 'ip');
+
+    // A login attempt after resetting the password should still fail, since the
+    // IP-based flood control count is not cleared after a password reset.
+    $this->resetUserPassword($user1);
+    $this->drupalLogout();
+    $this->assertFailedLogin($user1, 'ip');
+    $this->assertRaw(t('Sorry, too many failed login attempts from your IP address. This IP address is temporarily blocked. Try again later or <a href="@url">request a new password</a>.', array('@url' => url('user/password'))));
   }
 
   /**
@@ -410,6 +414,12 @@ class UserLoginTestCase extends DrupalWebTestCase {
     // Try one more attempt for user 1, it should be rejected, even if the
     // correct password has been used.
     $this->assertFailedLogin($user1, 'user');
+    $this->resetUserPassword($user1);
+    $this->drupalLogout();
+
+    // Try to log in as user 1, it should be successful.
+    $this->drupalLogin($user1);
+    $this->assertRaw('Member for');
   }
 
   /**
@@ -484,6 +494,26 @@ class UserLoginTestCase extends DrupalWebTestCase {
       $this->assertText(t('Sorry, unrecognized username or password. Have you forgotten your password?'));
     }
   }
+
+  /**
+   * Resets the user password and logs the user in.
+   *
+   * @param object $user
+   *   The account to reset the password for.
+   */
+  protected function resetUserPassword($user) {
+    $this->drupalGet('user/password');
+    $edit['name'] = $user->name;
+    $this->drupalPost(NULL, $edit, 'E-mail new password');
+    $emails = $this->drupalGetMails();
+    $email = end($emails);
+    $urls = array();
+    preg_match('#.+user/reset/.+#', $email['body'], $urls);
+    $resetURL = $urls[0];
+    $this->drupalGet($resetURL);
+    $this->drupalPost(NULL, NULL, 'Log in');
+  }
+
 }
 
 /**
@@ -721,6 +751,12 @@ class UserPasswordResetTestCase extends DrupalWebTestCase {
       array('%other_user' => $account->name, '%resetting_user' => $another_account->name, '!logout' => url('user/logout'))
     ));
 
+    // Verify that the invalid password reset page does not show the user name.
+    $attack_reset_url = "user/reset/" . $another_account->uid . "/1/1";
+    $this->drupalGet($attack_reset_url);
+    $this->assertNoText($another_account->name);
+    $this->assertText('The one-time login link you clicked is invalid.');
+
     // Test the link for a deleted user while logged in.
     user_delete($another_account->uid);
     $this->drupalGet($reset_url);
@@ -791,20 +827,29 @@ class UserPasswordResetTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Prefill the text box on incorrect login via link to password reset page.
+   * Tests the text box on incorrect login via link to password reset page.
    */
-  function testUserPasswordTextboxFilled() {
+  function testUserPasswordTextboxNotFilled() {
     $this->drupalGet('user/login');
     $edit = array(
       'name' => $this->randomName(),
       'pass' => $this->randomName(),
     );
     $this->drupalPost('user', $edit, t('Log in'));
-    $this->assertRaw(t('Sorry, unrecognized username or password. <a href="@password">Have you forgotten your password?</a>',
+    // Verify we don't pass the username as a query parameter.
+    $this->assertNoRaw(t('Sorry, unrecognized username or password. <a href="@password">Have you forgotten your password?</a>',
       array('@password' => url('user/password', array('query' => array('name' => $edit['name']))))));
+    $this->assertRaw(t('Sorry, unrecognized username or password. <a href="@password">Have you forgotten your password?</a>',
+      array('@password' => url('user/password'))));
     unset($edit['pass']);
+    // Verify the field is empty by default.
+    $this->drupalGet('user/password');
+    $this->assertFieldByName('name', '', 'User name not found.');
+    // Ensure the name field value is not cached.
     $this->drupalGet('user/password', array('query' => array('name' => $edit['name'])));
     $this->assertFieldByName('name', $edit['name'], 'User name found.');
+    $this->drupalGet('user/password');
+    $this->assertNoFieldByName('name', $edit['name'], 'User name not found.');
   }
 
   /**
@@ -885,6 +930,31 @@ class UserPasswordResetTestCase extends DrupalWebTestCase {
     user_save($account, array('mail' => '1' . $account->mail));
     $this->drupalGet($original_reset_url);
     $this->assertText('You have tried to use a one-time login link that has either been used or is no longer valid. Please request a new one using the form below.');
+  }
+
+  /**
+   * Test uniqueness of output from user_pass_rehash() with no passwords.
+   */
+  function testUniqueHashNoPasswordValue() {
+    $timestamp = REQUEST_TIME;
+
+    // Minimal user objects are sufficient.
+    $user = drupal_anonymous_user();
+    $user->login = $timestamp - 1000;
+    $user->pass = '';
+
+    $user_a = clone $user;
+    $user_a->uid = 12;
+    $user_a->mail = '3user@example.com';
+
+    $user_b = clone $user;
+    $user_b->uid = 123;
+    $user_b->mail = 'user@example.com';
+
+    $hash_a = user_pass_rehash($user_a->pass, $timestamp, $user_a->login, $user_a->uid, $user_a->mail);
+    $hash_b = user_pass_rehash($user_b->pass, $timestamp, $user_b->login, $user_b->uid, $user_b->mail);
+
+    $this->assertNotEqual($hash_a, $hash_b, "No user_pass_rehash() hash collision for different users with no stored password.");
   }
 
 }
@@ -2268,6 +2338,42 @@ class UserEditTestCase extends DrupalWebTestCase {
     $this->drupalLogout();
     $user1->pass_raw = '0';
     $this->drupalLogin($user1);
+    $this->drupalLogout();
+  }
+
+  /**
+   * Tests that the user can edit the account when another user with the same
+   * e-mail address exists.
+   */
+  public function testUserEditDuplicateEmail() {
+    // Create two regular users.
+    $user1 = $this->drupalCreateUser(array('change own username'));
+    $user2 = $this->drupalCreateUser(array('change own username'));
+
+    // Change the e-mail address of the user2 to have the same e-mail address
+    // as the user1.
+    db_update('users')
+      ->fields(array('mail' => $user1->mail))
+      ->condition('uid', $user2->uid)
+      ->execute();
+
+    $this->drupalLogin($user2);
+    $edit['name'] = $user2->name;
+    $this->drupalPost("user/" . $user2->uid . "/edit", $edit, t('Save'));
+    $this->assertRaw(t("The changes have been saved."));
+    $this->drupalLogout();
+
+    // Change the e-mail address of the user2 to have the same e-mail address
+    // as the user1, except that the first letter will be uppercase.
+    db_update('users')
+      ->fields(array('mail' => ucfirst($user1->mail)))
+      ->condition('uid', $user2->uid)
+      ->execute();
+
+    $this->drupalLogin($user2);
+    $edit['name'] = $user2->name;
+    $this->drupalPost("user/" . $user2->uid . "/edit", $edit, t('Save'));
+    $this->assertRaw(t("The changes have been saved."));
     $this->drupalLogout();
   }
 }

@@ -6,7 +6,7 @@ version = VERSION
 hidden = FALSE
 dependencies[] = system_null_version_test
 
-; Information added by Drupal.org packaging script on 2023-04-21
-version = "7.97"
+; Information added by Drupal.org packaging script on 2024-11-20
+version = "7.102"
 project = "drupal"
-datestamp = "1682075566"
+datestamp = "1732133210"

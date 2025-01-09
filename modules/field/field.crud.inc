@@ -23,13 +23,15 @@
 /**
  * Retrieves the schema for a field.
  *
- * @param $field
+ * @param array $field
  *   The field array to get the schema definition against.
- * @return
+ * @return array
  *   The field schema definition array.
  */
 function field_retrieve_schema($field) {
-  module_load_install($field['module']);
+  // Make sure the installation API is available.
+  include_once DRUPAL_ROOT . '/includes/install.inc';
+  module_load_all_includes('install');
   $schema = (array) module_invoke($field['module'], 'field_schema', $field);
   $schema += array('columns' => array(), 'indexes' => array(), 'foreign keys' => array());
   // Give other modules a chance to alter this definition.

@@ -850,6 +850,25 @@ class ImageAdminStylesUnitTest extends ImageFieldTestCase {
     $effects = array_values($style['effects']);
     $this->assertEqual($effects[0]['name'], 'image_scale', 'The default effect still exists in the reverted style.');
     $this->assertFalse(array_key_exists(1, $effects), 'The added effect has been removed in the reverted style.');
+
+    // Verify that a new style with the same name as the default one could not
+    // be created.
+    $edit = array(
+      'name' => $style_name,
+      'label' => $style_label,
+    );
+    // The default style is not overriden.
+    $this->drupalPost('admin/config/media/image-styles/add', $edit, t('Create new style'));
+    $this->assertNoRaw(t('Style %name was created.', array('%name' => $style_label)), 'Image style successfully created.');
+    // Override the default.
+    $this->drupalPost($edit_path, array(), t('Override defaults'));
+    $this->assertRaw(t('The %style style has been overridden, allowing you to change its settings.', array('%style' => $style_label)), 'Default image style may be overridden.');
+    // The default style is overriden.
+    $this->drupalPost('admin/config/media/image-styles/add', $edit, t('Create new style'));
+    $this->assertNoRaw(t('Style %name was created.', array('%name' => $style_label)), 'Image style successfully created.');
+    // Revert the image style.
+    $this->drupalPost($revert_path, array(), t('Revert'));
+    drupal_static_reset('image_styles');
   }
 
   /**
@@ -1233,6 +1252,56 @@ class ImageFieldValidateTestCase extends ImageFieldTestCase {
       'description' => 'Tests validation functions such as min/max resolution.',
       'group' => 'Image',
     );
+  }
+
+  /**
+   * Test image validity.
+   */
+  public function testValid() {
+    $image_files = $this->drupalGetTestFiles('image');
+
+    $field_name = strtolower($this->randomName());
+    $this->createImageField($field_name, 'article', array(), array('file_directory' => 'test-upload'));
+    $expected_path = 'public://test-upload';
+
+    // Create a node with a valid image.
+    $node = $this->uploadNodeImage($image_files[0], $field_name, 'article');
+    $this->assertTrue(file_exists($expected_path . '/' . $image_files[0]->filename));
+
+    // Remove the image.
+    $this->drupalPost('node/' . $node . '/edit', array(), t('Remove'));
+    $this->drupalPost(NULL, array(), t('Save'));
+
+    // Get invalid image test files from simpletest.
+    $files = file_scan_directory(drupal_get_path('module', 'simpletest') . '/files', '/invalid-img-.*/');
+    $invalid_image_files = array();
+    foreach ($files as $file) {
+      $invalid_image_files[$file->filename] = $file;
+    }
+
+    // Try uploading a zero-byte image.
+    $zero_size_image = $invalid_image_files['invalid-img-zero-size.png'];
+    $edit = array(
+      'files[' . $field_name . '_' . LANGUAGE_NONE . '_0]' => drupal_realpath($zero_size_image->uri),
+    );
+    $this->drupalPost('node/' . $node . '/edit', $edit, t('Upload'));
+    $this->assertFalse(file_exists($expected_path . '/' . $zero_size_image->filename));
+
+    // Try uploading an invalid image.
+    $invalid_image = $invalid_image_files['invalid-img-test.png'];
+    $edit = array(
+      'files[' . $field_name . '_' . LANGUAGE_NONE . '_0]' => drupal_realpath($invalid_image->uri),
+    );
+    $this->drupalPost('node/' . $node . '/edit', $edit, t('Upload'));
+    $this->assertFalse(file_exists($expected_path . '/' . $invalid_image->filename));
+
+    // Upload a valid image again.
+    $valid_image = $image_files[0];
+    $edit = array(
+      'files[' . $field_name . '_' . LANGUAGE_NONE . '_0]' => drupal_realpath($valid_image->uri),
+    );
+    $this->drupalPost('node/' . $node . '/edit', $edit, t('Upload'));
+    $this->assertTrue(file_exists($expected_path . '/' . $valid_image->filename));
   }
 
   /**
