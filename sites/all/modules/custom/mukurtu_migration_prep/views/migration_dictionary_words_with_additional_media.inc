@@ -21,6 +21,36 @@ $handler->display->display_options['exposed_form']['type'] = 'basic';
 $handler->display->display_options['pager']['type'] = 'full';
 $handler->display->display_options['pager']['options']['items_per_page'] = '20';
 $handler->display->display_options['style_plugin'] = 'table';
+$handler->display->display_options['style_options']['columns'] = array(
+  'title' => 'title',
+  'field_additional_media' => 'field_additional_media',
+  'field_dictionary_word_language' => 'field_dictionary_word_language',
+);
+$handler->display->display_options['style_options']['class'] = '';
+$handler->display->display_options['style_options']['default'] = '-1';
+$handler->display->display_options['style_options']['info'] = array(
+  'title' => array(
+    'sortable' => 1,
+    'default_sort_order' => 'asc',
+    'align' => '',
+    'separator' => '',
+    'empty_column' => 0,
+  ),
+  'field_additional_media' => array(
+    'sortable' => 0,
+    'default_sort_order' => 'asc',
+    'align' => '',
+    'separator' => '',
+    'empty_column' => 0,
+  ),
+  'field_dictionary_word_language' => array(
+    'sortable' => 1,
+    'default_sort_order' => 'asc',
+    'align' => '',
+    'separator' => '',
+    'empty_column' => 0,
+  ),
+);
 /* Header: Global: Text area */
 $handler->display->display_options['header']['area']['id'] = 'area';
 $handler->display->display_options['header']['area']['table'] = 'views';
@@ -46,6 +76,10 @@ $handler->display->display_options['fields']['field_additional_media']['id'] = '
 $handler->display->display_options['fields']['field_additional_media']['table'] = 'field_data_field_additional_media';
 $handler->display->display_options['fields']['field_additional_media']['field'] = 'field_additional_media';
 $handler->display->display_options['fields']['field_additional_media']['exclude'] = TRUE;
+/* Field: Content: Language */
+$handler->display->display_options['fields']['field_dictionary_word_language']['id'] = 'field_dictionary_word_language';
+$handler->display->display_options['fields']['field_dictionary_word_language']['table'] = 'field_data_field_dictionary_word_language';
+$handler->display->display_options['fields']['field_dictionary_word_language']['field'] = 'field_dictionary_word_language';
 /* Sort criterion: Content: Post date */
 $handler->display->display_options['sorts']['created']['id'] = 'created';
 $handler->display->display_options['sorts']['created']['table'] = 'node';
@@ -94,5 +128,6 @@ $translatables['migration_dictionary_words_with_additional_media'] = array(
   t('<a href="/admin/reports/migration/summary">Back to Migration Summary</a>'),
   t('Title'),
   t('Additional Media'),
+  t('Language'),
   t('Page'),
 );
