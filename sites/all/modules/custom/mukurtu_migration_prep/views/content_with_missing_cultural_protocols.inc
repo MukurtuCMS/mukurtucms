@@ -65,6 +65,13 @@ $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FAL
 $handler->display->display_options['fields']['type']['id'] = 'type';
 $handler->display->display_options['fields']['type']['table'] = 'node';
 $handler->display->display_options['fields']['type']['field'] = 'type';
+/* Field: Content: Nid */
+$handler->display->display_options['fields']['nid']['id'] = 'nid';
+$handler->display->display_options['fields']['nid']['table'] = 'node';
+$handler->display->display_options['fields']['nid']['field'] = 'nid';
+$handler->display->display_options['fields']['nid']['label'] = 'Node ID';
+$handler->display->display_options['fields']['nid']['alter']['make_link'] = TRUE;
+$handler->display->display_options['fields']['nid']['alter']['path'] = '/node/[nid]';
 /* Sort criterion: Content: Post date */
 $handler->display->display_options['sorts']['created']['id'] = 'created';
 $handler->display->display_options['sorts']['created']['table'] = 'node';
@@ -127,5 +134,6 @@ $translatables['content_with_missing_cultural_protocols'] = array(
   t('- Choose an operation -'),
   t('Title'),
   t('Type'),
+  t('Node ID'),
   t('Page'),
 );
