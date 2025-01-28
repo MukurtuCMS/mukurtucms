@@ -18,7 +18,7 @@ function mukurtu_migration_prep_menu() {
 
   $items['admin/reports/migration/summary'] = [
     'title' => 'Pre-migration Summary Report',
-    'description' => 'View a report on nodes with empty field_protocols.',
+    'description' => '',
     'page callback' => 'drupal_get_form',
     'page arguments' => ['mukurtu_migration_prep_summary_report_form'],
     'access callback' => 'mukurtu_migration_prep_current_user_has_role',
@@ -52,17 +52,6 @@ function mukurtu_migration_prep_views_default_views() {
   }
 
   return $views;
-}
-
-function mukurtu_migration_prep_query_alter($query) {
-  if ($query->hasAllTags('views_content_with_missing_cultural_protocols')) {
-    $count_protocol_refs_subquery = "(SELECT count(*) from og_membership as `ogm` where node.nid = ogm.etid AND ogm.entity_type = 'node' AND ogm.field_name = 'og_group_ref' AND ogm.state = 1)";
-    $query->addExpression($count_protocol_refs_subquery, 'protocol_refs');
-    $query->havingCondition('protocol_refs', 0);
-//    dpm((string) $query);
-//    dpm($query->arguments());
-  }
-
 }
 
 /**
@@ -129,30 +118,15 @@ function mukurtu_migration_prep_get_status_class($status) {
   }
 }
 
-function mukurtu_migration_prep_summary_report_form_submit($form, &$form_state) {
-  batch_set(mukurtu_migration_prep_batch());
-}
-
-/**
- * Define batch process to run all reports.
- */
-function mukurtu_migration_prep_batch() {
-  return [
-    'title' => t('Searching for content using markdown or ds_code filter formats...'),
-    'operations' => [
-      ['mukurtu_migration_prep_report_unsupported_text_formats_batch_process', []],
-    ],
-    'finished' => 'mukurtu_migration_prep_report_unsupported_text_formats_batch_finished',
-  ];
-}
-
 /**
  * Report for markdown/ds_code text formats.
  */
 function mukurtu_migration_prep_report_unsupported_text_formats() {
-  $previous_run = variable_get('mukurtu_migration_prep_report_unsupported_text_formats') ?? NULL;
-  $status = $previous_run[MUKURTU_MIGRATION_RESULT] ?? MUKURTU_MIGRATION_REPORT_STATUS_NOT_RUN;
-  $summary = $previous_run[MUKURTU_MIGRATION_SUMMARY] ?? '';
+  $view = views_get_view('migration_nodes_with_unsupported_text_formats');
+  $view->execute();
+  $status = $view->total_rows <= 0 ? MUKURTU_MIGRATION_REPORT_STATUS_OK : MUKURTU_MIGRATION_REPORT_STATUS_ERROR;
+  $link = l(t('Details'), 'admin/reports/migration/summary/migration-nodes-with-unsupported-text-formats');
+  $summary = $status == MUKURTU_MIGRATION_REPORT_STATUS_OK ? t('No nodes with unsupported text formats') : t('@count node(s) with unsupported text formats: ', ['@count' => $view->total_rows]) . $link;
 
   $row = [
     'data' => [
@@ -162,90 +136,8 @@ function mukurtu_migration_prep_report_unsupported_text_formats() {
     ],
     'class' => mukurtu_migration_prep_get_status_class($status),
   ];
+
   return $row;
-}
-
-/**
- * Batch process callback for the markdown/ds_code text format report.
- */
-function mukurtu_migration_prep_report_unsupported_text_formats_batch_process(&$context) {
-  if (!isset($context['sandbox']['progress'])) {
-    $context['sandbox']['progress'] = 0;
-    $context['sandbox']['max'] = db_query("SELECT COUNT(nid) FROM {node}")->fetchField();
-    $context['results']['nids'] = [];
-
-    // Load all text and text_long field instances.
-    $context['sandbox']['text_fields'] = ['field_data_body' => 'body'];
-
-    $field_types = ['text', 'text_long'];
-    $all_fields = field_info_fields();
-    foreach ($all_fields as $field_name => $field_info) {
-      if (in_array($field_info['type'], $field_types)) {
-        $table_name = 'field_data_' . $field_name;
-        $context['sandbox']['text_fields'][$table_name] = $field_name;
-      }
-    }
-  }
-
-  $unique_nids = [];
-  $node_batch_query = db_select('node', 'n')
-    ->fields('n', ['nid'])
-    ->range($context['sandbox']['progress'], $context['sandbox']['progress'] + 50);
-  $result = $node_batch_query->execute()->fetchAllAssoc('nid');
-  $batch_nids = array_keys($result);
-
-  // Loop through text fields and find nodes with the markdown format.
-  foreach ($context['sandbox']['text_fields'] as $table_name => $field_name) {
-    $format_column_name = $field_name . '_format';
-
-    $query = db_select($table_name, 'f')
-      ->fields('f', ['entity_id'])
-      ->condition($format_column_name, ['markdown', 'ds_code'], 'IN')
-      ->condition('entity_type', 'node')
-      ->condition('entity_id', $batch_nids, 'IN');
-
-    $result = $query->execute();
-
-    foreach ($result as $row) {
-      $unique_nids[$row->entity_id] = true;
-    }
-  }
-
-  $context['results']['nids'] = array_keys($unique_nids);
-  $context['sandbox']['progress'] += 50;
-
-  if ($context['sandbox']['progress'] < $context['sandbox']['max']) {
-    $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
-  } else {
-    $context['finished'] = 1;
-  }
-}
-
-/**
- * Batch 'finished' callback for the markdown/ds_code text format report.
- */
-function mukurtu_migration_prep_report_unsupported_text_formats_batch_finished($success, $results, $operations) {
-  if ($success) {
-    $report_result = empty($results['nids']) ? MUKURTU_MIGRATION_REPORT_STATUS_OK : MUKURTU_MIGRATION_REPORT_STATUS_ERROR;
-
-    sort($results['nids'], SORT_NUMERIC);
-    $summary = t('There are no nodes using these text formats.');
-    if ($report_result == MUKURTU_MIGRATION_REPORT_STATUS_ERROR) {
-      $ids_msg = implode(', ', $results['nids']);
-      $summary = t('There are @count nodes with these text formats: @ids.', ['@count' => count($results['nids']), '@ids' => $ids_msg]);
-    }
-
-    $report = [
-      MUKURTU_MIGRATION_CONTEXT => $results['nids'],
-      MUKURTU_MIGRATION_RESULT => $report_result,
-      MUKURTU_MIGRATION_SUMMARY => $summary,
-    ];
-    variable_set('mukurtu_migration_prep_report_unsupported_text_formats', $report);
-    //drupal_set_message(t('Found nodes with markdown filter format: @nids', ['@nids' => implode(', ', $results['nids'])]));
-  }
-  else {
-    drupal_set_message(t('An unknown error occurred'), 'error');
-  }
 }
 
 /**
