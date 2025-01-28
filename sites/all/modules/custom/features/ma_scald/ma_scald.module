@@ -551,6 +551,7 @@ function ma_scald_get_current_user_protocol_sets() {
   }
 
   // User has access to each single protocol they are a member of.
+  $protocol_memberships = [];
   $protocol_memberships = ma_cultural_protocol_get_cps_for_user(['member']);
   $protocol_memberships_ids = array_keys($protocol_memberships);
   foreach ($protocol_memberships_ids as $pid) {

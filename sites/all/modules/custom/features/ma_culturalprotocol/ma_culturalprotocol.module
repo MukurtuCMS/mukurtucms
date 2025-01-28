@@ -519,6 +519,7 @@ function ma_cultural_protocol_user_is_member_of_at_least_one_cp_of_node($node, $
  * Helper function for the CPs for user helper functions.
  */
 function ma_cultural_protocol_get_cps_for_user($roles, $community_nid = NULL, $import_form = FALSE) {
+  $cps = [];
   $groups_for_user = og_get_groups_by_user(null, 'node');
   if (count($groups_for_user)) {
     $allowed_groups_for_user[] = [];
@@ -545,15 +546,14 @@ function ma_cultural_protocol_get_cps_for_user($roles, $community_nid = NULL, $i
       $protocol_items_nids = array_keys($result['node']);
       $protocol_items = entity_load('node', $protocol_items_nids);
 
-      $cps = [];
       foreach ($protocol_items as $protocol_item) {
         if (in_array($protocol_item->nid, $allowed_groups_for_user)) {
           $cps[$protocol_item->nid] = $protocol_item->title;
         }
       }
-      return $cps;
     }
   }
+  return $cps;
 }
 
 /**
