@@ -7,7 +7,7 @@
  */
 
 /**
- * Introductory help for admin/structure/feeds/%feeds_importer page
+ * Introductory help for admin/structure/feeds/%feeds_importer page.
  */
 function feeds_ui_edit_help() {
   return t('
@@ -48,7 +48,7 @@ function feeds_ui_mapping_help() {
 /**
  * Build overview of available configurations.
  */
-function feeds_ui_overview_form($form, &$form_status) {
+function feeds_ui_overview_form($form, array &$form_state) {
   $form = $form['enabled'] = $form['disabled'] = array();
 
   $form['#header'] = array(
@@ -95,10 +95,10 @@ function feeds_ui_overview_form($form, &$form_status) {
     );
     $importer_form['operations'] = array(
       '#markup' =>
-        l($edit, 'admin/structure/feeds/' . $importer->id) . ' | ' .
-        l(t('Export'), 'admin/structure/feeds/' . $importer->id . '/export') . ' | ' .
-        l(t('Clone'), 'admin/structure/feeds/' . $importer->id . '/clone') .
-        (empty($delete) ? '' :  ' | ' . l($delete, 'admin/structure/feeds/' . $importer->id . '/delete')),
+      l($edit, 'admin/structure/feeds/' . $importer->id) . ' | ' .
+      l(t('Export'), 'admin/structure/feeds/' . $importer->id . '/export') . ' | ' .
+      l(t('Clone'), 'admin/structure/feeds/' . $importer->id . '/clone') .
+      (empty($delete) ? '' : ' | ' . l($delete, 'admin/structure/feeds/' . $importer->id . '/delete')),
     );
 
     $importer_form[$importer->id] = array(
@@ -137,7 +137,7 @@ function feeds_ui_overview_form_submit($form, &$form_state) {
  * Create a new configuration.
  *
  * @param $form_state
- *  Form API form state array.
+ *   Form API form state array.
  * @param $from_importer
  *   FeedsImporter object. If given, form will create a new importer as a copy
  *   of $from_importer.
@@ -378,7 +378,7 @@ function feeds_ui_edit_page(FeedsImporter $importer, $active = 'help', $plugin_k
       'title' => $parser['name'],
       'body' => $parser['description'],
       'actions' => $actions,
-    )
+    ),
   );
   $info['actions'] = array(l(t('Change'), $path . '/parser'));
   $config_info[] = $info;
@@ -396,10 +396,19 @@ function feeds_ui_edit_page(FeedsImporter $importer, $active = 'help', $plugin_k
       'title' => $processor['name'],
       'body' => $processor['description'],
       'actions' => $actions,
-    )
+    ),
   );
   $info['actions'] = array(l(t('Change'), $path . '/processor'));
   $config_info[] = $info;
+
+  // Validate configuration.
+  $errors = $importer->validateConfig();
+  if (count($errors)) {
+    $message = t('There are some issues with the importer configuration: !errors', array(
+      '!errors' => theme('item_list', array('items' => $errors)),
+    ));
+    drupal_set_message($message, 'warning');
+  }
 
   return theme('feeds_ui_edit_page', array(
     'info' => $config_info,
@@ -493,6 +502,8 @@ function theme_feeds_ui_plugin_form($variables) {
 function feeds_ui_mapping_form($form, &$form_state, $importer) {
   $form['#importer'] = $importer->id;
   $form['#mappings'] = $mappings = $importer->processor->getMappings();
+  $form['#feeds_targets'] = $importer->processor->getMappingTargets();
+  $form['#feeds_sources'] = $importer->parser->getMappingSources();
   $form['help']['#markup'] = feeds_ui_mapping_help();
   $form['#prefix'] = '<div id="feeds-ui-mapping-form-wrapper">';
   $form['#suffix'] = '</div>';
@@ -571,7 +582,7 @@ function feeds_ui_mapping_form($form, &$form_state, $importer) {
         '#delta' => $delta,
         '#attributes' => array(
           'class' => array(
-            'feeds-ui-mapping-weight'
+            'feeds-ui-mapping-weight',
           ),
         ),
       );
@@ -651,6 +662,9 @@ function feeds_ui_mapping_settings_form($form, $form_state, $i, $mapping, $targe
 
     return array(
       '#type' => 'container',
+      '#attributes' => array(
+        'class' => array('feeds-target-config'),
+      ),
       'settings' => $settings_form,
       'save_settings' => $base_button + array(
         '#type' => 'submit',
@@ -689,7 +703,7 @@ function feeds_ui_mapping_settings_form($form, $form_state, $i, $mapping, $targe
           '#markup' => $summary,
           '#suffix' => '</div>',
         ),
-       'edit_settings' => $base_button + array(
+        'edit_settings' => $base_button + array(
           '#type' => 'image_button',
           '#name' => 'mapping_settings_edit_' . $i,
           '#src' => 'misc/configure.png',
@@ -958,7 +972,8 @@ function theme_feeds_ui_edit_page($variables) {
   $output .= '</div>';
   $output .= '</div>';
 
-  $output .= '</div>'; // ''<div class="feeds-settings">';
+  // Close the outer wrapper.
+  $output .= '</div>';
 
   return $output;
 }
@@ -984,7 +999,7 @@ function theme_feeds_ui_container($variables) {
   $container = $variables['container'];
 
   $class = array_merge(array('feeds-container'), empty($container['class']) ? array('plain') : $container['class']);
-  $id = empty($container['id']) ? '': ' id="' . $container['id'] . '"';
+  $id = empty($container['id']) ? '' : ' id="' . $container['id'] . '"';
   $output = '<div class="' . implode(' ', $class) . '"' . $id . '>';
 
   if (isset($container['actions']) && count($container['actions'])) {
@@ -1029,10 +1044,10 @@ function theme_feeds_ui_container($variables) {
 function theme_feeds_ui_mapping_form($variables) {
   $form = $variables['form'];
 
-  $targets = feeds_importer($form['#importer'])->processor->getMappingTargets();
+  $targets = $form['#feeds_targets'];
   $targets = _feeds_ui_format_options($targets, TRUE);
 
-  $sources = feeds_importer($form['#importer'])->parser->getMappingSources();
+  $sources = $form['#feeds_sources'];
   // Some parsers do not define source options.
   $sources = $sources ? _feeds_ui_format_options($sources, TRUE) : array();
 
@@ -1187,7 +1202,8 @@ function feeds_ui_importer_import_validate($form, &$form_state) {
   elseif (version_compare($feeds_importer->api_version, feeds_api_version(), '>')) {
     form_error($form['importer'], t('That importer is created for the version %import_version of Feeds, but you only have version %api_version.', array(
       '%import_version' => $feeds_importer->api_version,
-      '%api_version' => feeds_api_version())));
+      '%api_version' => feeds_api_version(),
+    )));
   }
 
   // Change to user-supplied id.
@@ -1198,17 +1214,24 @@ function feeds_ui_importer_import_validate($form, &$form_state) {
   $exists = feeds_ui_importer_machine_name_exists($feeds_importer->id);
 
   if ($exists && !$form_state['values']['id_override']) {
-    if (feeds_importer($feeds_importer->id)->export_type != EXPORT_IN_CODE) {
-      return form_error($form['id'], t('Feeds importer already exists with that id.'));
-    }
+    return form_error($form['id'], t('Feeds importer already exists with that id.'));
   }
 
   if (!$form_state['values']['bypass_validation']) {
+    $errors = array();
+
+    $importer = feeds_importer($feeds_importer->id);
+    $importer->setConfig($feeds_importer->config);
     foreach (array('fetcher', 'parser', 'processor') as $type) {
       $plugin = feeds_plugin($feeds_importer->config[$type]['plugin_key'], $feeds_importer->id);
-      if (get_class($plugin) == 'FeedsMissingPlugin') {
-        form_error($form['importer'], t('The plugin %plugin is unavailable.', array('%plugin' => $feeds_importer->config[$type]['plugin_key'])));
+      if (!($plugin instanceof FeedsMissingPlugin)) {
+        $importer->setPlugin($feeds_importer->config[$type]['plugin_key']);
+        $importer->$type->setConfig($feeds_importer->config[$type]['config']);
       }
+    }
+    $errors = array_merge($errors, $importer->validateConfig());
+    if (!empty($errors)) {
+      form_error($form['importer'], theme('item_list', array('items' => $errors)));
     }
   }
 

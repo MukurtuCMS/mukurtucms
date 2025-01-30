@@ -1,0 +1,53 @@
+dist: precise
+sudo: required
+language: php
+
+php:
+  - 5.6
+  - 7.0
+
+mysql:
+  database: drupal
+  username: root
+  encoding: utf8
+
+before_script:
+  # Navigate out of module directory to prevent blown stack by recursive module lookup
+  - cd ../..
+
+  # Install Drush
+  - composer global require drush/drush:8
+  - export PATH=$PATH:~/.composer/vendor/bin
+
+  # Install php packages required for running Drupal
+  - sudo apt-get update > /dev/null
+  - sudo apt-get install -y --force-yes php5-mysql
+
+  # Try to avoid MySQL has gone away errors
+  - mysql -e "SET GLOBAL wait_timeout = 36000;"
+  - mysql -e "SET GLOBAL max_allowed_packet = 134209536;"
+  - mysql -e "SHOW VARIABLES LIKE 'max_allowed_packet';"
+  - mysql -e "SHOW VARIABLES LIKE 'wait_timeout';"
+
+  # Create new site, stubbing sendmail path with true to prevent delivery errors
+  - mysql -e 'CREATE DATABASE drupal'
+  - export PHP_OPTIONS="-d sendmail_path=`which true`"
+  - drush --yes core-quick-drupal --core=drupal-7.x --profile=testing --no-server --db-url=mysql://root:@127.0.0.1/drupal --enable=simpletest og
+  - export DRUPAL_ROOT=og/drupal-7.x
+
+  # Reference and enable module in build site
+  - ln -s $(readlink -e $(cd -)) $DRUPAL_ROOT/sites/all/modules/og
+  - cd $DRUPAL_ROOT
+
+  # Enable OG-UI, so drush will auto-download all dependencies
+  - drush --yes pm-enable og_ui
+
+  # Create webserver for the Simpletest
+  # Mandatory despite the fact that the tests can be
+  # executed from CLI!
+  - drush runserver 127.0.0.1:8080 &
+  - until netstat -an 2>/dev/null | grep '8080.*LISTEN'; do true; done
+
+script:
+  - 'php scripts/run-tests.sh --url http://127.0.0.1:8080 --php $(phpenv which php) --concurrency 2 --verbose --color "Organic groups","Organic groups access","Organic groups context","Organic groups field access","Organic groups UI" 2>&1 | tee /tmp/simpletest-result.txt'
+  - '! egrep -i "([1-9]+ fail)|(Fatal error)|([1-9]+ exception)" /tmp/simpletest-result.txt'

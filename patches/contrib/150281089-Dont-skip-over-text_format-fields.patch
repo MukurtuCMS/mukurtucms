@@ -1,0 +1,25 @@
+From 1da0ede5b175990c715849476b523114dc32a781 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Mon, 28 Aug 2017 15:50:15 -0700
+Subject: [PATCH] Don't skip over text_format fields
+
+---
+ includes/common.inc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/includes/common.inc b/includes/common.inc
+index 3835f01..8ba5fb8 100644
+--- a/includes/common.inc
++++ b/includes/common.inc
+@@ -74,7 +74,7 @@ function bootstrap_element_smart_description(&$element, &$target = NULL, $input_
+   if (($input_only && !isset($target['#input']))
+     // Ignore text_format elements.
+     // @see https://www.drupal.org/node/2478339
+-    || $type === 'text_format'
++    //    || $type === 'text_format'
+
+     // Ignore if the actual element has no #description set.
+     || empty($element['#description'])
+--
+2.7.4
+

@@ -99,10 +99,10 @@ function field_group_field_ui_overview_form_alter(&$form, &$form_state, $display
     // Play around with form_state so we only need to hold things
     // between requests, until the save button was hit.
     if (isset($form_state['field_group'][$name])) {
-      $group = & $form_state['field_group'][$name];
+      $group = &$form_state['field_group'][$name];
     }
     else {
-      $group = & $params->groups[$name];
+      $group = &$params->groups[$name];
     }
 
     // Check the currently selected formatter, and merge persisted values for
@@ -222,7 +222,7 @@ function field_group_field_ui_overview_form_alter(&$form, &$form_state, $display
       $table[$name]['format']['type']['#attributes']['class'] = array('element-invisible');
     }
     else {
-      // After saving, the settings are updated here aswell. First we create
+      // After saving, the settings are updated here as well. First we create
       // the element for the table cell.
       $table[$name]['settings_summary'] = array('#markup' => '');
       if (!empty($group->format_settings)) {
@@ -456,7 +456,7 @@ function field_group_format_settings_label_validate($element, &$form_state) {
  * @param Object $group
  * @param array $settings
  */
-function field_group_formatter_row_update(& $group, $settings) {
+function field_group_formatter_row_update(&$group, $settings) {
   // if the row has changed formatter type, update the group object
   if (!empty($settings['format']['type']) && $settings['format']['type'] != $group->format_type) {
     $group->format_type = $settings['format']['type'];
@@ -469,7 +469,7 @@ function field_group_formatter_row_update(& $group, $settings) {
  * @param Object $group The group object
  * @param Array $settings Configuration settings
  */
-function field_group_formatter_settings_update(& $group, $settings) {
+function field_group_formatter_settings_update(&$group, $settings) {
 
   // for format changes we load the defaults.
   if (empty($settings['format_settings']['settings'])) {

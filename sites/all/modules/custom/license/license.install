@@ -18,3 +18,21 @@ function license_install() {
 function license_update_7100() {
   variable_set ('mukurtu_use_sitewide_custom_tk_label_text', 1);
 }
+
+/**
+ * Hide unnecessary menu item that appears as a dropdown on the dashboard
+ */
+function license_update_7101(&$sandbox) {
+    // There was a menu item that was created because we forgot to set type to MENU_CALLBACK. That has been corrected, but
+    // pre-existing sites need to have the item hidden.
+    $mlids = db_query("SELECT mlid FROM {menu_links} WHERE link_path = :path AND menu_name = :menu",
+                      array(':path' => 'dashboard/customize-tk-label-text', ':menu' => 'main-menu'))->fetchCol();
+    if ($mlids) {
+        foreach ($mlids as $mlid) {
+            if ($menu_link = menu_link_load($mlid)) {
+                $menu_link['hidden'] = 1;
+                menu_link_save($menu_link);
+            }
+        }
+    }
+}

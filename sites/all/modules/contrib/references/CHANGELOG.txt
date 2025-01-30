@@ -63,10 +63,11 @@ settings" will lose the currently selected view if it doesn't have a
   when displaying referenced nodes.
 #1183300 by Pasqualle: Remove maxlength from noderef autocomplete widget.
 #1236096 by Dave Reid: fix fatal error on prepare_view (followup to #1094406)
-#1275096 by Scyther, dereine, and jenlampton: Fix column not found error for nid.
+#1275096 by Scyther, dereine, and jenlampton: Fix column not found error for
+nid.
 #1275096 by jboese, dereine: Fix column not found error for nid (take 2).
-#1341148 by plach: Fix Check views_access() when using Views to get the potential
-  references.
+#1341148 by plach: Fix Check views_access() when using Views to get the
+potential references.
 #1085576 by henrrrik, stamina, yched: Added "raw ID" and "raw path" formatters.
 #1051624 by Stalski: Added "rendered user in a given view mode" formatter for
   user_reference fields.
@@ -74,8 +75,8 @@ settings" will lose the currently selected view if it doesn't have a
   for node_reference and user_reference fields.
 #1219224 by kunago, michaelfavia, yched: Added support for optgroups in select
   widget (for referenceable nodes/users provided by a view).
-#1194086 by Dave Reid, mariagwyn, yched: Display entity labels through entity_label()
-  (formatters only for now)
+#1194086 by Dave Reid, mariagwyn, yched: Display entity labels through
+entity_label() (formatters only for now)
 #1288852 by yched: Fixed "Trying to get property of non-object" with fatal error
   on user_reference fields using a view (when the view does not include the
   user name as a field).

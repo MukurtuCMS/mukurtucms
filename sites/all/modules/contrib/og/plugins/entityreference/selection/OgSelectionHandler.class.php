@@ -105,7 +105,6 @@ class OgSelectionHandler extends EntityReference_SelectionHandler_Generic {
 
     $field_mode = $this->instance['field_mode'];
     $user_groups = og_get_groups_by_user(NULL, $group_type);
-    $user_groups = $user_groups ? $user_groups : array();
     $user_groups = array_merge($user_groups, $this->getGidsForCreate());
 
 
@@ -125,7 +124,7 @@ class OgSelectionHandler extends EntityReference_SelectionHandler_Generic {
           }
           elseif (!empty($node->nid) && (og_user_access($group_type, $gid, "update any $node_type content") || ($user->uid == $node->uid && og_user_access($group_type, $gid, "update own $node_type content")))) {
             $node_groups = isset($node_groups) ? $node_groups : og_get_entity_groups('node', $node->nid);
-            if (in_array($gid, $node_groups['node'])) {
+            if (in_array($gid, $node_groups[$group_type])) {
               $ids[] = $gid;
             }
           }

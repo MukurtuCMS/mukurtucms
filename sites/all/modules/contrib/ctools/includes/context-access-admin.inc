@@ -77,6 +77,7 @@
  *   ctools_include('object-cache');
  *   ctools_object_cache_set("$module:argument", $access);
  * }
+ * @endcode
  *
  * To utilize this form:
  * @code
@@ -101,6 +102,7 @@
  * @code{
  *   $form = ctools_access_admin_form($form, $form_state);
  * }
+ * @endcode
  *
  * You'll be responsible for adding a submit button.
  *
@@ -245,10 +247,10 @@ function ctools_access_admin_form_submit($form, &$form_state) {
 
 // --------------------------------------------------------------------------
 // AJAX menu entry points.
-
 /**
  * AJAX callback to add a new access test to the list.
  */
+
 function ctools_access_ajax_add($fragment = NULL, $name = NULL) {
   ctools_include('ajax');
   ctools_include('modal');
@@ -263,7 +265,7 @@ function ctools_access_ajax_add($fragment = NULL, $name = NULL) {
     ctools_ajax_render_error();
   }
 
-  // Separate the fragment into 'module' and 'argument'
+  // Separate the fragment into 'module' and 'argument'.
   if (strpos($fragment, '-') === FALSE) {
     $module = $fragment;
     $argument = NULL;
@@ -279,7 +281,7 @@ function ctools_access_ajax_add($fragment = NULL, $name = NULL) {
 
   list($access, $contexts) = $function($argument);
 
-  // Make sure we have the logged in user context
+  // Make sure we have the logged in user context.
   if (!isset($contexts['logged-in-user'])) {
     $contexts['logged-in-user'] = ctools_access_get_loggedin_context();
   }
@@ -306,6 +308,9 @@ function ctools_access_ajax_add($fragment = NULL, $name = NULL) {
   );
 
   $output = ctools_modal_form_wrapper('ctools_access_ajax_edit_item', $form_state);
+  $access = $form_state['access'];
+  $access['plugins'][$id] = $form_state['test'];
+
   if (!isset($output[0])) {
     $function = $module . '_ctools_access_set';
     if (function_exists($function)) {
@@ -333,7 +338,7 @@ function ctools_access_ajax_edit($fragment = NULL, $id = NULL) {
     ctools_ajax_render_error();
   }
 
-  // Separate the fragment into 'module' and 'argument'
+  // Separate the fragment into 'module' and 'argument'.
   if (strpos($fragment, '-') === FALSE) {
     $module = $fragment;
     $argument = NULL;
@@ -353,7 +358,7 @@ function ctools_access_ajax_edit($fragment = NULL, $id = NULL) {
     ctools_ajax_render_error();
   }
 
-  // Make sure we have the logged in user context
+  // Make sure we have the logged in user context.
   if (!isset($contexts['logged-in-user'])) {
     $contexts['logged-in-user'] = ctools_access_get_loggedin_context();
   }
@@ -367,12 +372,14 @@ function ctools_access_ajax_edit($fragment = NULL, $id = NULL) {
     'contexts' => $contexts,
     'title' => t('Edit criteria'),
     'ajax' => TRUE,
-    'ajax' => TRUE,
     'modal' => TRUE,
     'modal return' => TRUE,
   );
 
   $output = ctools_modal_form_wrapper('ctools_access_ajax_edit_item', $form_state);
+  $access = $form_state['access'];
+  $access['plugins'][$id] = $form_state['test'];
+
   if (!isset($output[0])) {
     $function = $module . '_ctools_access_set';
     if (function_exists($function)) {
@@ -449,10 +456,10 @@ function ctools_access_ajax_delete($fragment = NULL, $id = NULL) {
   ctools_include('context');
 
   if (empty($fragment) || !isset($id)) {
-    ajax_render_error();
+    ctools_ajax_render_error();
   }
 
-  // Separate the fragment into 'module' and 'argument'
+  // Separate the fragment into 'module' and 'argument'.
   if (strpos($fragment, '-') === FALSE) {
     $module = $fragment;
     $argument = NULL;
@@ -463,7 +470,7 @@ function ctools_access_ajax_delete($fragment = NULL, $id = NULL) {
 
   $function = $module . '_ctools_access_get';
   if (!function_exists($function)) {
-    ajax_render_error(t('Missing callback hooks.'));
+    ctools_ajax_render_error(t('Missing callback hooks.'));
   }
 
   list($access, $contexts) = $function($argument);
@@ -472,7 +479,7 @@ function ctools_access_ajax_delete($fragment = NULL, $id = NULL) {
     unset($access['plugins'][$id]);
   }
 
-  // re-cache
+  // re-cache.
   $function = $module . '_ctools_access_set';
   if (function_exists($function)) {
     $function($argument, $access);

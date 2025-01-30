@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * @file
  * General file handling code for Backup and Migrate.
@@ -12,7 +11,7 @@ define('BACKUP_MIGRATE_FILENAME_MAXLENGTH', 255);
  * Add a file to the temporary files list for deletion when we're done.
  */
 function backup_migrate_temp_files_add($filepath = NULL) {
-  static $files = array();
+  $files = &drupal_static('backup_migrate_temp_files_add', array());
   if (!$filepath) {
     return $files;
   }
@@ -25,41 +24,104 @@ function backup_migrate_temp_files_add($filepath = NULL) {
  * Delete all temporary files.
  */
 function _backup_migrate_temp_files_delete() {
-  // Delete the temp files created during this run.
-  foreach (backup_migrate_temp_files_add() as $file) {
-    $file = drupal_realpath($file);
-    if (file_exists($file) && is_writable($file)) {
+  if (variable_get('backup_migrate_cleanup_temp_files', BACKUP_MIGRATE_CLEANUP_TEMP_FILES)) {
+    // Delete the temp files created during this run.
+    foreach (backup_migrate_temp_files_add() as $file) {
+      if (file_exists($file) && is_writable($file)) {
+        _backup_migrate_temp_files_delete_file($file);
+      }
+    }
+
+    // Delete temp files abandoned for 6 or more hours.
+    $dir = file_directory_temp();
+    $expire = time() - variable_get('backup_migrate_cleanup_time', BACKUP_MIGRATE_CLEANUP_TIME);
+    if (file_exists($dir) && is_dir($dir) && is_readable($dir) && $handle = opendir($dir)) {
+      while (FALSE !== ($file = @readdir($handle))) {
+        // Delete 'backup_migrate_' files in the temp directory that are older than the expire time.
+        // We should only attempt to delete writable files to prevent errors in shared environments.
+        // This could still cause issues in shared environments with poorly configured file permissions.
+        if (strpos($file, 'backup_migrate_') === 0 && is_writable("$dir/$file") && @filectime("$dir/$file") < $expire) {
+          _backup_migrate_temp_files_delete_file("$dir/$file");
+        }
+      }
+      closedir($handle);
+    }
+  }
+}
+
+/**
+ * Delete a temporary file or folder.
+ */
+function _backup_migrate_temp_files_delete_file($file) {
+  if (file_exists($file) && (is_writable($file) || is_link($file))) {
+    if (!is_link($file) && is_dir($file) && is_readable($file) && $handle = opendir($file)) {
+      $dir = $file;
+      while (FALSE !== ($file = @readdir($handle))) {
+        if ($file != '..' && $file != '.') {
+          _backup_migrate_temp_files_delete_file("$dir/$file");
+        }
+      }
+      closedir($handle);
+      rmdir($dir);
+    }
+    else {
       unlink($file);
     }
   }
+}
 
-  // Delete temp files abandoned for 6 or more hours.
-  $dir = file_stream_wrapper_get_instance_by_scheme('temporary')->getDirectoryPath();
-  $expire = time() - variable_get('backup_migrate_cleanup_time', 21600);
-  if (file_exists($dir) && is_dir($dir) && is_readable($dir) && $handle = opendir($dir)) {
-    while (FALSE !== ($file = @readdir($handle))) {
-      // Delete 'backup_migrate_' files in the temp directory that are older than the expire time.
-      // We should only attempt to delete writable files to prevent errors in shared environments.
-      // This could still cause issues in shared environments with poorly configured file permissions.
-      if (strpos($file, 'backup_migrate_') === 0 && is_writable("$dir/$file") && @filectime("$dir/$file") < $expire) {
-        unlink("$dir/$file");
+/**
+ * Move files recursively.
+ */
+function _backup_migrate_move_files($from, $to) {
+  if (is_readable($from)) {
+    if (is_dir($from) && is_readable($from) && $handle = opendir($from)) {
+      if (!file_exists($to)) {
+        mkdir($to);
       }
+      while (FALSE !== ($file = @readdir($handle))) {
+        if ($file != '..' && $file != '.') {
+          _backup_migrate_move_files("$from/$file", "$to/$file");
+        }
+      }
+      closedir($handle);
     }
-    closedir($handle);
+    else {
+      rename($from, $to);
+    }
   }
+  return FALSE;
+}
+
+/**
+ * Create a temporary directory.
+ */
+function backup_migrate_temp_directory() {
+  $tmp = realpath(file_directory_temp());
+  // Check the writability of the temp directory.
+  if (!is_writable(realpath(file_directory_temp()))) {
+    _backup_migrate_message('Your temporary directory %tmp is not writable. Backup and migrate needs to be able to create temporary files.', array('%tmp' => $tmp), 'error');
+  }
+
+  // Use a full path so that the files can be deleted during the shutdown function if needed.
+  $file = $tmp . '/' . uniqid('backup_migrate_');
+  mkdir($file);
+  backup_migrate_temp_files_add($file);
+  return $file;
 }
 
 /**
  * Return a list of backup filetypes.
  */
 function _backup_migrate_filetypes() {
-  backup_migrate_include('filters');
+  require_once dirname(__FILE__) . '/filters.inc';
 
   $out = backup_migrate_filters_file_types();
 
   foreach ($out as $key => $info) {
     $out[$key]['id'] = empty($info['id']) ? $key : $info['id'];
   }
+
   return $out;
 }
 
@@ -78,19 +140,33 @@ function _backup_migrate_filename_append_prepare($filename, $append_str) {
 /**
  * Construct a filename using token and some cleaning.
  */
-function _backup_migrate_construct_filename($filename, $timestamp='') {
-  if (module_exists('token')) {
+function _backup_migrate_construct_filename($settings) {
+  // Get the raw filename from the settings.
+  $filename = $settings->filename;
+
+  // Replace any tokens.
+  if (module_exists('token') && function_exists('token_replace')) {
     $filename = token_replace($filename);
   }
-  $filename = preg_replace("/[^a-zA-Z0-9\.\-_]/", "", $filename);
+
+  // Remove illegal characters.
+  $filename = _backup_migrate_clean_filename($filename);
+
+  // Generate a timestamp if needed.
+  $timestamp = '';
+  if ($settings->append_timestamp == 1 && $settings->timestamp_format) {
+    $timestamp = format_date(time(), 'custom', $settings->timestamp_format);
+  }
+
+  // Trim to length if needed to allow the timestamp to fit into the max filename.
   $filename = _backup_migrate_filename_append_prepare($filename, $timestamp);
   $filename .= '-' . $timestamp;
   $filename = trim($filename, '-');
 
+  // If there is no filename, then just call it untitled.
   if (drupal_strlen($filename) == 0) {
     $filename = 'untitled';
   }
-
   return $filename;
 }
 
@@ -102,9 +178,18 @@ function _backup_migrate_default_filename() {
     return '[site:name]';
   }
   else {
-    // Cleaning the string isn't strictly necessary but it looks better in the settings field.
-    return variable_get('site_name', 'backup_migrate');
+    // Cleaning the string isn't strictly necessary but it looks better in the
+    // settings field.
+    return _backup_migrate_clean_filename(variable_get('site_name', "backup_migrate"));
   }
+}
+
+/**
+ * Clean up a filename to remove unsafe characters.
+ */
+function _backup_migrate_clean_filename($filename) {
+  $filename = preg_replace("/[^a-zA-Z0-9\.\-_]/", "", $filename);
+  return $filename;
 }
 
 /**
@@ -114,22 +199,21 @@ function _backup_migrate_file_dispose_buffer($buffer) {
   return "";
 }
 
-
 /**
  * A backup file which allows for saving to and reading from the server.
  */
 class backup_file {
-  var $file_info = array();
-  var $type = array();
-  var $ext = array();
-  var $path = "";
-  var $name = "";
-  var $handle = NULL;
+  public $file_info = array();
+  public $type = array();
+  public $ext = array();
+  public $path = "";
+  public $name = "";
+  public $handle = NULL;
 
   /**
    * Construct a file object given a file path, or create a temp file for writing.
    */
-  function backup_file($params = array()) {
+  public function __construct($params = array()) {
     if (isset($params['filepath']) && file_exists($params['filepath'])) {
       $this->set_filepath($params['filepath']);
     }
@@ -142,7 +226,7 @@ class backup_file {
   /**
    * Get the file_id if the file has been saved to a destination.
    */
-  function file_id() {
+  public function file_id() {
     // The default file_id is the filename. Destinations can override the file_id if needed.
     return isset($this->file_info['file_id']) ? $this->file_info['file_id'] : $this->filename();
   }
@@ -150,31 +234,37 @@ class backup_file {
   /**
    * Get the current filepath.
    */
-  function filepath() {
-    return drupal_realpath($this->path);
+  public function filepath() {
+    if ($filepath = drupal_realpath($this->path)) {
+      return $filepath;
+    }
+    return $this->path;
   }
 
   /**
    * Get the final filename.
    */
-  function filename($name = NULL) {
+  public function filename($name = NULL) {
     if ($name) {
       $this->name = $name;
     }
-    return $this->name .'.'. $this->extension();
+    $extension_str = '.' . $this->extension();
+    $this->name = _backup_migrate_filename_append_prepare($this->name, $extension_str);
+    return $this->name . $extension_str;
   }
 
   /**
    * Set the current filepath.
    */
-  function set_filepath($path) {
+  public function set_filepath($path) {
     $this->path = $path;
     $params = array(
       'filename' => basename($path),
+      'file_id' => basename($path),
     );
     if (file_exists($path)) {
       $params['filesize'] = filesize($path);
-      $params['filetime'] = filemtime($path);
+      $params['filetime'] = filectime($path);
     }
     $this->set_file_info($params);
   }
@@ -182,7 +272,7 @@ class backup_file {
   /**
    * Get one or all pieces of info for the file.
    */
-  function info($key = NULL) {
+  public function info($key = NULL) {
     if ($key) {
       return @$this->file_info[$key];
     }
@@ -190,59 +280,85 @@ class backup_file {
   }
 
   /**
+   * Get one or all pieces of info for the file.
+   */
+  public function info_set($key, $value) {
+    $this->file_info[$key] = $value;
+  }
+
+  /**
    * Get the file extension.
    */
-  function extension() {
+  public function extension() {
     return implode(".", $this->ext);
   }
 
   /**
    * Get the file type.
    */
-  function type() {
+  public function type() {
     return $this->type;
   }
 
   /**
    * Get the file mimetype.
    */
-  function mimetype() {
+  public function mimetype() {
     return @$this->type['filemime'] ? $this->type['filemime'] : 'application/octet-stream';
   }
 
   /**
    * Get the file mimetype.
    */
-  function type_id() {
+  public function type_id() {
     return @$this->type['id'];
   }
 
+  /**
+   *
+   */
+  public function filesize() {
+    if (empty($this->file_info['filesize'])) {
+      $this->calculate_filesize();
+    }
+    return $this->file_info['filesize'];
+  }
+
+  /**
+   *
+   */
+  public function calculate_filesize() {
+    $this->file_info['filesize'] = '';
+    if (!empty($this->path) && file_exists($this->path)) {
+      $this->file_info['filesize'] = filesize($this->path);
+    }
+  }
 
   /**
    * Can this file be used to backup to.
    */
-  function can_backup() {
+  public function can_backup() {
     return @$this->type['backup'];
   }
 
   /**
    * Can this file be used to restore to.
    */
-  function can_restore() {
+  public function can_restore() {
     return @$this->type['restore'];
   }
 
   /**
    * Can this file be used to restore to.
    */
-  function is_recognized_type() {
+  public function is_recognized_type() {
     return @$this->type['restore'] || @$this->type['backup'];
   }
 
   /**
    * Open a file for reading or writing.
    */
-  function open($write = FALSE, $binary = FALSE) {
+  public function open($write = FALSE, $binary = FALSE) {
     if (!$this->handle) {
       $path = $this->filepath();
 
@@ -267,7 +383,7 @@ class backup_file {
   /**
    * Close a file when we're done reading/writing.
    */
-  function close() {
+  public function close() {
     fclose($this->handle);
     $this->handle = NULL;
   }
@@ -275,7 +391,7 @@ class backup_file {
   /**
    * Write a line to the file.
    */
-  function write($data) {
+  public function write($data) {
     if (!$this->handle) {
       $this->handle = $this->open(TRUE);
     }
@@ -287,7 +403,7 @@ class backup_file {
   /**
    * Read a line from the file.
    */
-  function read($size = NULL) {
+  public function read($size = NULL) {
     if (!$this->handle) {
       $this->handle = $this->open();
     }
@@ -300,14 +416,14 @@ class backup_file {
   /**
    * Write data to the file.
    */
-  function put_contents($data) {
+  public function put_contents($data) {
     file_put_contents($this->filepath(), $data);
   }
 
   /**
    * Read data from the file.
    */
-  function get_contents() {
+  public function get_contents() {
     return file_get_contents($this->filepath());
   }
 
@@ -315,15 +431,15 @@ class backup_file {
    * Transfer file using http to client. Similar to the built in file_transfer,
    *  but it calls module_invoke_all('exit') so that temp files can be deleted.
    */
-  function transfer() {
+  public function transfer() {
     $headers = array(
       array('key' => 'Content-Type', 'value' => $this->mimetype()),
-      array('key' => 'Content-Disposition', 'value' => 'attachment; filename="'. $this->filename() .'"'),
+      array('key' => 'Content-Disposition', 'value' => 'attachment; filename="' . $this->filename() . '"'),
     );
     // In some circumstances, web-servers will double compress gzipped files.
     // This may help aleviate that issue by disabling mod-deflate.
     if ($this->mimetype() == 'application/x-gzip') {
-      $headers[] = 'Content-Encoding: gzip';
+      $headers[] = array('key' => 'Content-Encoding', 'value' => 'gzip');
     }
     if ($size = $this->info('filesize')) {
       $headers[] = array('key' => 'Content-Length', 'value' => $size);
@@ -363,7 +479,7 @@ class backup_file {
   /**
    * Push a file extension onto the file and return the previous file path.
    */
-  function push_type($extension) {
+  public function push_type($extension) {
     $types = _backup_migrate_filetypes();
     if ($type = @$types[$extension]) {
       $this->push_filetype($type);
@@ -377,7 +493,7 @@ class backup_file {
   /**
    * Push a file extension onto the file and return the previous file path.
    */
-  function pop_type() {
+  public function pop_type() {
     $out = new backup_file(array('filepath' => $this->filepath()));
     $this->pop_filetype();
     $this->temporary_file();
@@ -387,7 +503,7 @@ class backup_file {
   /**
    * Set the current file type.
    */
-  function set_filetype($type) {
+  public function set_filetype($type) {
     $this->type = $type;
     $this->ext = array($type['extension']);
   }
@@ -395,7 +511,7 @@ class backup_file {
   /**
    * Set the current file type.
    */
-  function push_filetype($type) {
+  public function push_filetype($type) {
     $this->ext[] = $type['extension'];
     $this->type = $type;
   }
@@ -403,7 +519,7 @@ class backup_file {
   /**
    * Pop the current file type.
    */
-  function pop_filetype() {
+  public function pop_filetype() {
     array_pop($this->ext);
     $this->detect_filetype_from_extension();
   }
@@ -411,7 +527,7 @@ class backup_file {
   /**
    * Set the file info.
    */
-  function set_file_info($file_info) {
+  public function set_file_info($file_info) {
     $this->file_info = $file_info;
 
     $this->ext = explode('.', @$this->file_info['filename']);
@@ -426,7 +542,7 @@ class backup_file {
   /**
    * Get the filetype info of the given file, or false if the file is not a valid type.
    */
-  function detect_filetype_from_extension() {
+  public function detect_filetype_from_extension() {
     $ext = end($this->ext);
     $this->type = array();
     $types = _backup_migrate_filetypes();
@@ -441,17 +557,17 @@ class backup_file {
   /**
    * Get a temporary file name with path.
    */
-  function temporary_file() {
+  public function temporary_file() {
     $file = drupal_tempnam('temporary://', 'backup_migrate_');
     // Add the version without the extension. The tempnam function creates this for us.
     backup_migrate_temp_files_add($file);
 
     if ($this->extension()) {
-      $file .= '.'. $this->extension();
+      $file .= '.' . $this->extension();
       // Add the version with the extension. This is the one we will actually use.
       backup_migrate_temp_files_add($file);
     }
     $this->path = $file;
   }
-}
 
+}

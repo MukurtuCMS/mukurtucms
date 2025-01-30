@@ -1,0 +1,1419 @@
+<?php
+/**
+ * @file
+ * Code for the Mukurtu Collaboration Tools feature.
+ */
+
+include_once 'ma_collaboration_tools.features.inc';
+
+/**
+ * Implements hook_page_alter().
+ *
+ * When viewing a CP, if there are section pages for the CP that the user has view rights to, then show them as tabs, with the CP itself in the first tab.
+ */
+function ma_collaboration_tools_page_alter(&$data) {
+
+  if (isset($data['content']['system_main']['nodes']) && !isset($data['content']['system_main']['term_heading']['term'])) {
+
+    $array_keys = array_keys($data['content']['system_main']['nodes']);
+    $cp_node = $data['content']['system_main']['nodes'][array_shift($array_keys)]["#node"];
+    if ($cp_node && $cp_node->type == 'cultural_protocol_group') {
+      $nids = element_children($data['content']['system_main']['nodes']);
+      $nid = $nids[0];
+
+      // Get all section pages referencing that are in this CP.
+      $query = new EntityFieldQuery();
+      $result = $query
+        ->addMetaData('account', user_load(1))
+        ->entityCondition('entity_type', 'node')
+        ->entityCondition('bundle', ma_culturalprotocol_collab_parent_node_types(), 'IN')
+        ->propertyCondition('status', NODE_PUBLISHED) // or else it will retrieve node references for deleted DH items
+        ->fieldCondition('og_group_ref', 'target_id', $nid)
+        ->execute();
+
+      if (isset($result['node']) && count($result['node'])) {
+        $tabs = [];
+        $section_nodes = node_load_multiple(array_keys($result['node']));
+        foreach ($section_nodes as $section_node) {
+          if (node_access('view', $section_node)) { // Ensure user has view perms to this section page.
+            $tabs[] = [
+              'type' => 'node',
+              'nid' => $section_node->nid,
+              'view_mode' => 'full',
+              'title' => $section_node->title,
+              'hide_title' => 0,
+            ];
+          }
+        }
+        if (count($tabs)) {
+
+          // If we need to be on the last (newly created) tab (as linked from ma_core_create_content_block(), then set the active tab cookie to the last tab and reload (without last_tab).
+          if (arg(2) == 'last_tab') {
+            setcookie('Drupal-quicktabs-active-tab-id-quicktabs-protocol-tabs-' . arg(1), 'quicktabs-tab-protocol-tabs-' . arg(1) . '-' . count($tabs), 0, '/');
+            drupal_goto(drupal_get_path_alias('node/' . arg(1)));
+          }
+
+          // Main CP tab
+          $contents = '';
+
+          // Add the CP node content to the first tab contents, and then build the first tab.
+          $tabs[] = [
+            'type' => 'node',
+            'nid' => $cp_node->nid,
+            'view_mode' => 'full',
+            'title' => 'Protocol',
+            'hide_title' => 1,
+            'weight' => -1,
+          ];
+
+          // Build the tabs object and render it as the output.
+          $tab_settings = [
+            'ajax' => 0,
+            'default_tab' => 0,
+            'title' => 'CP Tabs',
+            'renderer' => 'quicktabs',
+            'style' => 'Excel',
+            'hide_empty_tabs' => 1,
+          ];
+          $built_tabs = quicktabs_build_quicktabs("protocol-tabs-" . arg(1), $tab_settings, $tabs);
+          $data['content']['system_main']['#markup'] = drupal_render($built_tabs);
+
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Get the child type from the parent type.
+ */
+function ma_collaboration_tools_get_child_from_parent($parent_type) {
+  foreach (ma_culturalprotocol_collab_node_types_map() as $child_type => $child_type_props) {
+    if ($child_type_props['parent'] == $parent_type) {
+      return $child_type;
+    }
+  }
+}
+
+/**
+ * Get the child type ref field to its parent.
+ */
+function ma_collaboration_tools_get_child_ref_field_to_parent($child_type) {
+  return ma_culturalprotocol_collab_node_types_map()[$child_type]['ref_field'];
+}
+
+/**
+ * Get all child type ref-to-parent fields.
+ */
+function ma_collaboration_tools_get_all_child_ref_fields() {
+  $ref_fields = [];
+  foreach (ma_culturalprotocol_collab_node_types_map() as $child_type => $child_type_props) {
+    $ref_fields[] = $child_type_props['ref_field'];
+  }
+  return $ref_fields;
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function ma_collaboration_tools_node_view($node, $view_mode) {
+
+  // Update the item privacy text on the parent node view, to make more sense in this context and to hide it if there is only one protocol.
+  if ($view_mode == 'full' && in_array($node->type, ma_culturalprotocol_collab_parent_node_types())) {
+    if (count($node->content['og_group_ref'][0]['#items']) < 2) {
+      unset($node->content['field_item_privacy_setting'][0]['#markup']);
+    }
+    else {
+      if ($node->field_item_privacy_setting[LANGUAGE_NONE][0]['value'] == 'any') {
+        $text = 'Item is shared with members that belong to ANY of the above Protocols.';
+      }
+      else {
+        $text = 'Item is shared with members that belong to ALL the above Protocols (membership not required for Open Protocols).';
+      }
+      $node->content['field_item_privacy_setting'][0]['#markup'] = $text;
+    }
+  }
+
+  // On child collab pages, hide the "Following Users" and "Unfollowing Users" fields except to users that are Protocols Stewards of any of the child's CPs.
+  if ($view_mode == 'full' && in_array($node->type, ma_culturalprotocol_collab_child_node_types())) {
+    $hide_following_users = 1;
+    $groups_on_node = og_get_entity_groups('node', $node);
+    $groups_on_node = array_values($groups_on_node['node']);
+    foreach ($groups_on_node as $group) {
+      $user_roles = og_get_user_roles('node', $group);
+      if (in_array('protocol steward', $user_roles)) {
+        $hide_following_users = 0;
+        break;
+      }
+    }
+    if ($hide_following_users) {
+      unset($node->content['field_following_users']);
+      unset($node->content['field_un_following_users']);
+    }
+  }
+
+  // Events
+  if ($view_mode == 'full' && $node->type == 'event') {
+
+    $date = &$node->content['field_oa_date'][0]['#markup'];
+
+    // For events with a repeating date, add a field label "Next: " for the next event date. This provides info clarification, and makes the next date align with the repeating date description.
+    if (strpos($date, '<div class="date-repeat-rule">') !== false) {
+      $closing_div_pos = strpos ($date, '</div>') + 6;
+      $rrdiv = substr($date, 0, $closing_div_pos);
+      $rest = substr($date, $closing_div_pos);
+      $date =$rrdiv  . '<div class="label-inline">Next:&nbsp;</div>' . $rest;
+    }
+
+  }
+
+  // Calendar
+  if ($view_mode == 'full' && $node->type == 'calendar') {
+
+    // Set the calendarNid to be grabbed by fullcalendar_create's nodeAdd link (when clicking on a date in the calendar).
+    drupal_add_js(array('calendarNid' => $node->nid), 'setting');
+
+  }
+}
+
+/**
+ * Implements hook_node_load().
+ */
+function ma_collaboration_tools_node_load ($nodes, $types)  {
+  foreach ($nodes as &$node) {
+    if ($node->type =='event') {
+
+      // If there is no gmaps key, then do not show the location map.
+      if (!variable_get('geofield_map_google_apikey')) {
+        unset($node->field_oa_geo_location);
+      }
+
+    }
+  }
+}
+
+
+/**
+ * DS custom field.
+ *
+ * Add content to collab parent link.
+ */
+function ma_collaboration_tools_add_content_to_section_link($entity) {
+  $child_type = ma_collaboration_tools_get_child_from_parent($entity->type);
+  $node_disp_name = node_type_get_names()[$child_type];
+  $pronoun = 'a';
+  if (in_array(strtolower($node_disp_name[0]), ['a','e','i','o','u'])) {
+    $pronoun = 'an';
+  }
+  $child_type_path = str_replace('_', '-', $child_type);
+  if (og_user_access_entity('create ' . $child_type . ' content', 'node', $entity)) {
+    return l('Add ' . $pronoun . ' ' . $node_disp_name, 'node/add/' . $child_type_path . '/' . $entity->nid, [
+      'query' => ['destination' => 'node/' . arg(1)],
+    ]);
+  }
+}
+
+/**
+ * DS custom field.
+ *
+ * Edit collab section link.
+ */
+function ma_collaboration_tools_edit_collab_section_link($entity) {
+  if (node_access('update', $entity)) {
+    $node_disp_name = node_type_get_names()[$entity->type];
+    return l('Edit ' . $node_disp_name, 'node/' . $entity->nid . '/edit', [
+      'query' => ['destination' => 'node/' . arg(1)],
+    ]);
+  }
+}
+
+
+/**
+ * Implements hook_node_presave().
+ */
+function ma_collaboration_tools_node_presave($node) {
+  if (in_array($node->type, ma_culturalprotocol_collab_child_node_types())) {
+
+    // Copy the protocol, community, and item sharing field values for the child pages from their parent pages.
+    $child_page_w = entity_metadata_wrapper('node', $node);
+    $parent_page_w = entity_metadata_wrapper('node', $child_page_w->{ma_collaboration_tools_get_child_ref_field_to_parent($node->type)}->value());
+    $child_page_w->field_item_privacy_setting->set($parent_page_w->field_item_privacy_setting->value());
+    $protocols = $parent_page_w->og_group_ref->value();
+    $protocol_nids = [];
+    $community_nids = [];
+    foreach ($protocols as $protocol) {
+      $protocol_nids[] = $protocol->nid;
+      $community_nids[] = $protocol->og_group_ref[LANGUAGE_NONE][0]['target_id'];
+    }
+    if (count($protocol_nids)) {
+      $child_page_w->og_group_ref->set(array_unique($protocol_nids));
+      $child_page_w->field_community_ref->set(array_unique($community_nids));
+    }
+
+  }
+}
+
+/**
+ * Implements hook_node_postsave().
+ */
+function ma_collaboration_tools_node_postsave($node, $op) {
+  if ($op == 'update' && in_array($node->type, ma_culturalprotocol_collab_parent_node_types())) {
+
+    // When updating a parent page, load all its child pages and resave them, which will cause them to get their
+    // protocol, community, and item sharing fields updated according to the parent, in case it was changed.
+    // This needs to happen in a postsave hook, or else the parent won't be updated ahead of the child updates
+    // in ma_collaboration_tools_node_presave().
+    $child_target_field = ma_collaboration_tools_get_child_ref_field_to_parent(ma_collaboration_tools_get_child_from_parent($node->type));
+    $query = new EntityFieldQuery();
+    $result = $query
+      ->addMetaData('account', user_load(1))
+      ->entityCondition('entity_type', 'node')
+      ->fieldCondition($child_target_field, 'target_id', $node->nid)
+      ->execute();
+    if (isset($result['node']) && count($result['node'])) {
+      foreach(array_keys($result['node']) as $child_nid) {
+        $child_node = node_load ($child_nid);
+        node_save($child_node);
+      }
+    }
+  }
+
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Warn users when deleting parent collab pages.
+ */
+function ma_collaboration_tools_form_node_delete_confirm_alter(&$form, &$form_state) {
+  if (in_array($form['#node']->type, ma_culturalprotocol_collab_parent_node_types())) {
+    $form['description']['#markup'] = '<div style="font-size: large; color: #d9534f;">WARNING: this will delete this page and all its child collaboration pages.</div><br />';
+  }
+}
+
+/**
+ * Implements hook_node_delete().
+ */
+function ma_collaboration_tools_node_delete($node) {
+
+  // When deleting parent collab pages, delete its children.
+  if (in_array($node->type, ma_culturalprotocol_collab_parent_node_types())) {
+    $child_target_field = ma_collaboration_tools_get_child_ref_field_to_parent(ma_collaboration_tools_get_child_from_parent($node->type));
+    $query = new EntityFieldQuery();
+    $result = $query
+      ->addMetaData('account', user_load(1))
+      ->entityCondition('entity_type', 'node')
+      ->fieldCondition($child_target_field, 'target_id', $node->nid)
+      ->execute();
+    if (isset($result['node']) && count($result['node'])) {
+      foreach(array_keys($result['node']) as $child_nid) {
+        node_delete($child_nid);
+      }
+    }
+  }
+
+  // If a child node is deleted, also delete its Following node.
+  if (in_array($node->type, ma_culturalprotocol_collab_child_node_types())) {
+    if ($following_nid = ma_collaboration_tools_get_following_nid($node->nid)) { // This condition should always be met.
+      node_delete($following_nid);
+    }
+  }
+}
+
+/**
+ * Implements hook_node_insert().
+ */
+function ma_collaboration_tools_node_insert($node) {
+
+  ////
+  // Create a Following Notification when a child page is created.
+  ////
+
+  if (in_array($node->type, ma_culturalprotocol_collab_child_node_types())) {
+
+    // Create and save the Following Notification node.
+    $values = array(
+      'type' => 'following_notification',
+      'uid' => 1,
+      'status' => 1,
+    );
+    $notification = entity_create('node', $values);
+    $notification_w = entity_metadata_wrapper('node', $notification);
+    $notification_w->title->set($node->title . ' (notification)');
+    $notification_w = ma_collaboration_tools_set_notification_lists_on_following_node_wrapper($node, $notification_w);
+    $notification_w->field_following_content->set($node->nid);
+    $notification_w->save();
+
+    // Attach the notification email field collection to the notification node.
+    ma_collaboration_tools_set_notification_email_fc($notification_w, $node, 'created');
+
+    // Update field_all_users_notified
+    $notification_w = entity_metadata_wrapper('node',  $notification_w->getIdentifier()); // reload the notification wrapper, since it may have been updated in ma_collaboration_tools_field_collection_item_insert (as fired from ma_collaboration_tools_set_notification_email_fc)
+    ma_shared_notification_components_update_field_all_users_notified($notification_w);
+
+  }
+
+}
+
+/**
+ * Implements hook_node_update().
+ */
+function ma_collaboration_tools_node_update($node) {
+
+  ////
+  // Create a Following Notification when a child page is updated.
+  ////
+
+  if (in_array($node->type, ma_culturalprotocol_collab_child_node_types())) {
+    $entity_new = $cw = entity_metadata_wrapper('node', $node);
+    $entity_old = entity_metadata_wrapper('node', $node->original);
+
+    // When updating a child page, only create a following email FC instance if certain fields are changed.
+    // If only a Following field is changed, instead update the Following node instead.
+    // This diff'ing code is somewhat modified from https://drupal.stackexchange.com/a/175186/83739.
+    // Also using helper functions added to ma_core.
+    // $properties_within_fields_to_ignore does what it says, wherein those properties can be nested anywhere within the field that is being compared.
+    $ignore_fields = [
+      'field_pre_actions',
+      'path',
+      'redirect',
+      'og_group_ref',
+      'field_community_ref',
+      'field_item_privacy_setting',
+    ];
+    $properties_within_fields_to_ignore = [
+      'safe_value',
+      'safe_summary',
+      'all_day',
+      'show_repeat_settings',
+      'show_todate',
+      'offset',
+      'offset2',
+    ];
+    $ignore_fields = array_merge ($ignore_fields, ma_collaboration_tools_get_all_child_ref_fields());
+    $following_fields = [
+      'field_following_protocols',
+      'field_following_users',
+      'field_un_following_users',
+      'field_custom_notification_freq',
+    ];
+
+    $following_diff_list =  array();
+    $data = array_merge(['title' => ['label' => 'Title']], field_info_instances('node' ,$entity_new->getBundle()));
+    $fields_list = array_keys($data);
+    $diff_list =  array();
+    foreach ($fields_list as $key => $field_name ) {
+      // Ignore if field name belong to ignore list
+      if(in_array($field_name, $ignore_fields )) {
+        continue;
+      }
+      $old_value = $entity_old->{$field_name}->raw();
+      $new_value = $entity_new->{$field_name}->raw();
+      if (ma_shared_notification_components_check_for_field_value_change($old_value, $new_value, $properties_within_fields_to_ignore)) {
+        if (in_array($field_name, $following_fields)) {
+          $following_diff_list[$field_name] = $data[$field_name]['label'];
+        }
+        else {
+          $diff_list[$field_name] = $data[$field_name]['label'];
+        }
+      }
+    }
+
+    $following_nid = ma_collaboration_tools_get_following_nid($node->nid);
+    if (!$following_nid) { // this should never happen but log an error in case it does.
+      watchdog('ma_collaboration_tools', 'There is no Following node for node %nid', array('%nid' => $node->nid), WATCHDOG_ERROR);
+      return;
+    }
+    $notification_w = entity_metadata_wrapper('node', $following_nid);
+
+    // First update the Following node, if there are changes to the following fields.
+    if (count($following_diff_list)) {
+      $notification_w = ma_collaboration_tools_set_notification_lists_on_following_node_wrapper($node, $notification_w);
+      $notification_w->save();
+    }
+
+    // Then, if there are changes to the other fields, first unset the users_notified on the Following node, then add a new Following email FC.
+    if (count($diff_list)) {
+      $notification_w->field_users_notified->set([]);
+      $notification_w->save();
+      ma_collaboration_tools_set_notification_email_fc($notification_w, $node, 'updated');
+    }
+
+    // Update field_all_users_notified
+    if (count($following_diff_list) OR count ($diff_list)) {
+      $notification_w = entity_metadata_wrapper('node', $following_nid); // reload the notification wrapper, since it may have been updated in ma_collaboration_tools_field_collection_item_insert (as fired from ma_collaboration_tools_set_notification_email_fc)
+      ma_shared_notification_components_update_field_all_users_notified($notification_w);
+    }
+
+  }
+}
+
+
+/**
+ * Implements hook_comment_insert().
+ */
+function ma_collaboration_tools_comment_insert($comment) {
+
+  ////
+  // Create a Following Notification when a comment is added to a child node.
+  ////
+
+  $node = node_load($comment->nid);
+  if (in_array($node->type, ma_culturalprotocol_collab_child_node_types())) {
+    $following_nid = ma_collaboration_tools_get_following_nid($node->nid);
+    if (!$following_nid) { // this should never happen but log an error in case it does.
+      watchdog('ma_collaboration_tools', 'There is no Following node for node %nid', ['%nid' => $node->nid], WATCHDOG_ERROR);
+      return;
+    }
+    $notification_w = entity_metadata_wrapper('node', $following_nid);
+    // There's a new comment on this node, so reset the users notified on this to none.
+    $notification_w->field_users_notified->set([]);
+    $notification_w->save();
+    ma_collaboration_tools_set_notification_email_fc($notification_w, $node, 'commented on', $comment);
+    $notification_w = entity_metadata_wrapper('node', $following_nid); // reload the notification wrapper
+    ma_shared_notification_components_update_field_all_users_notified($notification_w);
+  }
+}
+
+// Set the notification lists on a Following node wrapper (to be saved by calling function).
+function ma_collaboration_tools_set_notification_lists_on_following_node_wrapper($child_node, $notification_w) {
+
+  $cw = entity_metadata_wrapper('node', $child_node);
+
+  // Build the notify list.
+  $notify_list = [];
+  // Following due to protocol membership
+  $following_protocols = $cw->field_following_protocols->value();
+  if (count($following_protocols)) {
+    foreach ($following_protocols as $following_protocol) {
+      $notify_list = array_merge($notify_list, og_get_group_members_properties($following_protocol, [], 'members', 'node'));
+    }
+  }
+  // Individually following
+  if (isset($child_node->field_following_users[LANGUAGE_NONE])) {
+    $notify_list = array_merge($notify_list, array_column($child_node->field_following_users[LANGUAGE_NONE], 'target_id'));
+  }
+  // Remove duplicates
+  $notify_list = array_unique($notify_list);
+  // Remove individually unfollowing
+  if (isset($child_node->field_un_following_users[LANGUAGE_NONE])) {
+    $notify_list = array_diff($notify_list, array_column($child_node->field_un_following_users[LANGUAGE_NONE], 'target_id'));
+  }
+
+  // Build notify_frequency lists.
+  $notify_frequency = [
+    'right away' => [],
+    'daily digest' => [],
+    'weekly digest' => [],
+  ];
+  $notify_freq_map = [];
+  if (isset($child_node->field_custom_notification_freq[LANGUAGE_NONE])) {
+    foreach ($child_node->field_custom_notification_freq[LANGUAGE_NONE] as $custom_frequency) {
+      $notify_freq_map[$custom_frequency['first']] = $custom_frequency['second'];
+    }
+  }
+  foreach ($notify_list as $notify_uuid) {
+    if (array_key_exists($notify_uuid, $notify_freq_map)) {
+      $notify_frequency[$notify_freq_map[$notify_uuid]][] = $notify_uuid;
+    }
+    else {
+      $account = user_load($notify_uuid);
+      $def_user_frequency = isset($account->field_notifications_freq_def[LANGUAGE_NONE][0]['value']) ? $account->field_notifications_freq_def['und'][0]['value'] : 'right away';
+      $notify_frequency[$def_user_frequency][] = $notify_uuid;
+    }
+  }
+
+  // Set the fields on the notification wrapper, and return the wrapper to be saved in calling function.
+  $notification_w->field_notify_immediately->set($notify_frequency['right away']);
+  $notification_w->field_notify_day->set($notify_frequency['daily digest']);
+  $notification_w->field_notify_week->set($notify_frequency['weekly digest']);
+  $notification_w->field_notify_all->set(array_merge($notify_frequency['right away'], $notify_frequency['daily digest'], $notify_frequency['weekly digest']));
+
+  return $notification_w;
+}
+
+
+// Attach the notification email field collection to a given notification node.
+function ma_collaboration_tools_set_notification_email_fc($notification_w, $child_node, $op, $comment = NULL) {
+  $fc_email = entity_create('field_collection_item', array('field_name' => 'field_notification_email'));
+  $fc_email->setHostEntity('node', node_load($notification_w->getIdentifier()));
+  $fce_w = entity_metadata_wrapper('field_collection_item', $fc_email);
+
+  // Set the time
+  $fce_w->field_notification_date_gene->set(time());
+
+  // Set the action
+  $fce_w->field_notification_action->set($op);
+
+  // Set the subject
+  $fce_w->field_notification_subject->set('"' . $child_node->title . '" has been ' . $op . '.');
+
+  // Set the body
+  $node_type_label = strtolower(node_type_get_name($child_node));
+  switch ($op) {
+    case 'updated':
+      global $user;
+      $author_id = $user->uid;
+      $body = "The " . $node_type_label . ' "' . $child_node->title . '", which you are following, was updated by ' . $user->name . ' on ' . date('l, F j', $child_node->timestamp) . ' at ' . date('g:ia', $child_node->timestamp) . ".\n\nView the " . $node_type_label . ': ' . $GLOBALS["base_url"] . '/' . $child_node->path["alias"];
+      break;
+    case 'created':
+      $author_id = $child_node->uid;
+      $body = "The " . $node_type_label . ' "' . $child_node->title . '", was created by ' . $child_node->name . ' on ' . date('l, F j', $child_node->timestamp) . ' at ' . date('g:ia', $child_node->timestamp) . ", and you were added as a follower.\n\nView the " . $node_type_label . ': ' . $GLOBALS["base_url"] . '/' . pathauto_create_alias('node', 'return', '/node/' . $child_node->nid, ['node' => $child_node], $child_node->type);
+      break;
+    case 'commented on':
+      $author_id = $comment->uid;
+      $comment_author = user_load($author_id);
+      $body = "The " . $node_type_label . ' "' . $child_node->title . '", which you are following, was commented on by ' . $comment_author->name . ' on ' . date('l, F j', $comment->created) . ' at ' . date('g:ia', $comment->created) . ".\n\nView the comment: " . $GLOBALS["base_url"] . '/' . drupal_get_path_alias('node/' . $child_node->nid) . '#comment-' . $comment->cid;
+      break;
+  }
+  $fce_w->field_notification_body->set($body);
+
+  // Set the notification "author".
+  $fce_w->field_notification_author	->set($author_id);
+
+  // If this is a comment notification, set the comment ref.
+  if ($comment) {
+    $fce_w->field_notification_comment->set($comment->cid);
+  }
+
+  // Save the field collection.
+  $fce_w->save();
+}
+
+/**
+ *  Implements hook_form_alter().
+ */
+function ma_collaboration_tools_form_alter(&$form, &$form_state, $form_id) {
+
+  // On Collab child pages
+  $node_type = str_replace('_node_form', '', $form_id, $count);
+  if ($count && in_array($node_type, ma_culturalprotocol_collab_child_node_types())) {
+
+    // Adding a new collab page.
+    if (is_null($form['nid']['#value'])) {
+
+      // Prepopulate the reference to the section page with the argument from the URL.
+      $ref_field = ma_collaboration_tools_get_child_ref_field_to_parent($node_type);
+      if (is_numeric(arg(3))) {
+        $form[$ref_field][LANGUAGE_NONE]['#value'] = arg(3);
+        $form_state['storage']['parent'] = arg(3);
+      }
+      elseif (arg(1) == 'ajax' && isset($form_state['storage']['parent'])) {
+        $form[$ref_field][LANGUAGE_NONE]['#value'] = $form_state['storage']['parent'];
+      }
+    }
+
+    // Fix OG bug that og_group_ref field, although set to not required, will not validate (as if required) when the node
+    // is being edited by certain users. This field does get set in the node_presave according to its parent,
+    // but the (buggy) validation happens before that. This simply removes the validation, taken from https://www.drupal.org/project/og/issues/2179367
+    foreach ($form['#validate'] as $index => $method) {
+      if ($method == 'og_form_group_reference_validate') {
+        unset($form['#validate'][$index]);
+      }
+    }
+
+    // Unfollowing Users should be viewable to anyone that can edit this node, but not editable. Only the users themselves should be able to do that through the Unfollow button.
+    $form['field_un_following_users']['#disabled'] = TRUE;
+
+    // Restrict the Protocols the user can set to those they are a Steward of (or it is already set on the node).
+    $existing_protocols = $form['field_following_protocols'][LANGUAGE_NONE]['#default_value']; // Existing protocols need to be added separately for cases where the editing user is not a protocol steward of a referenced protocol. It still needs to be an option if it was already set on the node.
+    $existing_protocols_with_titles = []; //
+    foreach ($existing_protocols as $existing_protocol) {
+      $existing_protocol_node = node_load ($existing_protocol);
+      $existing_protocols_with_titles[$existing_protocol] = $existing_protocol_node->title;
+    }
+    $valid_protocols_with_titles = ma_cultural_protocol_get_cps_user_is_steward();
+    $referenceable_cps = $existing_protocols_with_titles + $valid_protocols_with_titles;
+//    dpm ($existing_protocols_with_titles, 'existing');
+//    dpm ($valid_protocols_with_titles, 'valid');
+//    dpm ($referenceable_cps, 'referenceable');
+    $form['field_following_protocols'][LANGUAGE_NONE]['#options'] = $referenceable_cps;
+
+  }
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ *
+ * Taken from OA.
+ */
+function ma_collaboration_tools_field_formatter_info() {
+  return array(
+    'events_date_formatter' => array(
+      'label' => t('Open Atrium Date Formatter'),
+      'field types' => array('datestamp'),
+    ),
+  );
+}
+
+
+/**
+ * Implements hook_field_formatter_view().
+ *
+ * Taken from OA.
+ */
+function ma_collaboration_tools_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  if ($display['type'] == 'events_date_formatter') {
+
+    $event_info = ma_collaboration_tools_find_next_event($items);
+    $event = $event_info['event'];
+
+    // Create Date objects from item values.
+    $timezone_object = date_default_timezone_object();
+
+    $start_date = new DateObject($event['value'], $event['timezone_db'], DATE_FORMAT_UNIX);
+    $start_date->setTimezone($timezone_object);
+
+    $end_date = new DateObject($event['value2'], $event['timezone_db'], DATE_FORMAT_UNIX);
+    $end_date->setTimezone($timezone_object);
+
+    // Create an array of month / day information for ease of use.
+    $dates = array(
+      'start' => array(
+        'day' => date_format_date($start_date, 'custom', 'd'),
+        'month' => date_format_date($start_date, 'custom', 'M'),
+      ),
+      'end' => array(
+        'day' => date_format_date($end_date, 'custom', 'd'),
+        'month' => date_format_date($end_date, 'custom', 'M'),
+      ),
+    );
+
+    // For now always use the start date. We may add multi-day event to the
+    // widget at some point in the future.
+    $day = $dates['start']['day'];
+    $month = $dates['start']['month'];
+    $element[0] = array(
+      '#markup' => theme('event_date', array('month' => $month, 'day' => $day)),
+    );
+  }
+  return $element;
+}
+
+/**
+ * Find the next upcoming event or the last event in a series.
+ *
+ * @param  array $items
+ *   An array of dates attached to a field.
+ * @return array
+ *   An array, keyed by delta and event.
+ *
+ * Taken from OA.
+ */
+function ma_collaboration_tools_find_next_event($items) {
+  // Set some base params we'll need.
+  $now = time();
+  $event = NULL;
+  $event_delta = NULL;
+  $next_event = NULL;
+  $last_event = NULL;
+  $next_event_delta = NULL;
+  $last_event_delta = NULL;
+  $diff = 0;
+
+  // Loop through all events.
+  foreach ($items as $delta => $date) {
+    // If event is a future date.
+    if ($date['value'] >= $now) {
+      // That happens before the last found future event
+      if ($diff == 0 || ($date['value'] - $now) < $diff) {
+        // Set it as the currently found next event, and update the difference.
+        $diff = $date['value'] - $now;
+        $next_event = $date;
+        $next_event_delta = 0;
+      }
+    }
+    // Determine if this is the last event in the series.
+    else if (empty($last_event) || ($date['value'] > $last_event['value'])) {
+      $last_event = $date;
+      $last_event_delta = $delta;
+    }
+  }
+
+  // If there is no future event we'll use the last occurrence.
+  if (empty($next_event)) {
+    $event = $last_event;
+    $event_delta = $last_event_delta;
+  }
+  else {
+    $event = $next_event;
+    $event_delta = $next_event_delta;
+  }
+
+  return array(
+    'delta' => $event_delta,
+    'event' => $event,
+  );
+}
+
+/**
+ * Implements hook_theme()
+ *
+ * Taken from OA. Simplified.
+ */
+function ma_collaboration_tools_theme() {
+
+  $theme = array(
+    'event_date' => array(
+      'template' => 'event-date',
+      'path' => drupal_get_path('module', 'ma_collaboration_tools') . '/templates',
+      'variables' => array(
+        'month' => NULL,
+        'day' => NULL,
+      ),
+    ),
+  );
+  return $theme;
+}
+
+
+/**
+ * Custom follow/unfollow field.
+ */
+function ma_collaboration_tools_follow_unfollow($entity) {
+  global $user;
+  $user = user_load($user->uid); // Must reload user object to get the hidden field_notifications_freq_def field.
+
+  list ($following, $reasons) = ma_collaboration_tools_get_following_status_and_reasons($entity, $user->uid);
+
+  // Create output.
+  $output = '';
+  if ($following) {
+    $output .= l('<button class="btn btn-default">UnFollow</button>', 'node/' . $entity->nid . '/unfollow', ['html' => TRUE]);
+    $output .= '<div class="notifications-message">You are receiving notifications.</div>';
+  }
+  else {
+    $output .= l('<button class="btn btn-default">Follow</button>', 'node/' . $entity->nid . '/follow', ['html' => TRUE]);
+    $output .= '<div class="notifications-message">Follow to receive notifications.</div>';
+  }
+
+  // Popup text Following.
+  if ($following) {
+    $popup_text = '<p class="notification-popup-reasons-header">You are receiving notifications on this item because:</p>';
+  }
+  else {
+    $popup_text = '<p class="notification-popup-reasons-header">You are not receiving notifications on this item because:</p>';
+  }
+  $popup_text .= $reasons;
+
+  if ($following) {
+    // Popup text node notification frequency form.
+    $def_freq = isset($user->field_notifications_freq_def[LANGUAGE_NONE][0]['value']) ? $user->field_notifications_freq_def[LANGUAGE_NONE][0]['value'] : 'right away';
+    $node_freq = ma_collaboration_tools_get_user_node_notification_frequency($entity, $user);
+    $form = drupal_get_form('ma_collaboration_tools_notification_frequency_node_' . $entity->nid, $entity->nid, $def_freq, $node_freq);
+    $popup_text .= drupal_render($form);
+  }
+
+  // Add link to Following view.
+  $popup_text .= '<span class="link-to-following-view">' . l('See all content you are following.', '/user/' . $user->uid . '/following') . '</span>';
+
+  // Generate the popup
+  require_once drupal_get_path('module', 'popup') . '/includes/popup.api.inc';
+  $popup_attributes = array (
+    'style' => 'White',
+    'origin' => 'top-left',
+    'expand' => 'top-left',
+    'width' => '400',
+    'class' => 'follow-unfollow-popup',
+    // 'activate' => 'click', 'close' => 1, // uncomment this to tweak CSS in the inspector
+  );
+  $output .= popup_element('Details.', $popup_text, $popup_attributes);
+
+  // The Follow button should only show up for users that are a member of one the child node's CPs,
+  // otherwise they should not be able to follow (even if they can view it due to open perms on the CPs)
+  if (!$following) { // Check if they aren't already following, because a user may be following, then removed from the group, so we need to leave the option for them to unfollow.
+    if (!ma_cultural_protocol_user_is_member_of_at_least_one_cp_of_node($entity)) {
+      $output = '';
+    }
+  }
+
+  return $output;
+
+}
+
+
+/**
+ * Helper function for Following view to show the default notification frequency form in the header.
+ */
+function ma_collaboration_tools_show_default_notification_frequency_form($view) {
+  global $user;
+  if ($view->args[0] == $user->uid) {
+    $form = drupal_get_form('ma_collaboration_tools_notification_frequency_default');
+    return drupal_render($form);
+  }
+}
+
+/**
+ * Helper function for Following view to show Unfollow button.
+ */
+function ma_collaboration_tools_show_unfollow_button_in_view($view, $data) {
+  global $user;
+  if ($view->args[0] == $user->uid) {
+    return l('<button class="btn btn-default">UnFollow</button>', 'node/' . $data->nid . '/unfollow', [
+      'html' => TRUE,
+      'query' => drupal_get_destination()
+    ]);
+  }
+}
+
+/**
+ * Helper function for Following view to show the Following reasons.
+ */
+function ma_collaboration_tools_show_following_reasons($view, $data) {
+  $entity = node_load($data->nid);
+  list ($following, $reasons) = ma_collaboration_tools_get_following_status_and_reasons($entity, $view->args[0]);
+  return $reasons;
+}
+
+/**
+ * Helper function for Following view to show the per-node notification frequency form.
+ */
+function ma_collaboration_tools_generate_notication_frequency_form($view, $data) {
+  global $user;
+  if ($view->args[0] == $user->uid) {
+    $viewed_user = user_load($view->args[0]);
+    $entity = node_load($data->nid);
+    $def_freq = isset($viewed_user->field_notifications_freq_def[LANGUAGE_NONE][0]['value']) ? $viewed_user->field_notifications_freq_def[LANGUAGE_NONE][0]['value'] : 'right away';
+    $node_freq = ma_collaboration_tools_get_user_node_notification_frequency($entity, $viewed_user);
+    $form = drupal_get_form('ma_collaboration_tools_notification_frequency_node_' . $entity->nid, $entity->nid, $def_freq, $node_freq);
+    return drupal_render($form);
+  }
+}
+
+/**
+ * Helper function for the Following view Parent field.
+ */
+function ma_collaboration_tools_show_parent($nid) {
+  $child = node_load($nid);
+  $child_page_w = entity_metadata_wrapper('node', $child);
+  $parent =  ($child_page_w->{ma_collaboration_tools_get_child_ref_field_to_parent($child->type)}->value());
+  print l($parent->title, $parent->nid);
+}
+
+/**
+ * Returns if a given user is following a given node and why. Called from a few different places, including the Following view.
+ */
+function ma_collaboration_tools_get_following_status_and_reasons($entity, $uid) {
+
+  $reasons = [];
+
+  // Individually following
+  if (isset($entity->field_following_users[LANGUAGE_NONE])) {
+    foreach ($entity->field_following_users[LANGUAGE_NONE] AS $following_user) {
+      if ($uid == $following_user['target_id']) {
+        $following = TRUE;
+        $reasons[] = 'you are individually following this item';
+        break;
+      }
+    }
+  }
+
+  // Following by protocol
+  $following_by_protocol = [];
+  if (isset($entity->field_following_protocols[LANGUAGE_NONE])) {
+    foreach ($entity->field_following_protocols[LANGUAGE_NONE] AS $following_protocol) {
+      if (og_is_member('node', $following_protocol['target_id'], 'user', $uid)) {
+        $following_protocol_node = node_load ($following_protocol['target_id']);
+        $following_by_protocol[] = $following_protocol_node->title;
+        $following = TRUE;
+      }
+    }
+  }
+
+  // Individually unfollowing
+  if (count($following_by_protocol)) {
+    $reasons[] = 'you are a member of: ' . implode(', ', $following_by_protocol);
+    if (isset($entity->field_un_following_users[LANGUAGE_NONE])) {
+      foreach ($entity->field_un_following_users[LANGUAGE_NONE] AS $unfollowing_user) {
+        if ($uid == $unfollowing_user['target_id']) {
+          $following = FALSE;
+          $reasons[] = 'you are individually unfollowing this item';
+          break;
+        }
+      }
+    }
+  }
+  // Has no explicitly followed, followed by group, or unfollowed.
+  if (!isset($following)) {
+    $following = FALSE;
+    $reasons[] = 'you have never followed this item';
+
+  }
+
+  // Build reasons into a list, even if just one.
+  $reasons = theme_item_list([
+    'items' => $reasons,
+    'title' => '',
+    'type' => 'ul',
+    'attributes' => []
+  ]);
+
+  // Return results.
+  return [$following, $reasons];
+
+}
+
+
+/**
+ * Implementation of hook_menu().
+ */
+function ma_collaboration_tools_menu() {
+
+  $items['node/%node/follow'] = array(
+    'page callback' => 'ma_collaboration_tools_follow_unfollow_process',
+    'page arguments' => array(1, 'follow'),
+    'access callback' => TRUE,
+  );
+
+  $items['node/%node/unfollow'] = array(
+    'page callback' => 'ma_collaboration_tools_follow_unfollow_process',
+    'page arguments' => array(1, 'unfollow'),
+    'access callback' => TRUE,
+  );
+
+  $items['user/%user/following'] = array(
+    'title' => 'Following',
+    'page callback' => 'ma_collaboration_tools_following_view',
+    'page arguments' => array(1),
+    'access callback' => 'ma_collaboration_tools_following_view_access',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+/**
+ * Callback to process the user clicking the follow or unfollow button.
+ */
+function ma_collaboration_tools_follow_unfollow_process($node, $op) {
+  global $user;
+  $nw = entity_metadata_wrapper ('node', $node);
+  if ($op=='follow') {
+    if (!ma_cultural_protocol_user_is_member_of_at_least_one_cp_of_node($node)) {
+      drupal_set_message ('You cannot follow this item because you are not a member of any of its Cultural Protocols.'); // This will only happen if a user tries to hit the follow URL directly, ie. it won't.
+    }
+    $nw->field_following_users[] = $user->uid;
+    $new_unfollowing_users = [];
+    $unfollowing_users = $nw->field_un_following_users->value();
+    foreach ($unfollowing_users as $unfollowing_user) {
+      if ($unfollowing_user->uid <> $user->uid) {
+        $new_unfollowing_users[] = $unfollowing_user->uid;
+      }
+    }
+    $nw->field_un_following_users->set($new_unfollowing_users);
+  }
+  else {
+    $nw->field_un_following_users[] = $user->uid;
+    $new_following_users = [];
+    $following_users = $nw->field_following_users->value();
+    foreach ($following_users as $following_user) {
+      if ($following_user->uid <> $user->uid) {
+        $new_following_users[] = $following_user->uid;
+      }
+    }
+    $nw->field_following_users->set($new_following_users);
+  }
+  $nw->save();
+  drupal_goto('node/' . $node->nid);
+}
+
+/**
+ * Access callback; Determine if  user can view the Following tab on a given profile page.
+ */
+function ma_collaboration_tools_following_view_access($account) {
+  global $user;
+  // Can view if own profile page
+  if ($user->uid == $account->uid) {
+    return TRUE;
+  }
+  // Can view if admin or Mukurtu admin
+  $admin = user_role_load_by_name('administrator');
+  $mukurtuadmin = user_role_load_by_name('Mukurtu Administrator');
+  if (user_has_role($admin->rid) || user_has_role($mukurtuadmin->rid)) {
+    return TRUE;
+  }
+}
+
+/**
+ * Page callback; Call a view to show what the the user's Followings.
+ */
+function ma_collaboration_tools_following_view($account) {
+  $view = views_get_view('mukurtu_collab_subscriptions');
+  $view->set_arguments(array($account->uid));
+  return $view->preview();
+}
+
+/**
+ * Implements hook_views_post_execute.
+ */
+function ma_collaboration_tools_views_post_execute(&$view) {
+
+  // Filter down the Following view. Views UI could not handle this, so we are doing it here.
+  // It would be better to do this in a views query alter so that pagers could work (as now there is no paging),
+  // plus more efficient, but I do not think it is possible. If this becomes slow then will need to set a hidden field
+  // on the child collab nodes which contains following lists of users which can be queried.
+  if ($view->name == "mukurtu_collab_subscriptions") {
+    $uid = $view->args[0];
+    foreach ($view->result as $i => $row) {
+      list ($following, $reasons) = ma_collaboration_tools_get_following_status_and_reasons(node_load ($row->nid), $uid);
+      if (!$following) {
+       unset ($view->result[$i]);
+      }
+    }
+  }
+}
+
+/**
+ * Notification default frequency form (header of the Following view).
+ */
+function ma_collaboration_tools_notification_frequency_default($form, &$form_state) {
+  $account = user_load(arg(1));
+  $def_val = isset($account->field_notifications_freq_def[LANGUAGE_NONE][0]['value']) ? $account->field_notifications_freq_def['und'][0]['value'] : 'right away';
+  global $user;
+  $form = [
+    'notification_frequency_default' => [
+      '#type' => 'select',
+      '#title' => t('Notification Frequency Default: '),
+      '#options' => field_info_field('field_notifications_freq_def')['settings']['allowed_values'],
+      '#default_value' => $def_val,
+      '#disabled' => $user->uid <> $account->uid ? TRUE : FALSE,
+      '#attributes' => [
+        'onChange' => 'this.form.submit();',
+      ],
+    ],
+    'submit' => [
+      '#type' => 'submit',
+    ],
+  ];
+  return $form;
+}
+
+/**
+ * Submit handler for the notification default frequency form.
+ */
+function ma_collaboration_tools_notification_frequency_default_submit ($form, &$form_state) {
+
+  $account = user_load(arg(1));
+  $existing_freq = $account->field_notifications_freq_def[LANGUAGE_NONE][0]['value'];
+  $new_freq = $form_state['values']['notification_frequency_default'];
+  if ($existing_freq <> $new_freq) {
+
+    // Update the notification default frequency on the user object.
+    $account->field_notifications_freq_def[LANGUAGE_NONE][0]['value'] = $new_freq;
+    user_save($account);
+
+    // Update the Following nodes for all child pages the user is following that are set to default frequency.
+    $frequency_field_map = [
+      'right away' => 'field_notify_immediately',
+      'daily digest' => 'field_notify_day',
+      'weekly digest' => 'field_notify_week',
+    ];
+    // Get all Following nodes the user is marked as a follower of.
+    $query = new EntityFieldQuery();
+    $result = $query
+      ->addMetaData('account', user_load(1))
+      ->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'following_notification')
+      ->propertyCondition('status', NODE_PUBLISHED)
+      ->fieldCondition('field_notify_all', 'target_id', $account->uid)
+      ->execute();
+    if (isset($result['node']) && count($result['node'])) {
+      // Loop through these, and check the child page if this user is using their default notification frequency for that node, and if so, update the Following node.
+      foreach (array_keys($result['node']) as $nid) {
+        $notification_w = entity_metadata_wrapper('node', $nid);
+        $custom_notification_freqs = $notification_w->field_following_content->field_custom_notification_freq->value();
+        if (count($custom_notification_freqs)) {
+          foreach ($custom_notification_freqs as $custom_notification_freq) {
+            if ($custom_notification_freq['first'] = $account->uid) {
+              $user_custom_freq_for_this_node = 1;
+              break;
+            }
+          }
+        }
+        if (!$user_custom_freq_for_this_node) {
+          $notification_w->{$frequency_field_map[$existing_freq]}->set(array_diff($notification_w->{$frequency_field_map[$existing_freq]}->raw(), [$account->uid])); // Remove the user from the old frequency
+          $notification_w->{$frequency_field_map[$new_freq]}[] = $account->uid; // Add the user to the new frequency
+          $notification_w->save();
+        }
+      }
+    }
+
+  }
+
+}
+
+/**
+ * Get the notification frequency for a given node and user.
+ */
+function ma_collaboration_tools_get_user_node_notification_frequency($node, $user) {
+  if (isset($node->field_custom_notification_freq[LANGUAGE_NONE])) {
+    foreach ($node->field_custom_notification_freq[LANGUAGE_NONE] as $custom_frequency) {
+      if ($custom_frequency['first'] == $user->uid) {
+        return $custom_frequency['second'];
+      }
+    }
+  }
+}
+
+/**
+ * Notification node frequency form (in the node frequency popup as well as a column in the Following view).
+ */
+function ma_collaboration_tools_notification_frequency_node($form, &$form_state, $nid, $def_freq, $node_freq) {
+
+  $options = ['use default' => 'Use Default (' . ucwords($def_freq) . ')'] + field_info_field('field_notifications_freq_def')['settings']['allowed_values'];
+  $form = [
+    'notification_frequency_node' => [
+      '#type' => 'select',
+      '#title' => t('Notification frequency: '),
+      '#options' => $options,
+      '#default_value' => isset($node_freq) ? $node_freq : 'use default',
+      '#attributes' => [
+        'onChange' => 'this.form.submit();',
+      ],
+    ],
+    'nid' => [
+      '#type' => 'value',
+      '#value' => $nid,
+    ],
+    'submit' => [
+      '#type' => 'submit',
+    ],
+  ];
+  return $form;
+}
+
+/**
+ * Submit handler for the notification frequency sets the value on the node for the user, or unsets it if using default.
+ */
+function ma_collaboration_tools_notification_frequency_node_submit ($form, &$form_state) {
+  global $user;
+  $val = $form_state['values']['notification_frequency_node'];
+  $node = node_load ($form_state['values']['nid']);
+  if ($val == 'use default') {
+    foreach ($node->field_custom_notification_freq[LANGUAGE_NONE] as $i => $custom_frequency) {
+      if ($custom_frequency['first'] == $user->uid) {
+        unset ($node->field_custom_notification_freq[LANGUAGE_NONE][$i]);
+        node_save($node);
+        return;
+      }
+    }
+  }
+  else {
+    if (isset($node->field_custom_notification_freq[LANGUAGE_NONE])) {
+      foreach ($node->field_custom_notification_freq[LANGUAGE_NONE] as $i => $custom_frequency) {
+        if ($custom_frequency['first'] == $user->uid) {
+          unset ($node->field_custom_notification_freq[LANGUAGE_NONE][$i]);
+        }
+      }
+    }
+    $node->field_custom_notification_freq[LANGUAGE_NONE][] = [
+      'first' => $user->uid,
+      'second' => $val,
+    ];
+    node_save($node);
+  }
+}
+
+/**
+ * Implementation of hook_forms()
+ *
+ * This is required because we are using the same form multiple times on the (Following) page. This allows for multiple form IDs calling the same form definition.
+ */
+function ma_collaboration_tools_forms($form_id, $args) {
+  $forms = [];
+  if (strpos($form_id, 'ma_collaboration_tools_notification_frequency_node_') === 0) {
+    $forms[$form_id] = array(
+      'callback' => 'ma_collaboration_tools_notification_frequency_node',
+    );
+  }
+  return $forms;
+}
+
+
+/**
+ * Implementation of hook_cronapi.
+ *
+ * This hook is provided by Elysia Cron, which allows for scheduled cron jobs.
+ */
+function ma_collaboration_tools_cronapi($op, $job = NULL) {
+  $items['ma_collaboration_tools_daily_notifications'] = array(
+    'description' => 'Send daily collaboration page notifications.',
+    'rule' => '0 8 * * *', // every day at 2am
+  );
+  $items['ma_collaboration_tools_weekly_notifications'] = array(
+    'description' => 'Send weekly collaboration page notifications.',
+    'rule' => '0 8 * * 1', // every Monday at 8am
+  );
+  return $items;
+}
+
+// Elysia cron notification callacks.
+function ma_collaboration_tools_daily_notifications() {
+  ma_collaboration_tools_send_scheduled_notifications('daily');
+}
+function ma_collaboration_tools_weekly_notifications() {
+  ma_collaboration_tools_send_scheduled_notifications('weekly');
+}
+
+// Send scheduled notifications, as called by the different schedule Elysia cron callbacks.
+function ma_collaboration_tools_send_scheduled_notifications($schedule) {
+  switch ($schedule) {
+    case 'daily':
+      $notification_field = 'field_notify_day';
+      break;
+    case 'weekly':
+      $notification_field = 'field_notify_week';
+      break;
+  }
+
+  // Get the following nodes that still have users to notify.
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->addMetaData('account', user_load(1))
+    ->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'following_notification')
+    ->propertyCondition('status', NODE_PUBLISHED)
+    ->fieldCondition('field_all_users_notified', 'value', 0)
+    ->propertyOrderBy('changed', 'DESC')
+    ->execute();
+  if (isset($result['node']) && count($result['node'])) {
+    $successful_sends = [];
+    $aggregated_fcs_all_users = [];
+    foreach (array_keys($result['node']) as $nid) {
+      $notification_w = entity_metadata_wrapper('node', $nid);
+
+      // Get users to send to.
+      $users_to_send_to = $notification_w->field_notify_immediately->raw() ? $notification_w->field_notify_immediately->raw() : [];  // We start with all immediate notifications that have not yet gone out. This happens if a user was following a node on a schedule, the node was then updated before the schedule was fired, and then user changed their schedule to immediate (either on the node or by switching to default wherein their default is immediate). This ensures those notifications still get sent, during the next scheduled send (ie. no later than daily).
+      $users_to_send_to = array_merge($users_to_send_to, $notification_w->{$notification_field}->raw() ? $notification_w->{$notification_field}->raw() : []);
+      $users_to_send_to = array_diff($users_to_send_to, $notification_w->field_users_notified->raw() ? $notification_w->field_users_notified->raw() : []); // Do not send to users already notified.
+      $users_to_send_to = array_unique($users_to_send_to); // There never should be duplicates, but just in case.
+
+      if (count($users_to_send_to)) {
+        // Get the FC
+        $latest_fc = $notification_w->field_notification_email->count();
+        if ($latest_fc) { // This can be 0 from development debugging. Ultimately this should be able to be removed.
+          $fc = $notification_w->field_notification_email[$latest_fc - 1]->value();
+          // Add the FC for each user to send to.
+          foreach ($users_to_send_to as $user_to_send_to) {
+            $aggregated_fcs_all_users[$user_to_send_to][$nid] = $fc;
+          }
+        }
+      }
+
+    }
+
+    // Send the aggregate email(s), one per user.
+    foreach ($aggregated_fcs_all_users as $uid => $fc_items) {
+      $bodies = ["This is your " . $schedule . " digest of notifications for " . variable_get('site_name') . ". You may manage these notifications at: " . $GLOBALS['base_url'] . "/user/" . $uid . "/following"];
+      $following_nids = [];
+      foreach ($fc_items as $following_nid => $fc_item) {
+        $following_nids[] = $following_nid;
+        $bodies[] = $fc_item->field_notification_body[LANGUAGE_NONE][0]['value'];
+      }
+      $body = implode("\n_____________________________________________________________________________\n\n", $bodies); // 77 chars wide
+      $params = [
+        'subject' => 'Your ' . $schedule . ' notifications digest for ' . variable_get('site_name') . '.',
+        'body' => $body,
+      ];
+      $user = user_load($uid);
+      $result = drupal_mail('ma_collaboration_tools', 'collab_notification', $user->mail, language_default(), $params);
+      if ($result['result']) { // This doesn't guarantee much but it's better than nothing.
+        $successful_sends[$uid] = $following_nids;
+      }
+    }
+
+    // Update the Following nodes field_users_notified and then field_all_users_notified
+    $nids_to_update = [];
+    foreach ($successful_sends as $uid => $following_nids) {
+      foreach ($following_nids as $following_nid) {
+        $nids_to_update[$following_nid][] = $uid;
+      }
+    }
+    foreach ($nids_to_update as $nid_to_update => $users_emailed) {
+      $notification_w = entity_metadata_wrapper('node', $nid_to_update);
+      $users_notified = array_unique(array_merge($notification_w->field_users_notified->raw(), $users_emailed));
+      $notification_w->field_users_notified->set($users_notified);
+      $notification_w->save();
+      ma_shared_notification_components_update_field_all_users_notified($notification_w);
+    }
+
+  }
+}
+
+/**
+ * Implements hook_preprocess_views_view_fields().
+ *
+ * Perform field-level replacement/processing here.
+ *
+ * Mukurtu copied and modified from oa_core_preprocess_views_view_fields.
+ */
+function ma_collaboration_tools_preprocess_views_view_fields(&$vars) {
+  $vars['index'] = $vars['view']->row_index;
+  $vars['display'] = $vars['view']->current_display;
+  $vars['count'] = count($vars['view']->result);
+  foreach ($vars['fields'] as $id => $field) {
+    $vars[$id] = $field->content;
+    switch ($id) {
+      case 'timestamp':
+        $vars[$id . '_raw'] = $field->raw;
+        break;
+
+      // Views for these fields are: oa_comment_topics, oa_comment_media.
+      // Mukurtu uncomment this if/when users get profile pics, and tweak as needed to make work.
+//      case 'field_user_picture':
+//      case 'picture':
+//        // Check for a missing user image in the view.
+//        if (!strip_tags($field->content, '<img>')) {
+//          // Add the user placeholder image.
+//          $vars[$id] = oa_core_get_user_picture_for_views_fields($field);
+//          // Also provide image to default views templates
+//          $vars['fields'][$id]->content = $vars[$id];
+//        }
+//        break;
+    }
+  }
+}
+
+/**
+ * Helper function called by custom DS field.
+ */
+function ma_collaboration_tools_discussion_topic_intro($entity) {
+  $dp = node_load($entity->field_discussion_disc_space[LANGUAGE_NONE][0]['target_id']);
+  $output = 'By ' . l($entity->name, $entity->uid) . ' on ' . date('F j, Y - g:ia', $entity->created) . ' in ' . l($dp->title, 'node/' . $dp->nid . '.');
+    return $output;
+}
+
+/**
+ * Helper function to get the following NID given child NID
+ */
+function ma_collaboration_tools_get_following_nid($child_nid) {
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->addMetaData('account', user_load(1))
+    ->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'following_notification')
+    ->propertyCondition('status', NODE_PUBLISHED)// or else it will retrieve node references for deleted DH items
+    ->fieldCondition('field_following_content', 'target_id', $child_nid)
+    ->execute();
+  return reset($result['node'])->nid;
+}
+
+/**
+ * Implements hook_views_post_build.
+ */
+function ma_collaboration_tools_views_post_build(&$view) {
+  if ($view->name == 'documents' && $view->current_display == 'mini') {
+
+    // The provided draggable_views permission is per core role, but we need to permission according
+    // to whether the user has edit access to the Document Library, so we set the core permission to everyone and handle here instead.
+    $doclib = node_load($view->args[0]);
+    if (!$doclib OR !node_access('update', $doclib)) {
+      unset ($view->field['draggableviews']);
+    }
+
+  }
+
+}
+

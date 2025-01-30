@@ -1,0 +1,35 @@
+From 1de178533659ddd35db24461dd5a7364368af2a6 Mon Sep 17 00:00:00 2001
+From: Bob Vincent <bobvin@pillars.net>
+Date: Fri, 27 May 2011 19:08:31 -0400
+Subject: [PATCH] Issue #728702 by arpeggio, David_Rothstein, Damien Tournoud, pillarsdotnet: Redirect from index.php to install.php if database is empty.
+
+---
+ includes/bootstrap.inc |   10 +++++++++-
+ 1 files changed, 9 insertions(+), 1 deletions(-)
+
+diff --git a/includes/bootstrap.inc b/includes/bootstrap.inc
+index 984739ee25c3e7a870aff5226ec78ef8360f7c23..2a0d4c46406ec02990e800e0112a7b3e8e09021f 100644
+--- a/includes/bootstrap.inc
++++ b/includes/bootstrap.inc
+@@ -1189,7 +1189,15 @@ function variable_initialize($conf = array()) {
+     $variables = $cached->data;
+   }
+   else {
+-    // Cache miss. Avoid a stampede by acquiring a lock. If the lock fails to
+-    // acquire, optionally just continue with uncached processing.
++    // The variable cache was not available. It might mean that we are running
++    // on an empty database. In that case, just redirect the user to install.php,
++    // unless we've already been there.
++    if (!db_table_exists('variable') && !drupal_installation_attempted()) {
++      include_once DRUPAL_ROOT . '/includes/install.inc';
++      install_goto('install.php');
++    }
++
++    // Cache miss. Avoid a stampede by acquiring a lock. If the lock fails to
++    // acquire, optionally just continue with uncached processing.
+     $name = 'variable_init';
+     if (!lock_acquire($name, 1)) {
+       // Another request is building the variable cache.
+--
+1.7.4.1
+

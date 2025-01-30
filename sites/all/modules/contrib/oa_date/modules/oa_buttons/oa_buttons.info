@@ -1,0 +1,29 @@
+name = Open Atrium Buttons
+description = Provide command button customizations for Open Atrium
+core = 7.x
+package = Open Atrium
+dependencies[] = command_buttons
+dependencies[] = conditional_fields
+dependencies[] = ctools
+dependencies[] = features
+dependencies[] = list
+dependencies[] = oa_core
+dependencies[] = oa_section_context
+dependencies[] = oa_sections
+dependencies[] = options
+dependencies[] = taxonomy
+features[conditional_fields][] = node:oa_section
+features[conditional_fields][] = node:oa_space
+features[ctools][] = field_group:field_group:1
+features[features_api][] = api:2
+features[field_base][] = field_oa_node_types
+features[field_instance][] = node-oa_section-field_oa_node_types
+features[field_instance][] = node-oa_space-field_oa_node_types
+features[field_instance][] = taxonomy_term-section_type-field_oa_node_types
+features[field_instance][] = taxonomy_term-space_type-field_oa_node_types
+
+; Information added by Drupal.org packaging script on 2018-10-18
+version = "7.x-2.91"
+core = "7.x"
+project = "oa_core"
+datestamp = "1539884795"

@@ -1,0 +1,14 @@
+name = Owl Carousel
+description = "Provides Owl Carousel integration into Drupal."
+core = 7.x
+package = Owl Carousel
+
+dependencies[] = libraries
+dependencies[] = jquery_update
+
+
+; Information added by Drupal.org packaging script on 2019-03-05
+version = "7.x-2.0-alpha0"
+core = "7.x"
+project = "owlcarousel"
+datestamp = "1551800591"

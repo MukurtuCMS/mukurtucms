@@ -1,31 +1,33 @@
 <?php
 /**
  * @file
- *   Defines a YouTube provider for Scald.
+ * Defines a YouTube provider for Scald.
  */
 
-define('YOUTUBE_WEB',         'http://www.youtube.com/watch');
-define('YOUTUBE_EMBED',       '//www.youtube.com/embed/');
-// @deprecated
-define('YOUTUBE_OEMBED',      'http://www.youtube.com/oembed');
-define('YOUTUBE_ID_REGEXP',   '/^[a-zA-Z0-9\-_]+$/');
-define('YOUTUBE_WEB_REGEXP',
+define('SCALD_YOUTUBE_WEB', 'https://www.youtube.com/watch');
+define('SCALD_YOUTUBE_EMBED', 'https://www.youtube.com/embed/');
+define('SCALD_YOUTUBE_NOCOOKIE_EMBED', 'https://www.youtube-nocookie.com/embed/');
+define('SCALD_YOUTUBE_ID_REGEXP', '/^[a-zA-Z0-9\-_]+$/');
+define('SCALD_YOUTUBE_WEB_REGEXP',
 '/(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+(?:&|&#38;);v=))((?:\w|-|_){11})(?:(?:\?|&|&#38;)index=((?:\d){1,3}))?(?:(?:\?|&|&#38;)list=((?:\w|-|_){12,}))?(?:\S+)?/');
-define('YOUTUBE_API',         'https://www.googleapis.com/youtube/v3/videos');
-// @deprecated
-define('YOUTUBE_MEDIA',       'http://search.yahoo.com/mrss/');
+define('SCALD_YOUTUBE_API', 'https://www.googleapis.com/youtube/v3');
 
 /**
  * Implements hook_scald_atom_providers().
+ *
  * Tell Scald that we'll be providing some video atoms.
  */
 function scald_youtube_scald_atom_providers() {
   return array(
-    'video' => 'Video hosted on YouTube'
+    'video' => 'Video hosted on YouTube',
   );
-  // This code will never be hit, but is necessary to mark the string
-  // for translation on localize.d.o
+  /*
+   * This code will never be hit, but is necessary to mark the string
+   * for translation on localize.d.o
+   * @codingStandardsIgnoreStart
+   */
   t('Video hosted on YouTube');
+  // @codingStandardsIgnoreEnd
 }
 
 /**
@@ -39,6 +41,84 @@ function scald_youtube_scald_add_form(&$form, &$form_state) {
     '#required' => TRUE,
     '#default_value' => '',
   );
+
+  $api_key = variable_get('scald_youtube_api_key', '');
+  if (!empty($api_key)) {
+    $form['search'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Search on YouTube'),
+      '#weight' => 5,
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    );
+
+    $form['search']['search_text'] = array(
+      '#type' => 'textfield',
+      '#default_value' => '',
+      '#size' => 60,
+      '#maxlength' => 128,
+    );
+
+    $form['search']['search_button'] = array(
+      '#type' => 'submit',
+      '#value' => t('Search'),
+      '#weight' => 19,
+      '#submit' => array('scald_youtube_search_submit'),
+      '#limit_validation_errors' => array(array('search_text')),
+      '#ajax' => array(
+        'callback' => 'scald_youtube_search_callback',
+        'wrapper' => 'search-results-wrapper',
+        'method' => 'replace',
+        'effect' => 'fade',
+      ),
+      '#attributes' => array(
+        'class' => array('search-button'),
+      ),
+    );
+
+    $form['search']['search_results_wrapper'] = array(
+      '#tree' => FALSE,
+      '#weight' => 20,
+      '#prefix' => '<div id="search-results-wrapper">',
+      '#suffix' => '</div>',
+    );
+
+    $form['search']['search_results_wrapper']['results'] = array(
+      '#theme' => 'scald_youtube_search',
+      '#videos' => array(),
+      '#attached' => array(
+        'js' => array(drupal_get_path('module', 'scald_youtube') . '/js/scald_youtube_search.js'),
+        'css' => array(drupal_get_path('module', 'scald_youtube') . '/css/scald_youtube_search.css'),
+      ),
+    );
+    $form['buttons']['next']['#attributes']['class'][] = 'continue-button';
+  }
+}
+
+/**
+ * Submit callback for the YouTube Search.
+ */
+function scald_youtube_search_submit($form, &$form_state) {
+  // A submit function is required for the limit validation errors to work.
+}
+
+/**
+ * Callback to perform the YouTube Search.
+ */
+function scald_youtube_search_callback($form, $form_state) {
+  $api_key = variable_get('scald_youtube_api_key', '');
+  if (empty($api_key)) {
+    return '';
+  }
+  $q = urlencode(check_plain($form_state['values']['search_text']));
+  $url = SCALD_YOUTUBE_API . '/search?key=' . $api_key . '&q=' . $q . '&part=snippet&order=rating&type=video,playlist';
+  $response = drupal_http_request($url);
+  if ($response->code >= 200 && $response->code < 400 && !empty($response->data)) {
+    $json = json_decode($response->data);
+    $form['search']['search_results_wrapper']['results']['#videos'] = $json->items;
+    return $form['search']['search_results_wrapper'];
+  }
+  return '';
 }
 
 /**
@@ -47,7 +127,7 @@ function scald_youtube_scald_add_form(&$form, &$form_state) {
 function scald_youtube_scald_add_form_fill(&$atom, $form, $form_state) {
 
   // Get the identifier.
-  $identifier = scald_youtube_parse_id($form_state['values']['identifier'], TRUE);
+  $identifier = scald_youtube_parse_id($form_state['values']['identifier'], FALSE);
 
   // Get video info.
   $infos = scald_youtube_video($identifier['id']);
@@ -66,17 +146,20 @@ function scald_youtube_scald_add_form_fill(&$atom, $form, $form_state) {
     $langcode = field_language('scald_atom', $atom, 'scald_authors');
     $atom->scald_authors[$langcode][0] = array(
       'tid' => 0,
-      'taxonomy_term' => (object)(array('name' => $infos->author))
+      'taxonomy_term' => (object) (array('name' => $infos->author)),
     );
   }
 
   // Prefill tags.
-  $langcode = field_language('scald_atom', $atom, 'scald_tags');
-  foreach ($infos->tags as $index => $tag) {
-    $atom->scald_tags[$langcode][$index] = array(
-      'tid' => $index,  // Beware, this is not a real tid, it's just an index
-      'taxonomy_term' => (object)(array('name' => $tag))
-    );
+  if (isset($infos->tags)) {
+    $langcode = field_language('scald_atom', $atom, 'scald_tags');
+    foreach ($infos->tags as $index => $tag) {
+      // Beware, this is not a real tid, it's just an index.
+      $atom->scald_tags[$langcode][$index] = array(
+        'tid' => $index,
+        'taxonomy_term' => (object) (array('name' => $tag)),
+      );
+    }
   }
 
   // Save video width and height.
@@ -92,7 +175,7 @@ function scald_youtube_scald_add_form_fill(&$atom, $form, $form_state) {
 
     if ($file) {
       // Set the file status to temporary.
-      $query = db_update('file_managed')
+      db_update('file_managed')
         ->condition('fid', $file->fid)
         ->fields(array('status' => 0))
         ->execute();
@@ -116,10 +199,10 @@ function scald_youtube_form_scald_atom_add_form_options_alter(&$form, &$form_sta
   if ($source != 'scald_youtube') {
     return;
   }
-  foreach($form as $key => $data) {
+  foreach ($form as $key => $data) {
     if (strpos($key, 'atom') === 0) {
       $index = intval(substr($key, 4));
-      $scald_youtube_show_related = TRUE;
+      $scald_youtube_show_related = variable_get('scald_youtube_show_related', TRUE);
       if (isset($scald['atoms'][$index]->data['show_related'])) {
         $scald_youtube_show_related = $scald['atoms'][$index]->data['show_related'];
       }
@@ -132,21 +215,50 @@ function scald_youtube_form_scald_atom_add_form_options_alter(&$form, &$form_sta
         '#tree' => TRUE,
         '#parents' => array($key, 'scald_youtube_show_related'),
       );
+
+      $scald_youtube_autoplay = variable_get('scald_youtube_autoplay', FALSE);
+      if (isset($scald['atoms'][$index]->data['youtube_autoplay'])) {
+        $scald_youtube_autoplay = $scald['atoms'][$index]->data['youtube_autoplay'];
+      }
+      $form[$key]['scald_youtube_autoplay'] = array(
+        '#type' => 'checkbox',
+        '#default_value' => $scald_youtube_autoplay,
+        '#title' => t('Autoplay the video'),
+        '#description' => t('If checked, the video will be automatically started.'),
+        '#weight' => $form[$key]['scald_thumbnail']['#weight'] + .7,
+        '#tree' => TRUE,
+        '#parents' => array($key, 'scald_youtube_autoplay'),
+      );
+
+      $scald_youtube_mute = FALSE;
+      if (isset($scald['atoms'][$index]->data['youtube_mute'])) {
+        $scald_youtube_mute = $scald['atoms'][$index]->data['youtube_mute'];
+      }
+      $form[$key]['scald_youtube_mute'] = array(
+        '#type' => 'checkbox',
+        '#default_value' => $scald_youtube_mute,
+        '#title' => t('Mute the video'),
+        '#description' => t('If checked, the video will be muted.'),
+        '#weight' => $form[$key]['scald_thumbnail']['#weight'] + .8,
+        '#tree' => TRUE,
+        '#parents' => array($key, 'scald_youtube_mute'),
+      );
     }
   }
 
   array_unshift($form['#submit'], 'scald_youtube_extra_options_save_handler');
 }
 
-
 /**
  * Handler to store any extra options in the atom Entity.
  */
 function scald_youtube_extra_options_save_handler(&$form, &$form_state) {
-  foreach($form as $key => $data) {
+  foreach ($form as $key => $data) {
     if (strpos($key, 'atom') === 0) {
       $index = intval(substr($key, 4));
       $form_state['scald']['atoms'][$index]->data['show_related'] = $form_state['values'][$key]['scald_youtube_show_related'];
+      $form_state['scald']['atoms'][$index]->data['youtube_autoplay'] = $form_state['values'][$key]['scald_youtube_autoplay'];
+      $form_state['scald']['atoms'][$index]->data['youtube_mute'] = $form_state['values'][$key]['scald_youtube_mute'];
     }
   }
 }
@@ -168,13 +280,13 @@ function scald_youtube_scald_prerender($atom, $context, $options, $mode) {
   if ($mode == 'atom') {
     // Load context configuration to retrieve dimension data if present.
     $context_config = scald_context_config_load($context);
-    $video_width = (isset($atom->data['video_width'])) ? $atom->data['video_width'] : 480;
-    $video_height = (isset($atom->data['video_height'])) ? $atom->data['video_height'] : 365;
+    $video_width = (!empty($atom->data['video_width'])) ? $atom->data['video_width'] : 480;
+    $video_height = (!empty($atom->data['video_height'])) ? $atom->data['video_height'] : 365;
     // Allow context configuration to override video dimension variables.
-    if(isset($context_config->data['width'])){
+    if (!empty($context_config->data['width'])) {
       $video_width = $context_config->data['width'];
     }
-    if(isset($context_config->data['height'])){
+    if (!empty($context_config->data['height'])) {
       $video_height = $context_config->data['height'];
     }
     $query = array();
@@ -184,21 +296,61 @@ function scald_youtube_scald_prerender($atom, $context, $options, $mode) {
     if (isset($atom->data['show_related']) && empty($atom->data['show_related'])) {
       $query['rel'] = '0';
     }
-    $video_url = url(YOUTUBE_EMBED . $atom->base_id, array(
+    // Don't apply the autoplay on admin page.
+    if (isset($atom->data['youtube_autoplay']) && !empty($atom->data['youtube_autoplay']) && !path_is_admin(current_path())) {
+      $query['autoplay'] = '1';
+    }
+    if (isset($atom->data['youtube_mute']) && !empty($atom->data['youtube_mute'])) {
+      $query['mute'] = '1';
+    }
+
+    $youtube_domain = SCALD_YOUTUBE_EMBED;
+
+    $attached_files = array(
+      'css' => array(drupal_get_path('module', 'scald_youtube') . '/css/scald_youtube_iframe.css'),
+    );
+
+    $defer_enable = variable_get('scald_youtube_defer_videos', FALSE);
+    $consent_enable = variable_get('scald_youtube_consent_enable', FALSE);
+    $consent_text = variable_get('scald_youtube_consent_text', '');
+    $consent_button = variable_get('scald_youtube_consent_button', 'Accept');
+
+    if ($consent_enable) {
+      $defer_enable = TRUE;
+    }
+
+    $delayed_cookie = variable_get('scald_youtube_delayed_cookie', FALSE);
+    if ($delayed_cookie) {
+      $youtube_domain = SCALD_YOUTUBE_NOCOOKIE_EMBED;
+    }
+
+    if ($defer_enable) {
+      $attached_files['js'] = array(
+        drupal_get_path('module', 'scald_youtube') . '/js/scald_youtube_defer_library.js',
+        drupal_get_path('module', 'scald_youtube') . '/js/scald_youtube_defer.js',
+      );
+    }
+
+    $video_url = url($youtube_domain . $atom->base_id, array(
       'query' => $query,
     ));
-    $atom->rendered->player = theme('scald_youtube_player',
-      array('vars' =>
-        array(
-          'video_id'      => $atom->base_id,
-          'video_width'   => $video_width,
-          'video_height'  => $video_height,
-          'video_url'     => $video_url,
-          'thumbnail'     => $atom->rendered->thumbnail_source_url,
-          'title'         => check_plain($atom->title),
-        ),
-        'atom' => $atom,
-      )
+
+    $atom->rendered->player = array(
+      '#theme' => 'scald_youtube_player',
+      '#vars' => array(
+        'video_id'      => $atom->base_id,
+        'video_width'   => $video_width,
+        'video_height'  => $video_height,
+        'video_url'     => $video_url,
+        'thumbnail'     => $atom->rendered->thumbnail_source_url,
+        'title'         => check_plain($atom->title),
+        'enable_defer'  => $defer_enable,
+        'enable_consent' => $consent_enable,
+        'consent_text'   => t($consent_text),
+        'consent_button' => !empty($consent_button) ? t($consent_button) : FALSE,
+      ),
+      '#atom' => $atom,
+      '#attached' => $attached_files,
     );
   }
 }
@@ -209,21 +361,33 @@ function scald_youtube_scald_prerender($atom, $context, $options, $mode) {
 function scald_youtube_theme() {
   return array(
     'scald_youtube_player' => array(
-      'variables' => array('vars' => NULL, 'atom' => NULL),
-      'template' => 'scald_youtube_player'
+      'variables' => array(
+        'vars' => NULL,
+        'atom' => NULL,
+      ),
+      'template' => 'templates/scald_youtube_player',
+    ),
+    'scald_youtube_search' => array(
+      'variables' => array(
+        'videos' => NULL,
+      ),
+      'template' => 'templates/scald_youtube_search',
     ),
   );
 }
 
-
 /**
- * Creates an atom based on a YouTube video id or an object
- * containing the video informations..
- * @param $video
+ * Scald_youtube_register.
+ *
+ * Creates an atom based on a video ID or an object containing
+ * the video informations.
+ *
+ * @param mixed $video
  *   Unique identifier of the video on YouTube, or object
  *   returned by scald_youtube_video.
- * @return integer
- *   Unique identifier of the new atom
+ *
+ * @return int
+ *   Unique identifier of the new atom.
  */
 function scald_youtube_register($video) {
   // Fetch the needed informations from YouTube.
@@ -234,7 +398,7 @@ function scald_youtube_register($video) {
     $infos = scald_youtube_video($video);
   }
 
-  // Check if the video has already been imported to prevent duplicate
+  // Check if the video has already been imported to prevent duplicate.
   $old = scald_youtube_already_imported($infos->id);
   if ($old) {
     return FALSE;
@@ -264,7 +428,7 @@ function scald_youtube_register($video) {
 
   // Set file.
   if ($file) {
-    $query = db_update('file_managed')
+    db_update('file_managed')
       ->condition('fid', $file->fid)
       ->fields(array('status' => 0))
       ->execute();
@@ -278,42 +442,44 @@ function scald_youtube_register($video) {
   return $atom_sid;
 }
 
-
 /**
- * Analyze a YouTube RSS feed to extract videos information
- * @param $type
- *   RSS Type of the feed. Example, 'user', 'video', 'tag'.
- * @param $id
- *   Identifier or string associated with the type. For example, user name, video id or tag
+ * Analyze a YouTube RSS feed to extract videos information.
+ *
+ * @param string $id
+ *   Identifier or string associated with the type. For example, user name,
+ *   video id or tag.
+ *
  * @return array
  *   An array of object, each one containing an analyzed video.
  */
 function scald_youtube_feed($id) {
-  $item = array();
-  $info_extra = scald_youtube_video_get_info($id);
-  if (empty($info_extra)) {
-    return $item;
-  }
-  $item = new stdClass();
+  $item = scald_youtube_video_get_info($id);
   $api_key = variable_get('scald_youtube_api_key', '');
   if (empty($api_key)) {
-    $item = $info_extra;
+    if (empty($item)) {
+      return array();
+    }
   }
   else {
-    $url = YOUTUBE_API . '?id=' . $id . '&key=' . $api_key . '&part=snippet';
+    if (empty($item)) {
+      $item = scald_youtube_create_default_info($id);
+    }
+    $url = SCALD_YOUTUBE_API . '/videos?id=' . $id . '&key=' . $api_key . '&part=snippet';
     $response = drupal_http_request($url);
     if ($response->code >= 200 && $response->code < 400 && !empty($response->data)) {
       $json = json_decode($response->data);
-      $item = $json->items[0];
-      $item->title = $item->snippet->title;
-      $item->author = $item->snippet->channelTitle;
-      $item->tags = $info_extra->tags;
-      $item->license = $info_extra->license;
+      $data = $json->items[0];
+      $thumb_size = variable_get('scald_youtube_thumb_size', 'default');
+      $item->thumbnail = array(
+        'src' => $data->snippet->thumbnails->{$thumb_size}->url,
+      );
+      $item->title = $data->snippet->title;
+      $item->author = $data->snippet->channelTitle;
+    }
+    else {
+      return array();
     }
   }
-  $item->thumbnail = $info_extra->thumbnail;
-  $item->width = $info_extra->video_width;
-  $item->height = $info_extra->video_height;
   return $item;
 }
 
@@ -326,13 +492,26 @@ function scald_youtube_video($id) {
 }
 
 /**
- * Analyze OEmbed response for a given video ID
+ * Analyze OEmbed response for a given video ID.
  *
  * @deprecated
- * @see scald_youtube_video_get_info().
+ *
+ * @see scald_youtube_video_get_info()
  */
 function scald_youtube_video_oembed($id) {
   return scald_youtube_video_get_info($id);
+}
+
+/**
+ * Create a default info object.
+ */
+function scald_youtube_create_default_info($id) {
+  $info = new stdClass();
+  $info->id = $id;
+  $info->license = 'YT';
+  $info->width = $info->video_width = 480;
+  $info->height = $info->video_height = 365;
+  return $info;
 }
 
 /**
@@ -351,15 +530,16 @@ function scald_youtube_video_get_info($id) {
   }
 
   $info = array();
-  $url = YOUTUBE_WEB . '?v=' . $id;
-  $response = drupal_http_request($url);
+  $url = SCALD_YOUTUBE_WEB . '?v=' . $id;
+  $options = array(
+    'headers' => array(
+      'User-Agent' => NULL,
+    ),
+  );
+  $response = drupal_http_request($url, $options);
   if ($response->code >= 200 && $response->code < 400 && !empty($response->data)) {
     // Initialize default values.
-    $info = new stdClass();
-    $info->id = $id;
-    $info->license = 'YT';
-    $info->video_width = 480;
-    $info->video_height = 365;
+    $info = scald_youtube_create_default_info($id);
 
     $data = $response->data;
     // DOMDocument does not work well with UTF-8, we need to use HTML entities
@@ -388,15 +568,17 @@ function scald_youtube_video_get_info($id) {
       switch ($meta->getAttribute('property')) {
         case 'og:image':
           $info->thumbnail = array(
-            'src' => $content
+            'src' => $content,
           );
           break;
 
         case 'og:video:width':
+          $info->width = $content;
           $info->video_width = $content;
           break;
 
         case 'og:video:height':
+          $info->height = $content;
           $info->video_height = $content;
           break;
       }
@@ -416,22 +598,84 @@ function scald_youtube_video_get_info($id) {
  */
 function scald_youtube_form_scald_admin_type_form_alter(&$form, &$form_state, $form_id) {
   if ($form['atom_type']['#value'] === 'video') {
-    $form['defaults']['scald_youtube_api_key'] = array(
+    $form['defaults']['scald_youtube'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Scald YouTube Configuration'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    );
+    $form['defaults']['scald_youtube']['scald_youtube_api_key'] = array(
       '#type' => 'textfield',
       '#title' => t('YouTube API Key'),
       '#element_validate' => array('scald_youtube_validate_api_key'),
       '#default_value' => variable_get('scald_youtube_api_key', ''),
-      '#description' => t('The API Key can be requested on the Google Developer Console. Without it some of the video information will not be accessible.'),
+      '#description' => t('The API Key can be requested on the Google Developer Console. Without it the YouTube Search and some of the video information will not be accessible.'),
     );
-    $form['#submit'][] = 'scald_youtube_api_key_submit';
+    $form['defaults']['scald_youtube']['scald_youtube_show_related'] = array(
+      '#type' => 'checkbox',
+      '#default_value' => variable_get('scald_youtube_show_related', TRUE),
+      '#title' => t('Show related videos by default'),
+      '#description' => t('If checked the related videos will be visible at the end of the video by default for new Atoms.'),
+    );
+    $form['defaults']['scald_youtube']['scald_youtube_autoplay'] = array(
+      '#type' => 'checkbox',
+      '#default_value' => variable_get('scald_youtube_autoplay', FALSE),
+      '#title' => t('Autoplay the video'),
+      '#description' => t('If checked, the video will be set to automatically start by default for new Atoms.'),
+    );
+    $form['defaults']['scald_youtube']['scald_youtube_delayed_cookie'] = array(
+      '#type' => 'checkbox',
+      '#default_value' => variable_get('scald_youtube_delayed_cookie', FALSE),
+      '#title' => t('Use the "delayed cookie" privacy feature'),
+      '#description' => t("If this checkbox is checked, the nocookie.com domain will be used for embedding. The cache has to be cleared for the changes to take effect."),
+    );
+    $form['defaults']['scald_youtube']['scald_youtube_defer_videos'] = array(
+      '#type' => 'checkbox',
+      '#default_value' => variable_get('scald_youtube_defer_videos', FALSE),
+      '#title' => t('Defer the Youtube videos'),
+      '#description' => t("If this checkbox is checked, the loading of the Scald Youtube videos will be deferred to the end. The cache has to be cleared for the changes to take effect. If you use the WYSIWYG module, you must enable the 'Defer Youtube videos' plugin in your WYSIWYG profile."),
+    );
+    $form['defaults']['scald_youtube']['scald_youtube_consent_enable'] = array(
+      '#type' => 'checkbox',
+      '#default_value' => variable_get('scald_youtube_consent_enable', FALSE),
+      '#title' => t('Ask user consent before displaying videos'),
+      '#description' => t("If this checkbox is checked, the configured message below with a button will be displayed instead of the video in order to receive user consent. When the user agrees, the video will be shown. The cache has to be cleared for the changes to take effect. This will enable the defer option."),
+    );
+    $form['defaults']['scald_youtube']['scald_youtube_consent_text'] = array(
+      '#type' => 'textfield',
+      '#default_value' => variable_get('scald_youtube_consent_text', ''),
+      '#title' => t('Consent text'),
+      '#description' => t("This text will be displayed instead of the video until the user gives his consent."),
+    );
+    $form['defaults']['scald_youtube']['scald_youtube_consent_button'] = array(
+      '#type' => 'textfield',
+      '#default_value' => variable_get('scald_youtube_consent_button', 'Accept'),
+      '#title' => t('Consent button'),
+      '#description' => t("This text will be used as the button label in order to get the user consent."),
+    );
+    $form['defaults']['scald_youtube']['scald_youtube_thumb_size'] = array(
+      '#type' => 'select',
+      '#title' => t('Size of thumbnails'),
+      '#default_value' => variable_get('scald_youtube_thumb_size', 'default'),
+      '#options' => array(
+        'default' => t('Default resolution'),
+        'medium' => t('Medium resolution'),
+        'high' => t('High resolution'),
+        'standard' => t('Standard resolution'),
+        'maxres' => t('Max resolution'),
+      ),
+      '#description' => t('Choose the size of thumbnails that is used to save to the local file system'),
+    );
+    $form['#submit'][] = 'scald_youtube_configuration_submit';
   }
 }
 
 /**
- * Checks if a video has already been imported, based on its video
- * id.
- * @param $id
- *   The video identifier
+ * Checks if a video has already been imported, based on its video ID.
+ *
+ * @param string $id
+ *   The video identifier.
+ *
  * @return mixed
  *   FALSE if the video was never imported, the scald identifier of
  *   the video otherwise.
@@ -442,8 +686,7 @@ function scald_youtube_already_imported($id) {
 }
 
 /**
- * Form element validation handler for YouTube API key
- *
+ * Form element validation handler for YouTube API key.
  */
 function scald_youtube_validate_api_key($element, &$form_state) {
   if (!empty($form_state['values']['scald_youtube_api_key']) && !preg_match('/^[a-zA-Z0-9_\-]+$/', $form_state['values']['scald_youtube_api_key'])) {
@@ -452,15 +695,22 @@ function scald_youtube_validate_api_key($element, &$form_state) {
 }
 
 /**
- * Submit function to save the YouTube API key.
+ * Submit function to save the YouTube Configuration.
  */
-function scald_youtube_api_key_submit($form_id, &$form_state) {
+function scald_youtube_configuration_submit($form_id, &$form_state) {
   variable_set('scald_youtube_api_key', $form_state['values']['scald_youtube_api_key']);
+  variable_set('scald_youtube_show_related', $form_state['values']['scald_youtube_show_related']);
+  variable_set('scald_youtube_autoplay', $form_state['values']['scald_youtube_autoplay']);
+  variable_set('scald_youtube_delayed_cookie', $form_state['values']['scald_youtube_delayed_cookie']);
+  variable_set('scald_youtube_defer_videos', $form_state['values']['scald_youtube_defer_videos']);
+  variable_set('scald_youtube_consent_enable', $form_state['values']['scald_youtube_consent_enable']);
+  variable_set('scald_youtube_consent_text', $form_state['values']['scald_youtube_consent_text']);
+  variable_set('scald_youtube_consent_button', $form_state['values']['scald_youtube_consent_button']);
+  variable_set('scald_youtube_thumb_size', $form_state['values']['scald_youtube_thumb_size']);
 }
 
 /**
- * Form element validation handler for YouTube identifier
- *
+ * Form element validation handler for YouTube identifier.
  */
 function scald_youtube_validate_id($element, &$form_state) {
   $identifier = scald_youtube_parse_id($form_state['values']['identifier'], TRUE);
@@ -473,15 +723,14 @@ function scald_youtube_validate_id($element, &$form_state) {
 }
 
 /**
- * Parse a YouTube ID and check validity
- *
+ * Parse a YouTube ID and check validity.
  */
 function scald_youtube_parse_id($string, $check) {
   $identifier = NULL;
   $string = trim($string);
-  if (!preg_match(YOUTUBE_ID_REGEXP, $string)) {
+  if (!preg_match(SCALD_YOUTUBE_ID_REGEXP, $string)) {
     // The string ID is not easy to parse, let's try to analyze it.
-    if (preg_match(YOUTUBE_WEB_REGEXP, $string, $m)) {
+    if (preg_match(SCALD_YOUTUBE_WEB_REGEXP, $string, $m)) {
       // This string is a full YouTube URL.
       $identifier['id'] = $m[1];
       if (!empty($m[3])) {
@@ -489,7 +738,8 @@ function scald_youtube_parse_id($string, $check) {
       }
     }
     elseif (preg_match("/^http/", $string)) {
-      // This string is a URL, most likely a shortened one. (http://dai.ly, http://bit.ly, etc...)
+      // This string is a URL, most likely a shortened one.
+      // For example (http://dai.ly, http://bit.ly, etc...).
       $response = drupal_http_request($string);
       if ($response->code == 200 && isset($response->redirect_code) && ($response->redirect_code == 301 || $response->redirect_code == 302)) {
         return scald_youtube_parse_id($response->redirect_url, $check);
@@ -508,4 +758,54 @@ function scald_youtube_parse_id($string, $check) {
     }
   }
   return $identifier;
+}
+
+/**
+ * Implements hook_wysiwyg_plugin().
+ */
+function scald_youtube_wysiwyg_plugin($editor, $version) {
+  switch ($editor) {
+    case 'ckeditor':
+      return array(
+        'scald_youtube_defer_plugin' => array(
+          'path' => drupal_get_path('module', 'scald_youtube') . '/scald_youtube_defer_plugin/',
+          'buttons' => array(
+            'scald_youtube_defer_button' => t('Defer Youtube videos'),
+          ),
+          'load' => TRUE,
+        ),
+      );
+  }
+}
+
+/**
+ * Implements hook_element_info_alter().
+ */
+function scald_youtube_element_info_alter(&$types) {
+  $defer_enable = variable_get('scald_youtube_defer_videos', FALSE);
+  if ($defer_enable) {
+    // Add the path of the script.
+    $types['text_format']['#pre_render'][] = 'scald_youtube_add_defer_video_plugin_js';
+  }
+}
+
+/**
+ * A function in order to pass the JS file to the ckeditor plugin.
+ *
+ * @param array $element
+ *   The element array.
+ *
+ * @return array
+ *   Return the text format element with a settings in order to add the JS file.
+ */
+function scald_youtube_add_defer_video_plugin_js($element) {
+  global $base_url, $base_path;
+  $element['#attached']['js'][] = array(
+    'type' => 'setting',
+    'data' => array(
+      'defer_youtube_video_js_library' => $base_url . $base_path . drupal_get_path('module', 'scald_youtube') . '/js/scald_youtube_defer_library.js',
+    ),
+  );
+
+  return $element;
 }

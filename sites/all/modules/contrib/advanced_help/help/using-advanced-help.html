@@ -1,45 +1,202 @@
-<p>The <em>Advanced help</em> system is a pluggable system that provides advanced help facilities for Drupal and its modules. Although the advanced help does not provide general help by itself, it provides a powerful and easy framework that modules may use to provide their own help.
-</p>
+<p>The <strong>Advanced Help</strong> module provides a framework that
+allows module and theme developers integrate help texts in a Drupal
+site.</p>
 
-<p>
-Modules utilizing <em>Advanced help</em> should create a 'help' subdirectory inside their
-module's directory. Place the file MODULENAME.help.ini in this subdirectory, formatted
-similar to the following example:
-</p>
+<p>It provides a framework for creating and maintaing HTML help texts.
+It may also be used to display a module's or
+theme's <code>README</code>-file on the screen.</p>
+
+<h2 id="ah_enable">Enabling the module</h2>
+
+<p>When you enable the module, a new tab with the legend “Advanced
+help” will show up under “Help”:
+
+<div class="help-imgpos-center" style="max-width:661px">
+<img class="help-img" alt="ahelp_tab.png" title="The “Advanced help” tab" src="&path&ahelp_tab.png" width="661" />
+<div class="help-img-caption" style="max-width:661px">Advanced help is found under a separate tab</div>
+</div>
+
+<p>Links to the help texts are under this tab.</p>
+
+<h2 id="ah_crehlp">Creating help</h2>
+
+<p>Modules and themes utilizing <strong>Advanced Help</strong> should
+create a subdirectory named <code>help</code> inside their own main
+directory. Place the file
+<em>MODULENAME</em>.help.ini (resp. <em>THEMENAME</em>.help.ini) in this subdirectory.
+formatted similar to the following example:</p>
+
 <pre>
-[buses]
-title = "How buses are tied into the system"
-file = buses
+[advanced help settings]
+navigation = FALSE
+show readme = FALSE
 
-[TOPIC_ID]
-title = "Title of topic".
-file = filename of topic, without the .html extension.
-weight = How important the topic is on the index page.
-parent = The optional topic parent to use in the breadcrumb, 
-         either topic or module%topic.
+[about-example]
+title = About the help example
+weight = -11
+
+[lorem]
+title = Lorem ipsum
+weight = -10
+
+[etiam]
+title = Etiam ultricies
+parent = lorem
+line break = TRUE
 </pre>
 
-<p>
-All topics are addressed by the module providing the topic, and by the topic
-id. To embed links, use the following format:
-</p>
-<code>
-$output .= theme('advanced_help_topic', $module, $topic);
-</code>
+<p>This file defines some global settings as well as three help topics
+(inside the square brackets), and some settings for them.  See:
+“<a href="&topic:advanced_help/ini-file&">Advanced help .ini file
+format</a>” for the full list of settings.</p>
 
-<p>Inside your help file, link to other topics using the format <strong>&lt;a href="&amp;topic:module/topic&amp;"&gt;</strong>. This
-format will ensure the popup status remains consistent when switching between links.</p>
+<p>Characters <code>?{}|&~!()^"</code> should not be used anywhere in
+the title as they have a special meaning, unless the the string is
+quoted.  An error message like the one below indicates that quotes
+should be used:</p>
 
-<p>Use <strong>&lt;a href="&amp;path&amp;example.jpg"&gt;</strong> to reference items
-within the help directory, such as images you wish to embed within the help text.</p>
+<blockquote><p>Warning: syntax error, unexpected '(' in example.help.ini &hellip;</p></blockquote>
 
-<p>Use <strong>&lt;a href="&amp;base_url&amp;admin/settings/site-configuration"&gt;</strong> to reference any normal path in the site.</p>
+<h2 id="ah_lnkhlp">Linking to help</h2>
 
-<p>If the search module is enabled, the contents of help system will be indexed on cron. If you enable new modules and wish to immediately index its help text, visit the "Administration -> Reports -> Status report" and click the "Run cron manually" link.</p>
+<p>All topics are addressed by the module or theme providing the
+topic, and by the topic id. To produce a themed link to popup about a
+topic, there is a theme
+function <code>theme_advanced_help_topic()</code> accepting three
+named parameters passed in an array:</p>
 
-<p>Example: <a href="&path&nowhere.jpg">Don't click this!</a></p>
+<ol>  
+<li><code>'module'</code>: The machine name of the module that owns this help topic.</li>
+<li><code>'topic'</code>: The identifier for the topic (to link to topic) or <code>'toc'</code> (to link to index page).</li>
+</ul></li>
+<li><code>'type'</code>: The type of link to create:<ul>
+  <li>'<code>icon'</code> to display the question mark icon.</li>
+  <li>'<code>title'</code> to display the topic's title.</li>
+  <li>any other text to display the text. Wrap it in <code>t()</code> to make it translatable.</li>
+</ul></li>
+</ol>  
 
-<p>See: <a href="&topic:advanced_help/ini-file&">ini file format</a></p>
+<p>The following example shows how to link to a popup with the
+topic <code>'about-example'</code> owned by the module
+<code>'help_example'</code> using the question mark icon:</p>
 
-<p><strong>NOTE: </strong> In previous versions Advanced Help did not require the &amp;'s wrapped around the topic:, path:, and base_url: links.  This
-is currently still supported, but may be removed in a future version.  By adding the &'s these tokens are now not limited to href="" and src="" paramaters.</p>
+<!-- D7 -->
+<pre>
+// Create the question mark icon.
+$output = theme('advanced_help_topic', array(
+  'module' => 'help_example',
+  'topic' => 'about-example',
+  'type' => 'icon',
+));
+// Append some explanatory text.
+$output .= '&nbsp;' . t('Click the help icon!');
+</pre>
+
+<p>This produces the following output:</p>
+
+<pre>
+&lt;a class="advanced-help-link" title="About the help example"
+  onclick="var w=window.open(this.href, 'advanced_help_window',
+  'width=500,height=500,scrollbars,resizable');
+  w.focus(); return false;"
+  href="/help/help_example/about-example?popup=1"&gt;
+&lt;span&gt;Help&lt;/span&gt;
+&lt;/a&gt;
+ Click the help icon!
+&lt;/div&gt;
+</pre>
+
+<p>This produces a clickable help icon like the one shown below:</p>
+
+<div class="help-imgpos-center" style="max-width:180px">
+<img class="help-img" alt="clickable icon" title="The advanced help icon is a question mark" src="&path&click_icon.png" width="180" />
+<div class="help-img-caption" style="max-width:180px">Question mark help icon</div>
+</div>
+
+<p>See the source code of demo module <strong>Advanced Help
+Example</strong> for link examples.</p>
+
+<p>You may link to other help topics inside your HTML help file using
+this format:</p>
+
+<pre>
+&lt;a href="&amp;topic:moduleshortname/moduletopic&amp;"&gt;anchortext&lt;/a&gt;
+&lt;a href="&amp;topic:help_example/lorem&amp;"&gt;Lorem ipsum&lt;/a&gt;
+</pre>
+
+<p>The second line show how to link to a help page provided by the
+module with shortname <code>help_example</code>, with the
+topic <code>lorem</code>.</p>
+
+<p>To reference items within the help directory, such as images you wish to embed  within the help text, use:</p>
+
+<pre>
+&lt;img src="&amp;path&amp;example.png"/&gt;
+&lt;img src="&amp;trans_path&amp;example.png"/&gt;
+</pre>
+
+<p>The <code>trans_path</code> keyword refers to a translated version
+of the image in the translation directory and may be used if it
+differs from the original.</p>
+
+<p>To reference any normal path in the site, use:</p>
+<pre>
+&lt;a href="&amp;base_url&amp;admin/settings/site-configuration"&gt;anchor text&lt;/a&gt;
+</pre>
+
+<p><strong>NOTE: </strong> In previous versions <strong>Advanced
+help</strong> did not require the &amp;'s to be wrapped around
+<code>topic</code>, <code>path</code>, and <code>base_url</code>.
+This is currently still supported, but will be removed in a future
+version.  By adding the &amp;'s these tokens are now not limited
+to <code>href=""</code> and <code>src=""</code> parameters.</p>
+
+<h2 id="access-control">Hiding help files</h2>
+
+<p>When this module is installed, users with the
+<code>view advanced help index</code>
+permission can access the advanced help index by navigating to
+<span class="nav">Help » Advanced Help</span>.
+Additional permissions
+<code>view advanced help topic</code>  and
+<code>view advanced help popup</code> allows the user to click
+trough to the actual help pages and popups.</p>
+
+<p>By taking away these permissions from a role, a site can “hide” the
+direct access to these topics and popup.  Note that this does not
+restrict <em>access</em>, as the contents of an unprotected HTML-file
+on a Drupal website can be viewed by anyone who know (or is able to
+guess) its URL.</p>
+
+
+<p>To protect these files, place the following four lines in a file
+named <code>.htaccess</code> in project's <code>help</code> directory:</p>
+
+<pre>
+&lt;Files *\.html&gt;
+Order Allow,Deny
+Deny from all
+&lt;/Files&gt;
+</pre>
+
+<p>It as the responsibility of the site manager to make sure this type
+of protection is in place if the site has help files that merits
+protection from direct access.</p>
+
+<p>See also this tracker in the project's issue queue:  
+<a href="https://www.drupal.org/node/1980936">#1980936 Typing complete path to .html help files in module bypasses user permissions</a>.</p>
+
+<h2 id="search">Search</h2>
+
+<p>To enable advanced help search, navigate to
+<span class="nav">Administration » Configuration » Search and metadata » Search settings</span>.
+Scroll down to <em>Active search modules</em> and tick the box to the
+left of “Advanced help”.  The search form will appear on the top of
+the advanced help index pages.</p>
+
+<p>If the core <strong>Search</strong> module is enabled, the contents
+of the advanced help framework will be indexed on cron. If you enable
+new modules or themes and wish to immediately index their help text,
+navigate to <span class="nav">Reports » Status report</span> and
+click the link “run cron manually”.</p>
+

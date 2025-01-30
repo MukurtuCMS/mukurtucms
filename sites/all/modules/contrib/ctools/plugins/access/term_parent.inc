@@ -15,14 +15,14 @@ $plugin = array(
   'callback' => 'ctools_term_parent_ctools_access_check',
   'default' => array('vid' => array(), 'negate' => 0),
   'settings form' => 'ctools_term_parent_ctools_access_settings',
-  'settings form validation' => 'ctools_term_parent_ctools_access_settings_validate',
+  'settings form validate' => 'ctools_term_parent_ctools_access_settings_validate',
   'settings form submit' => 'ctools_term_parent_ctools_access_settings_submit',
   'summary' => 'ctools_term_parent_ctools_access_summary',
   'required context' => new ctools_context_required(t('Term'), array('taxonomy_term', 'terms')),
 );
 
 /**
- * Settings form for the 'by parent term' access plugin
+ * Settings form for the 'by parent term' access plugin.
  */
 function ctools_term_parent_ctools_access_settings($form, &$form_state, $conf) {
   // If no configuration was saved before, set some defaults.

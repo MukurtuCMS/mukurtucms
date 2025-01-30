@@ -8,7 +8,7 @@
  */
 
 // Adapters
-include_once("lib/adapters/GeoAdapter.class.php"); // Abtract class
+include_once("lib/adapters/GeoAdapter.class.php"); // Abstract class.
 include_once("lib/adapters/GeoJSON.class.php");
 include_once("lib/adapters/WKT.class.php");
 include_once("lib/adapters/EWKT.class.php");
@@ -21,9 +21,9 @@ include_once("lib/adapters/GoogleGeocode.class.php");
 include_once("lib/adapters/GeoHash.class.php");
 
 // Geometries
-include_once("lib/geometry/Geometry.class.php"); // Abtract class
+include_once("lib/geometry/Geometry.class.php"); // Abstract class.
 include_once("lib/geometry/Point.class.php");
-include_once("lib/geometry/Collection.class.php"); // Abtract class
+include_once("lib/geometry/Collection.class.php"); // Abstract class.
 include_once("lib/geometry/LineString.class.php");
 include_once("lib/geometry/MultiPoint.class.php");
 include_once("lib/geometry/Polygon.class.php");
@@ -35,7 +35,7 @@ class geoPHP
 {
 
   static function version() {
-    return '1.1';
+    return '1.2';
   }
 
   // geoPHP::load($data, $type, $other_args);
@@ -45,6 +45,10 @@ class geoPHP
 
     $data = array_shift($args);
     $type = array_shift($args);
+
+    if (empty($data)) {
+      return null;
+    }
 
     $type_map = geoPHP::getAdapterMap();
 
@@ -78,7 +82,7 @@ class geoPHP
     if (!is_array($data)) {
       $result = call_user_func_array(array($processor, "read"), array_merge(array($data), $args));
     }
-    // Data is an array, combine all passed in items into a single geomtetry
+    // Data is an array, combine all passed in items into a single geometry
     else {
       $geoms = array();
       foreach ($data as $item) {
@@ -97,6 +101,7 @@ class geoPHP
       'wkb' =>  'WKB',
       'ewkb' => 'EWKB',
       'json' => 'GeoJSON',
+      'geojson' => 'GeoJSON',
       'kml' =>  'KML',
       'gpx' =>  'GPX',
       'georss' => 'GeoRSS',
@@ -148,7 +153,7 @@ class geoPHP
     // If it's an array of one, then just parse the one
     if (is_array($geometry)) {
       if (empty($geometry)) return FALSE;
-      if (count($geometry) == 1) return geoPHP::geometryReduce($geometry[0]);
+      if (count($geometry) == 1) return geoPHP::geometryReduce(array_shift($geometry));
     }
 
     // If the geometry cannot even theoretically be reduced more, then pass it back
@@ -159,7 +164,7 @@ class geoPHP
       }
     }
 
-    // If it is a mutlti-geometry, check to see if it just has one member
+    // If it is a multi-geometry, check to see if it just has one member
     // If it does, then pass the member, if not, then just pass back the geometry
     if (gettype($geometry) == 'object') {
       $simple_collections = array('MultiPoint','MultiLineString','MultiPolygon');
@@ -233,7 +238,8 @@ class geoPHP
 
     // First char is a tab, space or carriage-return. trim it and try again
     if ($bytes[1] == 9 || $bytes[1] == 10 || $bytes[1] == 32) {
-      return geoPHP::detectFormat(ltrim($input));
+      $ltinput = ltrim($input);
+      return geoPHP::detectFormat($ltinput);
     }
 
     // Detect WKB or EWKB -- first byte is 1 (little endian indicator)

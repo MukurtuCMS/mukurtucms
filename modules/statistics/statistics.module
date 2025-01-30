@@ -74,8 +74,6 @@ function statistics_exit() {
     }
   }
   if (variable_get('statistics_enable_access_log', 0)) {
-    drupal_bootstrap(DRUPAL_BOOTSTRAP_SESSION);
-
     // For anonymous users unicode.inc will not have been loaded.
     include_once DRUPAL_ROOT . '/includes/unicode.inc';
     // Log this page access.
@@ -245,7 +243,7 @@ function statistics_user_delete($account) {
  * Implements hook_cron().
  */
 function statistics_cron() {
-  $statistics_timestamp = variable_get('statistics_day_timestamp', '');
+  $statistics_timestamp = variable_get('statistics_day_timestamp', 0);
 
   if ((REQUEST_TIME - $statistics_timestamp) >= 86400) {
     // Reset day counts.

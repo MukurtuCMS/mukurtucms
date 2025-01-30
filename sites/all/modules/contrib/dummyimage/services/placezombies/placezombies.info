@@ -5,9 +5,9 @@ package = Dummy image
 dependencies[] = dummyimage
 
 
-; Information added by Drupal.org packaging script on 2014-01-13
-version = "7.x-1.5"
+; Information added by Drupal.org packaging script on 2016-03-06
+version = "7.x-1.6"
 core = "7.x"
 project = "dummyimage"
-datestamp = "1389642806"
+datestamp = "1457262243"
 

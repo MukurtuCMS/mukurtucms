@@ -19,8 +19,12 @@ class ViewsHandlerFilterCombineTest extends ViewsSqlTest {
     );
   }
 
-  function setUp() {
-    parent::setUp();
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    parent::setUp($modules);
+
     $this->column_map = array(
       'views_test_name' => 'name',
       'views_test_job' => 'job',
@@ -102,4 +106,5 @@ class ViewsHandlerFilterCombineTest extends ViewsSqlTest {
     unset($schema['views_test']['fields']['job']['not null']);
     return $schema;
   }
+
 }

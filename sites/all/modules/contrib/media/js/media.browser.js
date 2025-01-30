@@ -29,8 +29,10 @@ Drupal.behaviors.MediaBrowser = {
         $(parent_iframe).attr('current_tab', $('#media-tabs-wrapper > ul > li.ui-state-active').index());
       }
     };
+
     var activeTab = Drupal.media.browser.tabFromHash();
-    $('#media-browser-tabset').tabs({
+
+    $('#media-browser-tabset').once('MediaBrowser').tabs({
       selected: activeTab, // jquery < 1.9
       active: activeTab, // jquery >= 1.9
       show: showFunc, // jquery ui < 1.8
@@ -38,12 +40,34 @@ Drupal.behaviors.MediaBrowser = {
     });
 
     $('.media-browser-tab').each( Drupal.media.browser.validateButtons );
+
+    // Keep keyboard focus from going to the browser chrome.
+    $('body', context).once(function () {
+      $(window).bind('keydown', function (event) {
+        if (event.keyCode === 9) {
+          var tabbables = $(':tabbable'),
+              first = tabbables.filter(':first'),
+              last = tabbables.filter(':last'),
+              new_event;
+          if ((event.target === last[0] && !event.shiftKey) || (event.target === first[0] && event.shiftKey)) {
+            // If we're at the end of the tab list, then send a keyboard event
+            // to the parent iframe.
+            if (parent_iframe = Drupal.media.browser.getParentIframe(window)) {
+              $('.ui-dialog-titlebar-close', $(parent_iframe).closest('.ui-dialog')).focus();
+              event.preventDefault();
+              return false;
+            }
+          }
+        }
+      });
+    });
   }
   // Wait for additional params to be passed in.
 };
 
 Drupal.media.browser.getParentIframe = function (window) {
   var arrFrames = parent.document.getElementsByTagName("IFRAME");
+
   for (var i = 0; i < arrFrames.length; i++) {
     if (arrFrames[i].contentWindow === window) {
       return arrFrames[i];
@@ -58,6 +82,7 @@ Drupal.media.browser.tabFromHash = function () {
   if (parent_iframe = Drupal.media.browser.getParentIframe(window)) {
     return $(parent_iframe).attr('current_tab');
   }
+
   return 0;
 };
 

@@ -1,0 +1,226 @@
+/// Start bean
+.bean-hero-image-one-column {
+    .content {
+        position: relative;
+        width: 100%;
+    }
+
+    .field-name-field-hero-image-caption.field-type-text.field-label-hidden {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .field-name-field-hero-image-caption .field-item {
+        top: auto;
+        left: auto;
+        margin: auto;
+        text-align: center;
+        color: #fff;
+        line-height: 1em;
+        font-size: 40px;
+        width: 100%;
+
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            font-size: 60px;
+            width: 80%;
+        }
+
+        // Desktop
+        @media (min-width: @screen-md-min) {
+            font-size: 72px;
+            width: 60%;
+        }
+
+        background: url(@mukurtu-chevron-down-path) no-repeat 0% 50%;
+        background-position: bottom center;
+        padding-bottom: 50px;
+    }
+
+    .field-name-field-hero-image {
+        img {
+            min-height: 225px;
+            width: 100%;
+        }
+    }
+}
+
+.bean-hero-image-two-columns {
+    overflow: hidden;
+
+    .row > div.col-sm-6 {
+        padding: 0px;
+        padding-bottom: 100%;
+        margin-bottom: -100%;
+    }
+
+    .field-name-field-hero-image {
+        img {
+            margin: auto;
+            width: 100%;
+            object-fit: cover;
+        }
+    }
+
+    .row > div:nth-of-type(2) {
+        .primary-color-link-container;
+        height: 100%;
+
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            //padding-bottom: 99999px;
+            //margin-bottom: -99999px;
+        }
+
+        .field-name-field-welcome-title .field-item {
+            .font-light;
+            padding: 50px 20px 10px 20px;
+            color: @mukurtu-panel-pane-text-color;
+            font-size: 40px;
+            text-align: center;
+            line-height: 1;
+
+            // Tablet
+            @media (min-width: @screen-sm-min) {
+                text-align: left;
+            }
+        }
+
+        .field-name-field-welcome-message {
+            padding: 0px 40px 50px 40px;
+            color: #111111;
+            font-size: 16px;
+
+            // Tablet
+            @media (min-width: @screen-sm-min) {
+                padding: 0px 50px 0px 20px;
+            }
+
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                font-size: 17px;
+            }
+
+            .mejs__container,
+            .mejs__controls  {
+                border-radius: 24px;
+            }
+        }
+    }
+}
+
+/// End bean
+.large-hero {
+    .hero-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: #fff;
+        line-height: 1em;
+        font-size: 40px;
+        width: 100%;
+
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            font-size: 60px;
+            width: 80%;
+        }
+
+        // Desktop
+        @media (min-width: @screen-md-min) {
+            font-size: 72px;
+            width: 60%;
+        }
+
+        background: url(@mukurtu-chevron-down-path) no-repeat 0% 50%;
+        background-position: bottom center;
+        padding-bottom: 50px;
+    }
+
+    .hero-image {
+        img {
+            min-height: 225px;
+            width: 100%;
+        }
+    }
+}
+
+.hero-side-by-side {
+    overflow: hidden;
+
+    .hero-left,
+    .hero-right {
+        padding: 0px;
+    }
+
+    .hero-left {
+        img {
+            margin: auto;
+        }
+    }
+
+    .hero-right {
+        .primary-color-link-container;
+        height: 100%;
+
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            padding-bottom: 99999px;
+            margin-bottom: -99999px;
+        }
+
+        .hero-text {
+            .font-light;
+            padding: 50px 20px 10px 20px;
+            color: @mukurtu-panel-pane-text-color;
+            font-size: 40px;
+            text-align: center;
+            line-height: 1;
+
+            // Tablet
+            @media (min-width: @screen-sm-min) {
+                text-align: left;
+            }
+        }
+
+        .hero-welcome {
+            padding: 0px 20px 50px 20px;
+            color: #111111;
+            font-size: 16px;
+
+            // Tablet
+            @media (min-width: @screen-sm-min) {
+                padding: 0px 20px;
+            }
+
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                font-size: 17px;
+            }
+        }
+    }
+}
+
+.front {
+    .main-container {
+        section {
+            .section-shadow;
+            h2 {
+                .font-light;
+                text-align: center;
+                font-size: 35px;
+                color: @text-color;
+                padding-top: 20px;
+                padding-bottom: 10px;
+            }
+        }
+    }
+}

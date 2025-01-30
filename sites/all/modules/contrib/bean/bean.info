@@ -1,0 +1,32 @@
+name = Bean
+description = Create Bean (Block Entities)
+core = 7.x
+package = Bean
+
+; These modules are required.
+dependencies[] = ctools
+dependencies[] = entity
+
+files[] = includes/bean.core.inc
+files[] = includes/bean.info.inc
+files[] = plugins/BeanPlugin.class.php
+files[] = plugins/BeanDefault.class.php
+files[] = includes/translation.handler.bean.inc
+files[] = includes/bean.inline_entity_form.inc
+files[] = views/views_handler_filter_bean_type.inc
+files[] = views/views_handler_field_bean_type.inc
+files[] = views/views_handler_field_bean_edit_link.inc
+files[] = views/views_handler_field_bean_delete_link.inc
+files[] = views/views_handler_field_bean_operations.inc
+
+; Tests.
+files[] = tests/BeanSetup.test
+files[] = tests/BeanTests.test
+files[] = tests/BeanTestPlugins.test
+files[] = tests/BeanUnitTests.test
+
+; Information added by Drupal.org packaging script on 2018-08-09
+version = "7.x-1.13"
+core = "7.x"
+project = "bean"
+datestamp = "1533832989"

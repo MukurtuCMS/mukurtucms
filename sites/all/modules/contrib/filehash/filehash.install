@@ -1,0 +1,86 @@
+<?php
+
+/**
+ * @file
+ * Install and uninstall functions for the filehash module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function filehash_schema() {
+  $schema['filehash'] = array(
+    'description' => 'Store hashes for each uploaded file.',
+    'fields' => array(
+      'fid' => array(
+        'description' => 'Primary key: {file_managed}.fid.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'timestamp' => array(
+        'description' => 'UNIX timestamp for when the hash was generated.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'default' => NULL,
+      ),
+    ),
+    'primary key' => array('fid'),
+    'foreign keys' => array(
+      'fid' => array(
+        'table' => 'file_managed',
+        'columns' => array('fid' => 'fid'),
+      ),
+    ),
+    'indexes' => array(
+      'timestamp' => array('timestamp'),
+    ),
+  );
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function filehash_uninstall() {
+  variable_del('filehash_algos');
+  variable_del('filehash_dedupe');
+  variable_del('filehash_local_only');
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function filehash_requirements($phase) {
+  $requirements = array();
+  if ('runtime' === $phase && preg_grep('/^blake/', filehash_columns())) {
+    $t = get_t();
+    $requirements['filehash_sodium'] = array(
+      'title' => $t('Sodium PHP extension'),
+      'description' => $t('File Hash is configured to use the BLAKE2b hash algorithm, which requires the Sodium PHP extension.'),
+    );
+    if (function_exists('sodium_crypto_generichash_init')) {
+      $requirements['filehash_sodium']['value'] = $t('Enabled');
+      $requirements['filehash_sodium']['severity'] = REQUIREMENT_OK;
+    }
+    else {
+      $requirements['filehash_sodium']['value'] = $t('Not enabled');
+      $requirements['filehash_sodium']['severity'] = REQUIREMENT_WARNING;
+    }
+  }
+  return $requirements;
+}
+
+/**
+ * Add filehash.timestamp column.
+ */
+function filehash_update_7100() {
+  db_add_field('filehash', 'timestamp', array(
+    'description' => 'UNIX timestamp for when the hash was generated.',
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => FALSE,
+    'default' => NULL,
+  ), array('indexes' => array('timestamp' => array('timestamp'))));
+}

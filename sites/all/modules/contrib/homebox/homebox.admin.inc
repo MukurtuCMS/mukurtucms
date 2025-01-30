@@ -48,7 +48,6 @@ function homebox_admin_page($form, &$form_state, $page = FALSE) {
     '#default_value' => $page ? $page->settings['title'] : '',
     '#maxlength' => 64,
     '#required' => TRUE,
-    '#prefix' => theme('advanced_help_topic', array('module' => 'homebox', 'topic' => 'new-page')),
     '#description' => t('The title of the page that will be created.'),
   );
 
@@ -64,8 +63,8 @@ function homebox_admin_page($form, &$form_state, $page = FALSE) {
 
   $form['page']['options']['menu'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Create a menu entry'),
-    '#description' => t('If checked, a menu entry will be created for this page.'),
+    '#title' => t('Visible menu item'),
+    '#description' => t('Can be positioned in <a href="!url">Menus admin</a>.', array('!url' => url('admin/structure/menu'))),
     '#default_value' => $page ? $page->settings['menu'] : 1,
   );
 
@@ -244,7 +243,7 @@ function homebox_admin_page_submit($form, &$form_state) {
     $page->name = $form_state['values']['name'];
 
     // Check to see if imported homebox object is present
-    if ($form_state['values']['import']) {
+    if (!empty($form_state['values']['import'])) {
       $page->settings = $form_state['values']['import']->settings;
     }
     else {
@@ -407,7 +406,7 @@ function homebox_layout($page) {
 
   usort($blocks, '_homebox_block_compare');
 
-  $form = drupal_get_form('homebox_admin_display_form', $blocks, $page, $theme = NULL);
+  $form = drupal_get_form('homebox_admin_display_form', $blocks, $page);
   return drupal_render($form);
 }
 
@@ -432,14 +431,8 @@ function homebox_export_form($form, &$form_state, $page) {
 /**
  * Generate main blocks administration form.
  */
-function homebox_admin_display_form($form, &$form_state, $blocks, $page, $theme = NULL) {
-  global $theme_key, $custom_theme;
-
-  // Add CSS
+function homebox_admin_display_form($form, &$form_state, $blocks, $page) {
   drupal_add_css(drupal_get_path('module', 'block') . '/block.css', array('preprocess' => FALSE));
-
-  // If non-default theme configuration has been selected, set the custom theme.
-  $custom_theme = isset($theme) ? $theme : variable_get('theme_default', 'garland');
 
   $columns = homebox_named_columns($page->settings['regions']);
 
@@ -457,6 +450,18 @@ function homebox_admin_display_form($form, &$form_state, $blocks, $page, $theme 
   // Iterate on each block
   foreach ($blocks as $i => $block) {
     $key = $block['module'] . '_' . $block['delta'];
+
+    // Get default region/column for block
+    if (isset($page->settings['blocks'][$key]['region'])){
+      $column = $page->settings['blocks'][$key]['region'];
+    }
+    else {
+      // Skip not configured blocks to not have an excessive long list of
+      // blocks.
+      $disabled_options[$key] = $block['info'];
+      continue;
+    }
+
     $form[$key]['module'] = array(
       '#type' => 'value',
       '#value' => $block['module'],
@@ -474,15 +479,6 @@ function homebox_admin_display_form($form, &$form_state, $blocks, $page, $theme 
       '#default_value' => $block['weight'],
       '#delta' => $weight_delta,
     );
-
-    // Get default region/column for block
-    if (isset($page->settings['blocks'][$key]['region'])){
-      $column = $page->settings['blocks'][$key]['region'];
-    }
-    else {
-      // If not set assign to <none>
-      $column = HOMEBOX_REGION_NONE;
-    }
 
     $form[$key]['region'] = array(
       '#type' => 'select',
@@ -515,6 +511,12 @@ function homebox_admin_display_form($form, &$form_state, $blocks, $page, $theme 
       '#value' => $block['bid'],
     );
   }
+
+  $form['enable_block'] = array(
+    '#type' => 'select',
+    '#title' => t('Enable block'),
+    '#options' => array(0 => t('- None -')) + $disabled_options,
+  );
 
   $form['name'] = array(
     '#type' => 'value',
@@ -558,6 +560,28 @@ function homebox_admin_display_form_submit($form, &$form_state) {
     }
   }
 
+  if ($form_state['values']['enable_block']) {
+    $blocks = $form_state['build_info']['args'][0];
+    $key = $form_state['values']['enable_block'];
+    foreach ($blocks as $block) {
+      if ($key == ($block['module'] . '_' . $block['delta'])) {
+        break;
+      }
+    }
+    $page->settings['blocks'][$key] = array(
+      'module' => $block['module'],
+      'delta' => $block['delta'],
+      // Always move the enabled block to the first column.
+      'region' => 1,
+      'movable' => (int) $block['movable'],
+      'status' => (int) $block['status'],
+      'open' => (int) $block['open'],
+      'closable' => (int) $block['closable'],
+      'title' => $block['title'],
+      'weight' => (int) $block['weight'],
+    );
+  }
+
   // Save the page
   homebox_save_page($page);
 
@@ -570,7 +594,6 @@ function homebox_admin_display_form_submit($form, &$form_state) {
 
   menu_rebuild();
   drupal_set_message(t('Layout settings have been updated for @page_title.', array('@page_title' => $page->settings['title'])));
-  $form_state['redirect'] = 'admin/structure/homebox';
 }
 
 /**
@@ -621,8 +644,6 @@ function homebox_admin_flush_form_submit(&$form, &$form_state) {
  * @see theme_homebox_admin_display()
  */
 function template_preprocess_homebox_admin_display_form(&$variables) {
-
-  global $theme_key;
   drupal_add_css(drupal_get_path('module', 'homebox') . '/homebox.css', array('type' => 'module', 'media' => 'all', 'preprocess' => TRUE));
 
   // Load page

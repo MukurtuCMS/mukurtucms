@@ -1,0 +1,13 @@
+diff --git a/og_context/og_context.module b/og_context/og_context.module
+index d9f6d7a955d4978231bd0b332549695afb599a77..c21a9274fc8bf9942d873e1892d0545e45d08490 100644
+--- a/og_context/og_context.module
++++ b/og_context/og_context.module
+@@ -74,7 +74,7 @@ function og_context_entity_property_info() {
+  *   $group = $wrapper->og_context__node->value();
+  * @endcode
+  */
+-function og_context_get_properties($data = array(), array $options, $name, $type) {
++function og_context_get_properties($data, array $options, $name, $type) {
+   // Get the entity type form the property name.
+   $group_type = str_replace('og_context__', '', $name);
+   if ($context = og_context($group_type)) {

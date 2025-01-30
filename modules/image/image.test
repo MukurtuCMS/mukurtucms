@@ -31,8 +31,13 @@ class ImageFieldTestCase extends DrupalWebTestCase {
   protected $admin_user;
 
   function setUp() {
-    parent::setUp('image');
-    $this->admin_user = $this->drupalCreateUser(array('access content', 'access administration pages', 'administer site configuration', 'administer content types', 'administer nodes', 'create article content', 'edit any article content', 'delete any article content', 'administer image styles'));
+    $modules = func_get_args();
+    if (isset($modules[0]) && is_array($modules[0])) {
+      $modules = $modules[0];
+    }
+    $modules[] = 'image';
+    parent::setUp($modules);
+    $this->admin_user = $this->drupalCreateUser(array('access content', 'access administration pages', 'administer site configuration', 'administer content types', 'administer nodes', 'create article content', 'edit any article content', 'delete any article content', 'administer image styles', 'administer fields'));
     $this->drupalLogin($this->admin_user);
   }
 
@@ -202,6 +207,22 @@ class ImageStylesPathAndUrlTestCase extends DrupalWebTestCase {
   }
 
   /**
+   * Test that we do not pass an array to drupal_add_http_header.
+   */
+  function testImageContentTypeHeaders() {
+    $files = $this->drupalGetTestFiles('image');
+    $file = array_shift($files);
+    // Copy the test file to private folder.
+    $private_file = file_copy($file, 'private://', FILE_EXISTS_RENAME);
+    // Tell image_module_test module to return the headers we want to test.
+    variable_set('image_module_test_invalid_headers', $private_file->uri);
+    // Invoke image_style_deliver so it will try to set headers.
+    $generated_url = image_style_url($this->style_name, $private_file->uri);
+    $this->drupalGet($generated_url);
+    variable_del('image_module_test_invalid_headers');
+  }
+
+  /**
    * Test image_style_url().
    */
   function _testImageStyleUrlAndPath($scheme, $clean_url = TRUE, $extra_slash = FALSE) {
@@ -269,7 +290,7 @@ class ImageStylesPathAndUrlTestCase extends DrupalWebTestCase {
     $this->assertEqual($this->drupalGetHeader('Content-Length'), $generated_image_info['file_size'], 'Expected Content-Length was reported.');
     if ($scheme == 'private') {
       $this->assertEqual($this->drupalGetHeader('Expires'), 'Sun, 19 Nov 1978 05:00:00 GMT', 'Expires header was sent.');
-      $this->assertEqual($this->drupalGetHeader('Cache-Control'), 'no-cache, must-revalidate, post-check=0, pre-check=0', 'Cache-Control header was set to prevent caching.');
+      $this->assertEqual($this->drupalGetHeader('Cache-Control'), 'no-cache, must-revalidate', 'Cache-Control header was set to prevent caching.');
       $this->assertEqual($this->drupalGetHeader('X-Image-Owned-By'), 'image_module_test', 'Expected custom header has been added.');
 
       // Make sure that a second request to the already existing derivate works
@@ -362,6 +383,11 @@ class ImageStylesPathAndUrlTestCase extends DrupalWebTestCase {
     $directory = $scheme . '://styles/' . $this->style_name . '/' . $scheme . '/' . $this->randomName();
     $this->drupalGet(file_create_url($directory . '/' . $this->randomName()));
     $this->assertFalse(file_exists($directory), 'New directory was not created in the filesystem when requesting an unauthorized image.');
+
+    // Check that requesting a partial image style path returns access denied.
+    $partial_url = $scheme . '://styles/' . $this->style_name . '/';
+    $this->drupalGet(file_create_url($partial_url) . '/');
+    $this->assertResponse(403, 'Access was denied to a partial image style path.');
   }
 }
 
@@ -550,6 +576,10 @@ class ImageAdminStylesUnitTest extends ImageFieldTestCase {
       'description' => 'Tests creation, deletion, and editing of image styles and effects at the UI level.',
       'group' => 'Image',
     );
+  }
+
+  function setUp() {
+    parent::setUp('image_module_test', 'image_module_styles_test');
   }
 
   /**
@@ -820,6 +850,25 @@ class ImageAdminStylesUnitTest extends ImageFieldTestCase {
     $effects = array_values($style['effects']);
     $this->assertEqual($effects[0]['name'], 'image_scale', 'The default effect still exists in the reverted style.');
     $this->assertFalse(array_key_exists(1, $effects), 'The added effect has been removed in the reverted style.');
+
+    // Verify that a new style with the same name as the default one could not
+    // be created.
+    $edit = array(
+      'name' => $style_name,
+      'label' => $style_label,
+    );
+    // The default style is not overriden.
+    $this->drupalPost('admin/config/media/image-styles/add', $edit, t('Create new style'));
+    $this->assertNoRaw(t('Style %name was created.', array('%name' => $style_label)), 'Image style successfully created.');
+    // Override the default.
+    $this->drupalPost($edit_path, array(), t('Override defaults'));
+    $this->assertRaw(t('The %style style has been overridden, allowing you to change its settings.', array('%style' => $style_label)), 'Default image style may be overridden.');
+    // The default style is overriden.
+    $this->drupalPost('admin/config/media/image-styles/add', $edit, t('Create new style'));
+    $this->assertNoRaw(t('Style %name was created.', array('%name' => $style_label)), 'Image style successfully created.');
+    // Revert the image style.
+    $this->drupalPost($revert_path, array(), t('Revert'));
+    drupal_static_reset('image_styles');
   }
 
   /**
@@ -871,6 +920,18 @@ class ImageAdminStylesUnitTest extends ImageFieldTestCase {
 
     $this->drupalGet('node/' . $nid);
     $this->assertRaw(check_plain(image_style_url('thumbnail', $node->{$field_name}[LANGUAGE_NONE][0]['uri'])), format_string('Image displayed using style replacement style.'));
+  }
+
+  /**
+   * Test disabling a module providing an effect in use by an image style.
+   */
+  function testOrphanedEffect() {
+    // This will not check whether anything depends on the module.
+    module_disable(array('image_module_test'), FALSE);
+    $this->drupalGet('admin/config/media/image-styles');
+    $this->assertText('Test Image Style', 'Image style with an orphaned effect displayed in the list of styles.');
+    $image_log = db_query_range('SELECT message FROM {watchdog} WHERE type = :type ORDER BY wid DESC', 0, 1, array(':type' => 'image'))->fetchField();
+    $this->assertEqual('Image style %style_name has an effect %effect_name with no definition.', $image_log, 'A watchdog message was logged for the broken image style effect');
   }
 }
 
@@ -1006,7 +1067,7 @@ class ImageFieldDisplayTestCase extends ImageFieldTestCase {
     $this->drupalGet('node/add/article');
     $this->assertText(t('Files must be less than 50 KB.'), 'Image widget max file size is displayed on article form.');
     $this->assertText(t('Allowed file types: ' . $test_image_extension . '.'), 'Image widget allowed file types displayed on article form.');
-    $this->assertText(t('Images must be between 10x10 and 100x100 pixels.'), 'Image widget allowed resolution displayed on article form.');
+    $this->assertText(t('Images must be at least 10x10 pixels. Images larger than 100x100 pixels will be resized.'), 'Image widget allowed resolution displayed on article form.');
 
     // We have to create the article first and then edit it because the alt
     // and title fields do not display until the image has been attached.
@@ -1149,6 +1210,36 @@ class ImageFieldDisplayTestCase extends ImageFieldTestCase {
     $this->drupalGet('node/' . $node->nid);
     $this->assertRaw($default_output, 'Default private image displayed when no user supplied image is present.');
   }
+
+  /**
+   * Tests the display of image field with the missing FID.
+   */
+  function testMissingImageFieldDisplay() {
+    $field_name = strtolower($this->randomName());
+    $type_name = 'article';
+    $field_settings = array(
+      'display_field' => '1',
+      'display_default' => '1',
+    );
+    $instance_settings = array(
+      'description_field' => '1',
+    );
+    $widget_settings = array();
+    $this->createImageField($field_name, $type_name, $field_settings, $instance_settings, $widget_settings);
+    $images = $this->drupalGetTestFiles('image');
+
+    // Create a new node with the uploaded file.
+    $nid = $this->uploadNodeImage($images[1], $field_name, 'article');
+    // Delete uploaded file from file_managed table.
+    $max_fid_after = db_query('SELECT MAX(fid) AS fid FROM {file_managed}')->fetchField();
+    $uploaded_file = file_load($max_fid_after);
+    file_delete($uploaded_file, TRUE);
+    // Clear field cache.
+    field_cache_clear();
+    // Check the node detail if the file is loaded.
+    $this->drupalGet('node/' . $nid);
+    $this->assertResponse(200);
+  }
 }
 
 /**
@@ -1161,6 +1252,56 @@ class ImageFieldValidateTestCase extends ImageFieldTestCase {
       'description' => 'Tests validation functions such as min/max resolution.',
       'group' => 'Image',
     );
+  }
+
+  /**
+   * Test image validity.
+   */
+  public function testValid() {
+    $image_files = $this->drupalGetTestFiles('image');
+
+    $field_name = strtolower($this->randomName());
+    $this->createImageField($field_name, 'article', array(), array('file_directory' => 'test-upload'));
+    $expected_path = 'public://test-upload';
+
+    // Create a node with a valid image.
+    $node = $this->uploadNodeImage($image_files[0], $field_name, 'article');
+    $this->assertTrue(file_exists($expected_path . '/' . $image_files[0]->filename));
+
+    // Remove the image.
+    $this->drupalPost('node/' . $node . '/edit', array(), t('Remove'));
+    $this->drupalPost(NULL, array(), t('Save'));
+
+    // Get invalid image test files from simpletest.
+    $files = file_scan_directory(drupal_get_path('module', 'simpletest') . '/files', '/invalid-img-.*/');
+    $invalid_image_files = array();
+    foreach ($files as $file) {
+      $invalid_image_files[$file->filename] = $file;
+    }
+
+    // Try uploading a zero-byte image.
+    $zero_size_image = $invalid_image_files['invalid-img-zero-size.png'];
+    $edit = array(
+      'files[' . $field_name . '_' . LANGUAGE_NONE . '_0]' => drupal_realpath($zero_size_image->uri),
+    );
+    $this->drupalPost('node/' . $node . '/edit', $edit, t('Upload'));
+    $this->assertFalse(file_exists($expected_path . '/' . $zero_size_image->filename));
+
+    // Try uploading an invalid image.
+    $invalid_image = $invalid_image_files['invalid-img-test.png'];
+    $edit = array(
+      'files[' . $field_name . '_' . LANGUAGE_NONE . '_0]' => drupal_realpath($invalid_image->uri),
+    );
+    $this->drupalPost('node/' . $node . '/edit', $edit, t('Upload'));
+    $this->assertFalse(file_exists($expected_path . '/' . $invalid_image->filename));
+
+    // Upload a valid image again.
+    $valid_image = $image_files[0];
+    $edit = array(
+      'files[' . $field_name . '_' . LANGUAGE_NONE . '_0]' => drupal_realpath($valid_image->uri),
+    );
+    $this->drupalPost('node/' . $node . '/edit', $edit, t('Upload'));
+    $this->assertTrue(file_exists($expected_path . '/' . $valid_image->filename));
   }
 
   /**
@@ -1196,6 +1337,21 @@ class ImageFieldValidateTestCase extends ImageFieldTestCase {
     $this->assertText(t('The specified file ' . $image_that_is_too_small->filename . ' could not be uploaded. The image is too small; the minimum dimensions are 50x50 pixels.'), 'Node save failed when minimum image resolution was not met.');
     $nid = $this->uploadNodeImage($image_that_is_too_big, $field_name, 'article');
     $this->assertText(t('The image was resized to fit within the maximum allowed dimensions of 100x100 pixels.'), 'Image exceeding max resolution was properly resized.');
+
+    // Verify that image resolution can contain only positive numbers.
+    $edit = array(
+      'instance[settings][max_resolution][x]' => -10,
+      'instance[settings][max_resolution][y]' => -10,
+    );
+    $this->drupalPost('admin/structure/types/manage/article/fields/' . $field_name, $edit, t('Save settings'));
+    $this->assertRaw(t('Height and width values must be positive numbers.'));
+
+    $edit = array(
+      'instance[settings][max_resolution][x]' => 'x',
+      'instance[settings][max_resolution][y]' => 'x',
+    );
+    $this->drupalPost('admin/structure/types/manage/article/fields/' . $field_name, $edit, t('Save settings'));
+    $this->assertRaw(t('Height and width values must be numeric.'));
   }
 }
 
@@ -1951,4 +2107,161 @@ class ImageStyleFlushTest extends ImageFieldTestCase {
     // Post flush, expected no image in the 'private' wrapper.
     $this->assertEqual($this->getImageCount($style, 'private'), 0, format_string('Image style %style flushed correctly for %wrapper wrapper.', array('%style' => $style['name'], '%wrapper' => 'private')));
   }
+
+}
+
+/**
+ * Tests for correct file size, dimensions and HTTP headers after scaling.
+ */
+class ImageStylesHTTPHeadersTestCase extends ImageFieldTestCase {
+
+  /**
+   * Generated style name.
+   *
+   * @var string
+   */
+  protected $styleName;
+
+  /**
+   * ID of generated style.
+   *
+   * @var int
+   */
+  protected $styleId;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Image styles HTTP headers tests',
+      'description' => 'Tests file size, dimensions and HTTP headers of image styles generated with scaling.',
+      'group' => 'Image',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp('image_module_test');
+
+    $this->styleName = 'style_foo_scale';
+    $style = image_style_save(array(
+      'name' => $this->styleName,
+      'label' => $this->randomString(),
+    ));
+    $this->styleId = $style['isid'];
+  }
+
+  /**
+   * Test image_style_url() with a file with public scheme and upscaling.
+   */
+  public function testImageStyleUrlAndPathPublicAndUpscale() {
+    $width = 3600;
+    $height = 2400;
+    $this->_imagestyleUpscale($width, $height);
+    $this->_testImageStyleUrlAndPath('public', $width, $height);
+  }
+
+  /**
+   * Test image_style_url() with a file with private scheme and upscaling.
+   */
+  public function testImageStyleUrlAndPathPrivateAndUpscale() {
+    $width = 3600;
+    $height = 2400;
+    $this->_imagestyleUpscale($width, $height);
+    $this->_testImageStyleUrlAndPath('private', $width, $height);
+  }
+
+  /**
+   * Test image_style_url() with a file with public scheme and downscaling.
+   */
+  public function testImageStyleUrlAndPathPublicAndDownscale() {
+    $width = 180;
+    $height = 120;
+    $this->_imagestyleUpscale($width, $height);
+    $this->_testImageStyleUrlAndPath('public', $width, $height);
+  }
+
+  /**
+   * Test image_style_url() with a file with private scheme and downscaling.
+   */
+  public function testImageStyleUrlAndPathPrivateAndDownscale() {
+    $width = 180;
+    $height = 120;
+    $this->_imagestyleUpscale($width, $height);
+    $this->_testImageStyleUrlAndPath('private', $width, $height);
+  }
+
+  /**
+   * Adding upscale effect to imagestyle.
+   */
+  private function _imagestyleUpscale($width, $height) {
+    // Scale an image that is wider than it is high.
+    $effect = array(
+      'name' => 'image_scale',
+      'data' => array(
+        'width' => $width,
+        'height' => $height,
+        'upscale' => TRUE,
+      ),
+      'isid' => $this->styleId,
+    );
+    image_effect_save($effect);
+  }
+
+  /**
+   * Function to scale and test.
+   */
+  private function _testImageStyleUrlAndPath($scheme, $width, $height) {
+    $directory = $scheme . '://styles/' . $this->styleName;
+    $status = file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+    $this->assertNotIdentical(FALSE, $status, 'Created the directory for the generated images for the test style.');
+
+    // Create an image field that uses the new style.
+    $field_name = strtolower($this->randomName(10));
+    $this->createImageField($field_name, 'article', array('uri_scheme' => $scheme));
+    $instance = field_info_instance('node', $field_name, 'article');
+    $instance['display']['default']['type'] = 'image';
+    $instance['display']['default']['settings']['image_style'] = $this->styleName;
+    field_update_instance($instance);
+
+    // Create a new node with an image attached.
+    $images = $this->drupalGetTestFiles('image');
+    // Taking image no. 6 because Apache sets own
+    // Content-Length if response is smaller than 8000 bytes.
+    $test_image = $images[6];
+    $nid = $this->uploadNodeImage($test_image, $field_name, 'article');
+    $node = node_load($nid);
+
+    // Get image file from created node.
+    $field_items = field_get_items('node', $node, $field_name);
+    $file = file_load($field_items[0]['fid']);
+    $original_uri = $file->uri;
+
+    // Let the image_module_test module know about this file, so it can claim
+    // ownership in hook_file_download().
+    variable_set('image_module_test_file_download', $original_uri);
+
+    // Get the URL of a file that has not been generated and try to create it.
+    $generated_uri = image_style_path($this->styleName, $original_uri);
+    $this->assertFalse(file_exists($generated_uri), 'Generated file does not exist.');
+    $generate_url = image_style_url($this->styleName, $original_uri);
+
+    // Fetch the URL that generates the file.
+    $this->drupalGet($generate_url);
+    $this->assertResponse(200, 'Image was generated at the URL.');
+    $this->assertTrue(file_exists($generated_uri), 'Generated file does exist after we accessed it: ' . $generated_uri);
+
+    // Store generated image info.
+    $generated_image_info = image_get_info($generated_uri);
+
+    // Compare result.
+    $this->assertEqual($this->drupalGetHeader('Content-Type'), $generated_image_info['mime_type'], 'Expected Content-Type was reported.');
+    $this->assertEqual($this->drupalGetHeader('Content-Length'), $generated_image_info['file_size'], 'Expected Content-Length was reported: ' . $generated_image_info['file_size'] . ' vs. ' . $this->drupalGetHeader('Content-Length'));
+    $this->assertEqual($width, $generated_image_info['width'], 'Expected width was reported.');
+    $this->assertEqual($height, $generated_image_info['height'], 'Expected height was reported.');
+  }
+
 }

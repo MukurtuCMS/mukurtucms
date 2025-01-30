@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_culturalprotocol.field_group.inc
@@ -8,7 +9,7 @@
  * Implements hook_field_group_info().
  */
 function ma_culturalprotocol_field_group_info() {
-  $export = array();
+  $field_groups = array();
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -23,10 +24,11 @@ function ma_culturalprotocol_field_group_info() {
     'label' => 'Advanced',
     'weight' => '2',
     'children' => array(
-      0 => 'group_group',
-      1 => 'og_roles_permissions',
-      2 => 'group_register',
-      3 => 'field_protocol_auto_join',
+      0 => 'field_membership_list_options',
+      1 => 'field_protocol_auto_join',
+      2 => 'group_group',
+      3 => 'group_register',
+      4 => 'og_roles_permissions',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -36,10 +38,10 @@ function ma_culturalprotocol_field_group_info() {
         'classes' => '',
         'description' => '',
       ),
-      'formatter' => 'closed',
+      'formatter' => 'open',
     ),
   );
-  $export['group_advanced|node|cultural_protocol_group|form'] = $field_group;
+  $field_groups['group_advanced|node|cultural_protocol_group|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -55,24 +57,26 @@ function ma_culturalprotocol_field_group_info() {
     'weight' => '1',
     'children' => array(
       0 => 'body',
-      1 => 'group_access',
-      2 => 'og_group_ref',
-      3 => 'field_protocol_image',
-      4 => 'field_protocol_image_thumbnail',
-      5 => 'field_protocl_signup_permissions',
-      6 => 'title',
+      1 => 'field_protocl_signup_permissions',
+      2 => 'field_protocol_image',
+      3 => 'field_protocol_image_thumbnail',
+      4 => 'group_access',
+      5 => 'og_group_ref',
+      6 => 'field_dhan_notified_users',
+      7 => 'title',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
-      'formatter' => 'closed',
+      'label' => 'Basic',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => '',
         'required_fields' => 1,
+        'classes' => '',
+        'description' => '',
       ),
+      'formatter' => 'open',
     ),
   );
-  $export['group_basic|node|cultural_protocol_group|form'] = $field_group;
+  $field_groups['group_basic|node|cultural_protocol_group|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -85,7 +89,7 @@ function ma_culturalprotocol_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Tabs',
-    'weight' => '0',
+    'weight' => '1',
     'children' => array(
       0 => 'group_advanced',
       1 => 'group_basic',
@@ -98,7 +102,13 @@ function ma_culturalprotocol_field_group_info() {
       ),
     ),
   );
-  $export['group_tabs|node|cultural_protocol_group|form'] = $field_group;
+  $field_groups['group_tabs|node|cultural_protocol_group|form'] = $field_group;
 
-  return $export;
+  // Translatables
+  // Included for use with string extractors like potx.
+  t('Advanced');
+  t('Basic');
+  t('Tabs');
+
+  return $field_groups;
 }

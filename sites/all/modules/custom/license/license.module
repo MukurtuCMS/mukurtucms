@@ -103,6 +103,9 @@ function license_basic_display($uri, $name, $image, $alt = '', $hover_text = '')
   // The content is the image followed by the name
   $title = theme('image', $image) . '<p>' . $name . '</p>';
 
+  // If there's no popup (CC Labels), the content is the image/name pairing
+  $content = $title;
+
   // Add a popup if there is hover text
   if ($hover_text) {
     require_once drupal_get_path('module', 'popup') . '/includes/popup.api.inc';
@@ -167,11 +170,12 @@ function mukurtu_build_tk_label_text($entity, $license) {
 
 // Build the default TK License Label text based on its URI
 function license_build_default_tk_label_text ($license_uri) {
-  // Scrape the "TK User" section of the license description
-  $desc = file_get_contents($license_uri);
-  preg_match ('/(?<=<p><strong>TK User<\/strong>: |<p><strong>TK User:<\/strong> )(.*)(?=<\/p>)/', $desc, $matches); // In some cases the colon is before the closing strong tag and in other cases after.
-  $tk_user_text = '<p>' . $matches[0] . '</p>';
-  return $tk_user_text;
+    $pattern = '/http:\/\/localcontexts.org\/tk\/([a-z]+)\/.*/';
+    $letter = preg_match($pattern, $license_uri, $matches);
+    $github_url = "https://raw.githubusercontent.com/kimberlycw/Local-Contexts/master/{$matches[1]}/description.txt";
+    $desc = file_get_contents($github_url);
+    $tk_user_text = '<p>' . $desc . '</p>';
+    return $tk_user_text;
 }
 
 /**
@@ -186,6 +190,7 @@ function license_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('license_custom_tk_label_text_form'),
     'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
   );
 
   // Callback that toggles between sitewide and community-level custom TK label text
@@ -197,15 +202,32 @@ function license_menu() {
     'weight' => 100,
   );
 
+  // Callback to export customized TK Labels
+  $items['tk-labels/export'] = array(
+    'title' => 'Export TK Labels',
+    'page callback' => 'license_custom_tk_label_export',
+    'page arguments' => null,
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+    'weight' => 100,
+  );
+
+  $items['tk-labels/export/%'] = array(
+    'title' => 'Export TK Labels',
+    'page callback' => 'license_custom_tk_label_export',
+    'page arguments' => array(2),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+    'weight' => 100,
+  );
+
   return $items;
 }
 
 // Form to customize the TK Label text
 function license_custom_tk_label_text_form ($form, &$form_state) {
-
-  $form['#prefix'] = "<label>Tick a TK label's checkbox to customize its text. Hover over the label to see its default (non-customized) text.</label>";
-
   $form = array_merge ($form, license_custom_tk_label_form_shared());
+  $form['tk_label_export_link']['#prefix'] = "<label>Tick a TK label's checkbox to customize its text. Hover over the label to see its default (non-customized) text.</label>";
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -229,6 +251,24 @@ function license_custom_tk_label_form_shared($community_nid = NULL) {
     'expand' => 'bottom-right',
   );
 
+  $message = [];
+  $message[] = t('The TK Labels are an initiative for <strong>Indigenous communities</strong>. TK Labels allow communities to express local and specific conditions for content consistent with already existing community rules, governance and protocols for using, sharing, and circulating knowledge.');
+  $message[] = t('Customized TK Label text can be included in Mukurtu CMS. To develop customized TK Labels, you will need to use the <a href="@url">Local Contexts Hub</a> which allows community control over customization and delivery to institutions, data repositories and other organizations. Upcoming versions of Mukurtu will support closer integration with the Local Contexts Hub, use of the Local Contexts Hub will be required, and manual entry of customized TK Label text in Mukurtu sites will not be possible.', ['@url' => 'https://localcontextshub.org/']);
+  $message[] = t('Traditional Knowledge and Biocultural Labels, Notices and Template Text ©2015-2023 Local Contexts. All Rights Reserved.');
+
+  $form['usage_message'] = [
+    '#type' => 'item',
+    '#markup' => "<div class=\"lc-usage-message\"><p>{$message[0]}</p>
+    <p>{$message[1]}</p> 
+    <p>{$message[2]}</p><br></div>"
+  ];
+
+  // Export link
+  $form['tk_label_export_link'] = array(
+    '#type' => 'item',
+    '#markup' => l(t("Download Customized TK Labels"), "tk-labels/export/{$community_nid}", array('attributes' => array('class' => array('btn', 'btn-default', 'tk-label-export')))),
+  );
+
   foreach ($tk_labels as $tk_label_uri => $tk_label_name) {
     $tk_label_name_safe = str_replace(' ', '_', $tk_label_name);
     $tk_label_name_safe = str_replace('.', '_', $tk_label_name_safe);
@@ -246,7 +286,7 @@ function license_custom_tk_label_form_shared($community_nid = NULL) {
       $custom_tk_variable_name = 'mukurtu_comm_' . $checkbox_fieldname;
       $customized_comm_tk_labels = variable_get($custom_tk_variable_name);
       $default_checkbox_value = $customized_comm_tk_labels[$community_nid]['custom'];
-      $default_textfield_value = $customized_comm_tk_labels[$community_nid]['text'];
+      $default_textfield_value = isset($customized_comm_tk_labels[$community_nid]['text']) ? $customized_comm_tk_labels[$community_nid]['text'] : '';
     }
 		
 		// Site-wide
@@ -310,4 +350,89 @@ function license_toggle_custom_tk_label_text () {
     variable_set ('mukurtu_use_sitewide_custom_tk_label_text', 1);
   }
   drupal_goto ('dashboard');
+}
+
+// Export customized TK Labels
+// This is super quick and dirty. Long term we should consider switching TK Labels to some sort of entity
+// and using the existing export system.
+function license_custom_tk_label_export($community = NULL) {
+  $prefix = "";
+
+  // Site wide labels
+  if(is_null($community)) {
+    if(user_access('administer site configuration')) {
+      $prefix = 'mukurtu_';
+    } else {
+      return;
+    }
+  } else {
+    // Community labels
+    $node = node_load($community);
+    if(node_access('update', $node)) {
+      $prefix = 'mukurtu_comm_';
+    } else {
+      return;
+    }
+  }
+
+  $rows = array();
+  $rows[] = array('Title', 'Image', 'Description');
+  $tk_labels_info = field_info_field('field_licence_trad');
+  $tk_labels = $tk_labels_info['settings']['allowed_values'];
+
+  foreach ($tk_labels as $tk_label_uri => $tk_label_name) {
+    $tk_label_name_safe = str_replace(' ', '_', $tk_label_name);
+    $tk_label_name_safe = str_replace('.', '_', $tk_label_name_safe);
+    $checkbox_fieldname = 'custom_' . $tk_label_name_safe;
+    $textfield_fieldname = 'customized_' . $tk_label_name_safe;
+
+    // Build url to image
+    $image = license_traditional_build_license_label_uri($tk_label_uri);
+
+    // Get the custom description
+    if(is_null($community)) {
+      $customized = variable_get($prefix . $checkbox_fieldname);
+      if($customized == 1) {
+        $custom_description = variable_get($prefix . $textfield_fieldname);
+        $rows[] = array($tk_label_name, $image, $custom_description);
+      }
+    } else {
+      $stored = variable_get($prefix . $checkbox_fieldname);
+      if(!empty($stored)) {
+        if(isset($stored[$community]['text']) && $stored[$community]['custom'] == 1) {
+          $rows[] = array($tk_label_name, $image, $stored[$community]['text']);
+        }
+      }
+    }
+  }
+
+  // If we have custom labels, save to CSV and download
+  if(!empty($rows)) {
+    _license_download_license_export($rows);
+  }
+}
+
+// Take a CSV array, write it to a temp file, download it
+function _license_download_license_export($export) {
+  $temp_name = drupal_tempnam('temporary://', 'file');
+  $file = fopen($temp_name, "w");
+
+  foreach ($export as $line) {
+    fputcsv($file, $line);
+  }
+
+  fclose($file);
+
+  header('Content-Description: File Transfer');
+  header('Content-Type: application/octet-stream');
+  header('Content-Disposition: attachment; filename=tklabels.csv');
+  header('Content-Transfer-Encoding: binary');
+  header('Expires: 0');
+  header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+  header('Pragma: public');
+  header('Content-Length: ' . filesize($temp_name));
+  ob_clean();
+  flush();
+  readfile($temp_name);
+  exit;  
 }

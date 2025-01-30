@@ -17,7 +17,7 @@ Drupal.behaviors.autocomplete = {
       $($input[0].form).submit(Drupal.autocompleteSubmit);
       $input.parent()
         .attr('role', 'application')
-        .append($('<span class="element-invisible" aria-live="assertive"></span>')
+        .append($('<span class="element-invisible" aria-live="assertive" aria-atomic="true"></span>')
           .attr('id', $input.attr('id') + '-autocomplete-aria-live')
         );
       new Drupal.jsAC($input, acdb[uri]);
@@ -297,8 +297,9 @@ Drupal.ACDB.prototype.search = function (searchString) {
     // encodeURIComponent to allow autocomplete search terms to contain slashes.
     $.ajax({
       type: 'GET',
-      url: db.uri + '/' + Drupal.encodePath(searchString),
+      url: Drupal.sanitizeAjaxUrl(db.uri + '/' + Drupal.encodePath(searchString)),
       dataType: 'json',
+      jsonp: false,
       success: function (matches) {
         if (typeof matches.status == 'undefined' || matches.status != 0) {
           db.cache[searchString] = matches;
@@ -310,7 +311,7 @@ Drupal.ACDB.prototype.search = function (searchString) {
         }
       },
       error: function (xmlhttp) {
-        alert(Drupal.ajaxError(xmlhttp, db.uri));
+        Drupal.displayAjaxError(Drupal.ajaxError(xmlhttp, db.uri));
       }
     });
   }, this.delay);

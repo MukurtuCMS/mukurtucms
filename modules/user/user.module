@@ -304,7 +304,7 @@ class UserController extends DrupalDefaultEntityController {
     $picture_fids = array();
     foreach ($queried_users as $key => $record) {
       $picture_fids[] = $record->picture;
-      $queried_users[$key]->data = unserialize($record->data);
+      $queried_users[$key]->data = unserialize((string) $record->data);
       $queried_users[$key]->roles = array();
       if ($record->uid) {
         $queried_users[$record->uid]->roles[DRUPAL_AUTHENTICATED_RID] = 'authenticated user';
@@ -322,7 +322,7 @@ class UserController extends DrupalDefaultEntityController {
 
     // Add the full file objects for user pictures if enabled.
     if (!empty($picture_fids) && variable_get('user_pictures', 0)) {
-      $pictures = file_load_multiple($picture_fids);
+      $pictures = file_load_multiple(array_filter($picture_fids));
       foreach ($queried_users as $account) {
         if (!empty($account->picture) && isset($pictures[$account->picture])) {
           $account->picture = $pictures[$account->picture];
@@ -418,13 +418,11 @@ function user_load_by_name($name) {
  *
  * @return
  *   A fully-loaded $user object upon successful save or FALSE if the save failed.
- *
- * @todo D8: Drop $edit and fix user_save() to be consistent with others.
  */
 function user_save($account, $edit = array(), $category = 'account') {
   $transaction = db_transaction();
   try {
-    if (!empty($edit['pass'])) {
+    if (isset($edit['pass']) && strlen(trim($edit['pass'])) > 0) {
       // Allow alternate password hashing schemes.
       require_once DRUPAL_ROOT . '/' . variable_get('password_inc', 'includes/password.inc');
       $edit['pass'] = user_hash_password(trim($edit['pass']));
@@ -508,6 +506,8 @@ function user_save($account, $edit = array(), $category = 'account') {
 
       // Do not allow 'uid' to be changed.
       $account->uid = $account->original->uid;
+      // Save current time as last changed time.
+      $account->changed = REQUEST_TIME;
       // Save changes to the user table.
       $success = drupal_write_record('users', $account, 'uid');
       // Restore the picture object.
@@ -579,6 +579,8 @@ function user_save($account, $edit = array(), $category = 'account') {
       if (!isset($account->created)) {
         $account->created = REQUEST_TIME;
       }
+      // Save current time as last changed time.
+      $account->changed = REQUEST_TIME;
       $success = drupal_write_record('users', $account);
       if ($success === FALSE) {
         // On a failed INSERT some other existing user's uid may be returned.
@@ -639,7 +641,7 @@ function user_validate_name($name) {
   if (strpos($name, '  ') !== FALSE) {
     return t('The username cannot contain multiple spaces in a row.');
   }
-  if (preg_match('/[^\x{80}-\x{F7} a-z0-9@_.\'-]/i', $name)) {
+  if (preg_match('/[^\x{80}-\x{F7} a-z0-9@+_.\'-]/i', $name)) {
     return t('The username contains an illegal character.');
   }
   if (preg_match('/[\x{80}-\x{A0}' .         // Non-printable ISO-8859-1 + NBSP
@@ -691,7 +693,12 @@ function user_validate_picture(&$form, &$form_state) {
   $validators = array(
     'file_validate_is_image' => array(),
     'file_validate_image_resolution' => array(variable_get('user_picture_dimensions', '85x85')),
-    'file_validate_size' => array(variable_get('user_picture_file_size', '30') * 1024),
+    'file_validate_size' => array((int) variable_get('user_picture_file_size', '30') * 1024),
+    // file_validate_is_image() uses the image toolkit to validate whether the
+    // file is a valid image type, so set file_validate_extensions to an empty
+    // array in order to signal to file_save_upload() that there is no need to
+    // validate the upload against a default list of file extensions.
+    'file_validate_extensions' => array(),
   );
 
   // Save the file as a temporary file.
@@ -791,7 +798,7 @@ function user_role_permissions($roles = array()) {
  *   (optional) The account to check, if not given use currently logged in user.
  *
  * @return
- *   Boolean TRUE if the current user has the requested permission.
+ *   Boolean TRUE if the user has the requested permission.
  *
  * All permission checks in Drupal should go through this function. This
  * way, we guarantee consistent behavior, and ensure that the superuser
@@ -958,6 +965,8 @@ function user_search_access() {
  */
 function user_search_execute($keys = NULL, $conditions = NULL) {
   $find = array();
+  // Escape for LIKE matching.
+  $keys = db_like($keys);
   // Replace wildcards with MySQL/PostgreSQL wildcards.
   $keys = preg_replace('!\*+!', '%', $keys);
   $query = db_select('users')->extend('PagerDefault');
@@ -967,13 +976,13 @@ function user_search_execute($keys = NULL, $conditions = NULL) {
     // and they don't need to be restricted to only active users.
     $query->fields('users', array('mail'));
     $query->condition(db_or()->
-      condition('name', '%' . db_like($keys) . '%', 'LIKE')->
-      condition('mail', '%' . db_like($keys) . '%', 'LIKE'));
+      condition('name', '%' . $keys . '%', 'LIKE')->
+      condition('mail', '%' . $keys . '%', 'LIKE'));
   }
   else {
     // Regular users can only search via usernames, and we do not show them
     // blocked accounts.
-    $query->condition('name', '%' . db_like($keys) . '%', 'LIKE')
+    $query->condition('name', '%' . $keys . '%', 'LIKE')
       ->condition('status', 1);
   }
   $uids = $query
@@ -1088,13 +1097,16 @@ function user_account_form(&$form, &$form_state) {
       '#description' => t('To change the current user password, enter the new password in both fields.'),
     );
     // To skip the current password field, the user must have logged in via a
-    // one-time link and have the token in the URL.
-    $pass_reset = isset($_SESSION['pass_reset_' . $account->uid]) && isset($_GET['pass-reset-token']) && ($_GET['pass-reset-token'] == $_SESSION['pass_reset_' . $account->uid]);
+    // one-time link and have the token in the URL. Store this in $form_state
+    // so it persists even on subsequent Ajax requests.
+    if (!isset($form_state['user_pass_reset'])) {
+      $form_state['user_pass_reset'] = isset($_SESSION['pass_reset_' . $account->uid]) && isset($_GET['pass-reset-token']) && ($_GET['pass-reset-token'] == $_SESSION['pass_reset_' . $account->uid]);
+    }
     $protected_values = array();
     $current_pass_description = '';
     // The user may only change their own password without their current
     // password if they logged in via a one-time login link.
-    if (!$pass_reset) {
+    if (!$form_state['user_pass_reset']) {
       $protected_values['mail'] = $form['account']['mail']['#title'];
       $protected_values['pass'] = t('Password');
       $request_new = l(t('Request new password'), 'user/password', array('attributes' => array('title' => t('Request new password via e-mail.'))));
@@ -1160,7 +1172,7 @@ function user_account_form(&$form, &$form_state) {
   $form['account']['roles'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Roles'),
-    '#default_value' => (!$register && isset($account->roles) ? array_keys($account->roles) : array()),
+    '#default_value' => (!$register && !empty($account->roles) ? array_keys(array_filter($account->roles)) : array()),
     '#options' => $roles,
     '#access' => $roles && user_access('administer permissions'),
     DRUPAL_AUTHENTICATED_RID => $checkbox_authenticated,
@@ -1230,7 +1242,7 @@ function user_validate_current_pass(&$form, &$form_state) {
     // that prevent them from being empty if they are changed.
     if ((strlen(trim($form_state['values'][$key])) > 0) && ($form_state['values'][$key] != $account->$key)) {
       require_once DRUPAL_ROOT . '/' . variable_get('password_inc', 'includes/password.inc');
-      $current_pass_failed = empty($form_state['values']['current_pass']) || !user_check_password($form_state['values']['current_pass'], $account);
+      $current_pass_failed = strlen(trim($form_state['values']['current_pass'])) == 0 || !user_check_password($form_state['values']['current_pass'], $account);
       if ($current_pass_failed) {
         form_set_error('current_pass', t("Your current password is missing or incorrect; it's required to change the %name.", array('%name' => $name)));
         form_set_error($key);
@@ -1271,7 +1283,12 @@ function user_account_form_validate($form, &$form_state) {
     elseif ((bool) db_select('users')->fields('users', array('uid'))->condition('uid', $account->uid, '<>')->condition('mail', db_like($form_state['values']['mail']), 'LIKE')->range(0, 1)->execute()->fetchField()) {
       // Format error message dependent on whether the user is logged in or not.
       if ($GLOBALS['user']->uid) {
-        form_set_error('mail', t('The e-mail address %email is already taken.', array('%email' => $form_state['values']['mail'])));
+        // Do not fail the validation if user has not changed e-mail address.
+        // This means that multiple accounts with the same e-mail address exist
+        // and the logged-in user is one of them.
+        if ((isset($account->mail) && $account->mail != $mail) || !isset($account->mail)) {
+          form_set_error('mail', t('The e-mail address %email is already taken.', array('%email' => $form_state['values']['mail'])));
+        }
       }
       else {
         form_set_error('mail', t('The e-mail address %email is already registered. <a href="@password">Have you forgotten your password?</a>', array('%email' => $form_state['values']['mail'], '@password' => url('user/password'))));
@@ -1306,10 +1323,12 @@ function user_user_presave(&$edit, $account, $category) {
     elseif (!empty($edit['picture_delete'])) {
       $edit['picture'] = NULL;
     }
-    // Prepare user roles.
-    if (isset($edit['roles'])) {
-      $edit['roles'] = array_filter($edit['roles']);
-    }
+  }
+
+  // Filter out roles with empty values to avoid granting extra roles when
+  // processing custom form submissions.
+  if (isset($edit['roles'])) {
+    $edit['roles'] = array_filter($edit['roles']);
   }
 
   // Move account cancellation information into $user->data.
@@ -1751,9 +1770,11 @@ function user_menu() {
 
   $items['admin/people/create'] = array(
     'title' => 'Add user',
+    'page callback' => 'user_admin',
     'page arguments' => array('create'),
     'access arguments' => array('administer users'),
     'type' => MENU_LOCAL_ACTION,
+    'file' => 'user.admin.inc',
   );
 
   // Administration pages.
@@ -2161,7 +2182,7 @@ function user_login_name_validate($form, &$form_state) {
  */
 function user_login_authenticate_validate($form, &$form_state) {
   $password = trim($form_state['values']['pass']);
-  if (!empty($form_state['values']['name']) && !empty($password)) {
+  if (!empty($form_state['values']['name']) && strlen(trim($password)) > 0) {
     // Do not allow any login from the current user's IP if the limit has been
     // reached. Default is 50 failed attempts allowed in one hour. This is
     // independent of the per-user limit to catch attempts from one IP to log
@@ -2218,14 +2239,20 @@ function user_login_final_validate($form, &$form_state) {
     if (isset($form_state['flood_control_triggered'])) {
       if ($form_state['flood_control_triggered'] == 'user') {
         form_set_error('name', format_plural(variable_get('user_failed_login_user_limit', 5), 'Sorry, there has been more than one failed login attempt for this account. It is temporarily blocked. Try again later or <a href="@url">request a new password</a>.', 'Sorry, there have been more than @count failed login attempts for this account. It is temporarily blocked. Try again later or <a href="@url">request a new password</a>.', array('@url' => url('user/password'))));
+        module_invoke_all('user_flood_control', ip_address(), $form_state['values']['name']);
       }
       else {
         // We did not find a uid, so the limit is IP-based.
         form_set_error('name', t('Sorry, too many failed login attempts from your IP address. This IP address is temporarily blocked. Try again later or <a href="@url">request a new password</a>.', array('@url' => url('user/password'))));
+        module_invoke_all('user_flood_control', ip_address());
       }
+      // We cannot call drupal_access_denied() here as that can result in an
+      // infinite loop if the login form is rendered on the 403 page (e.g. in a
+      // block). So add the 403 header and allow form processing to finish.
+      drupal_add_http_header('Status', '403 Forbidden');
     }
     else {
-      form_set_error('name', t('Sorry, unrecognized username or password. <a href="@password">Have you forgotten your password?</a>', array('@password' => url('user/password', array('query' => array('name' => $form_state['values']['name']))))));
+      form_set_error('name', t('Sorry, unrecognized username or password. <a href="@password">Have you forgotten your password?</a>', array('@password' => url('user/password'))));
       watchdog('user', 'Login attempt failed for %user.', array('%user' => $form_state['values']['name']));
     }
   }
@@ -2233,6 +2260,23 @@ function user_login_final_validate($form, &$form_state) {
     // Clear past failures for this user so as not to block a user who might
     // log in and out more than once in an hour.
     flood_clear_event('failed_login_attempt_user', $form_state['flood_control_user_identifier']);
+  }
+}
+
+/**
+ * Implements hook_user_flood_control().
+ */
+function user_user_flood_control($ip, $username = FALSE) {
+  if (variable_get('log_user_flood_control', TRUE)) {
+    if (!empty($username)) {
+      watchdog('user', 'Flood control blocked login attempt for %user from %ip.', array(
+        '%user' => $username,
+        '%ip' => $ip
+      ));
+    }
+    else {
+      watchdog('user', 'Flood control blocked login attempt from %ip.', array('%ip' => $ip));
+    }
   }
 }
 
@@ -2248,7 +2292,7 @@ function user_login_final_validate($form, &$form_state) {
  */
 function user_authenticate($name, $password) {
   $uid = FALSE;
-  if (!empty($name) && !empty($password)) {
+  if (!empty($name) && strlen(trim($password)) > 0) {
     $account = user_load_by_name($name);
     if ($account) {
       // Allow alternate password hashing schemes.
@@ -2273,12 +2317,12 @@ function user_authenticate($name, $password) {
  * The function records a watchdog message about the new session, saves the
  * login timestamp, calls hook_user_login(), and generates a new session.
  *
- * @param array $edit
- *   The array of form values submitted by the user.
+ * @param array $form_state
+ *   A keyed array containing the current state of the login form.
  *
  * @see hook_user_login()
  */
-function user_login_finalize(&$edit = array()) {
+function user_login_finalize(&$form_state = array()) {
   global $user;
   watchdog('user', 'Session opened for %name.', array('%name' => $user->name));
   // Update the user table timestamp noting user has logged in.
@@ -2290,11 +2334,12 @@ function user_login_finalize(&$edit = array()) {
     ->execute();
 
   // Regenerate the session ID to prevent against session fixation attacks.
-  // This is called before hook_user in case one of those functions fails
-  // or incorrectly does a redirect which would leave the old session in place.
+  // This is called before hook_user_login() in case one of those functions
+  // fails or incorrectly does a redirect which would leave the old session in
+  // place.
   drupal_session_regenerate();
 
-  user_module_invoke('login', $edit, $user);
+  user_module_invoke('login', $form_state, $user);
 }
 
 /**
@@ -2355,7 +2400,7 @@ function user_external_login_register($name, $module) {
  */
 function user_pass_reset_url($account) {
   $timestamp = REQUEST_TIME;
-  return url("user/reset/$account->uid/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid), array('absolute' => TRUE));
+  return url("user/reset/$account->uid/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid, $account->mail), array('absolute' => TRUE));
 }
 
 /**
@@ -2377,7 +2422,7 @@ function user_pass_reset_url($account) {
  */
 function user_cancel_url($account) {
   $timestamp = REQUEST_TIME;
-  return url("user/$account->uid/cancel/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid), array('absolute' => TRUE));
+  return url("user/$account->uid/cancel/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid, $account->mail), array('absolute' => TRUE));
 }
 
 /**
@@ -2399,11 +2444,13 @@ function user_cancel_url($account) {
  *   The UNIX timestamp of the user's last login.
  * @param int $uid
  *   The user ID of the user account.
+ * @param string $mail
+ *   The e-mail address of the user.
  *
  * @return
  *   A string that is safe for use in URLs and SQL statements.
  */
-function user_pass_rehash($password, $timestamp, $login, $uid) {
+function user_pass_rehash($password, $timestamp, $login, $uid, $mail = '') {
   // Backwards compatibility: Try to determine a $uid if one was not passed.
   // (Since $uid is a required parameter to this function, a PHP warning will
   // be generated if it's not provided, which is an indication that the calling
@@ -2423,7 +2470,14 @@ function user_pass_rehash($password, $timestamp, $login, $uid) {
     }
   }
 
-  return drupal_hmac_base64($timestamp . $login . $uid, drupal_get_hash_salt() . $password);
+  // Backwards compatibility: If the $mail parameter is not provided, load it
+  // from the user object.
+  if (empty($mail)) {
+    $account = user_load($uid);
+    $mail = $account->mail;
+  }
+
+  return drupal_hmac_base64($timestamp . ':' . $login . ':' . $uid . ':' . $mail, drupal_get_hash_salt() . $password);
 }
 
 /**
@@ -3663,12 +3717,7 @@ function user_form_process_password_confirm($element) {
   );
 
   $element['#attached']['js'][] = drupal_get_path('module', 'user') . '/user.js';
-  // Ensure settings are only added once per page.
-  static $already_added = FALSE;
-  if (!$already_added) {
-    $already_added = TRUE;
-    $element['#attached']['js'][] = array('data' => $js_settings, 'type' => 'setting');
-  }
+  $element['#attached']['js'][] = array('data' => $js_settings, 'type' => 'setting');
 
   return $element;
 }
@@ -3724,6 +3773,12 @@ function user_action_info() {
       'configurable' => FALSE,
       'triggers' => array('any'),
     ),
+    'user_unblock_user_action' => array(
+      'label' => t('Unblock current user'),
+      'type' => 'user',
+      'configurable' => FALSE,
+      'triggers' => array('any'),
+     ),
   );
 }
 
@@ -3755,6 +3810,43 @@ function user_block_user_action(&$entity, $context = array()) {
   $account = user_load($uid);
   $account = user_save($account, array('status' => 0));
   watchdog('action', 'Blocked user %name.', array('%name' => $account->name));
+}
+
+/**
+ * Unblocks a specific user or the current user, if one is not specified.
+ *
+ * @param $entity
+ *   (optional) An entity object; if it is provided and it has a uid property,
+ *   the user with that ID is unblocked.
+ * @param $context
+ *   (optional) An associative array; if no user ID is found in $entity, the
+ *   'uid' element of this array determines the user to unblock.
+ *
+ * @ingroup actions
+ */
+function user_unblock_user_action(&$entity, $context = array()) {
+  // First priority: If there is a $entity->uid, unblock that user.
+  // This is most likely a user object or the author if a node or comment.
+  if (isset($entity->uid)) {
+    $uid = $entity->uid;
+  }
+  elseif (isset($context['uid'])) {
+    $uid = $context['uid'];
+  }
+  // If neither of those are valid, then unblock the current user.
+  else {
+    $uid = $GLOBALS['user']->uid;
+  }
+
+  // The anonymous user should not be unblocked.
+  if ($uid == 0) {
+    watchdog('action', 'Anonymous user should not be unblocked.', array(), WATCHDOG_WARNING);
+    return;
+  }
+
+  $account = user_load($uid);
+  $account = user_save($account, array('status' => 1));
+  watchdog('action', 'Unblocked user %name.', array('%name' => $account->name));
 }
 
 /**

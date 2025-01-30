@@ -9,6 +9,7 @@ function mukurtu_install_tasks($install_state) {
     'mukurtu_set_misc_vars' => array(),
     'mukurtu_set_theme' => array(),
     'mukurtu_create_default_boxes' => array(),
+    'mukurtu_resolve_dependencies' => array(),
     'mukurtu_revert_features' => array(
       'display_name' => st('Finalize configuration'),
     ),
@@ -16,10 +17,14 @@ function mukurtu_install_tasks($install_state) {
     'mukurtu_default_tax_terms' => array(),
     'mukurtu_default_menu_links' => array(),
     'mukurtu_create_default_pages' => array(),
-    'mukurtu_create_default_contexts' => array(),
+    //    'mukurtu_create_default_contexts' => array(),
     'mukurtu_set_permissions' => array(),
     'mukurtu_set_scald_drawer_thumbnails' => array(),
     'mukurtu_delete_og_roles' => array(),
+    'mukurtu_cycle_search_api' => array(),
+    'mukurtu_revert_features' => array(),
+    'mukurtu_create_default_content' => array(),
+    'mukurtu_revert_features' => array(),
 //    'mukurtu_client_form' => array(
 //      'display_name' => st('Setup Client'),
 //      'type' => 'form',
@@ -40,8 +45,8 @@ function mukurtu_set_misc_vars () {
 }
 
 function mukurtu_set_theme () {
-  theme_enable (array('mukurtu_starter'));
-  variable_set ('theme_default', 'mukurtu_starter');
+  theme_enable(array('bootstrap', 'mukurtu', 'mukurtu_starter'));
+  variable_set ('theme_default', 'mukurtu');
   theme_disable (array('bartik', 'seven'));
 }
 
@@ -79,11 +84,22 @@ function mukurtu_create_default_boxes() {
 
 }
 
+function mukurtu_resolve_dependencies() {
+    // Long term the community_tags module will probably be removed.
+    // We have removed it as a dependency from the Mukurtu features now, which
+    // allows sites to disable the module if they prefer. Here we enable the
+    // module as part of new installs for the sake of consistency.
+    module_enable(array('ma_dictionary'));
+}
+
 function mukurtu_revert_features () {
   features_revert_module('ma_search_api'); // First revert search_api to get the node index
   features_revert(); // Revert all features
+  drupal_get_messages();
   features_revert(); // Revert all features a second time, for any straggling components
+  drupal_get_messages();
 }
+
 function mukurtu_rebuild_permissions () {
   node_access_rebuild();
 }
@@ -91,7 +107,7 @@ function mukurtu_rebuild_permissions () {
 function mukurtu_default_tax_terms () {
   $taxonomy = array(
     'category' => array(
-      'General',
+      'Default',
     ),
   );
   foreach ($taxonomy as $vocabulary_name => $terms) {
@@ -126,6 +142,25 @@ function mukurtu_default_menu_links () {
   );
   menu_link_save($item);
 
+  $item = array(
+    'link_path' => 'browse',
+    'link_title' => 'Browse',
+    'menu_name' => 'menu-browse-menu',
+    'weight' => -43,
+    'expanded' => 0,
+    'customized' => 1,
+  );
+  menu_link_save($item);
+
+  $item = array(
+    'link_path' => 'dictionary',
+    'link_title' => 'Browse Dictionary',
+    'menu_name' => 'menu-browse-menu',
+    'weight' => -40,
+    'expanded' => 0,
+    'customized' => 1,
+  );
+  menu_link_save($item);
 }
 
 function mukurtu_set_permissions () {
@@ -203,7 +238,7 @@ function mukurtu_create_default_contexts () {
 
   // frontpage context
   $context = new stdClass();
-  $context->disabled = FALSE; /* Edit this to true to make a default context disabled initially */
+  $context->disabled = TRUE; /* Edit this to true to make a default context disabled initially */
   $context->api_version = 3;
   $context->name = 'front_page';
   $context->description = '';
@@ -235,6 +270,35 @@ function mukurtu_create_default_contexts () {
   );
   $context->condition_mode = 0;
   context_save ($context);
+}
+
+function mukurtu_cycle_search_api() {
+    // Disable Search API then revert the ma_search_api feature
+    if(module_exists('search_api')) {
+        $result = search_api_server_disable('search_api_db_server');
+        if($result) {
+            $feature = features_get_features('ma_search_api');
+            if(isset($feature->info)) {
+                $components = array_keys($feature->info['features']);
+                features_revert(array('ma_search_api' => $components));
+            }
+        }
+    }
+}
+
+function mukurtu_create_default_content() {
+  // Cycle the theme feature.
+  features_revert_module('ma_base_theme');
+
+  // Create frontpage beans.
+  _ma_base_theme_create_default_beans();
+
+  // Cycle the theme feature.
+  features_revert_module('ma_base_theme');
+
+  // Set default browse mode.
+  _ma_base_theme_set_default_browse('digital-heritage');
+
 }
 
 //function mukurtu_client_form() {

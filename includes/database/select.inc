@@ -883,13 +883,17 @@ class SelectQuery extends Query implements SelectQueryInterface {
    *   'type' => $join_type (one of INNER, LEFT OUTER, RIGHT OUTER),
    *   'table' => $table,
    *   'alias' => $alias_of_the_table,
-   *   'condition' => $condition_clause_on_which_to_join,
+   *   'condition' => $join_condition (string or Condition object),
    *   'arguments' => $array_of_arguments_for_placeholders_in_the condition.
    *   'all_fields' => TRUE to SELECT $alias.*, FALSE or NULL otherwise.
    * )
    *
    * If $table is a string, it is taken as the name of a table. If it is
    * a SelectQuery object, it is taken as a subquery.
+   *
+   * If $join_condition is a Condition object, any arguments should be
+   * incorporated into the object; a separate array of arguments does not need
+   * to be provided.
    *
    * @var array
    */
@@ -941,6 +945,20 @@ class SelectQuery extends Query implements SelectQueryInterface {
   protected $range;
 
   /**
+   * The query metadata for alter purposes.
+   *
+   * @var array
+   */
+  public $alterMetaData;
+
+  /**
+   * The query tags.
+   *
+   * @var array
+   */
+  public $alterTags;
+
+  /**
    * An array whose elements specify a query to UNION, and the UNION type. The
    * 'type' key may be '', 'ALL', or 'DISTINCT' to represent a 'UNION',
    * 'UNION ALL', or 'UNION DISTINCT' statement, respectively.
@@ -964,7 +982,7 @@ class SelectQuery extends Query implements SelectQueryInterface {
    */
   protected $forUpdate = FALSE;
 
-  public function __construct($table, $alias = NULL, DatabaseConnection $connection, $options = array()) {
+  public function __construct($table, $alias, DatabaseConnection $connection, $options = array()) {
     $options['return'] = Database::RETURN_STATEMENT;
     parent::__construct($connection, $options);
     $this->where = new DatabaseCondition('AND');
@@ -1028,6 +1046,10 @@ class SelectQuery extends Query implements SelectQueryInterface {
       if ($table['table'] instanceof SelectQueryInterface) {
         $args += $table['table']->arguments();
       }
+      // If the join condition is an object, grab its arguments recursively.
+      if (!empty($table['condition']) && $table['condition'] instanceof QueryConditionInterface) {
+        $args += $table['condition']->arguments();
+      }
     }
 
     foreach ($this->expressions as $expression) {
@@ -1079,6 +1101,10 @@ class SelectQuery extends Query implements SelectQueryInterface {
       if ($table['table'] instanceof SelectQueryInterface) {
         $table['table']->compile($connection, $queryPlaceholder);
       }
+      // Make sure join conditions are also compiled.
+      if (!empty($table['condition']) && $table['condition'] instanceof QueryConditionInterface) {
+        $table['condition']->compile($connection, $queryPlaceholder);
+      }
     }
 
     // If there are any dependent queries to UNION, compile it recursively.
@@ -1096,6 +1122,11 @@ class SelectQuery extends Query implements SelectQueryInterface {
       // If this table is a subquery, check its status recursively.
       if ($table['table'] instanceof SelectQueryInterface) {
         if (!$table['table']->compiled()) {
+          return FALSE;
+        }
+      }
+      if (!empty($table['condition']) && $table['condition'] instanceof QueryConditionInterface) {
+        if (!$table['condition']->compiled()) {
           return FALSE;
         }
       }
@@ -1231,6 +1262,21 @@ class SelectQuery extends Query implements SelectQueryInterface {
 
     // Modules may alter all queries or only those having a particular tag.
     if (isset($this->alterTags)) {
+      // Many contrib modules assume that query tags used for access-checking
+      // purposes follow the pattern $entity_type . '_access'. But this is
+      // not the case for taxonomy terms, since core used to add term_access
+      // instead of taxonomy_term_access to its queries. Provide backwards
+      // compatibility by adding both tags here instead of attempting to fix
+      // all contrib modules in a coordinated effort.
+      // TODO:
+      // - Extract this mechanism into a hook as part of a public (non-security)
+      //   issue.
+      // - Emit E_USER_DEPRECATED if term_access is used.
+      //   https://www.drupal.org/node/2575081
+      $term_access_tags = array('term_access' => 1, 'taxonomy_term_access' => 1);
+      if (array_intersect_key($this->alterTags, $term_access_tags)) {
+        $this->alterTags += $term_access_tags;
+      }
       $hooks = array('query');
       foreach ($this->alterTags as $tag => $value) {
         $hooks[] = 'query_' . $tag;
@@ -1489,7 +1535,14 @@ class SelectQuery extends Query implements SelectQueryInterface {
     // the query will be executed, it will be recompiled using the proper
     // placeholder generator anyway.
     if (!$this->compiled()) {
-      $this->compile($this->connection, $this);
+      try {
+        $this->compile($this->connection, $this);
+      }
+      // PHP does not allow exceptions to be thrown in __toString(), so trigger
+      // a fatal error instead.
+      catch (InvalidQueryConditionOperatorException $e) {
+        drupal_trigger_fatal_error($e->getMessage());
+      }
     }
 
     // Create a sanitized comment string to prepend to the query.
@@ -1505,13 +1558,16 @@ class SelectQuery extends Query implements SelectQueryInterface {
     $fields = array();
     foreach ($this->tables as $alias => $table) {
       if (!empty($table['all_fields'])) {
-        $fields[] = $this->connection->escapeTable($alias) . '.*';
+        $fields[] = $this->connection->escapeAlias($alias) . '.*';
       }
     }
     foreach ($this->fields as $alias => $field) {
+      // Note that $field['table'] holds the table alias.
+      // @see \SelectQuery::addField
+      $table = isset($field['table']) ? $this->connection->escapeAlias($field['table']) . '.' : '';
       // Always use the AS keyword for field aliases, as some
       // databases require it (e.g., PostgreSQL).
-      $fields[] = (isset($field['table']) ? $this->connection->escapeTable($field['table']) . '.' : '') . $this->connection->escapeField($field['field']) . ' AS ' . $this->connection->escapeAlias($field['alias']);
+      $fields[] = $table . $this->connection->escapeField($field['field']) . ' AS ' . $this->connection->escapeAlias($field['alias']);
     }
     foreach ($this->expressions as $alias => $expression) {
       $fields[] = $expression['expression'] . ' AS ' . $this->connection->escapeAlias($expression['alias']);
@@ -1540,10 +1596,10 @@ class SelectQuery extends Query implements SelectQueryInterface {
 
       // Don't use the AS keyword for table aliases, as some
       // databases don't support it (e.g., Oracle).
-      $query .=  $table_string . ' ' . $this->connection->escapeTable($table['alias']);
+      $query .=  $table_string . ' ' . $this->connection->escapeAlias($table['alias']);
 
       if (!empty($table['condition'])) {
-        $query .= ' ON ' . $table['condition'];
+        $query .= ' ON ' . (string) $table['condition'];
       }
     }
 
@@ -1562,6 +1618,14 @@ class SelectQuery extends Query implements SelectQueryInterface {
     if (count($this->having)) {
       // There is an implicit string cast on $this->having.
       $query .= "\nHAVING " . $this->having;
+    }
+
+    // UNION is a little odd, as the select queries to combine are passed into
+    // this query, but syntactically they all end up on the same level.
+    if ($this->union) {
+      foreach ($this->union as $union) {
+        $query .= ' ' . $union['type'] . ' ' . (string) $union['query'];
+      }
     }
 
     // ORDER BY
@@ -1583,14 +1647,6 @@ class SelectQuery extends Query implements SelectQueryInterface {
       $query .= "\nLIMIT " . (int) $this->range['length'] . " OFFSET " . (int) $this->range['start'];
     }
 
-    // UNION is a little odd, as the select queries to combine are passed into
-    // this query, but syntactically they all end up on the same level.
-    if ($this->union) {
-      foreach ($this->union as $union) {
-        $query .= ' ' . $union['type'] . ' ' . (string) $union['query'];
-      }
-    }
-
     if ($this->forUpdate) {
       $query .= ' FOR UPDATE';
     }
@@ -1599,6 +1655,8 @@ class SelectQuery extends Query implements SelectQueryInterface {
   }
 
   public function __clone() {
+    parent::__clone();
+
     // On cloning, also clone the dependent objects. However, we do not
     // want to clone the database connection object as that would duplicate the
     // connection itself.
@@ -1607,6 +1665,11 @@ class SelectQuery extends Query implements SelectQueryInterface {
     $this->having = clone($this->having);
     foreach ($this->union as $key => $aggregate) {
       $this->union[$key]['query'] = clone($aggregate['query']);
+    }
+    foreach ($this->tables as $alias => $table) {
+      if ($table['table'] instanceof SelectQueryInterface) {
+        $this->tables[$alias]['table'] = clone $table['table'];
+      }
     }
   }
 }

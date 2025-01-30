@@ -1,0 +1,25 @@
+From 3364dadf7a2442c8cfad350c3542ae5209c70cdd Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Tue, 13 Dec 2016 13:50:39 -0800
+Subject: [PATCH] Respect quoted strings in Soundcloud tags
+
+---
+ scald_soundcloud.module | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scald_soundcloud.module b/scald_soundcloud.module
+index 3553b17..18ba851 100644
+--- a/scald_soundcloud.module
++++ b/scald_soundcloud.module
+@@ -183,7 +183,7 @@ function scald_soundcloud_audio($id) {
+   }
+
+   // Tags
+-  $info->tags = explode(" ", $data->tag_list);
++  $info->tags = str_getcsv($data->tag_list, ' ');
+   // License
+   $info->license = 'SC';
+
+--
+2.1.4
+

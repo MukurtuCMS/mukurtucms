@@ -1,0 +1,345 @@
+<?php
+/**
+ * @file
+ * Features export for date components.
+ *
+ *  - 'date_format_types': Hooks 'date_format_types_features_revert()' and
+ *    'date_format_types_features_rebuild()' should be managed by
+ *    'hook_date_format_types()'.
+ *  - 'locale_date_format': Localized date formats.
+ *  - 'custom_date_formats': These formats can be deleted via gui and can be
+ *    used in all date format types.
+ */
+
+/**
+ * Implements hook_features_api().
+ */
+function fe_date_features_api() {
+  $components['fe_date_date_format_types'] = array(
+    'name' => t('Date format types'),
+    'feature_source' => TRUE,
+    'default_hook' => 'date_format_types',
+    'default_file' => FEATURES_DEFAULTS_INCLUDED_COMMON,
+  );
+
+  $components['fe_date_custom_date_formats'] = array(
+    'name' => t('Custom date formats'),
+    'feature_source' => TRUE,
+    'default_hook' => 'fe_date_custom_date_formats',
+    'default_file' => FEATURES_DEFAULTS_INCLUDED_COMMON,
+  );
+
+  if (module_exists('locale')) {
+    $components['fe_date_locale_date_format'] = array(
+      'name' => t('Locale date format'),
+      'feature_source' => TRUE,
+      'default_hook' => 'fe_date_locale_date_format',
+      'default_file' => FEATURES_DEFAULTS_INCLUDED_COMMON,
+    );
+  }
+
+  return $components;
+}
+
+/**
+ * Implements hook_features_export_options().
+ */
+function fe_date_date_format_types_features_export_options() {
+  $options = array();
+  $format_types = system_get_date_types();
+  foreach ($format_types as $type => $format_type) {
+    $options[$type] = $format_type['title'];
+  }
+
+  return $options;
+}
+
+/**
+ * Implements hook_features_export().
+ */
+function fe_date_date_format_types_features_export($data, &$export, $module_name = '') {
+  $export['dependencies']['fe_date'] = 'fe_date';
+  $pipe = array('variable' => array());
+  $map_variable = features_get_default_map('variable');
+  $map_custom_formats = features_get_default_map('fe_date_custom_date_formats');
+  $map_date_format_types = features_get_default_map('fe_date_date_format_types');
+  foreach ($data as $type) {
+    // Only add format type to export, if it is available.
+    if (system_get_date_types($type)) {
+      $variable = 'date_format_' . $type;
+
+      // Add a dependency when the variable already in a feature but not by use.
+      if (isset($map_variable[$variable]) && $map_variable[$variable] != $module_name) {
+        $export['dependencies'][$map_variable[$variable]] = $map_variable[$variable];
+      }
+      else {
+        // Add strongarm variable for given default date format for this type.
+        $pipe['variable'][$variable] = $variable;
+      }
+
+      $default_format = _fe_date_get_default_format($type);
+
+      // Add a dependency when the default date format is a custom date format
+      // and already in a feature but not by use.
+      if (isset($map_custom_formats[$default_format]) && $map_custom_formats[$default_format] != $module_name) {
+        $export['dependencies'][$map_custom_formats[$default_format]] = $map_custom_formats[$default_format];
+      }
+      else {
+        // Add custom date format for this type.
+        $pipe['fe_date_custom_date_formats'][$default_format] = $default_format;
+      }
+
+      // Add a dependency when the date_format_type already in a feature but
+      // not by use.
+      if (isset($map_date_format_types[$type]) && $map_date_format_types[$type] != $module_name) {
+        $export['dependencies'][$map_date_format_types[$type]] = $map_date_format_types[$type];
+      }
+      else {
+        $export['features']['fe_date_date_format_types'][$type] = $type;
+      }
+
+    }
+  }
+
+  return $pipe;
+}
+
+/**
+ * Implements hook_features_export_render().
+ */
+function fe_date_date_format_types_features_export_render($module, $data, $export = NULL) {
+  $code = array();
+  $code[] = '  $format_types = array();';
+
+  foreach ($data as $type) {
+    if ($spec = system_get_date_types($type)) {
+      $format_export = features_var_export($spec['title'], '  ');
+      $format_identifier = features_var_export($type);
+      $code[] = "  // Exported date format type: $type";
+      $code[] = "  \$format_types[{$format_identifier}] = {$format_export};";
+    }
+  }
+  $code[] = '  return $format_types;';
+  $code = implode("\n", $code);
+
+  return array('date_format_types' => $code);
+}
+
+/**
+ * Implements hook_features_export_options().
+ */
+function fe_date_locale_date_format_features_export_options() {
+  $options = array();
+  $format_types = system_get_date_types();
+  $languages = locale_language_list('native');
+
+  foreach ($format_types as $type => $format_type) {
+    foreach ($languages as $langcode => $language) {
+      $format = _fe_date_get_locale_date_format($type, $langcode);
+      if (!empty($format)) {
+        $options["$type::$langcode"] = "{$format_type['title']} ($language)";
+      }
+    }
+  }
+
+  return $options;
+}
+
+/**
+ * Implements hook_features_export().
+ */
+function fe_date_locale_date_format_features_export($data, &$export, $module_name = '') {
+  $export['dependencies']['features'] = 'features';
+  $export['dependencies']['fe_date'] = 'fe_date';
+  $map_language = features_get_default_map('language');
+  $map_date_format_types = features_get_default_map('fe_date_date_format_types');
+  $map_locale_date_format = features_get_default_map('fe_date_locale_date_format');
+  $pipe = array('fe_date_date_format_types' => array(), 'language' => array());
+  foreach ($data as $name) {
+    list($type, $langcode) = explode('::', $name . '::', 3);
+    if ($format = _fe_date_get_locale_date_format($type, $langcode)) {
+      // Add a dependency when the type already in a feature but not by use
+      // or system.
+      if (isset($map_date_format_types[$type]) && !in_array($map_date_format_types[$type], array('system', $module_name))) {
+        $export['dependencies'][$map_date_format_types[$type]] = $map_date_format_types[$type];
+      }
+      else {
+        // Add date_format_type to pipe.
+        $pipe['fe_date_date_format_types'][$type] = $type;
+      }
+      // Add a dependency when the language is in a feature but not by use.
+      if (isset($map_language[$langcode]) && $map_language[$langcode] != $module_name) {
+        $export['dependencies'][$map_language[$langcode]] = $map_language[$langcode];
+      }
+      else {
+        // Add language to pipe.
+        $pipe['language'][$langcode] = $langcode;
+      }
+
+      if (isset($map_locale_date_format[$name]) && $map_locale_date_format[$name] != $module_name) {
+        $export['dependencies'][$map_locale_date_format[$name]] = $map_locale_date_format[$name];
+      }
+      else {
+        // Add format to exports.
+        $export['features']['fe_date_locale_date_format'][$name] = $name;
+      }
+    }
+  }
+
+  return $pipe;
+}
+
+/**
+ * Implements hook_features_export_render().
+ */
+function fe_date_locale_date_format_features_export_render($module, $data, $export = NULL) {
+  $code = array();
+  $code[] = '  $locale_date_formats = array();';
+  $code[] = '';
+  foreach ($data as $name) {
+    list($type, $langcode) = explode('::', $name . '::', 3);
+    if ($format = _fe_date_get_locale_date_format($type, $langcode)) {
+      $var = array(
+        'type' => $type,
+        'format' => $format,
+        'locales' => $langcode ? array($langcode) : array(),
+      );
+      $format_export = features_var_export($var, '  ');
+      $format_identifier = features_var_export($name);
+      $code[] = "  // Exported format: $name";
+      $code[] = "  \$locale_date_formats[{$format_identifier}] = {$format_export};";
+    }
+  }
+
+  $code[] = '  return $locale_date_formats;';
+  $code = implode("\n", $code);
+
+  return array('fe_date_locale_date_format' => $code);
+}
+
+/**
+ * Implements hook_features_revert().
+ */
+function fe_date_locale_date_format_features_revert($module) {
+  fe_date_locale_date_format_features_rebuild($module);
+}
+
+/**
+ * Implements hook_features_rebuild().
+ *
+ * hook_date_formats() is used to define the necessary formats, but the
+ * association to the date format type is not set by using that hook. So we have
+ * to set it in the database by ourselves.
+ *
+ * @see hook_date_formats()
+ */
+function fe_date_locale_date_format_features_rebuild($module) {
+  if ($defaults = features_get_default('fe_date_locale_date_format', $module)) {
+    foreach ($defaults as $spec) {
+      foreach ($spec['locales'] as $locale) {
+        locale_date_format_save($locale, $spec['type'], $spec['format']);
+      }
+    }
+  }
+}
+
+/**
+ * Helper function to get the pure format (locale or from variable).
+ */
+function _fe_date_get_locale_date_format($type, $langcode) {
+  // Try to get a locale date format.
+  $format = system_date_format_locale($langcode, $type);
+  // If no format was found, we get the default value.
+  if (empty($format)) {
+    $format = _fe_date_get_default_format($type);
+  }
+  return $format ? $format : NULL;
+}
+
+/**
+ * Helper function to get the pure format (from variable).
+ */
+function _fe_date_get_default_format($type) {
+  // Do not use variable_get() as this may fetch an already localized variable.
+  $format = db_query('SELECT value FROM {variable} WHERE name = :name', array(':name' => 'date_format_' . $type))->fetchField();
+
+  return $format !== FALSE ? unserialize($format) : NULL;
+}
+
+/**
+ * Implements hook_features_export_options().
+ */
+function fe_date_custom_date_formats_features_export_options() {
+  $formats = system_get_date_formats('custom');
+  $options = array();
+  if (!empty($formats)) {
+    foreach (array_keys($formats) as $format) {
+      $options[$format] = $format;
+    }
+  }
+
+  return $options;
+}
+
+/**
+ * Implements hook_features_export().
+ */
+function fe_date_custom_date_formats_features_export($data, &$export, $module_name = '') {
+  $export['dependencies']['features'] = 'features';
+  $export['dependencies']['fe_date'] = 'fe_date';
+  foreach ($data as $format) {
+    $map = features_get_default_map('fe_date_custom_date_formats');
+    if (!empty($map[$format]) && $map[$format] != $module_name) {
+      $export['dependencies'][$map[$format]] = $map[$format];
+    }
+    else {
+      $export['features']['fe_date_custom_date_formats'][$format] = $format;
+    }
+  }
+
+  return array();
+}
+
+/**
+ * Implements hook_features_export_render().
+ */
+function fe_date_custom_date_formats_features_export_render($module, $data, $export = NULL) {
+  $formats = system_get_date_formats('custom');
+  $code = array();
+  $code[] = '  $custom_date_formats = array();';
+  foreach ($data as $format) {
+    if (!empty($formats[$format])) {
+      $format = features_var_export($format);
+      $code[] = "  \$custom_date_formats[{$format}] = {$format};";
+    }
+  }
+  $code[] = '  return $custom_date_formats;';
+  $code = implode("\n", $code);
+
+  return array('fe_date_custom_date_formats' => $code);
+}
+
+/**
+ * Implements hook_features_rebuild().
+ */
+function fe_date_custom_date_formats_features_rebuild($module) {
+  fe_date_custom_date_formats_features_revert($module);
+}
+
+/**
+ * Implements hook_features_revert().
+ */
+function fe_date_custom_date_formats_features_revert($module) {
+  if ($defaults = features_get_default('fe_date_custom_date_formats', $module)) {
+    $formats = system_get_date_formats('custom');
+    foreach ($defaults as $format) {
+      if (empty($formats[$format])) {
+        $format_data['format'] = trim($format);
+        $format_data['type'] = 'custom';
+        $format_data['locked'] = 0;
+        $format_data['is_new'] = 1;
+        system_date_format_save($format_data);
+      }
+    }
+  }
+}

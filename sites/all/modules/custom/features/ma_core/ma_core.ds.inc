@@ -1,8 +1,33 @@
 <?php
+
 /**
  * @file
  * ma_core.ds.inc
  */
+
+/**
+ * Implements hook_ds_custom_fields_info().
+ */
+function ma_core_ds_custom_fields_info() {
+  $export = array();
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'create_content_block_ds_field';
+  $ds_field->label = 'Create Content Block DS';
+  $ds_field->field_type = 6;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'block' => 'ma_core|create_content',
+    'block_render' => '1',
+  );
+  $export['create_content_block_ds_field'] = $ds_field;
+
+  return $export;
+}
 
 /**
  * Implements hook_ds_layout_settings_info().
@@ -25,9 +50,12 @@ function ma_core_ds_layout_settings_info() {
         2 => 'field_tags',
         3 => 'field_image',
         4 => 'body',
-        5 => 'flag',
-        6 => 'path',
+        5 => 'path',
         7 => 'field_test_assets',
+      ),
+      'hidden' => array(
+        6 => 'redirect',
+        8 => '_add_existing_field',
       ),
     ),
     'fields' => array(
@@ -36,17 +64,25 @@ function ma_core_ds_layout_settings_info() {
       'field_tags' => 'ds_content',
       'field_image' => 'ds_content',
       'body' => 'ds_content',
-      'flag' => 'ds_content',
       'path' => 'ds_content',
+      'redirect' => 'hidden',
       'field_test_assets' => 'ds_content',
+      '_add_existing_field' => 'hidden',
     ),
-    'classes' => array(),
-    'wrappers' => array(),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',
-    'layout_attributes_merge' => TRUE,
-    'layout_link_attribute' => FALSE,
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['node|article|form'] = $ds_layout;
 

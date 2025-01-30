@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * @file
+ * Install/enable/update hooks for feeds_ex.
+ */
+
+/**
+ * Implements hook_enable().
+ */
+function feeds_ex_enable() {
+  cache_clear_all('plugins:feeds:plugins', 'cache');
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function feeds_ex_uninstall() {
+  variable_del('feeds_ex_jmespath_compile_dir');
+}
+
+/**
+ * Empty update hook to clear the cache.
+ */
+function feeds_ex_update_7101() {
+}

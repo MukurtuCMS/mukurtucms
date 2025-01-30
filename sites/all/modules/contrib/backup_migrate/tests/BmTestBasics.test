@@ -1,0 +1,276 @@
+<?php
+
+/**
+ * @file
+ * Tests for different parts of the Backup Migrate system.
+ */
+
+/**
+ * Test that the front page still loads.
+ */
+class BmTestBasics extends BmTestBase {
+
+  /**
+   * Define this test class.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Basic tests',
+      'description' => 'Run through basic scenarios and functionality.',
+      'group' => 'backup_migrate',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    parent::setUp($modules);
+
+    // Log in as user 1, so that permissions are irrelevant.
+    $this->loginUser1();
+  }
+
+  /**
+   * Verify the main page has the expected form, then run a basic backup.
+   */
+  public function testQuickBackup() {
+    // Ensure that the private file system is working correctly.
+    $this->drupalGet('admin/config/media/file-system');
+    $this->assertResponse(200);
+    $edit = array();
+    $this->drupalPost(NULL, $edit, 'Save configuration');
+    $this->assertResponse(200);
+    $this->assertText('The configuration options have been saved.');
+
+    // Load the main B&M page.
+    $this->drupalGet(BACKUP_MIGRATE_MENU_PATH);
+    $this->assertResponse(200);
+
+    // @todo Confirm each of the tabs are present.
+    // @todo Confirm each of the local tasks are present.
+    // Confirm the form has the expected fields.
+    $this->assertFieldByName('source_id');
+    $this->assertFieldByName('destination_id');
+    $this->assertFieldByName('profile_id');
+    $this->assertFieldByName('copy');
+    $this->assertFieldByName('copy_destination_id');
+    $this->assertFieldByName('description_enabled');
+    // This item should not have a value "selected", it just defaults to the
+    // first item being the active item.
+    $items = array('db', 'files', 'archive');
+    $this->assertSelectOptions('edit-source-id', $items);
+    $this->assertNoOptionsSelected('edit-source-id');
+    // This item should have a value "selected", not just the first item. Note:
+    // if the 'manual' backup option isn't available then the private directory
+    // path is not set correctly.
+    $items = array('manual', 'download');
+    $this->assertSelectOptions('edit-destination-id', $items);
+    $this->assertOptionSelected('edit-destination-id', 'download');
+    // This item should not have a value "selected", it just defaults to the
+    // first item being the active item.
+    $items = array('default');
+    $this->assertSelectOptions('edit-profile-id', $items);
+    $this->assertNoOptionsSelected('edit-profile-id');
+    // This item should not have a value "selected", it just defaults to the
+    // first item being the active item.
+    $items = array('manual', 'download');
+    $this->assertSelectOptions('edit-copy-destination-id', $items);
+    $this->assertNoOptionsSelected('edit-copy-destination-id');
+
+    // Generate a backup and confirm it was created correctly.
+    $edit = array(
+      'destination_id' => 'manual',
+    );
+    $this->drupalPost(NULL, $edit, 'Backup now');
+    $this->assertResponse(200);
+    // Confirm the response is as expected. This is split up into separate
+    // pieces because it'd be more effort than is necessary right now to confirm
+    // what the exact filename is.
+    $this->assertText('Default Database backed up successfully');
+    $this->assertText('in destination Manual Backups Directory');
+    $this->assertLink('download');
+    $this->assertLink('restore');
+    $this->assertLink('delete');
+
+    // Try requesting the backup file.
+    $xpath = $this
+      ->xpath('//a[normalize-space(text())=:label]', array(
+        ':label' => 'download',
+      ));
+    $this->verbose($xpath);
+    $this->assertTrue(isset($xpath[0]['href']));
+    $this->assertNotNull($xpath[0]['href']);
+    // @todo This doesn't work on drupalci, so work out how to fix it.
+    // $this->drupalGet($xpath[0]['href']);
+    $this->assertResponse(200);
+  }
+
+  /**
+   * Test the custom validators.
+   */
+  public function testFieldValidators() {
+    // Need this file loaded for the custom validators.
+    module_load_include('advanced_settings.inc', 'backup_migrate');
+
+    $field = 'mock_field';
+
+    $element = array(
+      '#value' => 'a',
+      '#title' => '',
+      '#parents' => array($field),
+    );
+
+    // Test the memory limit validator.
+    $element['#title'] = 'Mock Field (Memory Limit)';
+    $test_values = array(
+      // Value to be tested => validity.
+      // Special meaning: no limit.
+      '-1' => TRUE,
+      '50' => TRUE,
+      // 5 megabytes.
+      '5M' => TRUE,
+      // 500 kilobytes.
+      '.5M' => TRUE,
+      // 5 gigabytes.
+      '5G' => TRUE,
+      '.5G' => TRUE,
+      '1.5G' => TRUE,
+      '0' => TRUE,
+      'a' => FALSE,
+      '-2' => FALSE,
+      // You cannot have half a byte.
+      '1.5' => FALSE,
+      '5T' => FALSE,
+      '5 G' => FALSE,
+      '.5.5G' => FALSE,
+    );
+    foreach ($test_values as $value => $valid) {
+      $this->assertValidFieldValue('backup_migrate_memory_limit_validate', $element, $value, $valid, 'memory limit value');
+    }
+
+    // Test the positive non-zero integer validator.
+    $element['#title'] = 'Mock Field (Unsigned Integer)';
+    $test_values = array(
+      '0' => TRUE,
+      '1' => TRUE,
+      '10000' => TRUE,
+      // NaN.
+      'a' => FALSE,
+      // Not an integer.
+      '.5' => FALSE,
+      // Not positive.
+      '-1' => FALSE,
+      // Largest integer.
+      // @code
+      // PHP_INT_MAX => TRUE,
+      // @endcode
+      // Resolves to a decimal.
+      // @code
+      // (PHP_INT_MAX + 1) => FALSE,
+      // @endcode
+    );
+    foreach ($test_values as $value => $valid) {
+      $this->assertValidFieldValue('backup_migrate_unsigned_integer_validate', $element, $value, $valid, 'zero or a positive integer');
+    }
+
+    // Test the validator for decimals ranging from 0 to 1.
+    $element['#title'] = 'Mock Field (Decimal between 0 and 1)';
+    $test_values = array(
+      '0' => TRUE,
+      '1' => TRUE,
+      '0.1' => TRUE,
+      '.1' => TRUE,
+      '1.1' => FALSE,
+      '-1' => FALSE,
+      '-1.1' => FALSE,
+      '2' => FALSE,
+      'a' => FALSE,
+    );
+    foreach ($test_values as $value => $valid) {
+      $this->assertValidFieldValue('backup_migrate_fraction_validate', $element, $value, $valid, 'decimal between 0 and 1');
+    }
+  }
+
+  /**
+   * Asserts that the content of a field passes its associated validation.
+   *
+   * @param string $validator
+   *   Drupal validator function callback.
+   * @param array $element
+   *   Input for error setter.
+   * @param string $value
+   *   Field value to be tested.
+   * @param bool $value_is_valid
+   *   Expected outcome.
+   * @param string $type
+   *   Description of value sub-type.
+   */
+  protected function assertValidFieldValue($validator, array $element, $value, $value_is_valid, $type) {
+    $form = array();
+    $form_state = array();
+    $field = 'mock_field';
+    $element['#value'] = $value;
+
+    form_clear_error();
+    call_user_func_array($validator, array($element, &$form_state, $form));
+    $errors = form_get_errors();
+
+    if ($value_is_valid) {
+      $args = array(
+        '%value' => $value,
+        '%type' => $type,
+      );
+      $msg = t('%value is a valid %type.', $args);
+      $result = $this->assertTrue(empty($errors[$field]), $msg);
+    }
+    else {
+      $args = array(
+        '%value' => $value,
+        '%type' => $type,
+        '%msg' => strip_tags($errors[$field]),
+      );
+      $msg = t('%value is not a valid %type. Error message: "%msg".', $args);
+      $result = $this->assertFalse(empty($errors[$field]), $msg);
+    }
+
+    return $result;
+  }
+
+  /**
+   * Confirm backup_migrate_to_bytes() works.
+   */
+  public function testBackupMigrateToBytes() {
+    // PHP manual:
+    // http://php.net/manual/en/ini.core.php#ini.memory-limit
+    // '-1' is a reserved value meaning 'no limit'.
+    $input = '-1';
+    $expected = -1;
+    $this->assertEqual(backup_migrate_to_bytes($input), $expected);
+
+    // PHP would halt before this, but let us test anyway.
+    $input = 'nonsense';
+    $expected = 0;
+    $this->assertEqual(backup_migrate_to_bytes($input), $expected);
+
+    // This is 123 bytes, but there is a bug in B&M that turns
+    // this into 12.5 megabytes.
+    $input = '123';
+    $expected = 12582912;
+    $this->assertEqual(backup_migrate_to_bytes($input), $expected);
+
+    // 45 megabytes.
+    $input = '45M';
+    $expected = 47185920;
+    $this->assertEqual(backup_migrate_to_bytes($input), $expected);
+
+    // 8 gigabytes.
+    $input = '8G';
+    $expected = 8589934592;
+    $this->assertEqual(backup_migrate_to_bytes($input), $expected);
+  }
+
+}
+
+// @todo Test permissions.
+// @todo Test admin forms.

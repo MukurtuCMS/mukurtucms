@@ -55,7 +55,7 @@ html.js fieldset.collapsed .fieldset-wrapper {
   display: none;
 }
 fieldset.collapsible {
-  position: relative;
+  position: inherit;
 }
 fieldset.collapsible .fieldset-legend {
   display: block;

@@ -1,0 +1,11 @@
+name = Announcements
+description =  Displays announcements from the Drupal community.
+package = Core
+version = VERSION
+core = 7.x
+files[] = tests/announce_feed_test.test
+
+; Information added by Drupal.org packaging script on 2024-12-04
+version = "7.103"
+project = "drupal"
+datestamp = "1733324608"

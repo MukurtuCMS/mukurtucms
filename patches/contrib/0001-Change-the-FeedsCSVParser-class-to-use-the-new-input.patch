@@ -1,0 +1,27 @@
+From e177b556a6bd5d7eb69c752a626548e92d2597bf Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Fri, 8 Dec 2017 14:00:24 -0800
+Subject: [PATCH] Change the FeedsCSVParser class to use the new input fields
+ property
+
+In this case, the headers from the CSV file represent the input fields.
+---
+ sites/all/modules/contrib/feeds/plugins/FeedsCSVParser.inc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sites/all/modules/contrib/feeds/plugins/FeedsCSVParser.inc b/sites/all/modules/contrib/feeds/plugins/FeedsCSVParser.inc
+index 073a56d..9694fdc 100644
+--- a/plugins/FeedsCSVParser.inc
++++ b/plugins/FeedsCSVParser.inc
+@@ -50,7 +50,7 @@ class FeedsCSVParser extends FeedsParser {
+     $state->progress($state->total, $progress);
+
+     // Create a result object and return it.
+-    return new FeedsParserResult($rows, $source->feed_nid);
++    return new FeedsParserResult($rows, $source->feed_nid, $header);
+   }
+
+   /**
+--
+2.7.4
+

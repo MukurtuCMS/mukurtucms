@@ -9,7 +9,7 @@
  */
 function scald_plupload_save_file($tmppath, $target) {
   $tmp = plupload_file_uri_to_object($tmppath);
-  // changing file mime to the proper one
+  // Changing file mime to the proper one.
   $tmp->filemime = file_get_mimetype($target);
   $tmp->status = 0;
   $destination = dirname($target);

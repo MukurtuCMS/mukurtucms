@@ -1,0 +1,60 @@
+<?php
+
+/**
+ * @file
+ * hook_uninstall and hook_requirements implementations for Geofield Map.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function geofield_map_uninstall() {
+  $result = db_select('variable', 'v')
+    ->fields('v', array('name'))
+    ->condition('name', db_like('geofield_map_google_') . '%', 'LIKE')
+    ->execute();
+
+  foreach ($result as $row) {
+    variable_del($row->name);
+  }
+}
+
+/**
+ * Implementation of hook_requirements().
+ */
+function geofield_map_requirements($phase) {
+  $requirements = array();
+
+  if ($phase == 'runtime') {
+    // Whether or not an API key or client id is provided.
+    $key_provided = FALSE;
+
+    switch (variable_get('geofield_map_google_auth_method')) {
+      case 1:
+        $key = variable_get('geofield_map_google_apikey', FALSE);
+        if (!empty($key)) {
+          $key_provided = TRUE;
+        }
+        break;
+
+      case 2:
+        $client_id = variable_get('geofield_map_google_client_id', FALSE);
+        if (!empty($client_id)) {
+          $key_provided = TRUE;
+        }
+        break;
+    }
+
+    if (!$key_provided) {
+      $requirements['geofield_map'] = array(
+        'title' => t('Geofield Map'),
+        'severity' => REQUIREMENT_WARNING,
+        'value' => t('Google Maps API key or Client ID was not found. As of 2016/06/22, keyless access is no longer supported and it may impact rendering of maps. For more information visit: <a href="@link">@link</a>', array(
+          '@link' => 'http://googlegeodevelopers.blogspot.ca/2016/06/building-for-scale-updates-to-google.html',
+        )),
+      );
+    }
+  }
+
+  return $requirements;
+}

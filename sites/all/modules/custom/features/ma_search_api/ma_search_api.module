@@ -6,50 +6,77 @@
 
 include_once 'ma_search_api.features.inc';
 
-//// REINDEX RELATED NODES
+/// 1) REINDEX RELATED NODES
+/// 2) UPDATE CUSTOM CERS
 
 function ma_search_api_node_insert ($node) {
   ma_search_api_node_update ($node);
 }
 
-function ma_search_api_node_update($node) {
+function ma_search_api_node_update($node) {;
 
-  $relations = array(
-    'collection' => array(
-      'relationships' => array(
-        'field_digital_heritage_items' => 'dh',
-      ),
-      'triggers' => array(),
-    ),
-    'digital_heritage' => array(
-      'relationships' => array(
-        'field_collection' => 'not dh',
-        'field_related_dh_items' => 'dh',
-        'og_group_ref' => 'not dh',
-      ),
-      'triggers' => array(
+  // Only process a node once.
+  static $processed_nids;
+  if (isset($processed_nids) && in_array($node->nid, $processed_nids)) {
+    return;
+  }
+  $processed_nids[] = $node->nid;
+  //dpm ($node->nid, 'processing');
+
+  $relations = [
+    'digital_heritage' => [
+      'relationships' => [
+        'og_group_ref',
+      ],
+      'triggers' => [
         'field_item_privacy_setting' => 'regular',
         'og_group_ref' => 'array values comparison',
-      ),
-    ),
-    'community' => array(
-      'relationships' => array(
-        'og_group_ref' => 'not dh',
-      ),
-      'triggers' => array(
+      ],
+    ],
+    'community' => [
+      'relationships' => [
+        'og_group_ref',
+      ],
+      'triggers' => [
         'og_group_ref' => 'array values comparison',
-      ),
-    ),
-    'cultural_protocol_group' => array(
-      'relationships' => array(
-        'og_group_ref' => 'not dh',
-      ),
-      'triggers' => array(
+      ],
+    ],
+    'cultural_protocol_group' => [
+      'relationships' => [
+        'og_group_ref',
+      ],
+      'triggers' => [
         'group_access' => 'regular',
         'og_roles_permissions' => 'regular',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
+
+  $custom_cer_fields = [
+    'field_related_content' => 'field_related_content',
+    'field_digital_heritage_items' => [
+      'collection' => 'field_collection',
+      'personal_collection' => 'field_personal_collections',
+    ],
+    'field_collection' => 'field_digital_heritage_items',
+  ];
+
+  // Add the custom CER fields to $relations.
+  $related_content_field_info = field_info_field('field_related_content');
+  $relateable_types = $related_content_field_info["settings"]["handler_settings"]["target_bundles"];
+  foreach ($relateable_types as $collectionable_type) {
+    $relations[$collectionable_type]['relationships'][] = 'field_related_content';
+  }
+  $collectionable_types = ma_collection_get_valid_node_types_for_collection();
+  foreach ($collectionable_types as $collectionable_type) {
+    $relations[$collectionable_type]['relationships'][] = 'field_collection';
+    $relations[$collectionable_type]['relationships'][] = 'field_personal_collections';
+  }
+  $collection_items_field = field_info_field('field_digital_heritage_items');
+  $collection_types = $collection_items_field["bundles"]["node"];
+  foreach ($collection_types as $collection_type) {
+    $relations[$collection_type]['relationships'][] = 'field_digital_heritage_items';
+  }
 
   if (isset($relations[$node->type])) {
 
@@ -61,53 +88,133 @@ function ma_search_api_node_update($node) {
       $wrapper_old = entity_metadata_wrapper('node', $node->original);
     }
 
-    $items_to_reindex = array();
+    $items_to_reindex = [];
 
     // Look for changes in any of the trigger fields. If any, ALL related nodes get reindexed.
     $reindex_all_relations = 0;
-    foreach ($content_type_properties['triggers'] as $trigger => $trigger_comparison_type) {
-      # dpm ($trigger, 'trigger');
-      $trigger_old_val = "";
-      if (isset($node->original)) {
-        $trigger_old_val = $wrapper_old->{$trigger}->value();
-      }
-      $trigger_new_val = $wrapper_new->{$trigger}->value();
-      if ($trigger_comparison_type == 'array values comparison') { // Some fields get their array keys changed as pulled by EMW even if they are not changed, so for these fields compare EMW array values to avoid false positives.
-        $trigger_new_val = array_values ($trigger_new_val);
-        $trigger_old_val = array_values ($trigger_old_val);
-      }
-      if ($trigger_old_val <> $trigger_new_val) {
-        # dpm ($trigger_old_val, 'trigger old val');
-        # dpm($trigger_new_val, 'trigger new val');
-        $reindex_all_relations = 1;
-        # dpm ('Trigger field changed. Reindexing ALL relations');
-        continue;
+    if (isset($content_type_properties['triggers'])) {
+      foreach ($content_type_properties['triggers'] as $trigger => $trigger_comparison_type) {
+        # dpm ($trigger, 'trigger');
+        $trigger_old_val = "";
+        if (isset($node->original)) {
+          $trigger_old_val = $wrapper_old->{$trigger}->value();
+        }
+        $trigger_new_val = $wrapper_new->{$trigger}->value();
+        if ($trigger_comparison_type == 'array values comparison') { // Some fields get their array keys changed as pulled by EMW even if they are not changed, so for these fields compare EMW array values to avoid false positives.
+          $trigger_new_val = array_values($trigger_new_val);
+          $trigger_old_val = empty($trigger_old_val) ? NULL : array_values($trigger_old_val);
+        }
+        if ($trigger_old_val <> $trigger_new_val) {
+          # dpm ($trigger_old_val, 'trigger old val');
+          # dpm($trigger_new_val, 'trigger new val');
+          $reindex_all_relations = 1;
+          # dpm ('Trigger field changed. Reindexing ALL relations');
+          continue;
+        }
       }
     }
 
     // Look for changes in any of the reference fields.
-    foreach ($content_type_properties['relationships'] as $relationship => $relationship_node_type) {
-      # dpm ($relationship, 'relationship (' . $relationship_node_type . ')');
 
-      $new_refs = ma_core_get_nids_from_array_of_nodes($wrapper_new->{$relationship}->value());
+    if (isset($content_type_properties['relationships'])) {
+      foreach ($content_type_properties['relationships'] as $relationship) {
+        $items_to_update_cers[$relationship] = [];
 
-      $old_refs = array();
-      if (isset($node->original)) {
-        $old_refs = ma_core_get_nids_from_array_of_nodes($wrapper_old->{$relationship}->value());
+        $new_refs = ma_core_get_nids_from_array_of_nodes($wrapper_new->{$relationship}->value());
+        $refs_added = [];
+        $refs_deleted = [];
+
+        $old_refs = [];
+        if (isset($node->original)) {
+          $old_refs = ma_core_get_nids_from_array_of_nodes($wrapper_old->{$relationship}->value());
+        }
+
+        // This update hook is manually called from ma_search_api_node_insert,
+        // we need to make sure brand new references are added as well.
+        if (isset($node->is_new) && $node->is_new) {
+          $refs_added = $new_refs;
+        }
+
+        // A trigger field was changed, so reindex all related values, both new and old.
+        if ($reindex_all_relations) {
+          $items_to_reindex = array_merge($items_to_reindex, $new_refs, $old_refs);
+          # dpm($items_to_reindex, 'items to reindex after a trigger');
+        }
+
+        // A trigger field was not changed, so if there were any changed related values, reindex whatever was changed.
+        elseif ($old_refs <> $new_refs) {
+          $refs_added = array_diff($new_refs, $old_refs);
+          $refs_deleted = array_diff($old_refs, $new_refs);
+          $items_to_reindex = array_merge($items_to_reindex, $refs_added, $refs_deleted);
+          # dpm($items_to_reindex, 'items to reindex after a changed relationship');
+        }
+
+        if (in_array_r($relationship, $custom_cer_fields)) {
+          $items_to_update_cers[$relationship] = array_merge($items_to_update_cers[$relationship], $refs_added, $refs_deleted);
+        }
       }
+    }
 
-      // A trigger field was changed, so reindex all related values, both new and old.
-      if ($reindex_all_relations) {
-        $items_to_reindex = array_merge($items_to_reindex, $new_refs, $old_refs);
-        # dpm($items_to_reindex, 'items to reindex after a trigger');
+    // Do the custom cer updating.
+    static $original_node_being_updated;
+    if (is_null($original_node_being_updated)) {
+      $original_node_being_updated = $node->nid;
+    }
+    $wrappers_to_resave = [];
+    foreach ($items_to_update_cers as $custom_cer_field => $items_to_update_cers_nids) {
+      if (count($items_to_update_cers_nids)) {
+        foreach ($items_to_update_cers_nids as $items_to_update_cer) {
+          if ($items_to_update_cer == $original_node_being_updated) {
+            continue; // Do not update the original node being updated.
+          }
+          $query = new EntityFieldQueryExtraFields();
+          $query->entityCondition('entity_type', 'node')
+            ->fieldCondition($custom_cer_field, 'target_id', [$items_to_update_cer]);
+          $result = $query->execute();
+          $new_refs = isset($result['node']) ? array_keys($result['node']) : [];
+          foreach ($new_refs as $key => $new_ref) {
+            $new_refs[$key] = (string) $new_refs[$key]; // convert $new_refs to string values to match $old_refs format.
+          }
+          $new_refs_numerically_sorted = $new_refs;
+          $nuw = entity_metadata_wrapper('node', $items_to_update_cer);
+          $target_field = $custom_cer_fields[$custom_cer_field];
+          if (is_array($target_field)) {
+            $target_field = $target_field[$node->type];
+          }
+          if (isset($nuw->{$target_field})) {
+            $old_refs_numerically_sorted = $old_refs = $nuw->{$target_field}->raw();
+            sort($old_refs_numerically_sorted);
+            if ($old_refs_numerically_sorted != $new_refs_numerically_sorted) {
+
+              // Maintain the old ref ordering, adding any new refs to the bottom.
+              $new_refs_ordered = [];
+              if (count($old_refs)) {
+                foreach ($old_refs as $old_ref) {
+                  if (in_array($old_ref, $new_refs)) {
+                    $new_refs_ordered[] = $old_ref;
+                    // https://stackoverflow.com/questions/7225070/php-array-delete-by-value-not-key
+                    foreach (array_keys($new_refs, $old_ref, TRUE) as $key) {
+                      unset($new_refs[$key]);
+                    }
+                  }
+                }
+              }
+              if (count($new_refs)) {
+                $new_refs_ordered = array_merge($new_refs_ordered, $new_refs);
+              }
+              $nuw->{$target_field}->set($new_refs_ordered);
+              $wrappers_to_resave[] = $nuw;
+            }
+          }
+          else {
+            drupal_set_message('issue'); // TODO: investigate this if error occurs.
+          }
+        }
       }
-
-      // A trigger field was not changed, so if there were any changed related values, reindex whatever was changed.
-      elseif ($old_refs <> $new_refs) {
-        $refs_added = array_diff($new_refs, $old_refs);
-        $refs_deleted = array_diff($old_refs, $new_refs);
-        $items_to_reindex = array_merge($items_to_reindex, $refs_added, $refs_deleted);
-        # dpm($items_to_reindex, 'items to reindex after a changed relationship');
+    }
+    if (count($wrappers_to_resave)) {
+      foreach ($wrappers_to_resave as $wrapper_to_resave) {
+        $wrapper_to_resave->save();
       }
     }
 
@@ -122,29 +229,50 @@ function ma_search_api_node_update($node) {
 }
 
 /**
+ * Recursive in_array helper.
+ * https://stackoverflow.com/questions/4128323/in-array-and-multidimensional-array
+ */
+function in_array_r($needle, $haystack, $strict = false) {
+  foreach ($haystack as $item) {
+    if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && in_array_r($needle, $item, $strict))) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
  * Implements hook_views_pre_view().
  */
 function ma_search_api_views_pre_view(&$view, &$display_id, &$args) {
 
-  // Rebuild permissions and reindex any DH nodes that were queued up for this op, just before the view is rendered.
-  if ($view->name == 'digital_heritage_grid_list') {
-    $dh_nodes_to_rebuid_and_reindex = variable_get ('mukurtu_dh_nodes_to_rebuild_perms_and_reindex', array());
-    if (count($dh_nodes_to_rebuid_and_reindex)) {
-      $dh_nodes_to_rebuid_and_reindex = array_unique ($dh_nodes_to_rebuid_and_reindex);
-      # dpm ($dh_nodes_to_rebuid_and_reindex, '$dh_nodes_to_rebuid_and_reindex');
-      // Rebuild perms
-      foreach ($dh_nodes_to_rebuid_and_reindex as $dh_nid) {
-        node_access_acquire_grants(node_load($dh_nid));
+  // Rebuild permissions and reindex any nodes-in-CP that were queued up for this op, just before the view is rendered.
+  $types_to_process = [
+    'digital_heritage_grid_list' => 'mukurtu_dh_nodes_to_rebuild_perms_and_reindex',
+    'dictionary_words' => 'mukurtu_dw_nodes_to_rebuild_perms_and_reindex',
+    'collections_grid_list' => 'mukurtu_coll_nodes_to_rebuild_perms_and_reindex',
+  ];
+  foreach ($types_to_process as $view_name => $process_nids_var) {
+    if ($view->name == $view_name) {
+      $dh_nodes_to_rebuild_and_reindex = variable_get ($process_nids_var, array());
+      if (count($dh_nodes_to_rebuild_and_reindex)) {
+        $dh_nodes_to_rebuild_and_reindex = array_unique ($dh_nodes_to_rebuild_and_reindex);
+        // Rebuild perms
+        foreach ($dh_nodes_to_rebuild_and_reindex as $dh_nid) {
+          node_access_acquire_grants(node_load($dh_nid));
+        }
+        // Reindex
+        search_api_index_specific_items (search_api_index_load('default_node_index'), $dh_nodes_to_rebuild_and_reindex);
+        variable_set ($process_nids_var, array());
       }
-      // Reindex
-      search_api_index_specific_items (search_api_index_load('default_node_index'), $dh_nodes_to_rebuid_and_reindex);
-      variable_set ('mukurtu_dh_nodes_to_rebuild_perms_and_reindex', array());
     }
   }
+
 }
 
 
-//  See "HOW DIGITAL HERITAGE CULTURAL PROTOCOL PERMISSIONS ARE IMPLEMENTED" comment in mukurtu_protocol_field.module explaining our multi-pronged approach, including what this hook does
+
 /**
  * Implements hook_search_api_query_alter().
  * Exclude user defined nodes from search index
@@ -152,68 +280,109 @@ function ma_search_api_views_pre_view(&$view, &$display_id, &$args) {
  */
 function ma_search_api_search_api_query_alter($sapi_query) {
 
-  if (arg(0) == 'digital-heritage' AND !user_access('bypass content access control')) {
+  $current_page = arg(0);
 
-    // Get all STRICT CPs that the user is not a member of
-    $cp_query = new EntityFieldQuery();
-    $cp_query->entityCondition('entity_type', 'node')
-      ->addMetaData('account', user_load(1))// run the query as admin, or else node_access will limit
-      ->entityCondition('bundle', 'cultural_protocol_group')
-      ->fieldCondition(OG_ACCESS_FIELD, 'value', 2, '='); // only Strict CPs
-    // Only groups the user is not a member of
-    if ($user_groups = og_get_groups_by_user()) {
-      $cp_query->propertyCondition('nid', $user_groups['node'], 'NOT IN');
-    }
-    $result = $cp_query->execute();
+  // Permissions alterations. See "HOW NODES-IN-CULTURAL PROTOCOL PERMISSIONS ARE IMPLEMENTED" comment in mukurtu_protocol_field.module explaining our multi-pronged approach, including what this hook does
+  if (!user_access('bypass content access control')) {
 
-    // Of all the CPs that the user cannot access, get all DHs within them that have Item Sharing set to "ALL"
-    if (isset($result['node'])) {
-      $cp_nids = array_keys($result['node']);
-      # dpm($cp_nids, 'cp nids');
-      $dh_query = new EntityFieldQuery();
-      $dh_query->entityCondition('entity_type', 'node')
-        ->addMetaData('account', user_load(1))// run the query as admin, or else node_access will limit
-        ->entityCondition('bundle', 'digital_heritage')
-        ->fieldCondition('og_group_ref', 'target_id', $cp_nids, 'IN')
-        ->fieldCondition('field_item_privacy_setting', 'value', 'all'); // we are only restricting DH items with Item Sharing set to "ALL"
-      $result = $dh_query->execute();
+    switch ($current_page) {
+      case 'digital-heritage':
+      case 'dictionary':
+      case 'collections':
 
-      // Filter our the DH items the user should not see
-      if (isset($result['node'])) {
-        $dh_nids = array_keys($result['node']);
-        # dpm($dh_nids, 'dh nids excluded');
-        $filter = $sapi_query->createFilter('AND');
-        $filter->condition('nid', $dh_nids, 'NOT IN');
-        $sapi_query->filter($filter);
+        $type_map = array (
+          'digital-heritage' => 'digital_heritage',
+          'dictionary' => 'dictionary_word',
+          'collections' => 'collection',
+        );
 
-      }
+        // Get all STRICT CPs that the user is not a member of
+        $cp_query = new EntityFieldQuery();
+        $cp_query->entityCondition('entity_type', 'node')
+          ->addMetaData('account', user_load(1))// run the query as admin, or else node_access will limit
+          ->entityCondition('bundle', 'cultural_protocol_group')
+          ->fieldCondition(OG_ACCESS_FIELD, 'value', 2, '='); // only Strict CPs
+        // Only groups the user is not a member of
+        if ($user_groups = og_get_groups_by_user()) {
+          $cp_query->propertyCondition('nid', $user_groups['node'], 'NOT IN');
+        }
+        $result = $cp_query->execute();
+
+        // Of all the CPs that the user cannot access, get all nodes-in-CP within them that have Item Sharing set to "ALL"
+        if (isset($result['node'])) {
+          $cp_nids = array_keys($result['node']);
+          # dpm($cp_nids, 'cp nids');
+          $dh_query = new EntityFieldQuery();
+          $dh_query->entityCondition('entity_type', 'node')
+            ->addMetaData('account', user_load(1))// run the query as admin, or else node_access will limit
+            ->entityCondition('bundle', $type_map[$current_page])
+            ->fieldCondition('og_group_ref', 'target_id', $cp_nids, 'IN')
+            ->fieldCondition('field_item_privacy_setting', 'value', 'all'); // we are only restricting DH items with Item Sharing set to "ALL"
+          $result = $dh_query->execute();
+
+          // Filter out the nodes-in-CP the user should not see
+          if (isset($result['node'])) {
+            $nids_in_cp = array_keys($result['node']);
+            $filter = $sapi_query->createFilter('AND');
+            $filter->condition('nid', $nids_in_cp, 'NOT IN');
+            $sapi_query->filter($filter);
+          }
+        }
+
     }
   }
-}
 
-/**
- * Implements hook_scald_atom_access
- *
- * This hook can be used to grant or deny access for a specific atom and
- * Scald action. It has the following possible return values:
- *   SCALD_ATOM_ACCESS_ALLOW
- *   SCALD_ATOM_ACCESS_DENY
- *   SCALD_ATOM_ACCESS_IGNORE
- *
- * Respect the Cultural Protocol setting on scald atoms. This is usually left blank (in which case IGNORE), but if set, if user has access to ANY of the CPs, then they get scald view access (IGNORE, to allow other handling). DENY if groups are set but they have access to none of them.
- */
-function ma_search_api_scald_atom_access($atom, $action, $account = NULL) {
-  $group_wrapper = entity_metadata_wrapper('scald_atom', $atom);
-  if (!isset($group_wrapper->field_scald_protocol)) {
-    return SCALD_ATOM_ACCESS_IGNORE;
-  }
-  if ($groups = $group_wrapper->field_scald_protocol->value()) {
-    foreach ($groups as $group) { 
-      if (node_access('view', $group)) {
-        return SCALD_ATOM_ACCESS_IGNORE;
+
+  // Custom sorts
+  $sort_pages = array('browse', 'collections', 'digital-heritage');
+  if (in_array($current_page, $sort_pages)) { // Add Dictionary here later.
+
+    // Sort according to the session var, otherwise fallback to default
+    if (isset($_SESSION[$current_page . '_custom_sort_order'])) {
+
+      $custom_sort = $_SESSION[$current_page . '_custom_sort_order'];
+
+      // Unset existing sorts
+      $sort =& $sapi_query->getSort();
+      $sort = array();
+
+      // Sort map
+      $sort_map = array(
+        'alphabetical' => array(
+          'sort' => 'search_api_aggregation_2',
+        ),
+        'changed' => array(
+          'sort' => 'changed',
+          'reverse' => TRUE,
+        ),
+        'added' => array(
+          'sort' => 'created',
+          'reverse' => TRUE,
+        ),
+        'oldest' => array(
+          'sort' => 'field_original_date:timestamp',
+        ),
+        'newest' => array(
+          'sort' => 'field_original_date:timestamp',
+          'reverse' => TRUE,
+        ),
+        'relevance' => array(
+          'sort' => 'search_api_aggregation_4',
+        ),
+      );
+      $sort_direction = 'ASC';
+      if (isset($sort_map[$custom_sort]['reverse']) AND $sort_map[$custom_sort]['reverse']) {
+        $sort_direction = 'DESC';
       }
+      $sapi_query->sort($sort_map[$custom_sort]['sort'], $sort_direction);
+
+
+      // When sorting by oldest or newest, filter out DH nodes that do not have an original date set.
+      if ($custom_sort == 'oldest' OR $custom_sort == 'newest') {
+        $sapi_query->condition('field_original_date:timestamp', NULL, '<>');
+      }
+
     }
-    return SCALD_ATOM_ACCESS_DENY;
   }
 }
 
@@ -260,6 +429,7 @@ function ma_search_api_list_of_indexed_fields() {
   #dpm ($indexed_fields_field_name_only);
   $fields_to_skip = array (
     'field_media_asset',
+    'field_related_content',
     'field_digital_heritage_count',
     'field_digital_heritage_items',
   );
@@ -278,9 +448,16 @@ function ma_search_api_list_of_indexed_fields() {
 
   // Build the output
   $output = '<p>The following fields will return results if their contents match searches made at ' . l("Browse Digital Heritage", 'digital-heritage') . ' or ' . l("Browse Collections", 'collections') . '.<p>';
+  if (drupal_valid_path('admin/config/search/search_api/index/default_node_index/fields')) {
+    $output .= '<p>' . t('Indexed fields can be altered at the') . ' ' . l(t("Search API node index page"), 'admin/config/search/search_api/index/default_node_index/fields') . '.';
+    $output .= '</p>';
+  }
   $content_types_to_show = array ( // Limit the list to just the content types that have search pages
     'digital_heritage',
     'collection',
+    'dictionary_word',
+    'word_list',
+    'person',
   );
   $types = node_type_get_types();
   foreach ($indexed_fields_per_content_type as $content_type => $indexed_fields) {
@@ -296,4 +473,128 @@ function ma_search_api_list_of_indexed_fields() {
   }
   return $output;
 
+}
+
+// Return the config for the Search API whitespace tokenizer regex
+function ma_search_api_get_whitespace_tokenizer_regex() {
+  // Default value
+  $spaces = "[\p{P}|\p{C}|\p{Z}|\p{S}]";
+
+  $server = search_api_server_load('search_api_db_server');
+  if($server) {
+    $index = search_api_index_load('default_node_index');
+    if($index) {
+      $spaces = $index->options['processors']['search_api_tokenizer']['settings']['spaces'];
+    }
+  }
+
+  return $spaces;
+}
+
+/**
+ * Implements hook_entity_property_info_alter().
+ *
+ * Custom index fields.
+ */
+function ma_search_api_entity_property_info_alter(&$info) {
+  $info['node']['properties']['dh_original_year'] = array(
+    'type'            => 'integer',
+    'label'           => t('DH Original Year'),
+    'sanitized'       => TRUE,
+    'getter callback' => 'ma_search_api_getter_callback_dh_original_year',
+  );
+}
+// The sort is done on the timestamp component of the original date field. This is being indexed when/if we add a year filter.
+function ma_search_api_getter_callback_dh_original_year($item) {
+  if (isset($item->field_original_date[LANGUAGE_NONE][0]['from']['year'])) {
+    return $item->field_original_date[LANGUAGE_NONE][0]['from']['year'];
+  }
+}
+
+/**
+ * Implementation of hook_block_info().
+ */
+function ma_search_api_block_info() {
+  $blocks['ma_custom_sorts'] = array(
+    'info' => t('Custom sorts for the browse pages'),
+  );
+  return $blocks;
+}
+
+
+/**
+ * Implementation of hook_block_view().
+ */
+function ma_search_api_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+
+    case 'ma_custom_sorts':
+      $block['subject'] = 'Sort';
+      $search_form = drupal_get_form('ma_search_api_sort_form');
+      $block['content'] = drupal_render($search_form);
+      break;
+  }
+
+  return $block;
+
+}
+
+/**
+ * Returns the render array for the form.
+ */
+function ma_search_api_sort_form($form, &$form_state) {
+  $current_page = arg(0);
+  $sort_options = array(
+    'relevance' => t('Search Relevance'),
+    'changed' => t('Date Changed'),
+    'added' => t('Date Added'),
+    'newest' => t('Newest'),
+    'oldest' => t('Oldest'), // NOTE: If the Original Date field is unset, date = 0, so those DH nodes will appear at top of Oldest list. This is a limitation of using the DB for the Search API backend. It should be resolveable when / if switching to SOLR.
+    'alphabetical' => t('Alphabetical'),
+  );
+  if ($current_page <> 'digital-heritage') {
+    unset($sort_options['newest']);
+    unset($sort_options['oldest']);
+  }
+
+  $form['sort'] = array(
+    '#type' => 'select',
+    '#default_value' => isset($_SESSION[$current_page . '_custom_sort_order']) ? $_SESSION[$current_page . '_custom_sort_order'] : 'relevance',
+    '#options' => $sort_options,
+    '#attributes' => array('onchange' => 'this.form.submit();'),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#attributes' => array('class' => array('element-invisible')),
+  );
+  return $form;
+}
+function ma_search_api_sort_form_submit($form, $form_state){
+  if (isset ($form_state['values']['sort'])) {
+    $_SESSION[arg(0) . '_custom_sort_order'] = $form_state['values']['sort'];
+  }
+}
+
+
+/**
+ * Delete the CERs that are replaced with Custom CERs.
+ *
+ * This is called from ma_base_theme's hook_update.
+ */
+function ma_search_api_delete_deprecated_cers() {
+  $presets_to_delete = [
+    'node:collection:field_digital_heritage_items*node:digital_heritage:field_collection',
+    'node:personal_collection:field_digital_heritage_items*node:digital_heritage:field_personal_collections',
+    'node:dictionary_word:field_related_dictionary_words*node:dictionary_word:field_related_dictionary_words',
+    'node:dictionary_word:field_word_list*node:word_list:field_words',
+    'node:digital_heritage:field_related_dictionary_words*node:dictionary_word:field_dictionary_word_related_dh',
+    'node:digital_heritage:field_related_dh_items*node:digital_heritage:field_related_dh_items',
+  ];
+  foreach (entity_load('cer', FALSE) as $preset) {
+    if (in_array($preset->identifier, $presets_to_delete)) {
+      entity_delete('cer', $preset->pid);
+    }
+  }
 }

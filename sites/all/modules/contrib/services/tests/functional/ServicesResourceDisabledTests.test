@@ -20,18 +20,18 @@ class ServicesResourceDisabledTest extends ServicesWebTestCase {
       'name' => 'Services Disabled Resource Test',
       'description' => 'Assert that a resource is disabled when a request is made to it.',
       'group' => 'Services',
+      // The libraries module is required by rest_service, which is used by
+      // ServicesEndpointTests.
+      'dependencies' => array('ctools', 'libraries'),
     );
   }
 
   /**
-   * Implementation of setUp().
+   * {@inheritdoc}
    */
-  public function setUp() {
-    parent::setUp(
-      'ctools',
-      'services',
-      'rest_server'
-    );
+  public function setUp(array $modules = array()) {
+    parent::setUp($modules);
+
     // Set up endpoint.
     $this->endpoint =  $this->saveNewEndpoint();
     // Set up privileged user and login.

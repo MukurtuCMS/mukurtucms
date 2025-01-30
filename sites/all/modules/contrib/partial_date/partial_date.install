@@ -1,0 +1,113 @@
+<?php
+
+/**
+ * @file
+ * Defines the schema for the partial date fields.
+ */
+
+/**
+ * Implement hook_field_schema().
+ *
+ * This module stores a dates in a string that represents the data that the user
+ * entered and a float timestamp that represents the best guess for the date.
+ *
+ * After tossing up the options a number of times, I've taken the conservative
+ * opinion of storing all date components separately rather than storing these
+ * in a singular field.
+ */
+function partial_date_field_schema($field) {
+  module_load_include('module', 'partial_date');
+  $has_range = strpos($field['type'], '_range');
+
+  $schema = array(
+    'columns' => array(
+      'timestamp' => array(
+        'type' => 'float',
+        'size' => 'big',
+        'description' => 'The calculated timestamp for a date stored in UTC as a float for unlimited date range support.',
+        'not null' => TRUE,
+        'default' => 0,
+        'sortable' => TRUE,
+      ),
+      // These are instance settings, so add to the schema for every field.
+      'txt_short' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'description' => 'A editable display field for this date for the short format.',
+        'not null' => FALSE,
+      ),
+      'txt_long' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'description' => 'A editable display field for this date for the long format.',
+        'not null' => FALSE,
+        'sortable' => FALSE,
+      ),
+      'data' => array(
+        'description' => 'The configuration data for the effect.',
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'sortable' => FALSE,
+      ),
+    ),
+    'indexes' => array(
+      'timestamp' => array('timestamp'),
+    ),
+  );
+
+  if ($has_range) {
+    $schema['columns']['timestamp_to'] = array(
+      'type' => 'float',
+      'size' => 'big',
+      'description' => 'The calculated timestamp for a date stored in UTC as a float for unlimited date range support.',
+      'not null' => TRUE,
+      'default' => 0,
+      'sortable' => TRUE,
+    );
+    $schema['indexes']['timestamp_to'] = array('timestamp_to');
+  }
+
+  foreach (partial_date_components() as $key => $label) {
+    $description = 'The ' . $label . ' for ' . ($has_range ? 'the starting date component.' : 'a date.');
+
+    if ($key == 'timezone') {
+      $column = array(
+        'type' => 'varchar',
+        'length' => 50,
+        'description' => $description,
+        'not null' => FALSE,
+        'default' => NULL,
+      );
+    }
+    else {
+      $column = array(
+        'type' => 'int',
+        'description' => $description,
+        'not null' => FALSE,
+        'default' => NULL,
+        'size' => ($key == 'year' ? 'big' : 'small'),
+      );
+    }
+    $schema['columns'][$key] = $column;
+    if ($has_range) {
+      $column['description'] = 'The ' . $label . ' for the finishing date component.';
+      $schema['columns'][$key . '_to'] = $column;
+    }
+  }
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function partial_date_uninstall() {
+  module_load_include('module', 'partial_date');
+
+  variable_del('partial_date_component_field_inline_styles');
+  variable_del('partial_date_component_field_txt_inline_styles');
+  variable_del('partial_date_format_types');
+  foreach (partial_date_format_types() as $type => $label) {
+    variable_del('partial_date_format_' . $type);
+  }
+}

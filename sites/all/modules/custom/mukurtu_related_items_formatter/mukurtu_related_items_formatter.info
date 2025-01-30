@@ -1,0 +1,5 @@
+name = Mukurtu Related Items Formatter
+description = "Add Mukurtu related items field formatter that provides a paged display of related entities."
+package = Mukurtu
+core = 7.x
+files[] = mukurtu_related_items_formatter.module

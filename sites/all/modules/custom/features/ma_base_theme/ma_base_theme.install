@@ -2,6 +2,52 @@
 /**
  * Enable Boostrap Theme, and Mukurtu Starter, and disable all others
  */
+
+/**
+ * Change the default postion of tooltips after a bootstrap update
+ */
+function ma_base_theme_update_7001() {
+    $mukurtu_starter_settings = variable_get('theme_mukurtu_starter_settings');
+    $mukurtu_starter_settings['bootstrap_tooltip_placement'] = 'auto bottom';
+    variable_set('theme_mukurtu_starter_settings', $mukurtu_starter_settings);
+}
+
+
+/**
+ * Create default front page blocks for new Mukurtu theme.
+ */
+function ma_base_theme_update_7002(&$sandbox) {
+  $themes = array(
+    'bootstrap',
+    'mukurtu',
+  );
+  theme_enable($themes);
+
+  // Need to pull in beans.
+  features_revert_module('ma_base_theme');
+  _ma_base_theme_create_default_beans();
+}
+
+/**
+ * Set default discovery to digital-heritage browse.
+ */
+function ma_base_theme_update_7003(&$sandbox) {
+  // Create new 'browse' link.
+  $item = array(
+    'link_path' => 'browse',
+    'link_title' => 'Browse',
+    'menu_name' => 'menu-browse-menu',
+    'weight' => -43,
+    'expanded' => 0,
+    'customized' => 1,
+  );
+  menu_link_save($item);
+
+  // Set default to digitial heritage for existing sites.
+  // This will disable the new browse item created above.
+  _ma_base_theme_set_default_browse('digital-heritage');
+}
+
 //function ma_base_theme_install () {
 //  $themes_to_enable = array (
 //    'bootstrap',
@@ -47,3 +93,34 @@
 //  );
 //  theme_disable ($themes_to_disable);
 //}
+
+/**
+ * Copy the entity references in the old related content fields to the new Related Content field.
+ */
+function ma_base_theme_update_7004() {
+  $features_to_revert = array(
+    'ma_base_theme',
+    'ma_digitalheritage',
+    'ma_collection',
+    'ma_lesson_plan',
+    'ma_person',
+    'ma_dictionary',
+    'ma_search_api',
+    'mukurtu_importer_generator',
+  );
+
+  foreach ($features_to_revert as $feature_name) {
+    if (module_exists($feature_name)) {
+      features_revert_module($feature_name);
+    }
+  }
+
+  ma_base_theme_copy_related_content();
+}
+
+/**
+ * Delete the CERs that are replaced with Custom CERs.
+ */
+function ma_base_theme_update_7005() {
+  ma_search_api_delete_deprecated_cers();
+}

@@ -8,12 +8,32 @@
 define('MEE_RENDERED_COPYRIGHT_PATTERN', '/<!--\s*copyright=(\d+)\s*-->(.*)<!--\s*END copyright=\1\s*-->/sU');
 
 /**
+ * Implements hook_menu().
+ */
+function mee_menu() {
+  // AJAX callback used to render atoms in the widget-based plugin for
+  // CKEditor4.
+  $items['atom/ajax-widget-expand/%scald_atom_fallback'] = array(
+    'page callback' => 'mee_ajax_widget_expand',
+    'page arguments' => array(2),
+    'access callback' => TRUE,
+    'delivery callback' => 'ajax_deliver',
+    'theme callback' => 'ajax_base_page_theme',
+  );
+
+  return $items;
+}
+
+/**
  * Implements hook_theme().
  */
 function mee_theme($existing, $type, $theme, $path) {
   return array(
     'mee_resource_manager' => array(
       'render element' => 'resource_manager',
+    ),
+    'mee_widget_embed' => array(
+      'variables' => array('atom' => NULL, 'context' => NULL, 'options' => NULL, 'align' => NULL, 'caption' => NULL, 'content' => NULL, 'wysiwyg' => FALSE),
     ),
   );
 }
@@ -33,7 +53,7 @@ function mee_library() {
         'type' => 'setting',
         'data' => array(
           'mee' => array(
-            'sas' => variable_get('mee_store_sas', TRUE),
+            'sas' => (mee_store_format() == 'sas'),
             'editors' => array(),
           ),
         ),
@@ -44,7 +64,130 @@ function mee_library() {
     ),
   );
 
+  // This file is included automatically if the CKEditor plugin is enabled.
+  // However we need to load it directly in Drupal so that strings can be
+  // translated.
+  $plugin = mee_store_format() !== 'embed_div' ? 'ckeditor' : 'dndck4';
+  $libraries['library']['js'][$path . '/plugins/' . $plugin . '/lang/en.js'] = array();
+
   return $libraries;
+}
+
+/**
+ * Implements hook_wywiwyg_plugin().
+ */
+function mee_wysiwyg_plugin($editor, $version) {
+  $plugins = array();
+  $mee_store_format = mee_store_format();
+  switch ($editor) {
+    case 'ckeditor':
+      if ($mee_store_format == 'sas') {
+        $plugins['dnd'] = array(
+          'path' => drupal_get_path('module', 'mee') . '/plugins/ckeditor',
+          'filename' => 'plugin.js',
+          'buttons' => array(
+            'dnd' => t('Scald DnD integration'),
+          ),
+          'load' => TRUE,
+        );
+      }
+      elseif ($mee_store_format == 'embed_div') {
+        $plugins['dndck4'] = array(
+          'path' =>  drupal_get_path('module', 'mee') . '/plugins/dndck4',
+          'filename' => 'plugin.js',
+          'buttons' => array(
+            'dndck4' => t('Scald DnD integration - CKEditor 4 widgets'),
+          ),
+          'load' => TRUE,
+        );
+      }
+      break;
+  }
+
+  return $plugins;
+}
+
+/**
+ * Implements hook_ckeditor_plugin().
+ */
+function mee_ckeditor_plugin() {
+  $plugins = array();
+  $mee_store_format = mee_store_format();
+  if ($mee_store_format == 'sas') {
+    $plugins['dnd'] = array(
+      'name' => 'dnd',
+      'desc' => t('Scald Drag and Drop integration'),
+      'path' =>  drupal_get_path('module', 'mee') . '/plugins/ckeditor/',
+      'buttons' => array(
+        'ScaldAtom' => array(
+          'icon' => 'icons/atom.png',
+          'label' => t('Edit atom properties'),
+        ),
+      ),
+    );
+  }
+  elseif ($mee_store_format == 'embed_div' && version_compare(ckeditor_get_version(), '4.3.0') >= 0) {
+    $plugins['dndck4'] = array(
+      'name' => 'dndck4',
+      'desc' => t('Scald Drag and Drop integration - CKEditor 4 widgets'),
+      'path' =>  drupal_get_path('module', 'mee') . '/plugins/dndck4/',
+      'buttons' => array(
+        'ScaldAtom' => array(
+          'icon' => 'icons/atom.png',
+          'label' => t('Edit atom properties'),
+        ),
+      ),
+    );
+  }
+
+  return $plugins;
+}
+
+/**
+ * Implements hook_editor_ckeditor_plugins().
+ */
+function mee_editor_ckeditor_plugins() {
+  $plugins = array();
+  $mee_store_format = mee_store_format();
+  if ($mee_store_format == 'sas') {
+    $plugins['dnd'] = array(
+      'name' => 'dnd',
+      'desc' => t('Scald Drag and Drop integration'),
+      'path' =>  drupal_get_path('module', 'mee') . '/plugins/ckeditor',
+      'buttons' => array(
+        'ScaldAtom' => array(
+          'label' => t('Edit atom properties'),
+          'image' => drupal_get_path('module', 'mee') . '/plugins/ckeditor/icons/atom.png',
+        ),
+      ),
+      'file' => 'plugin.js',
+      'enabled callback' => TRUE,
+    );
+  }
+  elseif ($mee_store_format == 'embed_div') {
+    $plugins['dndck4'] = array(
+      'name' => 'dndck4',
+      'desc' => t('Scald Drag and Drop integration - CKEditor 4 widgets'),
+      'path' =>  drupal_get_path('module', 'mee') . '/plugins/dndck4',
+      'buttons' => array(
+        'ScaldAtom' => array(
+          'label' => t('Edit atom properties'),
+          'image' => drupal_get_path('module', 'mee') . '/plugins/dndck4/icons/atom.png',
+        ),
+      ),
+      'file' => 'plugin.js',
+      'enabled callback' => TRUE,
+    );
+  }
+
+  return $plugins;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function mee_views_api($module = NULL, $api = NULL) {
+  return array("api" => "3.0");
 }
 
 /**
@@ -56,6 +199,17 @@ function mee_field_info_alter(&$info) {
     $info[$name]['instance_settings']['mee_enabled'] = 0;
     $info[$name]['instance_settings']['context'] = '';
   }
+}
+
+/**
+ * Returns the current storage format for embedded atoms.
+ *
+ * @return string
+ *   - 'sas' when using the legacy CKEditor plugin,
+ *   - 'embed_div' when using the CKEditor 4 widget plugin.
+ */
+function mee_store_format() {
+  return variable_get('mee_store_format', 'embed_div');
 }
 
 /**
@@ -74,7 +228,7 @@ function mee_form_alter(&$form, &$form_state, $form_id) {
   $settings = $form['#instance']['settings'];
 
   $context_options = array();
-  foreach (scald_contexts() as $name => $context) {
+  foreach (scald_contexts_public() as $name => $context) {
     $context_options[$name] = $context['title'];
   }
 
@@ -113,8 +267,8 @@ function mee_form_alter(&$form, &$form_state, $form_id) {
  * modules. However we should be safe with Drupal 7 core.
  */
 function text_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
-  // Convert rendered atom back to SAS for on the fly render if required
-  if (!variable_get('mee_store_sas', TRUE)) {
+  // Convert rendered atom back to SAS for on the fly render if required.
+  if (mee_store_format() != 'sas') {
     return;
   }
 
@@ -222,7 +376,7 @@ function text_field_delete($entity_type, $entity, $field, $instance, $langcode, 
 
   list($id, ) = _mee_extract_id($entity_type, $entity);
 
-  // Delete all resource associations for this field
+  // Delete all resource associations for this field.
   db_delete('mee_resource')
       ->condition('entity_type', $entity_type)
       ->condition('entity_id', $id)
@@ -236,17 +390,55 @@ function text_field_delete($entity_type, $entity, $field, $instance, $langcode, 
  * Converts the SAS representation to the rendered representation.
  */
 function mee_field_attach_view_alter(&$output, $context) {
-  if (variable_get('mee_store_sas', TRUE)) {
+  $store_format = mee_store_format();
+  if ($store_format == 'sas' || $store_format == 'embed_div') {
     list($id, $revision_id, $bundle) = entity_extract_ids($context['entity_type'], $context['entity']);
     $fields = field_info_instances($context['entity_type'], $bundle);
     foreach ($fields as $name => $field) {
       if (!empty($field['settings']['dnd_enabled']) && isset($output[$name])) {
         foreach (element_children($output[$name]) as $key) {
-          $output[$name][$key]['#markup'] = scald_sas_to_rendered($output[$name][$key]['#markup'], $field['settings']['context']);
+          if ($store_format == 'embed_div') {
+            $input_format = $output[$name]['#items'][$key]['format'];
+            $list = filter_list_format($input_format);
+            if (empty($list['mee_scald_widgets']) || $list['mee_scald_widgets']->status != 1) {
+              $output[$name][$key]['#markup'] = mee_filter_process($output[$name][$key]['#markup']);
+            }
+          }
+          $output[$name][$key]['#markup'] = scald_sas_to_rendered($output[$name][$key]['#markup'], $field['settings']['context'], FALSE, dnd_scald_wysiwyg_context_slugs());
         }
       }
     }
   }
+}
+
+/**
+ * Implements hook_panels_pane_content_alter().
+ *
+ * Converts the SAS representation to the rendered representation
+ * in custom content panes.
+ */
+function mee_panels_pane_content_alter($content, $pane, $args, $context) {
+  if ($pane->type === 'custom' && $pane->subtype === 'custom'
+    && $content->type === 'custom' && is_string($content->content)) {
+    $store_format = mee_store_format();
+    if ($store_format == 'embed_div') {
+      $input_format = $pane->configuration['format'];
+      $list = filter_list_format($input_format);
+      if (empty($list['mee_scald_widgets']) || $list['mee_scald_widgets']->status != 1) {
+        $content->content = mee_filter_process($content->content);
+      }
+    }
+    $content->content = scald_sas_to_rendered($content->content, NULL, FALSE, dnd_scald_wysiwyg_context_slugs());
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add dnd for ALL panels 'custom content' ctools forms.
+ */
+function mee_form_ctools_custom_content_type_edit_form_alter(&$form, &$form_state) {
+  $form['body']['#attached']['library'] = array(array('dnd', 'library'));
 }
 
 /**
@@ -255,23 +447,24 @@ function mee_field_attach_view_alter(&$output, $context) {
 function mee_field_widget_form_alter(&$element, &$form_state, $context) {
   $enables = _mee_field_instance_enabled($context['instance']);
 
-  // In any case, convert SAS into rendered for format textarea
+  // In any case, convert SAS into rendered for format textarea.
   if (in_array($context['field']['type'], mee_field_types()) && isset($element['#default_value'])) {
-    if (variable_get('mee_store_sas', TRUE)) {
-      $element['#default_value'] = scald_sas_to_rendered($element['#default_value'], $context['instance']['settings']['context']);
+    if (mee_store_format() == 'sas') {
+      $element['#default_value'] = scald_sas_to_rendered($element['#default_value'], $context['instance']['settings']['context'], FALSE, dnd_scald_wysiwyg_context_slugs());
     }
   }
 
   // Activate DnD Library for this element if enabled.
   if (!empty($enables['dnd'])) {
-    // Force an #id so that we can reference to it later
-    $element['#id'] = drupal_html_id('edit-' . $context['field']['field_name']);
-    $element += array(
-      '#dnd-enabled' => TRUE,
-      '#dnd-settings' => array(
-        'drop_selector' => '#' . $element['#id'] . ' .drop',
-      ),
-    );
+    $settings = $context['instance']['settings'];
+    $context_default = isset($settings['context_default']) ?
+       $settings['context_default'] :
+       variable_get('dnd_context_default', 'sdl_editor_representation');
+    $element['#attributes']['data-dnd-context'][] = $context_default;
+    $element['#attached']['library'][] = array('dnd', 'library');
+    if (isset($element['summary'])) {
+      $element['summary']['#attributes']['data-dnd-context'][] = $context_default;
+    }
   }
 
   // Add our custom form element into MEE enabled textarea only.
@@ -330,7 +523,7 @@ function mee_field_widget_form_alter(&$element, &$form_state, $context) {
     );
   }
 
-  // And now we add the separator
+  // And now we add the separator.
   $element['mee']['resource_manager'][0] = array(
     'title' => array(
       '#markup' => t('< Primary / Secondary >'),
@@ -444,6 +637,130 @@ function theme_mee_resource_manager($variables) {
 }
 
 /**
+ * Returns the HTML for an atom embedded through the CK widget plugin.
+ *
+ * This is used by the mee_scald_widgets filter, and leaves a placeholder SAS
+ * code for later rendering of the atom.
+ *
+ * @param $vars
+ *   An array with the following key/value pairs:
+ *   - atom: the atom,
+ *   - context: the rendering context,
+ *   - options: the options as a JSON string,
+ *   - align: the alignment (left, right, center, none),
+ *   - caption: the caption HTML,
+ *   - content: the atom content. Note: to account for filter cache, the
+ *     'mee_scald_widgets' filter only passes a SAS code here, that gets
+ *     replaced with the HTML for the rendered atom in
+ *     mee_field_attach_view_alter().
+ *   - wysiwyg: TRUE when the atom is displayed within a CKEditor. Defaults to
+ *     FALSE.
+ *
+ * @return string
+ *   The HTML for the atom embed.
+ */
+function theme_mee_widget_embed($vars) {
+  $options = array();
+  if (isset($vars['options'])) {
+    $options = drupal_json_decode($vars['options']);
+  }
+  $classes = array('dnd-widget-wrapper', 'context-' . $vars['context'], 'type-' . $vars['atom']->type);
+  if ($vars['align'] != 'none') {
+    $classes[] = 'atom-align-' . $vars['align'];
+  }
+  if (!empty($options['additionalClasses'])) {
+    foreach (explode(' ', $options['additionalClasses']) as $class) {
+      $classes[] = $class;
+    }
+  }
+  $output = '<div class="' . implode(' ', $classes) . '">';
+
+  $output .= '<div class="dnd-atom-rendered">' . $vars['content'] . '</div>';
+
+  // When displaying a widget within a CKEditor, always include a container div
+  // for the editable. Otherwise, only display the caption container if there
+  // is a caption.
+  if (!empty($vars['caption']) || $vars['wysiwyg']) {
+    // Note: The 'dnd-caption-wrapper' class is used by the CKEditor plugin to
+    // identify the editable zone and should not be modified by theme overrides.
+    $output .= '<div class="dnd-caption-wrapper">' . $vars['caption'] . '</div>';
+  }
+
+  $output .= '</div>';
+
+  return $output;
+}
+
+/**
+ * Ajax callback: returns the expanded HTML atom widget.
+ *
+ * This URL is used by the "CKEditor 4" widget plugin.
+ *
+ * @param $atom
+ *   The atom.
+ *
+ * Other parameters, such as context, could also be passed via the querystring.
+ */
+function mee_ajax_widget_expand($atom) {
+  $context = (isset($_GET['context']) && in_array($_GET['context'], dnd_scald_wysiwyg_context_slugs())) ? $_GET['context'] : NULL;
+  if ($atom->type == 'scald_atom_fallback') {
+    $context = 'invalid-id';
+  }
+  $options = isset($_GET['options']) ? urldecode($_GET['options']) : '';
+  $align = (isset($_GET['align']) && in_array($_GET['align'], array('left', 'right', 'center'))) ? $_GET['align'] : 'none';
+
+  // The legend call needs at least the basic atom meta-data
+  // to be pre-rendered, so ensure they are present by doing
+  // an early render, eventually in the lightweight 'title'
+  // context if no explicit context is given.
+  $output = $context ? scald_render($atom, $context, $options) : scald_render($atom, 'title');
+
+  if (empty($atom->omit_legend)) {
+    $legend = theme('sdl_editor_legend', array('atom' => $atom));
+  }
+  else {
+    $legend = '';
+  }
+
+  $commands = array();
+
+  $commands[] = array(
+    'command' => 'dndck4_cache_atom_metadatadata',
+    'data' => array(
+      'sid' => $atom->sid,
+      'meta' => array(
+        'title' => $atom->title,
+        'type' => $atom->type,
+        'data' => !empty($atom->data) ? $atom->data : array(),
+        'provider' => $atom->provider,
+        'legend' => $legend,
+      ),
+      'actions' => array_keys(scald_atom_actions_available($atom)),
+    ),
+  );
+
+
+  if ($context) {
+    $commands[] =  array(
+      'command' => 'dndck4_expand_widget',
+      'data' => theme('mee_widget_embed', array(
+        'atom' => $atom,
+        'context' => $context,
+        'options' => $options,
+        'align' => $align,
+        'content' => $output,
+        'wysiwyg' => TRUE,
+      )),
+    );
+  }
+
+  return array(
+    '#type' => 'ajax',
+    '#commands' => $commands,
+  );
+}
+
+/**
  * Tests if MEE is supported and enabled for this field instance.
  */
 function _mee_field_instance_enabled($instance, $key = NULL) {
@@ -460,7 +777,7 @@ function _mee_field_instance_enabled($instance, $key = NULL) {
 }
 
 /**
- * Extract entity id, santizing revision_id if necessary.
+ * Extract entity id, sanitizing revision_id if necessary.
  */
 function _mee_extract_id($entity_type, $entity) {
   list($entity_id, $revision_id, $bundle) = entity_extract_ids($entity_type, $entity);
@@ -479,13 +796,31 @@ function _mee_extract_id($entity_type, $entity) {
  * Extracts sids and copyright from $item. Updates $item if necessary.
  */
 function _mee_process_item_value(&$item, $entity_type, $entity, $field, $delta) {
-  // $sids contients the list of atom sid actually used in the item.
-  $sas = scald_rendered_to_sas($item['value']);
-  $scald_included = scald_included($sas);
-  $sids = array_unique($scald_included);
+  if (mee_store_format() == 'embed_div') {
+    $sids = array();
+    $copyrights = array();
+    // Collect the emebed data.
+    foreach (_mee_extract_widget_embed_info(filter_dom_load($item['value'])) as $info) {
+      $sids[] = $info['sid'];
+      $copyrights[$info['sid']] = $info['caption'];
+    }
+    if (!empty($item['summary'])) {
+      foreach (_mee_extract_widget_embed_info(filter_dom_load($item['summary'])) as $info) {
+        $sids[] = $info['sid'];
+        $copyrights[$info['sid']] = $info['caption'];
+      }
+    }
+    $sids = array_unique($sids);
+  }
+  else {
+    // $sids contains the list of atom sid actually used in the item.
+    $sas = scald_rendered_to_sas($item['value']);
+    $scald_included = scald_included($sas);
+    $sids = array_unique($scald_included);
 
-  // Parse copyright informations
-  $copyrights = mee_extract_copyrights($item['value']);
+    // Parse copyright informations.
+    $copyrights = mee_extract_copyrights($item['value']);
+  }
 
   // If $item['mee'] does not hold anything, load default data into it.
   if (empty($item['mee']) || !is_array($item['mee']['resource_manager'])) {
@@ -495,7 +830,7 @@ function _mee_process_item_value(&$item, $entity_type, $entity, $field, $delta) 
   // Finally, if there was unknown client-side problem, we might not have new
   // inserted resources. We set default value for them.
   foreach ($sids as $sid) {
-    if (!isset($item['mee']['resource_manager'][$sid])) {
+    if (is_array($item['mee']['resource_manager']) && !isset($item['mee']['resource_manager'][$sid])) {
       $item['mee']['resource_manager'][$sid] = array('required' => FALSE, 'weight' => 0);
     }
   }
@@ -520,7 +855,9 @@ function _mee_load_resources($entity_type, $entity, $field, $delta, &$item) {
       ->execute();
   $item['mee']['resource_manager'] = array();
   $item['mee']['resource_manager'] = $result->fetchAllAssoc('atom_sid', PDO::FETCH_ASSOC);
-  $item['mee']['resource_manager'][0] = array('weight' => 0, 'required' => FALSE);
+  if (is_array($item['mee']['resource_manager']) && isset($item['mee']['resource_manager'][0])) {
+    $item['mee']['resource_manager'][0] = array('weight' => 0, 'required' => FALSE);
+  }
 }
 
 /**
@@ -544,4 +881,117 @@ function mee_wysiwyg_include_directory($type) {
     case 'plugins':
       return $type;
   }
+}
+
+/**
+ * Implements hook_filter_info().
+ */
+function mee_filter_info() {
+  $filters['mee_scald_widgets'] = array(
+    'title' => t('Embedded atoms'),
+    'description' => t('This is only needed when using the Scald plugin for CKEditor 4'),
+    'process callback' => 'mee_filter_process',
+  );
+  return $filters;
+}
+
+/**
+ * Process callback for the 'mee_scald_widgets' filter.
+ *
+ * This expends the embed marker into the themed "atom embed" markup. The atom
+ * itself is not rendered yet, since that is not cacheable. Instead, a
+ * placeholder SAS code is left, that will be replaced in
+ * mee_field_attach_view_alter().
+ *
+ * @param string $text
+ *   The text to process.
+ *
+ * @return string
+ *   The processed text.
+ */
+function mee_filter_process($text) {
+  // Work on the string as a DOM structure.
+  $dom = filter_dom_load($text);
+
+  // Collect the DOM nodes and the corresponding embed data.
+  if ($embed_info = _mee_extract_widget_embed_info($dom)) {
+    // Collect the corresponding atom ids and load them upfront to benefit from
+    // multiple-loading.
+    $sids = array();
+    foreach ($embed_info as $info) {
+      $sids[] = $info['sid'];
+    }
+    $atoms = scald_atom_load_multiple(array_unique($sids));
+
+    // Replace each DOM node with the themed embed.
+    foreach ($embed_info as $info) {
+      $html = '';
+      if (isset($atoms[$info['sid']])) {
+        $html = theme('mee_widget_embed', array(
+          'atom' => $atoms[$info['sid']],
+          'context' => $info['context'],
+          'options' => $info['options'],
+          'align' => $info['align'],
+          'caption' => $info['caption'],
+          // Only store a SAS code in the filter cache, that will get replaced
+          // with the HTML for the rendered atom in
+          // mee_field_attach_view_alter().
+          'content' => '[scald=' . $info['sid'] . ':' . $info['context'] . ($info['options'] ? ' ' . $info['options'] : '') . ']',
+        ));
+      }
+
+      $node = $info['node'];
+      $fragment = $dom->createDocumentFragment();
+      $fragment->appendXML($html);
+      $node->parentNode->replaceChild($fragment, $node);
+    }
+
+    $text = filter_dom_serialize($dom);
+  }
+
+  return $text;
+}
+
+/**
+ * Extract information about atom embeds found in a DOMDocument.
+ *
+ * @param DOMDocument $dom
+ *   The DOMDocument.
+ *
+ * @return array
+ *   Information about atom embeds found in $dom. Each value is an array with
+ *   the following key/value pairs:
+ *   - node: the DOMNode containing the embed.
+ *   - sid: the atom id.
+ *   - align: the embed alignment (left, right, center, none).
+ *   - context: the atom render context.
+ *   - options: the atom render options.
+ *   - caption: the embed caption.
+ */
+function _mee_extract_widget_embed_info($dom) {
+  $embed_info = array();
+
+  // Collect the DOM nodes and the corresponding embed data.
+  $xpath = new DOMXPath($dom);
+  $nodes = $xpath->query("//div[@class='dnd-atom-wrapper']|//figure[@class='dnd-atom-wrapper']|//span[@class='dnd-atom-wrapper']");
+  foreach ($nodes as $node) {
+    $info = array(
+      'node' => $node,
+      'sid' => $node->getAttribute('data-scald-sid'),
+      'align' => $node->getAttribute('data-scald-align'),
+      'context' => $node->getAttribute('data-scald-context'),
+      'options' => urldecode($node->getAttribute('data-scald-options')),
+      'caption' => '',
+    );
+    // Extract the caption if present.
+    $result = $xpath->query("div[@class='dnd-caption-wrapper']|figcaption[@class='dnd-caption-wrapper']", $node);
+    if ($result->length) {
+      foreach ($result->item(0)->childNodes as $child) {
+        $info['caption'] .= $dom->saveXML($child);
+      }
+    }
+    $embed_info[] = $info;
+  }
+
+  return $embed_info;
 }

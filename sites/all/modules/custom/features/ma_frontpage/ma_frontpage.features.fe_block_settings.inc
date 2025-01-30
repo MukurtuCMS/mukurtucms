@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_frontpage.features.fe_block_settings.inc
@@ -18,12 +19,22 @@ function ma_frontpage_default_fe_block_settings() {
     'delta' => 'mukurtu_wizard',
     'module' => 'mukurtu_splash',
     'node_types' => array(),
-    'pages' => 'node/*/edit
-node/add/*
-dashboard*
+    'pages' => 'dashboard*
 dashboard',
     'roles' => array(),
     'themes' => array(
+      'bootstrap' => array(
+        'region' => 'header',
+        'status' => 1,
+        'theme' => 'bootstrap',
+        'weight' => 0,
+      ),
+      'mukurtu' => array(
+        'region' => 'header',
+        'status' => 1,
+        'theme' => 'mukurtu',
+        'weight' => -49,
+      ),
       'mukurtu_starter' => array(
         'region' => 'header',
         'status' => 1,

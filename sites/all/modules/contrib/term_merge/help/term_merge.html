@@ -1,0 +1,44 @@
+Term merge module, as its title well implies it, allows administrators to merge terms one into another.
+
+When using taxonomy for free tagging purposes, it's easy to end up with several terms having the same meaning. This may be due to spelling errors, or different users simply making up synonymous terms as they go.
+
+You, as an administrator, may then want to correct such errors or unify synonymous terms, thereby pruning the taxonomy to a more manageable set. This module allows you to merge multiple terms into one, while updating all fields referring to those terms to refer to the replacement term instead.
+
+Currently the module features the following set of functionality and useful tools:
+<dt>Updating all references to branch terms and changing them to the trunk term.</dt>
+<dd>The core feature of the module is to safely update all existing content and to make it point from a branch term to the trunk one. Right now the following Field types are supported: <ul>
+    <li>Taxonomy term reference</li>
+    <li>Entity reference (when the underlying entity type is Taxonomy term)</li>
+    <li>and any other field type that correctly defines its foreign keys in the database</li>
+</ul></dd>
+<dt>Merging field values from the branch term into the same fields of the trunk term.</dt>
+<dd>Optionally you may merge field values from each term branch into the term trunk. You choose what fields should get merged and after combining the values from both terms only unique values are kept in the trunk term. It is a useful option if you do not want to lose field values of your term branches.</dd>
+<dt>Redirect module integration</dt>
+<dd>Module integrates with the current release of Redirect module, allowing you to set up SEO friendly HTTP redirects from branch terms to the trunk term.</dd>
+<dt>Synonyms module integration</dt>
+<dd>Synonyms module is also integrated: before merging you may choose into which field of trunk term the branch terms will be added as synonyms - this should prevent from growing your vocabularies in future, since now your terms will have the terms they have merged as synonyms.</dd>
+<dt>Duplicate merge</dt>
+<dd>Sometimes even the task of identifying duplicates can become tedious, especially on the big vocabularies. So Term Merge tries to facilitate this part of the process too. There are certain heuristics implemented based on which the module tries to identify the terms that are likely to be duplicates of each other. Your task is then only to review the suggested duplicates and fire off merging of those that actually are duplicates. If your vocabulary is too big or if you only want it so, you can invoke the duplicate search tool only on a subset of the vocabulary terms, on the children of some term.</dd>
+
+<h2>Duplicate merge</h2>
+
+This is a somewhat versatile tool, so we decided to dedicate it a separate paragraph for we want to make sure users take the full advantage of its capabilities.
+
+When you face the task of finding duplicate terms, you are likely to deal with two complications: <ul>
+    <li>by what criteria should I judge if 2 terms are duplicates?</li>
+    <li>how easy and how much of additional information can I retrieve about possible duplicate terms in order to be able to decide whether they are actual duplicates or it was just a false positive?</li>
+</ul>
+
+<h3>Criterion of duplicate</h3>
+
+Out of the box Term Merge gives you 3 heuristics for this purpose. The terms are considered duplicates if:<ul>
+    <li>Their name is the same, disregarding the letter case</li>
+    <li>Their description is the same, disregarding the letter case</li>
+    <li>They have the same parent</li>
+</ul>
+
+And then through the UI of the duplicate tool you can enable a combination of the available heuristics based on which terms will be marked as duplicates. Additionally, you can introduce your own heuristic if you have a custom notion of what terms are possible duplicates. So you can plug in your duplicate heuristic into the Term Merge and leverage its whole power only providing your custom duplicate detection. If you are interested in writing custom duplicate detection heuristic, cheer up! It is not that difficult and you can read on about it on <a href="&topic:term_merge/term_merge_duplicate_suggestion&">this page</a>.
+
+<h3>How to judge if suggestion duplicates are actually duplicates?</h3>
+
+One way or another, but you will have your duplicates laid out in front of you. You certainly can merge all of them without extra worrying about it. But chances are, at least some of the suggested terms may actually not be duplicates. So you might want to quickly scan through the available suggestions and review them for any obvious false positives. You can use term name, term ID, description, parents and fields of those terms to tell the heads and tails in it.

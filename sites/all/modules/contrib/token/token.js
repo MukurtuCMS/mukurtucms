@@ -14,6 +14,12 @@ Drupal.behaviors.tokenDialog = {
     $('a.token-dialog', context).once('token-dialog').click(function() {
       var url = $(this).attr('href');
       var dialog = $('<div style="display: none" class="loading">' + Drupal.t('Loading token browser...') + '</div>').appendTo('body');
+
+      // Emulate the AJAX data sent normally so that we get the same theme.
+      var data = {};
+      data['ajax_page_state[theme]'] = Drupal.settings.ajaxPageState.theme;
+      data['ajax_page_state[theme_token]'] = Drupal.settings.ajaxPageState.theme_token;
+
       dialog.dialog({
         title: $(this).attr('title') || Drupal.t('Available tokens'),
         width: 700,
@@ -24,7 +30,7 @@ Drupal.behaviors.tokenDialog = {
       // Load the token tree using AJAX.
       dialog.load(
         url,
-        {},
+        data,
         function (responseText, textStatus, XMLHttpRequest) {
           dialog.removeClass('loading');
         }

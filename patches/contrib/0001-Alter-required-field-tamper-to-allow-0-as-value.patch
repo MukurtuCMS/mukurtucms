@@ -1,0 +1,41 @@
+From 932dd91cb51cb4776f837792766396a750557969 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Tue, 10 May 2016 13:58:48 -0700
+Subject: [PATCH] Alter required field tamper to allow 0 as value
+
+---
+ plugins/required.inc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/plugins/required.inc b/plugins/required.inc
+index a18d540..aa37d21 100644
+--- a/plugins/required.inc
++++ b/plugins/required.inc
+@@ -39,15 +39,21 @@ function feeds_tamper_required_form($importer, $element_key, $settings) {
+
+ function feeds_tamper_required_callback($result, $item_key, $element_key, &$field, $settings, $source) {
+   if (!empty($settings['invert'])) {
+-    if (!empty($field)) {
++    if (!empty($field) || $field == '0') {
+       unset($result->items[$item_key]);
+     }
+
+     return;
+   }
+
+-  if (!empty($field)) {
+-    return;
++  if (!empty($field) || $field == '0') {
++    // Mukurtu specific change. Because of the changes we've made to allow partial
++    // updates in feeds imports, not all fields get cleared. This means we end up with
++    // some untouched fields having single element arrays that contain a single empty
++    // string. We check for that here and count that as missing.
++    if (!(is_array($field) && count($field) == 1 && isset($field[0]) && empty($field[0]))) {
++      return;
++    }
+   }
+
+   unset($result->items[$item_key]);
+--
+2.1.4
+

@@ -1,0 +1,26 @@
+From 5ca75c8ed49166418b793fd222716612b87b43fe Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Mon, 15 May 2017 09:35:07 -0700
+Subject: [PATCH] Add ID to handle multiple carousels
+
+Otherwise it applies the same settings to all carousels.
+---
+ .../modules/contrib/owlcarousel/includes/js/owlcarousel.settings.js   | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/includes/js/owlcarousel.settings.js b/includes/js/owlcarousel.settings.js
+index 16d9a5c..956a746 100755
+--- a/includes/js/owlcarousel.settings.js
++++ b/includes/js/owlcarousel.settings.js
+@@ -19,6 +19,6 @@
+      * @param settings object
+      */
+     attachInit: function(carousel, settings) {
+-      var element = $('#' + carousel);
++      var element = $('#' + carousel + '.owl-carousel');
+       this.attachOwlCarousel(element, settings[carousel].settings);
+     },
+
+--
+1.9.1
+

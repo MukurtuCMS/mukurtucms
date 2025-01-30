@@ -1,7 +1,8 @@
 <?php
 
 /**
- * @file Base class for testing the Better Exposed Filters module.
+ * @file
+ * Base class for testing the Better Exposed Filters module.
  * @author mikeker
  */
 
@@ -24,6 +25,7 @@ class BEF_TestBase extends DrupalWebTestCase {
       'name' => 'BEF Basic functionality tests',
       'description' => 'Basic tests for Better Exposed Filters.',
       'group' => 'Better Exposed Filters',
+      'dependencies' => array('date', 'date_views', 'views', 'views_ui')
     );
   }
 
@@ -47,7 +49,7 @@ class BEF_TestBase extends DrupalWebTestCase {
     // One of these days I'll figure out why Features is breaking all my tests.
     module_enable(array('bef_test_content'));
 
-    // User with edit views perms
+    // User with edit views perms.
     $this->admin_user = $this->drupalCreateUser();
     $role = user_role_load_by_name('administrator');
     $this->assertTrue(!empty($role->rid), 'Found the "administrator" role.');
@@ -62,7 +64,7 @@ class BEF_TestBase extends DrupalWebTestCase {
     // Add field to default display
     // $this->addField('node.title');
 
-    // Turn of Better Exposed Filters
+    // Turn of Better Exposed Filters.
     $this->setBefExposedForm();
   }
 
@@ -118,7 +120,7 @@ class BEF_TestBase extends DrupalWebTestCase {
       $this->view['displays'] = array();
     }
 
-    // Add a display of $type to the view
+    // Add a display of $type to the view.
     $this->drupalPost($this->view['edit_url'], array(), "Add $type");
 
     // Grab the name of the newly created display and store some info about it.
@@ -151,17 +153,16 @@ class BEF_TestBase extends DrupalWebTestCase {
    *
    * $field: string in the form of node.status or
    *   field_data_field_example.field_example_value
-   * $display: machine name of the display to add this filter to. NOTE:
-   *   Currently only allows filters on the master display, no overrides.
-   *
-   * @todo: fix that, if needed.
-   * $exposed: (bool) (optional, default: TRUE) Is this an exposed filter?
    * $settings: (array) Settings on the "Configure filter criterion" dialog.
    *   NOTE: called after the "Expose filter" button is pressed if $exposed
    *   is TRUE so you can set things like "Allow multiple items" or grouped
    *   filter options.
    * $additional: (array) settings for any additional configuration forms such
    *   as taxonomy term settings.
+   * $display: machine name of the display to add this filter to. NOTE:
+   *   Currently only allows filters on the master display, no overrides.
+   *   @todo: fix that, if needed.
+   * $exposed: (bool) (optional, default: TRUE) Is this an exposed filter?
    *
    * Note: This routine expects the caller to save the view, as needed.
    */
@@ -238,7 +239,7 @@ class BEF_TestBase extends DrupalWebTestCase {
   }
 
   /**
-   * Ensures that BEF is selected as the exposed form option
+   * Ensures that BEF is selected as the exposed form option.
    *
    * Note: This routine expects the caller to save the view, as needed.
    */
@@ -268,7 +269,7 @@ class BEF_TestBase extends DrupalWebTestCase {
   }
 
   /**
-   * Saves the view
+   * Saves the view.
    */
   protected function saveView() {
     $this->drupalPost($this->view['edit_url'], array(), 'Save');

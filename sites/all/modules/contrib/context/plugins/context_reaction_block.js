@@ -68,8 +68,8 @@ DrupalContextBlockForm = function(blockForm) {
 
     // Hide enabled blocks from selector that are used
     $('table.context-blockform-region tr').each(function() {
-      var bid = $(this).attr('id');
-      $('div.context-blockform-selector input[value='+bid+']').parents('div.form-item').eq(0).hide();
+      var bid = Drupal.checkPlain($(this).attr('id'));
+      $('div.context-blockform-selector input[value="'+bid+'"]').parents('div.form-item').eq(0).hide();
     });
     // Show blocks in selector that are unused
     $('div.context-blockform-selector input').each(function() {
@@ -139,7 +139,7 @@ DrupalContextBlockForm = function(blockForm) {
           }
           select += '</select></div>';
           $(block).attr('id', $(this).attr('value')).addClass('draggable');
-          $(block).html("<td>"+ text + "</td><td>" + select + "</td><td><a href='' class='remove'>X</a></td>");
+          $(block).html("<td>"+ Drupal.checkPlain(text) + "</td><td>" + select + "</td><td><a href='' class='remove'>X</a></td>");
 
           // add block item to region
           //TODO : Fix it so long blocks don't get stuck when added to top regions and dragged towards bottom regions
@@ -159,7 +159,7 @@ DrupalContextBlockForm = function(blockForm) {
           $(this).removeAttr('checked');
         });
         if (weight_warn) {
-          alert(Drupal.t('Desired block weight exceeds available weight options, please check weights for blocks before saving'));
+          alert(Drupal.t('Desired block weight exceeds available weight options, please check weights for blocks before saving.'));
         }
       }
       return false;
@@ -425,10 +425,9 @@ DrupalContextBlockEditor.prototype = {
     $('a.context_ui_dialog-stop').hide();
 
     $('.editing-context-label').remove();
-    var label = $('#context-editable-trigger-'+context+' .label').text();
-    label = Drupal.t('Now Editing: ') + label;
-    editor.parent().parent()
-      .prepend('<div class="editing-context-label">'+ label + '</div>');
+    var label = $('#context-editable-trigger-'+context+' .label.top').text();
+    label = Drupal.t('Now editing: @label', {'@label': label});
+    editor.parent().parent().prepend('<div class="editing-context-label">' + label + '</div>');
 
     // First pass, enable sortables on all regions.
     $(this.regions).each(function() {

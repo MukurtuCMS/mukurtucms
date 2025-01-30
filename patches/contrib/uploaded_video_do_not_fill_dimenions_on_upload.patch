@@ -1,0 +1,58 @@
+diff --git a/modules/providers/scald_video/scald_video.module b/modules/providers/scald_video/scald_video.module
+index 7e17c34..ec094a6 100644
+--- a/modules/providers/scald_video/scald_video.module
++++ b/modules/providers/scald_video/scald_video.module
+@@ -194,52 +194,7 @@ function scald_video_form_scald_atom_add_form_options_alter(&$form, &$form_state
+       break;
+     }
+
+-    $width = '';
+-    $height = '';
+-    if (isset($atom->sid)) {
+-      if (isset($atom->data['video_width'])) {
+-        $width = $atom->data['video_width'];
+-      }
+-      if (isset($atom->data['video_height'])) {
+-        $height = $atom->data['video_height'];
+-      }
+-    }
+-    else {
+-      // Retrieve informations of Video by ffmpeg
+-      // http://ffmpeg-php.sourceforge.net/doc/api/ffmpeg_movie.php
+-      if (class_exists('ffmpeg_movie')) {
+-        $ffmpeg_video = new ffmpeg_movie(drupal_realpath($atom->file_source), FALSE);
+-        $ffmpeg_width = (int) $ffmpeg_video->getFrameWidth();
+-        if ($ffmpeg_width > 0) {
+-          $width = check_plain($ffmpeg_width);
+-        }
+-        $ffmpeg_height = (int) $ffmpeg_video->getFrameHeight();
+-        if ($ffmpeg_height > 0) {
+-          $height = check_plain($ffmpeg_height);
+-        }
+-        /* Does not work : page reset, but no error... (php and ffmpeg 5.4 from Linux Mint)
+-        $title = $ffmpeg_video->getTitle();
+-        if ($title != '') {
+-          $form['title']['#default_value'] = check_plain($title);
+-        }*/
+-      }
+-    }
+-    $form["atom$key"]['width'] = array(
+-      '#type' => 'textfield',
+-      '#title' => t('Width'),
+-      '#size' => 10,
+-      '#element_validate' => array('element_validate_integer_positive'),
+-      '#required' => TRUE,
+-      '#default_value' => $width,
+-    );
+-    $form["atom$key"]['height'] = array(
+-      '#type' => 'textfield',
+-      '#title' => t('Height'),
+-      '#size' => 10,
+-      '#element_validate' => array('element_validate_integer_positive'),
+-      '#required' => TRUE,
+-      '#default_value' => $height,
+-    );
++    // Patched by Shiraz to not require (or even have a field for) video height and width -- these are grabbed from the scald context instead
+
+     // Multi sources support: (https://drupal.org/node/2074349):
+     $form["atom$key"]['uploaded_video_sources'] = array('#tree' => TRUE);

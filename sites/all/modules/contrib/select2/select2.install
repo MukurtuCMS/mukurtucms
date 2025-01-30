@@ -1,0 +1,55 @@
+<?php
+/**
+ * @file
+ * Install, update, and uninstall functions for the Select2 module.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function select2_requirements($phase) {
+  $requirements = array();
+
+  if ($phase == 'runtime') {
+
+    $t = get_t();
+
+    $library = libraries_detect('select2');
+
+    $error_type = isset($library['error']) ? drupal_ucfirst($library['error']) : '';
+    $error_message = isset($library['error message']) ? $library['error message'] : '';
+
+    if (empty($library['installed'])) {
+      $requirements['select2_plugin'] = array(
+        'title' => $t('Select2 plugin'),
+        'value' => $t('@e: At least @a', array('@e' => $error_type, '@a' => SELECT2_MIN_PLUGIN_VERSION)),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => $t('!error You need to download the !select2, extract the archive and place the select2 directory in the %path directory on your server.',
+          array(
+            '!error' => $error_message,
+            '!select2' => l($t('Select2 plugin'), $library['download url']),
+            '%path' => 'sites/all/libraries')),
+      );
+    }
+    elseif (version_compare($library['version'], SELECT2_MIN_PLUGIN_VERSION, '>=')) {
+      $requirements['select2_plugin'] = array(
+        'title' => $t('Selct2 plugin'),
+        'severity' => REQUIREMENT_OK,
+        'value' => $library['version'],
+      );
+    }
+    else {
+      $requirements['select2_plugin'] = array(
+        'title' => $t('Select2 plugin'),
+        'value' => $t('At least @a', array('@a' => SELECT2_MIN_PLUGIN_VERSION)),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => $t('You need to download a later version of the !select2 and replace the old version located in the %path directory on your server.',
+          array(
+            '!select2' => l($t('Select2 plugin'), $library['download url']),
+            '%path' => $library['library path'])),
+      );
+    }
+  }
+
+  return $requirements;
+}

@@ -1,0 +1,552 @@
+<?php
+/**
+ * @file
+ * Search api glossary module file.
+ */
+
+/**
+ * Helper function to return list of fields.
+ */
+function _search_api_glossary_get_field() {
+  $fields = array(
+    'title_az_glossary',
+  );
+
+  return $fields;
+}
+
+
+/**
+ * Add search_api_glossary settings to Search API Index configuration.
+ *
+ * Implements hook_form_FORM_ID_alter().
+ */
+function search_api_glossary_form_search_api_admin_index_fields_alter(&$form, &$form_state, $form_id) {
+  // set the defaults
+
+  $form['fields']['title_az_glossary']['type']['#default_value'] = 'string';
+  $form['fields']['title_az_glossary']['type']['#disabled'] = TRUE;
+
+  $form['fields']['title_az_glossary']['indexed']['#default_value'] = TRUE;
+  $form['fields']['title_az_glossary']['indexed']['#disabled'] = TRUE;
+
+}
+
+
+
+/**
+ * Add search_api_glossary settings to facet configuration.
+ *
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function search_api_glossary_form_facetapi_facet_display_form_alter(&$form, &$form_state, $form_id) {
+  $adapter = $form['#facetapi']['adapter'];
+  $facet = $form['#facetapi']['facet'];
+
+  $fields = _search_api_glossary_get_field();
+
+  // Do not alter other facetapi display forms.
+  if (!in_array($facet['field'], $fields)) {
+    return;
+  }
+
+  $searcher = $adapter->getSearcher();
+  list($adapter_key, $index_key) = explode('@', $searcher, 2);
+
+  // We know how to handle only search_api at the moment.
+  if ($adapter_key != 'search_api') {
+    return;
+  }
+
+  if ($index = search_api_index_load($index_key)) {
+    $facet_settings = $adapter->getFacetSettingsGlobal($facet);
+
+    $index_fields = $index->getFields();
+    $index_field_names = $index->server()->getFieldNames($index);
+
+    $options = array('' => $index_fields[$facet['field']]['name']);
+    foreach ($index_fields as $key => $text_field) {
+      if (in_array($text_field['type'], array('text', 'string')) && ($key != $facet['field'])) {
+        $options[$index_field_names[$key]] = $text_field['name'];
+      }
+    }
+
+    $field_key = $facet['field'] . '_field';
+    $field_value = !empty($facet_settings->settings[$field_key]) ? $facet_settings->settings[$field_key] : '';
+
+    $form['global'][$field_key] = array(
+      '#type' => 'select',
+      '#title' => t('Source field'),
+      '#default_value' => $field_value,
+      '#options' => $options,
+      '#description' => t('Select the source field for glossary sorting. This is useful if you have multiple fields, eg: Display Title Field and Sort Title Field.'),
+    );
+  }
+
+}
+
+
+
+
+/**
+ * Alter Solr documents before they are sent to Solr for indexing.
+ *
+ * @param array $documents
+ *   An array of SearchApiSolrDocument objects ready to be indexed, generated
+ *   from $items array.
+ * @param SearchApiIndex $index
+ *   The search index for which items are being indexed.
+ * @param array $items
+ *   An array of items being indexed.
+ */
+function search_api_glossary_search_api_solr_documents_alter(array &$documents, SearchApiIndex $index, array $items) {
+  $searcher = 'search_api@' . $index->machine_name;
+
+  $fields = _search_api_glossary_get_field();
+  $field_names = $index->server()->getFieldNames($index);
+
+  foreach ($fields as $field) {
+    if ($facet = facetapi_facet_load($field, $searcher)) {
+      $adapter = facetapi_adapter_load($searcher);
+      $facet_settings = $adapter->getFacetSettingsGlobal($facet);
+      $field_key = $facet['field'] . '_field';
+
+      if (!empty($facet_settings->settings[$field_key])) {
+        $source_field_key = $facet_settings->settings[$field_key];
+
+        foreach ($documents as $document) {
+          $source_field = $document->getField($source_field_key);
+
+          // is source field a "string" or "text"?
+          if (0 === strpos($source_field['name'], 'tm_')) {
+            // $source_field['value'] is an array
+            $source_field_value = $source_field['value'][0];
+          }
+          elseif (0 === strpos($source_field['name'], 'ss_')) {
+            // $source_field['value'] is an string
+            $source_field_value = $source_field['value'];
+          }
+
+          if (is_string($source_field_value) && (drupal_strlen($source_field_value) > 0)) {
+            // get the first letter of $source_field_value, eg CAT = C
+            $first_letter = strtoupper($source_field_value[0]);
+
+            // Group the $first_letter into its container bin.
+            $value = search_api_glossary_getter_helper($first_letter);
+
+            // Set the values in Solr
+            $document->setField($field_names[$field], $value);
+          }
+
+        }
+      }
+
+    }
+  }
+}
+
+
+
+/**
+ * Implements hook_entity_property_info().
+ *
+ * @see entity_entity_property_info()
+ */
+function search_api_glossary_entity_property_info() {
+  $info = array();
+
+  // Add meta-data about the basic node properties.
+  $properties = &$info['node']['properties'];
+
+  $properties['title_az_glossary'] = array(
+    'label' => t("Title A-Z Glossary"),
+    'type' => 'text',
+    'description' => t("The A-Z Glossary from title of the node."),
+    'getter callback' => 'search_api_glossary_title_getter_callback',
+    'schema field' => 'az_title',
+    'sanitized' => TRUE,
+  );
+
+  return $info;
+}
+
+
+
+/**
+ * Getter callback for title_az_glossary property.
+ */
+function search_api_glossary_title_getter_callback($node, $name) {
+  // @TODO: remove hardcoded node title field and expose this as a setting.
+  // Mukurtu patch.
+  // Return the unicode of the first character, whatever it is.
+  return mb_strtoupper(mb_substr($node->title, 0, 1));
+  $key = search_api_glossary_getter_helper($first_letter);
+  return $key;
+}
+
+
+
+/**
+ * Getter Helper for Alpha Numeric Keys.
+ */
+function search_api_glossary_getter_helper($first_letter) {
+  // Is it alpha?
+  if (ctype_alpha($first_letter)) {
+    $key = $first_letter;
+  }
+  // Is it a number?
+  elseif (ctype_digit($first_letter)) {
+    $key = "0-9";
+  }
+  // Catch all.
+  else {
+    $key = "#";
+  }
+
+  return $key;
+}
+
+
+
+/**
+ * Implements hook_facetapi_sort_info().
+ */
+function search_api_glossary_facetapi_sort_info() {
+  $sorts = array();
+
+  $sorts['glossary_az'] = array(
+    'label' => t('Glossary A-Z'),
+    'callback' => 'search_api_glossary_sort_glossary',
+    'description' => t('Sort by Glossary A-Z then 0-9 and then #.'),
+    'weight' => -40,
+  );
+
+  return $sorts;
+}
+
+
+
+/**
+ * Sorts by A-Z then 0-9 and then # weight.
+ */
+function search_api_glossary_sort_glossary(array $a, array $b) {
+  $a_value = (isset($a['#indexed_value'])) ? $a['#indexed_value'] : '';
+  $b_value = (isset($b['#indexed_value'])) ? $b['#indexed_value'] : '';
+
+  if ($a_value == $b_value) {
+    return 0;
+  }
+  elseif (ctype_alpha($a_value) && ctype_alpha($b_value)) {
+    return ($a_value < $b_value) ? -1 : 1;
+  }
+  elseif (($a_value == "#" || $a_value == "0-9")&& ctype_alpha($b_value)) {
+    return 1;
+  }
+  elseif (ctype_alpha($a_value) && ($b_value == "#" || $b_value == "0-9")) {
+    return -1;
+  }
+  elseif ($a_value == "#" && $b_value == "0-9") {
+    return 1;
+  }
+  elseif ($b_value == "0-9" && $a_value == "#") {
+    return -1;
+  }
+  // Mukurtu patch for custom character sorting.
+  else {
+    return ma_dictionary_glossary_sort($a_value, $b_value);
+  }
+}
+
+
+
+/**
+ * Implements hook_facetapi_filters().
+ */
+function search_api_glossary_facetapi_filters() {
+  return array(
+    'glossary_rewrite_items' => array(
+      'handler' => array(
+        'label' => t('Rewrite facet items to pad out missing alpha'),
+        'class' => 'SearchApiGlossaryRewriteItems',
+        'query types' => array('term', 'date'),
+      ),
+    ),
+  );
+}
+
+
+
+class SearchApiGlossaryRewriteItems extends FacetapiFilter {
+
+  /**
+   * Filters facet items.
+   */
+  public function execute(array $build) {
+    // Pad the items out for missing alphabets.
+    $this->padListItems($build);
+    return $build;
+  }
+
+
+  /**
+   * Pads the array to add missing items.
+   *
+   * @param array $build
+   *   The facet's render array.
+   *
+   * @return array
+   *   The "items" parameter for theme_item_list().
+   */
+  public function padListItems(&$build) {
+    $glossary_array = range('A', 'Z');
+    // Mukurtu patch
+    // Special characters and numbers are now printed, so do not pad them with their alternate links.
+    // $glossary_array[] = "#";
+    // $glossary_array[] = "0-9";
+    // If skip padding var is set, then do not pad.
+    if (variable_get('field_aod_letter_padding')) {
+      return $build;
+    }
+    // end Mukurtu patch
+
+    foreach ($glossary_array as $key) {
+      if (!array_key_exists($key, $build)) {
+        if(!isset($build[$key]['#active'])){
+          $build[$key]['#active'] = FALSE;
+        }
+        $build[$key]['#markup'] = $key;
+        $build[$key]['#indexed_value'] = $key;
+        $build[$key]['#count'] = 0;
+      }
+    }
+
+    return $build;
+  }
+
+}
+
+
+
+
+/**
+ * Implements hook_facetapi_widgets().
+ */
+function search_api_glossary_facetapi_widgets() {
+  return array(
+    'search_api_glossary' => array(
+      'handler' => array(
+        'label' => t('Glossary AZ'),
+        'class' => 'SearchApiGlossaryWidget',
+        'query types' => array('term', 'date'),
+      ),
+    ),
+  );
+}
+
+
+
+class SearchApiGlossaryWidget extends FacetapiWidgetLinks {
+
+  /**
+   * Renders the links.
+   */
+  public function execute() {
+    $element = &$this->build[$this->facet['field alias']];
+    $total_count = 0;
+    foreach ($element as &$e) {
+      // Tally up the total hits for the "All" tab.
+      $total_count += $e['#count'];
+
+      if (isset($e['#active']) && $e['#active']) {
+        $active = $e;
+      }else{
+        $e['#active'] = FALSE;
+      }
+
+      // For each link, drop any active facet that isn't defined by the
+      // link itself. In effect, only the filter defined by the current
+      // link is active.
+      if (isset($e['#query']['f']) && is_array($e['#query']['f'])) {
+        foreach ($e['#query']['f'] as $key => $value) {
+          $temp = explode(':', $value);
+          if ($temp[0] == $this->facet['field alias'] && $temp[1] != $e['#indexed_value']) {
+            unset($e['#query']['f'][$key]);
+          }
+        }
+      }
+    }
+
+    if ($this->settings->settings['show_all']) {
+      // Create the "All" item using the last looped filter as the base.
+      $all = isset($active) ? $active : $e;
+      $all['#markup'] = t('All');
+      $all['#count'] = $total_count;
+      $all['#active'] = isset($active) ? FALSE : TRUE;
+      $all['#path'] = isset($active) ? $all['#path'] : current_path();
+
+      if (isset($all['#query']['f']) && is_array($all['#query']['f'])) {
+        foreach ($all['#query']['f'] as $key => $value) {
+          $temp = explode(':', $value);
+          if ($temp[0] == $this->facet['field alias']) {
+            unset($all['#query']['f'][$key]);
+          }
+        }
+      }
+
+      // Add our new tab to the beginning of the list.
+      array_unshift($element, $all);
+    }
+
+    // Sets each item's theme hook, builds item list.
+    $this->setThemeHooks($element);
+
+    $attributes = $this->build['#attributes'];
+    $attributes['class'][] = 'tabs';
+
+    $element = array(
+      '#theme' => 'item_list',
+      '#items' => $this->buildListItems($element),
+      '#attributes' => $attributes,
+    );
+  }
+
+
+  /**
+   * Converts the render array for passing to theme_item_list().
+   *
+   * @param array $build
+   *   The facet's render array.
+   *
+   * @return array
+   *   The "items" parameter for theme_item_list().
+   */
+  public function buildListItems($build) {
+    $items = array();
+
+    foreach ($build as $value => $item) {
+      $row = array('class' => array());
+
+      if(!isset($item['#active'])){
+        $item['#active'] = FALSE;
+      }
+      // Initializes variables passed to theme hook.
+      $variables = array(
+        'text' => $item['#markup'],
+        'path' => (isset($item['#path'])? $item['#path'] : current_path()),
+        'options' => array(
+          'attributes' => array('class' => $this->getItemClasses()),
+          'html' => (isset($item['#html'])? $item['#html'] : FALSE),
+          'query' => (isset($item['#query'])? $item['#query'] : array()),
+        ),
+      );
+
+      $display_count = $this->settings->settings['show_count'];
+
+      // Pass the display count setting
+      $variables['display_count'] = $display_count;
+      $variables['count'] = $item['#count'];
+
+      // If the item has no children, it is a leaf.
+      if (empty($item['#item_children'])) {
+        $row['class'][] = 'leaf';
+      }
+      else {
+        // If the item is active or the "show_expanded" setting is selected,
+        // show this item as expanded so we see its children.
+        if ($item['#active'] || !empty($this->settings->settings['show_expanded'])) {
+          $row['class'][] = 'expanded';
+          $row['children'] = $this->buildListItems($item['#item_children']);
+        }
+        else {
+          $row['class'][] = 'collapsed';
+        }
+      }
+
+      // Gets theme hook, adds last minute classes.
+      if ($item['#active']) {
+        $class = 'facetapi-tabs-active active';
+        $item['#theme'] = 'search_api_glossary_facetapi_link_active_v2';
+        $row['class'][] = 'active';
+      }
+      else {
+        $class = 'facetapi-tabs-inactive inactive';
+        $item['#theme'] = 'search_api_glossary_facetapi_link_inactive_v2';
+      }
+
+      // Add class is the facet is empty.
+      if ($item['#count'] == 0) {
+        $row['class'][] = 'no-content';
+      }
+
+      $variables['options']['attributes']['class'][] = $class;
+
+      // Themes the link, adds row to items.
+      $row['data'] = theme($item['#theme'], $variables);
+      $items[] = $row;
+
+    }
+
+    return $items;
+  }
+
+  /**
+   * Overrides FacetapiWidgetLinks::settingsForm().
+   */
+  function settingsForm(&$form, &$form_state) {
+    parent::settingsForm($form, $form_state);
+
+    // @see http://drupal.org/node/1370342
+    $form['widget']['widget_settings']['links'][$this->id]['show_all'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Show "all" facet'),
+      '#default_value' => !empty($this->settings->settings['show_all']),
+      '#description' => t('Whether to display the "all" facet or not'),
+      '#states' => array(
+        'visible' => array(
+          'select[name="widget"]' => array('value' => $this->id),
+        ),
+      ),
+    );
+
+    $form['widget']['widget_settings']['links'][$this->id]['show_count'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Show count in facet'),
+      '#default_value' => !empty($this->settings->settings['show_count']),
+      '#description' => t('Whether to display count in facet or not'),
+      '#states' => array(
+        'visible' => array(
+          'select[name="widget"]' => array('value' => $this->id),
+        ),
+      ),
+    );
+  }
+
+  /**
+   * Overrides FacetapiWidgetLinks::getDefaultSettings().
+   */
+  function getDefaultSettings() {
+    $settings = parent::getDefaultSettings();
+    $settings['show_all'] = 1;
+    $settings['show_count'] = 1;
+    return $settings;
+  }
+}
+
+
+
+
+/**
+ * Implements hook_theme().
+ */
+function search_api_glossary_theme() {
+  return array(
+    'search_api_glossary_facetapi_link_inactive_v2' => array(
+      'variables' => array(),
+      'file' => 'search_api_glossary.theme.inc',
+    ),
+    'search_api_glossary_facetapi_link_active_v2' => array(
+      'variables' => array(),
+      'file' => 'search_api_glossary.theme.inc',
+    ),
+  );
+}

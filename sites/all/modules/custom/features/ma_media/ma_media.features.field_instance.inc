@@ -10,7 +10,7 @@
 function ma_media_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'file-audio-field_folder'
+  // Exported field_instance: 'file-audio-field_folder'.
   $field_instances['file-audio-field_folder'] = array(
     'bundle' => 'audio',
     'cardinality' => 1,
@@ -18,6 +18,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 2,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -74,6 +81,12 @@ function ma_media_field_default_field_instances() {
         'weight' => 0,
       ),
       'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'wysiwyg' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -104,13 +117,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-audio-field_media_description'
+  // Exported field_instance: 'file-audio-field_media_description'.
   $field_instances['file-audio-field_media_description'] = array(
     'bundle' => 'audio',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -169,6 +189,12 @@ function ma_media_field_default_field_instances() {
         'weight' => 0,
       ),
       'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'wysiwyg' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -197,13 +223,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-audio-field_media_title'
+  // Exported field_instance: 'file-audio-field_media_title'.
   $field_instances['file-audio-field_media_title'] = array(
     'bundle' => 'audio',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
       'component_media_item' => array(
         'label' => 'hidden',
         'module' => 'text',
@@ -263,6 +296,12 @@ function ma_media_field_default_field_instances() {
         'weight' => 0,
       ),
       'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'wysiwyg' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -293,7 +332,7 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-audio-field_tags'
+  // Exported field_instance: 'file-audio-field_tags'.
   $field_instances['file-audio-field_tags'] = array(
     'bundle' => 'audio',
     'cardinality' => -1,
@@ -301,6 +340,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 3,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -357,6 +403,12 @@ function ma_media_field_default_field_instances() {
         'weight' => 0,
       ),
       'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'wysiwyg' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -388,7 +440,7 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-default-field_folder'
+  // Exported field_instance: 'file-default-field_folder'.
   $field_instances['file-default-field_folder'] = array(
     'bundle' => 'default',
     'cardinality' => 1,
@@ -458,6 +510,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_folder',
@@ -483,7 +541,7 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-default-field_media_description'
+  // Exported field_instance: 'file-default-field_media_description'.
   $field_instances['file-default-field_media_description'] = array(
     'bundle' => 'default',
     'default_value' => NULL,
@@ -553,6 +611,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_media_description',
@@ -576,7 +640,7 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-default-field_media_title'
+  // Exported field_instance: 'file-default-field_media_title'.
   $field_instances['file-default-field_media_title'] = array(
     'bundle' => 'default',
     'default_value' => NULL,
@@ -647,6 +711,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_media_title',
@@ -670,7 +740,7 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-default-field_tags'
+  // Exported field_instance: 'file-default-field_tags'.
   $field_instances['file-default-field_tags'] = array(
     'bundle' => 'default',
     'cardinality' => -1,
@@ -740,6 +810,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_tags',
@@ -766,13 +842,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_aperturevalue'
+  // Exported field_instance: 'file-image-field_aperturevalue'.
   $field_instances['file-image-field_aperturevalue'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 7,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -835,6 +918,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_aperturevalue',
@@ -852,6 +941,7 @@ function ma_media_field_default_field_instances() {
       'module' => 'exif',
       'settings' => array(
         'exif_field' => 'exif_aperturevalue',
+        'exif_field_separator' => '',
         'image_field' => 'file',
       ),
       'type' => 'exif_readonly',
@@ -859,13 +949,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_caption'
+  // Exported field_instance: 'file-image-field_caption'.
   $field_instances['file-image-field_caption'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 12,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -927,6 +1024,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_caption',
@@ -950,13 +1053,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_exif_artist'
+  // Exported field_instance: 'file-image-field_exif_artist'.
   $field_instances['file-image-field_exif_artist'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 5,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1019,6 +1129,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_exif_artist',
@@ -1036,6 +1152,7 @@ function ma_media_field_default_field_instances() {
       'module' => 'exif',
       'settings' => array(
         'exif_field' => 'exif_author',
+        'exif_field_separator' => '',
         'image_field' => 'file',
       ),
       'type' => 'exif_readonly',
@@ -1043,13 +1160,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_exif_datetime'
+  // Exported field_instance: 'file-image-field_exif_datetime'.
   $field_instances['file-image-field_exif_datetime'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 4,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1112,6 +1236,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'file',
@@ -1132,6 +1262,7 @@ function ma_media_field_default_field_instances() {
       'module' => 'exif',
       'settings' => array(
         'exif_field' => 'exif_datetimedigitized',
+        'exif_field_separator' => '',
         'image_field' => 'file',
       ),
       'type' => 'exif_readonly',
@@ -1139,13 +1270,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_exif_exposuretime'
+  // Exported field_instance: 'file-image-field_exif_exposuretime'.
   $field_instances['file-image-field_exif_exposuretime'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 6,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1208,6 +1346,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_exif_exposuretime',
@@ -1225,6 +1369,7 @@ function ma_media_field_default_field_instances() {
       'module' => 'exif',
       'settings' => array(
         'exif_field' => 'exif_exposuretime',
+        'exif_field_separator' => '',
         'image_field' => 'file',
       ),
       'type' => 'exif_readonly',
@@ -1232,13 +1377,19 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_file_image_alt_text'
+  // Exported field_instance: 'file-image-field_file_image_alt_text'.
   $field_instances['file-image-field_file_image_alt_text'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => 'Alternative text is used by screen readers, search engines, and when the image cannot be loaded. By adding alt text you improve accessibility and search engine optimization.',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 19,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1287,6 +1438,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_file_image_alt_text',
@@ -1310,13 +1467,19 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_file_image_title_text'
+  // Exported field_instance: 'file-image-field_file_image_title_text'.
   $field_instances['file-image-field_file_image_title_text'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => 'Title text is used in the tool tip when a user hovers their mouse over the image. Adding title text makes it easier to understand the context of an image and improves usability.',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 20,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1365,6 +1528,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_file_image_title_text',
@@ -1388,7 +1557,7 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_folder'
+  // Exported field_instance: 'file-image-field_folder'.
   $field_instances['file-image-field_folder'] = array(
     'bundle' => 'image',
     'cardinality' => 1,
@@ -1396,6 +1565,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 2,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1458,6 +1634,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_folder',
@@ -1483,13 +1665,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_gps_altitude'
+  // Exported field_instance: 'file-image-field_gps_altitude'.
   $field_instances['file-image-field_gps_altitude'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 11,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1552,6 +1741,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_gps_altitude',
@@ -1569,6 +1764,7 @@ function ma_media_field_default_field_instances() {
       'module' => 'exif',
       'settings' => array(
         'exif_field' => 'gps_gpsaltitude',
+        'exif_field_separator' => '',
         'image_field' => 'file',
       ),
       'type' => 'exif_readonly',
@@ -1576,13 +1772,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_gps_latitude'
+  // Exported field_instance: 'file-image-field_gps_latitude'.
   $field_instances['file-image-field_gps_latitude'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 9,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1645,6 +1848,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_gps_latitude',
@@ -1662,6 +1871,7 @@ function ma_media_field_default_field_instances() {
       'module' => 'exif',
       'settings' => array(
         'exif_field' => 'gps_gpslatitude',
+        'exif_field_separator' => '',
         'image_field' => 'file',
       ),
       'type' => 'exif_readonly',
@@ -1669,13 +1879,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_gps_longitude'
+  // Exported field_instance: 'file-image-field_gps_longitude'.
   $field_instances['file-image-field_gps_longitude'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 10,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1738,6 +1955,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_gps_longitude',
@@ -1755,6 +1978,7 @@ function ma_media_field_default_field_instances() {
       'module' => 'exif',
       'settings' => array(
         'exif_field' => 'gps_gpslongitude',
+        'exif_field_separator' => '',
         'image_field' => 'file',
       ),
       'type' => 'exif_readonly',
@@ -1762,13 +1986,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_iptc_copyright'
+  // Exported field_instance: 'file-image-field_iptc_copyright'.
   $field_instances['file-image-field_iptc_copyright'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 13,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1812,6 +2043,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_iptc_copyright',
@@ -1831,6 +2068,7 @@ function ma_media_field_default_field_instances() {
       'module' => 'exif',
       'settings' => array(
         'exif_field' => 'iptc_copyright_notice',
+        'exif_field_separator' => '',
         'image_field' => 'file',
       ),
       'type' => 'exif_readonly',
@@ -1838,13 +2076,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_iptc_headline'
+  // Exported field_instance: 'file-image-field_iptc_headline'.
   $field_instances['file-image-field_iptc_headline'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 8,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1907,6 +2152,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_iptc_headline',
@@ -1924,6 +2175,7 @@ function ma_media_field_default_field_instances() {
       'module' => 'exif',
       'settings' => array(
         'exif_field' => 'iptc_headline',
+        'exif_field_separator' => '',
         'image_field' => 'file',
       ),
       'type' => 'exif_readonly',
@@ -1931,13 +2183,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_iptc_keywords'
+  // Exported field_instance: 'file-image-field_iptc_keywords'.
   $field_instances['file-image-field_iptc_keywords'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 17,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1981,6 +2240,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_iptc_keywords',
@@ -2000,6 +2265,7 @@ function ma_media_field_default_field_instances() {
       'module' => 'exif',
       'settings' => array(
         'exif_field' => 'iptc_keywords',
+        'exif_field_separator' => '',
         'image_field' => 'file',
       ),
       'type' => 'exif_readonly',
@@ -2007,13 +2273,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_iptc_sublocation'
+  // Exported field_instance: 'file-image-field_iptc_sublocation'.
   $field_instances['file-image-field_iptc_sublocation'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 15,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2057,6 +2330,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_iptc_sublocation',
@@ -2076,6 +2355,7 @@ function ma_media_field_default_field_instances() {
       'module' => 'exif',
       'settings' => array(
         'exif_field' => 'iptc_sublocation',
+        'exif_field_separator' => '',
         'image_field' => 'file',
       ),
       'type' => 'exif_readonly',
@@ -2083,13 +2363,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_media_description'
+  // Exported field_instance: 'file-image-field_media_description'.
   $field_instances['file-image-field_media_description'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2153,6 +2440,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_media_description',
@@ -2170,6 +2463,7 @@ function ma_media_field_default_field_instances() {
       'module' => 'exif',
       'settings' => array(
         'exif_field' => 'exif_imagedescription',
+        'exif_field_separator' => '',
         'image_field' => 'file',
       ),
       'type' => 'exif_readonly',
@@ -2177,13 +2471,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_media_title'
+  // Exported field_instance: 'file-image-field_media_title'.
   $field_instances['file-image-field_media_title'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
       'component_media_item' => array(
         'label' => 'hidden',
         'module' => 'text',
@@ -2248,6 +2549,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_media_title',
@@ -2265,6 +2572,7 @@ function ma_media_field_default_field_instances() {
       'module' => 'exif',
       'settings' => array(
         'exif_field' => 'iptc_object_name',
+        'exif_field_separator' => '',
         'image_field' => 'file',
         'size' => 60,
       ),
@@ -2273,7 +2581,7 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_tags'
+  // Exported field_instance: 'file-image-field_tags'.
   $field_instances['file-image-field_tags'] = array(
     'bundle' => 'image',
     'cardinality' => -1,
@@ -2281,6 +2589,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 3,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2343,6 +2658,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_tags',
@@ -2369,13 +2690,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_xmp_creator'
+  // Exported field_instance: 'file-image-field_xmp_creator'.
   $field_instances['file-image-field_xmp_creator'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 16,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2419,6 +2747,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_xmp_creator',
@@ -2438,6 +2772,7 @@ function ma_media_field_default_field_instances() {
       'module' => 'exif',
       'settings' => array(
         'exif_field' => 'iptc_by_line',
+        'exif_field_separator' => '',
         'image_field' => 'file',
       ),
       'type' => 'exif_readonly',
@@ -2445,13 +2780,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-image-field_xmp_rights'
+  // Exported field_instance: 'file-image-field_xmp_rights'.
   $field_instances['file-image-field_xmp_rights'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 14,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2495,6 +2837,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'file',
@@ -2515,6 +2863,7 @@ function ma_media_field_default_field_instances() {
       'module' => 'exif',
       'settings' => array(
         'exif_field' => 'iptc_copyright_notice',
+        'exif_field_separator' => '',
         'image_field' => 'file',
       ),
       'type' => 'exif_readonly',
@@ -2522,7 +2871,7 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-text-field_text_description'
+  // Exported field_instance: 'file-text-field_text_description'.
   $field_instances['file-text-field_text_description'] = array(
     'bundle' => 'text',
     'default_value' => NULL,
@@ -2593,6 +2942,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_text_description',
@@ -2616,7 +2971,7 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-text-field_text_title'
+  // Exported field_instance: 'file-text-field_text_title'.
   $field_instances['file-text-field_text_title'] = array(
     'bundle' => 'text',
     'default_value' => NULL,
@@ -2688,6 +3043,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_text_title',
@@ -2711,7 +3072,7 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-video-field_folder'
+  // Exported field_instance: 'file-video-field_folder'.
   $field_instances['file-video-field_folder'] = array(
     'bundle' => 'video',
     'cardinality' => 1,
@@ -2719,6 +3080,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 2,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2776,6 +3144,12 @@ function ma_media_field_default_field_instances() {
         'weight' => 0,
       ),
       'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'wysiwyg' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -2806,13 +3180,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-video-field_media_description'
+  // Exported field_instance: 'file-video-field_media_description'.
   $field_instances['file-video-field_media_description'] = array(
     'bundle' => 'video',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2871,6 +3252,12 @@ function ma_media_field_default_field_instances() {
         'weight' => 0,
       ),
       'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'wysiwyg' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -2899,13 +3286,20 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-video-field_media_title'
+  // Exported field_instance: 'file-video-field_media_title'.
   $field_instances['file-video-field_media_title'] = array(
     'bundle' => 'video',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
       'component_media_item' => array(
         'label' => 'hidden',
         'module' => 'text',
@@ -2970,6 +3364,12 @@ function ma_media_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'wysiwyg' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'file',
     'field_name' => 'field_media_title',
@@ -2993,7 +3393,7 @@ function ma_media_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'file-video-field_tags'
+  // Exported field_instance: 'file-video-field_tags'.
   $field_instances['file-video-field_tags'] = array(
     'bundle' => 'video',
     'cardinality' => -1,
@@ -3001,6 +3401,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 3,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -3058,6 +3465,12 @@ function ma_media_field_default_field_instances() {
         'weight' => 0,
       ),
       'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'wysiwyg' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',

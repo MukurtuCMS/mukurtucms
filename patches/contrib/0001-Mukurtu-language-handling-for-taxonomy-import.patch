@@ -1,0 +1,46 @@
+From c43d1086c436c5f498c08ec2521a23dcd9af5bda Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Fri, 20 Nov 2020 12:41:05 -0800
+Subject: [PATCH] Mukurtu language handling for taxonomy import
+
+---
+ .../mappers/taxonomy.inc        | 28 +++++++++++++++++--
+ 1 file changed, 26 insertions(+), 2 deletions(-)
+
+diff --git a/mappers/taxonomy.inc b/mappers/taxonomy.inc
+index 26e0be42..b00582c6 100644
+--- a/mappers/taxonomy.inc
++++ b/mappers/taxonomy.inc
+@@ -87,6 +87,13 @@ function taxonomy_feeds_processor_targets($entity_type, $bundle_name) {
+  */
+ function taxonomy_feeds_set_target(FeedsSource $source, $entity, $target, array $terms, array $mapping) {
+   $language = $mapping['language'];
++
++  // Mukurtu patch for Mukurtu specific importers.
++  // We want to use the node's language for the field language.
++  // Mukurtu does not support field translation.
++  if (stripos($source->id, 'mukurtu_import') !== FALSE) {
++    $language = ma_importexport_get_field_language($entity->feeds_item->entity_type, $entity, $target);
++  }
+
+   // Add in default values.
+   $mapping += array(
+@@ -131,6 +139,15 @@ function taxonomy_feeds_set_target(FeedsSource $source, $entity, $target, array
+
+   $field = isset($entity->$target) ? $entity->$target : array($language => array());
+
++  // Mukurtu Patch.
++  // For our importers, we are completely replacing taxonomy values.
++  // Start from empty for all languages, we are not supporting field translation.
++  if (stripos($source->id, 'mukurtu_import') !== FALSE) {
++    foreach ($field as $field_lang => $values) {
++      $field[$field_lang] = array();
++    }
++  }
++
+   if (!isset($field[$language])) {
+     $field[$language] = array();
+   }
+--
+2.19.0.windows.1
+

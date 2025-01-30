@@ -1,0 +1,112 @@
+<?php
+
+/**
+ * @file
+ * Helper module for Feeds entity processor tests.
+ */
+
+/**
+ * Implements hook_entity_info().
+ */
+function feeds_entity_processor_test_entity_info() {
+  $items['feeds_entity_processor_test'] = array(
+    'label' => t('Test entity'),
+    'plural label' => t('Test entities'),
+    'description' => t('An entity type used by the Feeds entity processor tests.'),
+    'entity class' => 'Entity',
+    'controller class' => 'EntityAPIController',
+    'base table' => 'feeds_entity_processor_test',
+    'fieldable' => TRUE,
+    'entity keys' => array(
+      'id' => 'id',
+      'label' => 'title',
+      'bundle' => 'type',
+    ),
+    'bundles' => array(),
+    'bundle keys' => array(
+      'bundle' => 'name',
+    ),
+    'label callback' => 'entity_class_label',
+    'uri callback' => 'entity_class_uri',
+    'access callback' => 'feeds_entity_processor_test_access',
+    'module' => 'feeds_entity_processor_test',
+    'metadata controller class' => 'FeedsEntityProcessorTestMetadataController',
+  );
+  $items['feeds_entity_processor_test_type'] = array(
+    'label' => t('Test entity type'),
+    'entity class' => 'Entity',
+    'controller class' => 'EntityAPIControllerExportable',
+    'base table' => 'feeds_entity_processor_test_type',
+    'fieldable' => FALSE,
+    'bundle of' => 'feeds_entity_processor_test',
+    'exportable' => TRUE,
+    'entity keys' => array(
+      'id' => 'id',
+      'name' => 'name',
+    ),
+    'module' => 'feeds_entity_processor_test',
+  );
+
+  // Add bundle info but bypass entity_load() as we cannot use it here.
+  $types = db_select('feeds_entity_processor_test_type', 'et')
+    ->fields('et')
+    ->execute()
+    ->fetchAllAssoc('name');
+
+  foreach ($types as $name => $type) {
+    $items['feeds_entity_processor_test']['bundles'][$name] = array(
+      'label' => $type->label,
+    );
+  }
+
+  return $items;
+}
+
+/**
+ * Access callback for performing actions on a feeds_entity_processor_test.
+ */
+function feeds_entity_processor_test_access($op, $entity, $account, $entity_type) {
+  // No restrictions currently.
+  return TRUE;
+}
+
+/**
+ * Getter callback to load a referenced entity from a
+ * feeds_entity_processor_test.
+ *
+ * We have to return the entity wrapped.
+ */
+function feeds_entity_processor_test_entity_getter($object, array $options, $property_name) {
+  switch ($property_name) {
+    case 'entity':
+      return entity_metadata_wrapper($object->entity_type, $object->etid);
+
+    case 'user':
+      return entity_metadata_wrapper('user', $object->uid);
+  }
+}
+
+/**
+ * Entity property info setter callback to set a referenced entity on a
+ * feeds_entity_processor_test.
+ *
+ * As the property is of type entity, the value will be passed as a wrapped
+ * entity.
+ */
+function feeds_entity_processor_test_entity_setter($object, $property_name, $value) {
+  switch ($property_name) {
+    case 'entity':
+      $object->entity_type = $value->type();
+      $object->etid = $value->getIdentifier();
+      break;
+
+    case 'user':
+      if ($value instanceof EntityMetadataWrapper) {
+        $object->uid = $value->getIdentifier();
+      }
+      elseif (is_numeric($value)) {
+        $object->uid = $value;
+      }
+      break;
+  }
+}

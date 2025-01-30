@@ -1,5 +1,19 @@
 <?php
 
+define('CER_PROFILE2_PATTERN', '/^user:user:profile_/');
+
+/**
+ * Returns if either side of a preset refers to a profile2.
+ *
+ * @param \CerPreset $preset
+ *  The preset to test.
+ *
+ * @return bool
+ */
+function _cer_profile2_is_profile2_preset(CerPreset $preset) {
+  return preg_match(CER_PROFILE2_PATTERN, $preset->wrapper->cer_left->value()) || preg_match(CER_PROFILE2_PATTERN, $preset->wrapper->cer_right->value());
+}
+
 /**
  * Implements hook_entity_property_info_alter().
  */

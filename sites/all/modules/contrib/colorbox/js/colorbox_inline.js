@@ -1,3 +1,8 @@
+/**
+ * @file
+ * Colorbox module inline js.
+ */
+
 (function ($) {
 
 Drupal.behaviors.initColorboxInline = {
@@ -5,6 +10,15 @@ Drupal.behaviors.initColorboxInline = {
     if (!$.isFunction($.colorbox) || typeof settings.colorbox === 'undefined') {
       return;
     }
+
+    if (settings.colorbox.mobiledetect && window.matchMedia) {
+      // Disable Colorbox for small screens.
+      var mq = window.matchMedia("(max-device-width: " + settings.colorbox.mobiledevicewidth + ")");
+      if (mq.matches) {
+        return;
+      }
+    }
+
     $.urlParam = function(name, url){
       if (name == 'fragment') {
         var results = new RegExp('(#[^&#]*)').exec(url);
@@ -38,7 +52,8 @@ Drupal.behaviors.initColorboxInline = {
         return $.urlParam('height', $(this).attr('href'));
       },
       title:function(){
-        return decodeURIComponent($.urlParam('title', $(this).attr('href')));
+        return Drupal.colorbox.sanitizeMarkup(
+          decodeURIComponent($.urlParam('title', $(this).attr('href'))));
       },
       iframe:function(){
         return $.urlParam('iframe', $(this).attr('href'));

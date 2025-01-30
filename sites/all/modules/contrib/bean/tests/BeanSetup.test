@@ -1,0 +1,66 @@
+<?php
+
+/**
+ * @file
+ * Tests for block.module.
+ */
+
+/**
+ * A base class for other classes to extend.
+ */
+abstract class BeanSetup extends DrupalWebTestCase {
+
+  /**
+   * An admin user account.
+   *
+   * @var object
+   */
+  protected $admin_user;
+
+  /**
+   * The Bean plugin to test against.
+   *
+   * @var string
+   */
+  protected $plugin_name;
+
+  /**
+   * {@inheritdoc}
+   */
+  function setUp(array $modules = array()) {
+    // Core dependencies.
+    $modules[] = 'block';
+
+    // Contrib dependencies.
+    $modules[] = 'ctools';
+    $modules[] = 'entity';
+
+    // The Bean module itself.
+    $modules[] = 'bean';
+
+    // This provides some extras to help test the module.
+    $modules[] = 'bean_test';
+
+    parent::setUp($modules);
+
+    $this->addAdminUser();
+  }
+
+  /**
+   * Create an admin user.
+   */
+  function addAdminUser() {
+    $permissions = array_keys(bean_permission());
+    $permissions += array(
+      'administer blocks',
+      'access administration pages',
+      'access content',
+    );
+    $this->admin_user = $this->drupalCreateUser($permissions);
+    $this->drupalLogin($this->admin_user);
+
+    // Test plugin name.
+    $this->plugin_name = 'test_bean';
+  }
+
+}

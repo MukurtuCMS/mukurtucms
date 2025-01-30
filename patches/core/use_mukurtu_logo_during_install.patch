@@ -1,0 +1,19 @@
+diff --git a/maintenance-page.tpl.php b/maintenance-page.tpl.php
+index a158dde..07b49a2 100644
+--- a/maintenance-page.tpl.php
++++ b/maintenance-page.tpl.php
+@@ -19,7 +19,13 @@
+
+     <?php if ($sidebar_first): ?>
+       <div id="sidebar-first" class="sidebar">
+-        <?php if ($logo): ?>
++        <?php
++          # mukurtu patch for showing the mukurtu logo instead of seven logo during profile installation
++          # patching seven instead of doing a tpl override (https://www.drupal.org/node/195435) because that method inherits the whole theme
++          global $base_url;
++          $logo = $base_url . '/sites/all/themes/mukurtu_starter/logo.png';
++          # end patch
++          if ($logo): ?>
+           <img id="logo" src="<?php print $logo ?>" alt="<?php print $site_name ?>" />
+         <?php endif; ?>
+         <?php print $sidebar_first ?>

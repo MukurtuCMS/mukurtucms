@@ -1,0 +1,22 @@
+name = Open Atrium Recent Activity
+description = Displays a consolidated list of recent activities across all applications.
+core = 7.x
+package = Open Atrium
+dependencies[] = entity_token
+dependencies[] = oa_core
+dependencies[] = panels
+dependencies[] = views
+dependencies[] = views_content
+dependencies[] = views_load_more
+stylesheets[all][] = oa_river.css
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:2
+features[views_view][] = oa_recent_activity
+features_exclude[dependencies][ctools] = ctools
+project path = sites/all/modules/contrib/oa_core/modules
+
+; Information added by Drupal.org packaging script on 2018-10-18
+version = "7.x-2.91"
+core = "7.x"
+project = "oa_core"
+datestamp = "1539884795"

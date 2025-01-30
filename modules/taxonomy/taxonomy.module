@@ -25,7 +25,7 @@ function taxonomy_help($path, $arg) {
       $output .= '<h3>' . t('Uses') . '</h3>';
       $output .= '<dl>';
       $output .= '<dt>' . t('Creating vocabularies') . '</dt>';
-      $output .= '<dd>' . t('Users with sufficient <a href="@perm">permissions</a> can create <em>vocabularies</em> and <em>terms</em> through the <a href="@taxo">Taxonomy page</a>. The page listing the terms provides a drag-and-drop interface for controlling the order of the terms and sub-terms within a vocabulary, in a hierarchical fashion. A <em>controlled vocabulary</em> classifying music by genre with terms and sub-terms could look as follows:', array('@taxo' => url('admin/structure/taxonomy'), '@perm' => url('admin/people/permissions', array('fragment'=>'module-taxonomy'))));
+      $output .= '<dd>' . t('Users with sufficient <a href="@perm">permissions</a> can create <em>vocabularies</em> and <em>terms</em> through the <a href="@taxo">Taxonomy page</a>. The page listing the terms provides a drag-and-drop interface for controlling the order of the terms and sub-terms within a vocabulary, in a hierarchical fashion. A <em>controlled vocabulary</em> classifying music by genre with terms and sub-terms could look as follows:', array('@taxo' => url('admin/structure/taxonomy'), '@perm' => url('admin/people/permissions', array('fragment' => 'module-taxonomy'))));
       $output .= '<ul><li>' . t('<em>vocabulary</em>: Music') . '</li>';
       $output .= '<ul><li>' . t('<em>term</em>: Jazz') . '</li>';
       $output .= '<ul><li>' . t('<em>sub-term</em>: Swing') . '</li>';
@@ -207,7 +207,7 @@ function taxonomy_select_nodes($tid, $pager = TRUE, $limit = FALSE, $order = arr
   }
   $query = db_select('taxonomy_index', 't');
   $query->addTag('node_access');
-  $query->condition('tid', $tid);
+  $query->condition('t.tid', $tid);
   if ($pager) {
     $count_query = clone $query;
     $count_query->addExpression('COUNT(t.nid)');
@@ -283,6 +283,8 @@ function taxonomy_menu() {
     'title' => 'Taxonomy term',
     'title callback' => 'taxonomy_term_title',
     'title arguments' => array(2),
+    // The page callback also invokes drupal_set_title() in case
+    // the menu router's title is overridden by a menu link.
     'page callback' => 'taxonomy_term_page',
     'page arguments' => array(2),
     'access arguments' => array('access content'),
@@ -1023,7 +1025,7 @@ function taxonomy_get_parents($tid) {
     $query->join('taxonomy_term_hierarchy', 'h', 'h.parent = t.tid');
     $query->addField('t', 'tid');
     $query->condition('h.tid', $tid);
-    $query->addTag('term_access');
+    $query->addTag('taxonomy_term_access');
     $query->orderBy('t.weight');
     $query->orderBy('t.name');
     $tids = $query->execute()->fetchCol();
@@ -1081,7 +1083,7 @@ function taxonomy_get_children($tid, $vid = 0) {
     if ($vid) {
       $query->condition('t.vid', $vid);
     }
-    $query->addTag('term_access');
+    $query->addTag('taxonomy_term_access');
     $query->orderBy('t.weight');
     $query->orderBy('t.name');
     $tids = $query->execute()->fetchCol();
@@ -1129,7 +1131,7 @@ function taxonomy_get_tree($vid, $parent = 0, $max_depth = NULL, $load_entities 
     $query->join('taxonomy_term_hierarchy', 'h', 'h.tid = t.tid');
     $result = $query
       ->addTag('translatable')
-      ->addTag('term_access')
+      ->addTag('taxonomy_term_access')
       ->fields('t')
       ->fields('h', array('parent'))
       ->condition('t.vid', $vid)
@@ -1249,7 +1251,7 @@ class TaxonomyTermController extends DrupalDefaultEntityController {
   protected function buildQuery($ids, $conditions = array(), $revision_id = FALSE) {
     $query = parent::buildQuery($ids, $conditions, $revision_id);
     $query->addTag('translatable');
-    $query->addTag('term_access');
+    $query->addTag('taxonomy_term_access');
     // When name is passed as a condition use LIKE.
     if (isset($conditions['name'])) {
       $query_conditions = &$query->conditions();
@@ -1272,7 +1274,7 @@ class TaxonomyTermController extends DrupalDefaultEntityController {
     // LOWER() and drupal_strtolower() may return different results.
     foreach ($terms as $term) {
       $term_values = (array) $term;
-      if (isset($conditions['name']) && drupal_strtolower($conditions['name'] != drupal_strtolower($term_values['name']))) {
+      if (isset($conditions['name']) && drupal_strtolower($conditions['name']) != drupal_strtolower($term_values['name'])) {
         unset($terms[$term->tid]);
       }
     }
@@ -1310,7 +1312,7 @@ class TaxonomyVocabularyController extends DrupalDefaultEntityController {
  * @param $tids
  *   An array of taxonomy term IDs.
  * @param $conditions
- *   (deprecated) An associative array of conditions on the {taxonomy_term}
+ *   (deprecated) An associative array of conditions on the {taxonomy_term_data}
  *   table, where the keys are the database fields and the values are the
  *   values those fields must have. Instead, it is preferable to use
  *   EntityFieldQuery to retrieve a list of entity IDs loadable by
@@ -1424,8 +1426,7 @@ function taxonomy_implode_tags($tags, $vid = NULL) {
     }
   }
   // Mukurtu patch -- delimit by the semicolon instead of comma
-  return implode('; ', $typed_tags);
-}
+  return implode('; ', $typed_tags);}
 
 /**
  * Implements hook_field_info().
@@ -1507,7 +1508,7 @@ function taxonomy_field_validate($entity_type, $entity, $field, $instance, $lang
   // Build an array of existing term IDs so they can be loaded with
   // taxonomy_term_load_multiple();
   foreach ($items as $delta => $item) {
-    if (!empty($item['tid']) && $item['tid'] != 'autocreate') {
+    if (!empty($item['tid']) && $item['tid'] !== 'autocreate') {
       $tids[] = $item['tid'];
     }
   }
@@ -1518,7 +1519,7 @@ function taxonomy_field_validate($entity_type, $entity, $field, $instance, $lang
     // allowed values for this field.
     foreach ($items as $delta => $item) {
       $validate = TRUE;
-      if (!empty($item['tid']) && $item['tid'] != 'autocreate') {
+      if (!empty($item['tid']) && $item['tid'] !== 'autocreate') {
         $validate = FALSE;
         foreach ($field['settings']['allowed_values'] as $settings) {
           // If no parent is specified, check if the term is in the vocabulary.
@@ -1594,7 +1595,7 @@ function taxonomy_field_formatter_view($entity_type, $entity, $field, $instance,
   switch ($display['type']) {
     case 'taxonomy_term_reference_link':
       foreach ($items as $delta => $item) {
-        if ($item['tid'] == 'autocreate') {
+        if ($item['tid'] === 'autocreate') {
           $element[$delta] = array(
             '#markup' => check_plain($item['name']),
           );
@@ -1614,7 +1615,7 @@ function taxonomy_field_formatter_view($entity_type, $entity, $field, $instance,
 
     case 'taxonomy_term_reference_plain':
       foreach ($items as $delta => $item) {
-        $name = ($item['tid'] != 'autocreate' ? $item['taxonomy_term']->name : $item['name']);
+        $name = ($item['tid'] !== 'autocreate' ? $item['taxonomy_term']->name : $item['name']);
         $element[$delta] = array(
           '#markup' => check_plain($name),
         );
@@ -1625,9 +1626,9 @@ function taxonomy_field_formatter_view($entity_type, $entity, $field, $instance,
       foreach ($items as $delta => $item) {
         $entity->rss_elements[] = array(
           'key' => 'category',
-          'value' => $item['tid'] != 'autocreate' ? $item['taxonomy_term']->name : $item['name'],
+          'value' => $item['tid'] !== 'autocreate' ? $item['taxonomy_term']->name : $item['name'],
           'attributes' => array(
-            'domain' => $item['tid'] != 'autocreate' ? url('taxonomy/term/' . $item['tid'], array('absolute' => TRUE)) : '',
+            'domain' => $item['tid'] !== 'autocreate' ? url('taxonomy/term/' . $item['tid'], array('absolute' => TRUE)) : '',
           ),
         );
       }
@@ -1672,13 +1673,13 @@ function taxonomy_field_formatter_prepare_view($entity_type, $entities, $field, 
   foreach ($entities as $id => $entity) {
     foreach ($items[$id] as $delta => $item) {
       // Force the array key to prevent duplicates.
-      if ($item['tid'] != 'autocreate') {
+      if ($item['tid'] !== 'autocreate') {
         $tids[$item['tid']] = $item['tid'];
       }
     }
   }
   if ($tids) {
-    $terms = taxonomy_term_load_multiple($tids);
+    $terms = taxonomy_term_load_multiple(array_filter($tids));
 
     // Iterate through the fieldable entities again to attach the loaded term data.
     foreach ($entities as $id => $entity) {
@@ -1691,7 +1692,7 @@ function taxonomy_field_formatter_prepare_view($entity_type, $entities, $field, 
           $items[$id][$delta]['taxonomy_term'] = $terms[$item['tid']];
         }
         // Terms to be created are not in $terms, but are still legitimate.
-        elseif ($item['tid'] == 'autocreate') {
+        elseif ($item['tid'] === 'autocreate') {
           // Leave the item in place.
         }
         // Otherwise, unset the instance value, since the term does not exist.
@@ -1710,13 +1711,15 @@ function taxonomy_field_formatter_prepare_view($entity_type, $entities, $field, 
 }
 
 /**
- * Title callback for term pages.
+ * Title callback: Returns the title of the taxonomy term.
  *
  * @param $term
  *   A term object.
  *
  * @return
- *   The term name to be used as the page title.
+ *   An unsanitized string that is the title of the taxonomy term.
+ *
+ * @see taxonomy_menu()
  */
 function taxonomy_term_title($term) {
   return $term->name;
@@ -1761,7 +1764,7 @@ function taxonomy_autocomplete_validate($element, &$form_state) {
     }
 
     // Translate term names into actual terms.
-    $typed_terms = ma_core_taxonomy_explode_tags($tags);
+    $typed_terms = ma_core_taxonomy_explode_tags($tags); // mukurtu patch
     foreach ($typed_terms as $typed_term) {
       // See if the term exists in the chosen vocabulary and return the tid;
       // otherwise, create a new 'autocreate' term for insert/update.
@@ -1893,7 +1896,7 @@ function taxonomy_rdf_mapping() {
  */
 function taxonomy_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
   foreach ($items as $delta => $item) {
-    if ($item['tid'] == 'autocreate') {
+    if ($item['tid'] === 'autocreate') {
       $term = (object) $item;
       unset($term->tid);
       taxonomy_term_save($term);
@@ -2051,5 +2054,14 @@ function taxonomy_entity_query_alter($query) {
 
     $query->propertyCondition('vid', $vids, $conditions['bundle']['operator']);
     unset($conditions['bundle']);
+  }
+}
+
+/**
+ * Implements hook_file_download_access().
+ */
+function taxonomy_file_download_access($field, $entity_type, $entity) {
+  if ($entity_type == 'taxonomy_term') {
+    return user_access('access content');
   }
 }

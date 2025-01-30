@@ -1,0 +1,36 @@
+From 241dd2754ffc97ba27a91d689261ed865fe9c398 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Fri, 8 Dec 2017 14:01:44 -0800
+Subject: [PATCH 1/2] Add support for partial content updates
+
+If an existing entity has three fields A, B, and C, but the input to
+feeds was only given fields A and B, don't clear field C before
+import. This way users don't have to work with the entire dataset all
+the time.
+---
+ sites/all/modules/contrib/feeds/plugins/FeedsProcessor.inc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/sites/all/modules/contrib/feeds/plugins/FeedsProcessor.inc b/sites/all/modules/contrib/feeds/plugins/FeedsProcessor.inc
+index ead72acb..0c116c15 100644
+--- a/plugins/FeedsProcessor.inc
++++ b/plugins/FeedsProcessor.inc
+@@ -889,6 +889,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
+         $target_name = $mapping['target'];
+       }
+
++      if (ma_importexport_dc_is_xml_importer($source->id) || isset($result->input_fields) && in_array(strtolower($mapping['source']), $result->input_fields)) {
+       // If the target is a field empty the value for the targeted language
+       // only.
+       // In all other cases, just empty the target completely.
+@@ -735,6 +736,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
+         $target_item->{$target_name} = NULL;
+       }
+     }
++    }
+
+     // This is where the actual mapping happens: For every mapping we invoke
+     // the parser's getSourceElement() method to retrieve the value of the
+--
+2.17.1
+

@@ -1,0 +1,113 @@
+<?php
+
+/**
+ * @file
+ * The EckCrudTest class.
+ */
+
+/**
+ * Rudimentary CRUD functionality.
+ */
+class EckCrudTest extends EckTestHelper {
+
+  /**
+   * Meta data about these tests.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'ECK CRUD test',
+      'description' => 'Test the basic CRUD operations.',
+      'group' => 'eck',
+      'dependencies' => array('ctools', 'entity'),
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(array $modules = array()) {
+    $modules[] = 'eck';
+
+    parent::setUp($modules);
+
+    // Log in as user 1.
+    $this->loginUser1();
+  }
+
+  /**
+   * Confirm that entity types can be created, bundles created, etc.
+   */
+  public function testProcess() {
+    // Make sure the main Entity Types list page is present.
+    $this->drupalGet('admin/structure');
+    $this->assertResponse(200);
+    $this->assertLink('Entity types');
+    $this->assertLinkByHref('admin/structure/entity-type');
+
+    // Load the "Entity types" list page.
+    $this->drupalGet('admin/structure/entity-type');
+    $this->assertResponse(200);
+    $this->assertLink('Add entity type');
+    $this->assertText('Entity types');
+    $this->assertText('Entity type');
+    $this->assertText('Operations');
+    // @todo It would be useful to have a "no records" message when there are no entity types.
+
+    // Create a test entity type.
+    $this->createEntityType();
+
+    // Confirm the various tabs that should exist.
+    $this->drupalGet('admin/structure/entity-type/test_entity');
+    $this->assertResponse(200);
+    $this->assertLink('Edit');
+    $this->assertLinkByHref(url('admin/structure/entity-type/test_entity/edit'));
+    $this->assertLink('Delete');
+    $this->assertLinkByHref(url('admin/structure/entity-type/test_entity/delete'));
+    $this->assertLink('Manage properties');
+    $this->assertLinkByHref(url('admin/structure/entity-type/test_entity/properties'));
+    $this->assertLink('Bundle List');
+    $this->assertLinkByHref(url('admin/structure/entity-type/test_entity'));
+    $this->assertLink('Add bundle');
+    $this->assertLinkByHref(url('admin/structure/entity-type/test_entity/add'));
+    $this->assertLink('Test entity');
+    $this->assertLinkByHref(url('admin/structure/entity-type/test_entity/test_entity'));
+    $this->assertLink('delete');
+    $this->assertLinkByHref(url('admin/structure/entity-type/test_entity/test_entity/delete'));
+
+    // Load the bundle admin page.
+    $this->drupalGet('admin/structure/entity-type/test_entity/test_entity');
+    $this->assertResponse(200);
+    $this->assertLink('Delete');
+    $this->assertLinkByHref(url('admin/structure/entity-type/test_entity/test_entity/delete'));
+    $this->assertLink('Edit');
+    $this->assertLinkByHref(url('admin/structure/entity-type/test_entity/test_entity/edit'));
+    $this->assertLink('Manage fields');
+    $this->assertLinkByHref(url('admin/structure/entity-type/test_entity/test_entity/fields'));
+    $this->assertLink('Manage display');
+    $this->assertLinkByHref(url('admin/structure/entity-type/test_entity/test_entity/display'));
+    $this->assertLink('Entity List');
+    $this->assertLinkByHref(url('admin/structure/entity-type/test_entity/test_entity'));
+    $this->assertLink('Add Test entity');
+    $this->assertLinkByHref(url('admin/structure/entity-type/test_entity/test_entity/add'));
+    // @todo It would be useful to have a "no records" message when there are no entities for a given bundle.
+
+    // @todo Confirm creating a bundle.
+    // @todo Confirm adding fields, etc.
+    // @todo Confirm entity object CRUD.
+    // @todo Confirm deleting a bundle.
+
+    // Confirm deleting an entity type.
+    $this->drupalGet('admin/structure/entity-type/test_entity/delete');
+    $this->assertResponse(200);
+    $this->assertText('All of the data (entities and bundles) from this entity type will be deleted. This action cannot be undone.');
+    $this->drupalPost(NULL, array(), t('Delete'));
+    $this->assertResponse(200);
+    $this->assertText('The entity type Test entity has been deleted.');
+    // @todo It would be useful to have a "no records" message when there are no bundles.
+
+    // @todo Confirm "Manage properties" functionality.
+  }
+
+  // @todo Confirm creating a bundle at the same time as an entity type works.
+  // @todo Confirm each of the default_properties works as intended.
+}

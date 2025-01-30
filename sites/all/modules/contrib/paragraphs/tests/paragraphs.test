@@ -1,0 +1,182 @@
+<?php
+
+/**
+ * Defines tests for paragraphs.
+ */
+class ParagraphsWebTestCase extends DrupalWebTestCase {
+
+  /**
+   * A user object for the privilaged user.
+   *
+   * @var object
+   */
+  protected $privilegedUser;
+
+  /**
+   * Give display information to the SimpleTest system.
+   *
+   * It's a good idea to organize your tests consistently using the 'group' key.
+   *
+   * @return array
+   *   A keyed array of information for SimpleTest to show.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Paragraphs test',
+      'description' => 'Ensure that the simpletest_example content type provided functions properly.',
+      'group' => 'Paragraphs',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    $modules = array(
+      'paragraphs_test',
+    );
+    parent::setUp($modules);
+
+    // Make sure the base configuration is set up.
+    features_revert_module('paragraphs_test');
+
+    // Create with a user rolegiven by the feature.
+    $this->privilegedUser = $this->drupalCreateUserWithRole('ptest creator');
+  }
+
+  /**
+   * Tests creating and updating a node with panelizer enabled paragraphs.
+   */
+  public function testPanelizer() {
+
+    $this->drupalLogin($this->privilegedUser);
+
+    $this->drupalGet('node/add/paragraph-test');
+
+    // Add a new paragraph before saving node.
+    $this->drupalPost(NULL, array(), t('Add new Paragraph'));
+
+    $title = $this->randomString(20);
+    $value1 = $this->randomString(20);
+    $create_edit = array(
+      'title' => $title,
+      'field_paragraphs[und][0][field_ptest_text][und][0][value]' => $value1,
+    );
+    $this->drupalPost(NULL, $create_edit, t('Save'));
+
+    $this->assertRaw(t('!post %title has been created.', array('!post' => 'Paragraph Test', '%title' => $title)), 'Paragraph test node created.');
+    $this->assertText(check_plain($value1), 'First value of paragraph was rendered.');
+
+    // Update the created node.
+    $node_url = $this->getUrl();
+    $this->drupalGet($node_url . '/edit');
+
+    $this->drupalPost(NULL, array(), t('Add another Paragraph'));
+
+    $value2 = $this->randomString(20);
+    $update_edit = array(
+      'field_paragraphs[und][1][field_ptest_text][und][0][value]' => $value2,
+    );
+    $this->drupalPost(NULL, $update_edit, t('Save'));
+
+    $this->assertRaw(t('!post %title has been updated.', array('!post' => 'Paragraph Test', '%title' => $title)), 'Paragraph test node updated.');
+    $this->assertText(check_plain($value1), 'First value of paragraph was rendered.');
+    $this->assertText(check_plain($value2), 'Second value of paragraph was rendered.');
+
+  }
+
+  /**
+   * Tests required field validation on paragraph bundle.
+   */
+  public function testRequiredFieldInBundle() {
+    $this->drupalLogin($this->privilegedUser);
+
+    $this->drupalGet('node/add/paragraph-test');
+
+    // Add a new paragraph before saving node.
+    $this->drupalPost(NULL, array(), t('Add new Paragraph'));
+
+    $title = $this->randomString(20);
+
+    $create_edit = array(
+      'title' => $title,
+    );
+
+    // Click the Save button to test whole-form validation.
+    $this->drupalPost(NULL, $create_edit, t('Save'));
+
+    // Empty field should fail validation.
+    $this->assertRaw(t('!field field is required.', array('!field' => 'PTest Text')), 'Field failed whole-form validation');
+
+    // Click the Collapse button to test per-paragraph validation.
+    $this->drupalPost(NULL, $create_edit, t('Collapse'));
+
+    // Empty field should fail validation.
+    $this->assertRaw(t('!field field is required.', array('!field' => 'PTest Text')), 'Field failed per-paragraph validation');
+
+    // Add value to field.
+    $value1 = $this->randomString(20);
+    $create_edit = array(
+      'field_paragraphs[und][0][field_ptest_text][und][0][value]' => $value1,
+    );
+
+    // Click Collapse button to close paragraph (should now pass).
+    $this->drupalPost(NULL, $create_edit, t('Collapse'));
+
+    // Paragraph item should collapse after passing validation.
+    $this->assertRaw(t('Warning: this content must be saved to reflect changes on this paragraphs item.'), 'Field passed per-paragraph validation');
+
+    $create_edit = array(
+      'title' => $title,
+    );
+
+    // Save whole node.
+    $this->drupalPost(NULL, $create_edit, t('Save'));
+
+    // Node should save.
+    $this->assertRaw(t('!post %title has been created.', array('!post' => 'Paragraph Test', '%title' => $title)), 'Paragraph test node created.');
+    $this->assertText(check_plain($value1), 'Value of paragraph was rendered.');
+  }
+
+  /**
+   * Helper to create a user with a given role.
+   *
+   * @param string $role_name
+   *   The name of the role to give the user.
+   *
+   * @return bool|object
+   *   A user account object.
+   *
+   * @throws \Exception
+   *
+   * @see DrupalWebTestCase::drupalCreateUser()
+   */
+  protected function drupalCreateUserWithRole($role_name) {
+
+    $role = user_role_load_by_name($role_name);
+    if (!$role) {
+      return FALSE;
+    }
+
+    // Create a user assigned to that role.
+    $edit           = array();
+    $edit['name']   = $this->randomName();
+    $edit['mail']   = $edit['name'] . '@example.com';
+    $edit['pass']   = user_password();
+    $edit['status'] = 1;
+    $edit['roles']  = array($role->rid => $role->rid);
+
+    $account = user_save(drupal_anonymous_user(), $edit);
+
+    $this->assertTrue(!empty($account->uid), t('User created with name %name and pass %pass', array('%name' => $edit['name'], '%pass' => $edit['pass'])), t('User login'));
+    if (empty($account->uid)) {
+      return FALSE;
+    }
+
+    // Add the raw password so that we can log in as this user.
+    $account->pass_raw = $edit['pass'];
+
+    return $account;
+  }
+
+}

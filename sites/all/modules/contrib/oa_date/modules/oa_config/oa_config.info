@@ -1,0 +1,35 @@
+name = Open Atrium Config
+description = System configuration variables
+core = 7.x
+package = Open Atrium
+dependencies[] = chosen
+dependencies[] = ctools
+dependencies[] = panopoly_wysiwyg
+dependencies[] = strongarm
+features[ctools][] = strongarm:strongarm:1
+features[features_api][] = api:2
+features[variable][] = advagg_core_groups
+features[variable][] = advagg_ie_css_selector_limiter
+features[variable][] = advagg_ie_css_selector_limiter_value
+features[variable][] = apps_grouping_mode
+features[variable][] = apps_grouping_vertical
+features[variable][] = bootstrap_library_settings
+features[variable][] = chosen_jquery_selector
+features[variable][] = chosen_minimum
+features[variable][] = chosen_minimum_multiple
+features[variable][] = chosen_minimum_single
+features[variable][] = features_rebuild_on_flush
+features[variable][] = file_default_scheme
+features[variable][] = file_entity_file_upload_wizard_skip_scheme
+features[variable][] = og_context_negotiation_group_context
+features[variable][] = og_context_providers_weight_group_context
+features[variable][] = panopoly_core_breadcrumb_title
+features[variable][] = pathauto_reduce_ascii
+features[variable][] = preprocess_css
+features[variable][] = select2_delay
+
+; Information added by Drupal.org packaging script on 2018-10-18
+version = "7.x-2.91"
+core = "7.x"
+project = "oa_core"
+datestamp = "1539884795"

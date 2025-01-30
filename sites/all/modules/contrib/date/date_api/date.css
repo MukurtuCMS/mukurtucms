@@ -3,7 +3,8 @@
  * Main stylesheet for Date module.
  */
 
-/* Force start/end dates to float using inline-block, where it works, otherwise inline. */
+/* Force start/end dates to float using inline-block, where it works, */
+/* otherwise inline. */
 .container-inline-date {
   clear: both;
 }
@@ -15,8 +16,10 @@
 .container-inline-date > .form-item {
   display: inline-block;
   margin-right: 0.5em; /* LTR */
-  margin-bottom: 10px;
   vertical-align: top;
+}
+fieldset.date-combo .container-inline-date > .form-item {
+  margin-bottom: 10px;
 }
 .container-inline-date .form-item .form-item {
   float: left; /* LTR */
@@ -50,16 +53,18 @@
   width: auto;
 }
 
-/* The exposed Views form doesn't need some of these styles */
+/* The exposed Views form doesn't need some of these styles. */
 .container-inline-date .date-padding {
-  padding: 10px;
   float: left;
+}
+fieldset.date-combo .container-inline-date .date-padding {
+  padding: 10px;
 }
 .views-exposed-form .container-inline-date .date-padding {
   padding: 0;
 }
 
-/* Fixes for date popup css so it will behave in Drupal */
+/* Fixes for date popup css so it will behave in Drupal. */
 #calendar_div,
 #calendar_div td,
 #calendar_div th {
@@ -80,7 +85,7 @@
   padding: 0;
 }
 
-/* formatting for start/end dates in nodes and views */
+/* Formatting for start/end dates in nodes and views. */
 span.date-display-single {
 }
 span.date-display-start {
@@ -110,13 +115,13 @@ span.date-display-end {
   width: auto;
 }
 
-/* Add space between date option checkboxes ('All day' & 'Collect End Date') */
-.date-float .form-type-checkbox{
+/* Add space between date option checkboxes ('All day' & 'Collect End Date'). */
+.date-float .form-type-checkbox {
   padding-right: 1em;
 }
 
 /* Add space between the date and time portions of the date_select widget. */
-.form-type-date-select .form-type-select[class$=hour] {
+.form-type-date-select .form-type-select[class*=hour] {
   margin-left: .75em; /* LTR */
 }
 
@@ -138,13 +143,13 @@ span.date-display-end {
   float: left;
 }
 
-/* Calendar day css */
+/* Calendar day CSS. */
 div.date-calendar-day {
-  background: #F3F3F3;
-  border-top: 1px solid #EEE;
-  border-left: 1px solid #EEE;
-  border-right: 1px solid #BBB;
-  border-bottom: 1px solid #BBB;
+  background: #f3f3f3;
+  border-top: 1px solid #eee;
+  border-left: 1px solid #eee;
+  border-right: 1px solid #bbb;
+  border-bottom: 1px solid #bbb;
   color: #999;
   float: left;
   line-height: 1;
@@ -158,7 +163,7 @@ div.date-calendar-day span {
   text-align: center;
 }
 div.date-calendar-day span.month {
-  background-color: #B5BEBE;
+  background-color: #b5bebe;
   color: white;
   font-size: .9em;
   padding: 2px;
@@ -173,7 +178,12 @@ div.date-calendar-day span.year {
   padding: 2px;
 }
 
-/* Admin styling */
+.date-form-element-content-multiline {
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+/* Admin styling. */
 .form-item.form-item-instance-widget-settings-input-format-custom,
 .form-item.form-item-field-settings-enddate-required {
   margin-left: 1.3em;

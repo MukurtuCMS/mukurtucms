@@ -2659,7 +2659,7 @@ function node_feed($nids = FALSE, $channel = array()) {
  *   An array in the format expected by drupal_render().
  */
 function node_view_multiple($nodes, $view_mode = 'teaser', $weight = 0, $langcode = NULL) {
-  $build = array();
+  $build = array('nodes' => array());
   $entities_by_view_mode = entity_view_mode_prepare('node', $nodes, $view_mode, $langcode);
   foreach ($entities_by_view_mode as $entity_view_mode => $entities) {
     field_attach_prepare_view('node', $entities, $entity_view_mode, $langcode);
@@ -2953,7 +2953,10 @@ function node_search_validate($form, &$form_state) {
  * system. When adding a node listing to your module, be sure to use a dynamic
  * query created by db_select() and add a tag of "node_access". This will allow
  * modules dealing with node access to ensure only nodes to which the user has
- * access are retrieved, through the use of hook_query_TAG_alter().
+ * access are retrieved, through the use of hook_query_TAG_alter(). Tagging a
+ * query with "node_access" does not check the published/unpublished status of
+ * nodes, so the base query is responsible for ensuring that unpublished nodes
+ * are not displayed to inappropriate users.
  *
  * Note: Even a single module returning NODE_ACCESS_DENY from hook_node_access()
  * will block access to the node. Therefore, implementers should take care to
@@ -3052,18 +3055,12 @@ function node_access($op, $node, $account = NULL) {
       $query->condition($nids);
       $query->range(0, 1);
 
-      $grants = db_or();
-      foreach (node_access_grants($op, $account) as $realm => $gids) {
-        foreach ($gids as $gid) {
-          $grants->condition(db_and()
-            ->condition('gid', $gid)
-            ->condition('realm', $realm)
-          );
-        }
-      }
+      $grants = node_add_node_grants_to_query(node_access_grants($op, $account));
+
       if (count($grants) > 0) {
         $query->condition($grants);
       }
+
       $result =  (bool) $query
         ->execute()
         ->fetchField();
@@ -3079,6 +3076,31 @@ function node_access($op, $node, $account = NULL) {
   }
 
   return FALSE;
+}
+
+/**
+ * Helper function to create the or condition for a node grants check.
+ *
+ * @param $account
+ *   The grants to add to the query, usually gotten via node_access_grants().
+ * @param $table_alias
+ *   Optional, the alias to the node access table.
+ *
+ * @return
+ *   TRUE if the operation may be performed, FALSE otherwise.
+ */
+function node_add_node_grants_to_query($node_access_grants, $table_alias = '') {
+  $grants = db_or();
+  $prefix = $table_alias ? $table_alias . '.' : '';
+  foreach ($node_access_grants as $realm => $gids) {
+    if (!empty($gids)) {
+      $grants->condition(db_and()
+        ->condition($prefix . 'gid', $gids, 'IN')
+        ->condition($prefix . 'realm', $realm)
+      );
+    }
+  }
+  return $grants;
 }
 
 /**
@@ -3249,15 +3271,8 @@ function node_access_view_all_nodes($account = NULL) {
       ->condition('nid', 0)
       ->condition('grant_view', 1, '>=');
 
-    $grants = db_or();
-    foreach (node_access_grants('view', $account) as $realm => $gids) {
-      foreach ($gids as $gid) {
-        $grants->condition(db_and()
-          ->condition('gid', $gid)
-          ->condition('realm', $realm)
-        );
-      }
-    }
+    $grants = node_add_node_grants_to_query(node_access_grants('view', $account));
+
     if (count($grants) > 0 ) {
       $query->condition($grants);
     }
@@ -3419,17 +3434,7 @@ function _node_query_node_access_alter($query, $type) {
       $subquery = db_select('node_access', 'na')
        ->fields('na', array('nid'));
 
-      $grant_conditions = db_or();
-      // If any grant exists for the specified user, then user has access
-      // to the node for the specified operation.
-      foreach ($grants as $realm => $gids) {
-        foreach ($gids as $gid) {
-          $grant_conditions->condition(db_and()
-            ->condition('na.gid', $gid)
-            ->condition('na.realm', $realm)
-          );
-        }
-      }
+      $grant_conditions = node_add_node_grants_to_query($grants, 'na');
 
       // Attach conditions to the subquery for nodes.
       if (count($grant_conditions->conditions())) {
@@ -3685,7 +3690,7 @@ function _node_access_rebuild_batch_operation(&$context) {
     // Initiate multistep processing.
     $context['sandbox']['progress'] = 0;
     $context['sandbox']['current_node'] = 0;
-    $context['sandbox']['max'] = db_query('SELECT COUNT(DISTINCT nid) FROM {node}')->fetchField();
+    $context['sandbox']['max'] = db_query('SELECT COUNT(nid) FROM {node}')->fetchField();
   }
 
   // Process the next 20 nodes.

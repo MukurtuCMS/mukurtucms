@@ -9,16 +9,20 @@
  * Basic test for pluggable argument default.
  */
 class ViewsArgumentDefaultTest extends ViewsSqlTest {
+
   public static function getInfo() {
     return array(
       'name' => 'Argument_default',
       'description' => 'Tests pluggable argument_default for views.',
-      'group' => 'Views Plugins'
+      'group' => 'Views Plugins',
     );
   }
 
-  public function setUp() {
-    parent::setUp('views');
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    parent::setUp($modules);
 
     $this->random = $this->randomString();
   }
@@ -62,7 +66,7 @@ class ViewsArgumentDefaultTest extends ViewsSqlTest {
 
     $view->destroy();
 
-    // Make sure that a normal argument provided is used
+    // Make sure that a normal argument provided is used.
     $view = $this->view_argument_default_fixed();
 
     $view->set_display('default');
@@ -87,7 +91,7 @@ class ViewsArgumentDefaultTest extends ViewsSqlTest {
   }
 
   function view_argument_default_fixed() {
-    $view = new view;
+    $view = new view();
     $view->name = 'test_argument_default_fixed';
     $view->description = '';
     $view->tag = '';
@@ -134,4 +138,5 @@ class ViewsArgumentDefaultTest extends ViewsSqlTest {
 
     return $view;
   }
+
 }

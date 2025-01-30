@@ -1,0 +1,15 @@
+name = Field Display Label
+package = Fields
+description = Defines a label for fields that is used for displaying content which can be different than the form label.
+core = 7.x
+
+dependencies[] = field
+
+files[] = field_display_label.test
+
+; Information added by Drupal.org packaging script on 2016-07-10
+version = "7.x-1.4"
+core = "7.x"
+project = "field_display_label"
+datestamp = "1468149030"
+

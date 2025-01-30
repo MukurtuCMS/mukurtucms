@@ -1,0 +1,33 @@
+.view-border {
+    border-bottom: 5px solid @mukurtu-view-row-divider-color;
+}
+
+.not-front {
+    .view {
+        .view-header {
+            .btn {
+                text-transform: uppercase;
+                font-size: 12px;
+                font-weight: bold;
+                margin-top: 20px;
+                margin-bottom: 20px;
+                border: 1px solid @brand-primary;
+                border-radius: 0px;
+
+                &.active {
+                    border: none;
+                    background-color: @brand-primary;
+                    color: #FFF;
+                }
+
+                &.active:hover {
+                    color: #fff;
+                }
+
+                &:hover {
+                    color: @brand-secondary;
+                }
+            }
+        }
+    }
+}

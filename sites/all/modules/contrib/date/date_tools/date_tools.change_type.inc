@@ -10,10 +10,11 @@
  *
  * @see date_tools_change_type_form_validate()
  * @see date_tools_change_type_form_submit()
+ *
+ * @todo This is broken, still needs to be adjusted for the D6->D7 changes.
  */
 function date_tools_change_type_form() {
   $form = array();
-  // This is broken, still needs to be adjusted for the D6->D7 changes.
   drupal_set_message(t('This operation does not yet work for the Drupal 7 version.'), 'error');
   return $form;
   $fields = content_fields();
@@ -28,10 +29,14 @@ function date_tools_change_type_form() {
   // Get the available date fields.
   foreach ($fields as $field_name => $field) {
     if ($field['type'] == 'date' || $field['type'] == 'datestamp' || $field['type'] == 'datetime') {
-      $date_options[$labels[$field['type']]][$field_name] = t('Field @label (@field_name)', array('@label' => $field['widget']['label'], '@field_name' => $field_name, '@type' => $labels[$field['type']]));
+      $date_options[$labels[$field['type']]][$field_name] = t('Field @label (@field_name)', array(
+        '@label' => $field['widget']['label'],
+        '@field_name' => $field_name,
+        '@type' => $labels[$field['type']],
+      ));
     }
   }
-  if (sizeof($date_options) < 1) {
+  if (count($date_options) < 1) {
     drupal_set_message(t('There are no date fields in this database.'));
     return $form;
   }
@@ -90,13 +95,11 @@ function date_tools_change_type_form_submit($form, &$form_state) {
     $labels[$type] = $info['label'];
   }
 
-  // Is there any data in this field? If not, we can
-  // skip some steps.
+  // Is there any data in this field? If not, we can skip some steps.
   $has_data = db_query("SELECT COUNT(*) FROM {" . $table . "}")->fetchField();
 
-  // Create a backup copy of the original values.
-  // The values are going to get corrupted when we
-  // change the column type.
+  // Create a backup copy of the original values. The values are going to get
+  // corrupted when we change the column type.
   if ($has_data) {
     $temp_table = $table . '_temp';
     db_query("CREATE TABLE {" . $temp_table . "} SELECT * FROM {" . $table . "}");
@@ -111,7 +114,10 @@ function date_tools_change_type_form_submit($form, &$form_state) {
   // If there's no data to update, we're finished.
   if (!$has_data) {
     drupal_set_message(t('The field @field_name has been changed from @old_type to @new_type.', array(
-    '@field_name' => $field['widget']['label'], '@old_type' => $labels[$old_type], '@new_type' => $labels[$new_type])));
+      '@field_name' => $field['widget']['label'],
+      '@old_type' => $labels[$old_type],
+      '@new_type' => $labels[$new_type],
+    )));
     return;
   }
 
@@ -142,26 +148,31 @@ function date_tools_change_type_form_submit($form, &$form_state) {
           case 'datestamp':
             $new_columns[] = $date_handler->sql_format('U', $db_field) . ' AS ' . $info['column'];
             break;
+
           case 'datetime':
             $new_columns[] = $date_handler->sql_format('Y-m-d H:i:s', $db_field) . ' AS ' . $info['column'];
             break;
         }
         break;
+
       case 'datestamp':
         switch ($new_type) {
           case 'date':
             $new_columns[] = $date_handler->sql_format('Y-m-d/TH:i:s', $db_field) . ' AS ' . $info['column'];
             break;
+
           case 'datetime':
             $new_columns[] = $date_handler->sql_format('Y-m-d H:i:s', $db_field) . ' AS ' . $info['column'];
             break;
         }
         break;
+
       case 'datetime':
         switch ($new_type) {
           case 'date':
             $new_columns[] = $date_handler->sql_format('Y-m-d/TH:i:s', $db_field) . ' AS ' . $info['column'];
             break;
+
           case 'datestamp':
             $new_columns[] = $date_handler->sql_format('U', $db_field) . ' AS ' . $info['column'];
             break;
@@ -178,5 +189,9 @@ function date_tools_change_type_form_submit($form, &$form_state) {
   db_query($sql);
   db_query("DROP TABLE {" . $temp_table . "}");
 
-  drupal_set_message(t('The field @field_name has been changed from @old_type to @new_type.', array('@field_name' => $field['widget']['label'], '@old_type' => $labels[$old_type], '@new_type' => $labels[$new_type])));
+  drupal_set_message(t('The field @field_name has been changed from @old_type to @new_type.', array(
+    '@field_name' => $field['widget']['label'],
+    '@old_type' => $labels[$old_type],
+    '@new_type' => $labels[$new_type],
+  )));
 }

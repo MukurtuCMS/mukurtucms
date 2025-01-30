@@ -13,10 +13,12 @@
  * collection of features.
  *
  * The settings array maps to the settings available to leaflet map object,
- * http://leaflet.cloudmade.com/reference.html#map-properties
+ * http://leafletjs.com/reference-1.0.2.html#map
  *
  * Layers are the available base layers for the map and, if you enable the
- * layer control, can be toggled on the map.
+ * layer control, can be toggled on the map. On top of layers, you can add
+ * overlays. Overlays are defined just a layers, but have their 'layer_type'
+ * set to 'overlay'. See drupal.org/project/leaflet_more_maps for examples.
  *
  * @return array
  *   Associative array containing a complete leaflet map definition.

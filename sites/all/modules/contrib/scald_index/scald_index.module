@@ -1,0 +1,423 @@
+<?php
+/**
+ * @file
+ *   Management of insert, update and delete actions on node to record atom associations.
+ */
+
+include_once 'scald_index.features.inc';
+
+/**
+ * Implements hook_help().
+ */
+function scald_index_help($path, $arg) {
+  $result = '';
+
+  switch ($path) {
+    case 'admin/help#scald_index':
+      $result = '<p>' . t("This module maintains an index of atoms referenced in nodes for both atoms referenced through an atom reference field and through SAS tokens within a node's body field markup. Navigate to Structure > Scald > Atoms index to get an overview of all atoms with their node references.") . '</p>';
+      break;
+  }
+
+  return $result;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function scald_index_menu() {
+  $items = array();
+
+  // Confirm index rebuild.
+  $items['admin/structure/scald/atoms-index'] = array(
+    'title' => 'Atoms index',
+    'description' => 'View the index of atoms.',
+    'access arguments' => array('administer scald index'),
+    'page callback' => 'views_embed_view',
+    'page arguments' => array('scald_atoms_index', 'page_1'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  // View atom index.
+  $items['admin/structure/scald/atoms-index/view'] = array(
+    'title' => 'View atoms index',
+    'description' => 'View the index of atoms.',
+    'access arguments' => array('administer scald index'),
+    'weight' => -10,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  // Confirm index rebuild.
+  $items['admin/structure/scald/atoms-index/rebuild'] = array(
+    'title' => 'Rebuild index',
+    'access arguments' => array('administer scald index'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('scald_index_rebuild_confirm_form'),
+    'weight' => 10,
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function scald_index_permission() {
+  return array(
+    'administer scald index' => array(
+      'title' => t('Administer Scald Index'),
+      'description' => t('Perform administration tasks for Scald Index.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_node_insert().
+ *
+ * Creates the index data.
+ */
+function scald_index_node_insert($node) {
+  scald_index_build_node_index($node);
+}
+
+/**
+ * Implements hook_node_update().
+ *
+ * Updates the index data.
+ */
+function scald_index_node_update($node) {
+  scald_index_delete_node_index($node);
+  scald_index_build_node_index($node);
+}
+
+/**
+ * Implements hook_node_delete().
+ *
+ * Delete the index data.
+ */
+function scald_index_node_delete($node) {
+  scald_index_delete_node_index($node);
+}
+
+/**
+ * Implements hook_scald_atom_delete().
+ */
+function scald_index_scald_atom_delete($atom) {
+  // Delete index data.
+  db_delete('scald_index')->condition('sid', $atom->sid)->execute();
+}
+
+/**
+ * Implements hook_field_delete().
+ */
+function scald_index_field_delete_instance($instance) {
+  // Delete all atom associations for this field.
+  db_delete('scald_index')
+    ->condition('field_name', $instance['field_name'])
+    ->condition('type', $instance['bundle'])
+    ->execute();
+}
+
+/**
+ * Builds index for a given node.
+ *
+ * Gather all atoms from the node fields
+ * and insert index data for each of them.
+ *
+ * @param object $node
+ *   The node object.
+ */
+function scald_index_build_node_index($node) {
+  // If a node property is not set in the node object when node_save() is
+  // called, the old value from $node->original is used.
+  $status = NULL;
+  $type = NULL;
+  if (!empty($node->original)) {
+    $status = (int) (!empty($node->status) || (!isset($node->status) && !empty($node->original->status)));
+    $type = $node->original->type;
+  }
+  else {
+    $status = (int) (!empty($node->status));
+    $type = $node->type;
+  }
+
+  // Collect a unique list of all the atom ids from all node fields.
+  $sid_all = array();
+  $instances = field_info_instances('node', $node->type);
+  foreach ($instances as $field_name => $instance) {
+    $field = field_info_field($field_name);
+    $analyse_field = FALSE;
+
+    // Detect atom in reference fields.
+    if ($field['module'] == 'atom_reference' && $field['storage']['type'] == 'field_sql_storage') {
+      $analyse_field = TRUE;
+    }
+
+    // Detect atoms embedded in text fields.
+    if ((isset($instance['settings']['mee_enabled']) && $instance['settings']['mee_enabled'])
+      or (isset($instance['settings']['dnd_enabled']) && $instance['settings']['dnd_enabled'])
+    ) {
+      $analyse_field = TRUE;
+    }
+
+    // Extract atoms used in this field.
+    if ($analyse_field) {
+      foreach (field_available_languages('node', $field) as $langcode) {
+        $values = field_get_items('node', $node, $field_name, $langcode);
+        if (!empty($values)) {
+          foreach ($values as $value) {
+            // Atom references.
+            if (isset($value['sid'])) {
+              $sid_all[] = array(
+                'sid' => $value['sid'],
+                'field_name' => $field_name,
+              );
+            }
+
+            // Text scanning.
+            if (isset($value['value'])) {
+              $extracted_sids = scald_index_included($value['value']);
+              foreach ($extracted_sids as $sid) {
+                $sid_all[] = array(
+                  'sid' => $sid,
+                  'field_name' => $field_name,
+                );
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Allow other modules to alter the list of atoms of the node.
+  drupal_alter('scald_index_node_atoms', $node, $sid_all);
+
+  // Create index entries for all the node's atoms.
+  if (!empty($sid_all)) {
+    $query = db_insert('scald_index')->fields(array(
+      'nid',
+      'sid',
+      'status',
+      'type',
+      'field_name',
+    ));
+
+    foreach ($sid_all as $sid_infos) {
+      $query->values(array(
+        'nid' => $node->nid,
+        'sid' => $sid_infos['sid'],
+        'status' => $status,
+        'type' => $type,
+        'field_name' => $sid_infos['field_name'],
+      ));
+    }
+
+    $query->execute();
+
+    // Allow other modules to do treatments after index build.
+    module_invoke_all('scald_index_after_build_node_index', $node, $sid_all);
+  }
+}
+
+/**
+ * Deletes index for a given node.
+ *
+ * @param object $node
+ *   The node object.
+ */
+function scald_index_delete_node_index($node) {
+  // Delete index data.
+  db_delete('scald_index')->condition('nid', $node->nid)->execute();
+}
+
+/**
+ * Rebuilds the entire index using the batch API.
+ */
+function scald_index_rebuild() {
+  // Deleting old entries.
+  db_truncate('scald_index')->execute();
+
+  // Run batches of 5 nodes per batch.
+  $nids = db_query('SELECT nid FROM {node}')->fetchCol();
+  $step = 5;
+  $current = 0;
+  $i = 0;
+  $batch_operations = array();
+  foreach ($nids as $nid) {
+    if (!isset($batch_operations[$i])) {
+      $batch_operations[$i] = array(
+        'scald_index_rebuild_run',
+        array(array($nid)),
+      );
+    }
+    else {
+      $batch_operations[$i][1][0][] = $nid;
+    }
+
+    $current++;
+    if ($current == $step) {
+      $current = 0;
+      // Start next batch.
+      $i++;
+    }
+  }
+
+  // Execute the batch.
+  batch_set(array(
+    'title' => t('Adding existing atom/node references'),
+    'operations' => $batch_operations,
+    'init_message' => t('The atom/node association is getting added.'),
+    'progress_message' => t('Processed @current groups of :step nodes out of @total.', array(':step' => $step)),
+    'finished' => 'scald_index_rebuild_finished',
+  ));
+
+  batch_process('admin/structure/scald/atoms-index');
+}
+
+/**
+ * Rebuilds the index for a batch of nodes.
+ *
+ * @param array $nids
+ *   Node IDs.
+ */
+function scald_index_rebuild_run($nids) {
+  $nodes = node_load_multiple($nids, array());
+  foreach ($nodes as $current_node) {
+    scald_index_build_node_index($current_node);
+  }
+}
+
+/**
+ * Finishes the batch run.
+ */
+function scald_index_rebuild_finished($success, $results, $operations) {
+  if ($success) {
+    drupal_set_message(t('Rebuilding index complete.'));
+  }
+  else {
+    // An error occurred.
+    // $operations contains the operations that remained unprocessed.
+    $error_operation = reset($operations);
+    $message = t('An error occurred while processing %error_operation with arguments: @arguments', array(
+      '%error_operation' => $error_operation[0],
+      '@arguments' => print_r($error_operation[1], TRUE),
+    ));
+    drupal_set_message($message, 'error');
+  }
+}
+
+/**
+ * Returns all published nodes linked to this atom.
+ *
+ * @param string $atom
+ *   The atom sid.
+ * @param string $lang
+ *   The language : fr|de|etc.
+ *
+ * @return array
+ *   Published nodes linked to this atom.
+ */
+function scald_index_get_nodes($atom, $lang = NULL) {
+  $nids = array();
+
+  $query = db_select('scald_index', 'si');
+  $query->join('node', 'n', 'n.nid = si.nid');
+  $query->fields('n', array('nid'));
+  $query->condition('si.sid', $atom);
+  $query->condition('n.status', 1);
+
+  if (!is_null($lang)) {
+    $query->condition('n.language', $lang);
+  }
+
+  $result = $query->execute();
+  foreach ($result as $r) {
+    $nids[] = $r->nid;
+  }
+
+  return $nids;
+}
+
+/**
+ * Returns all atoms linked to this node.
+ *
+ * @param string $node
+ *   The node ID.
+ *
+ * @return array
+ *   Atoms linked to this node.
+ */
+function scald_index_get_atoms($node) {
+  $sids = array();
+
+  $query = db_select('scald_index', 'si');
+  $query->join('node', 'n', 'n.nid = si.nid');
+  $query->fields('si', array('sid'));
+  $query->condition('n.nid', $node);
+
+  $result = $query->execute();
+  foreach ($result as $r) {
+    $sids[] = $r->sid;
+  }
+
+  return $sids;
+}
+
+/**
+ * Confirmation form for scald index rebuilding
+ */
+function scald_index_rebuild_confirm_form($form, &$form_state){
+
+  $text = array(
+    t('Delete and rebuild scald index.'),
+    t('Do you really want to rebuild this index?'),
+    t('This will delete the complete scald index and rebuilt it. This action cannot be undone.'),
+    t('The index has been successfully rebuilt.'),
+  );
+
+  $form = array(
+    'message' => array(
+      '#type' => 'value',
+      '#value' => $text[3],
+    ),
+  );
+
+  $desc = "<h3>{$text[1]}</h3><p>{$text[2]}</p>";
+
+  return confirm_form($form, $text[0], "admin/structure/scald/atoms-index", $desc);
+}
+
+/**
+ * Submit function for scald_index_rebuild_confirm_form().
+ */
+function scald_index_rebuild_confirm_form_submit(array $form, array &$form_state) {
+  scald_index_rebuild();
+}
+
+/**
+ * Determine atoms (expressed as SAS or DIV) embedded in a string.
+ *
+ * @param string $string
+ *   The string to search for SAS/DIV notation atoms.
+ *
+ * @return array
+ *   An array of SIDs which are included in the string in SAS/DIV notation.
+ *
+ * @see scald_included().
+ */
+function scald_index_included($string) {
+  $atoms = array();
+
+  // Detect SAS atoms.
+  if (preg_match_all(SCALD_SAS_MATCH_PATTERN, $string, $sas_atoms)) {
+    $atoms = array_merge($atoms, $sas_atoms[1]);
+  }
+
+  // Detect DIV atoms.
+  if (preg_match_all('/<div.*data-scald-sid=\"(\\d+)\".*>/', $string, $div_atoms)) {
+    $atoms = array_merge($atoms, $div_atoms[1]);
+  }
+
+  return $atoms;
+}

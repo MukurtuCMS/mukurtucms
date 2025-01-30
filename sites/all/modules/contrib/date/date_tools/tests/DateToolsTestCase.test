@@ -1,0 +1,129 @@
+<?php
+
+/**
+ * @file
+ * Tests for Date Tools.
+ */
+
+/**
+ * Tests for Date Tools.
+ */
+class DateToolsTestCase extends DrupalWebTestCase {
+  /**
+   * Drupal privileged users.
+   *
+   * @var object|false
+   */
+  protected $privilegedUser;
+
+  /**
+   * Date Tools.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Date Tools',
+      'description' => 'Test Date Wizard and other Date Tools.',
+      'group' => 'date',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    $modules[] = 'field';
+    $modules[] = 'field_ui';
+    $modules[] = 'date_api';
+    $modules[] = 'date';
+    $modules[] = 'date_popup';
+    $modules[] = 'date_tools';
+    parent::setUp($modules);
+
+    // Create and log in our privileged user.
+    $perms = array(
+      'administer content types',
+      'administer nodes',
+      'bypass node access',
+      'administer date tools',
+      'administer fields',
+    );
+    $this->privilegedUser = $this->drupalCreateUser($perms);
+    $this->drupalLogin($this->privilegedUser);
+
+    variable_set('date_format_long', 'D, m/d/Y - H:i');
+  }
+
+  /**
+   * Creates a date field using the Date Wizard.
+   */
+  public function testTools() {
+    $form_values = array(
+      'label' => 'Test',
+      'field_type' => 'datetime',
+      'widget_type' => 'date_select',
+      'todate' => '',
+    );
+    $this->createDateWizard($form_values);
+    $this->dateForm($options = 'select');
+    $this->assertText('Thu, 10/07/2010 - 10:30', 'Found the correct date for the Date Wizard datetime field using the date_select widget.');
+    $this->deleteDateField();
+  }
+
+  /**
+   * Tests that date field functions properly.
+   */
+  public function dateForm($options) {
+    $edit = array();
+    $edit['title'] = $this->randomName(8);
+    $edit['body[und][0][value]'] = $this->randomName(16);
+    if ($options == 'select') {
+      $edit['field_test[und][0][value][year]'] = '2010';
+      $edit['field_test[und][0][value][month]'] = '10';
+      $edit['field_test[und][0][value][day]'] = '7';
+      $edit['field_test[und][0][value][hour]'] = '10';
+      $edit['field_test[und][0][value][minute]'] = '30';
+    }
+    elseif ($options == 'text') {
+      $edit['field_test[und][0][value][date]'] = '10/07/2010 - 10:30';
+    }
+    elseif ($options == 'popup') {
+      $edit['field_test[und][0][value][date]'] = '10/07/2010';
+      $edit['field_test[und][0][value][time]'] = '10:30';
+    }
+    $this->drupalPost('node/add/story', $edit, t('Save'));
+    $this->assertText($edit['body[und][0][value]'], 'Test node has been created');
+  }
+
+  /**
+   * Delete date field test.
+   */
+  public function deleteDateField() {
+    $this->drupalGet('admin/structure/types/manage/story/fields');
+    $this->clickLink('delete');
+    $this->drupalPost(NULL, NULL, t('Delete'));
+    $this->assertText('The field Test has been deleted from the Story content type.', 'Removed date field.');
+  }
+
+  /**
+   * Creates a date field using the Date Wizard.
+   */
+  public function createDateWizard($edit) {
+    $edit += array(
+      'bundle' => 'story',
+      'name' => 'Story',
+      'type_description' => 'A test content type.',
+      'field_name' => 'test',
+      'label' => 'Test',
+      'widget_type' => 'date_select',
+      'todate' => 'optional',
+      'field_type' => 'date',
+      'granularity[]' => array('year', 'month', 'day', 'hour', 'minute'),
+      'tz_handling' => 'none',
+      'year_range' => '2010:+2',
+      'weight' => -100,
+    );
+    $this->drupalPost('admin/config/date/tools/date_wizard', $edit, t('Save'));
+    $this->assertText('Your date field Test has been created.', 'Create a date field using the Date Wizard.');
+  }
+
+}

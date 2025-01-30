@@ -1,0 +1,26 @@
+name = Paragraphs
+description = Paragraphs module to control your content flow.
+core = 7.x
+package = Paragraphs
+configure = admin/structure/paragraphs
+
+dependencies[] = entity
+
+test_dependencies[] = ctools
+test_dependencies[] = entity
+test_dependencies[] = features
+test_dependencies[] = panelizer
+test_dependencies[] = strongarm
+
+files[] = ParagraphsItemEntity.inc
+files[] = ParagraphsItemMetadataController.inc
+files[] = migrate/destinations/MigrateDestinationParagraphsItem.inc
+files[] = migrate/fields/ParagraphsMigrateParagraphsFieldHandler.inc
+files[] = views/paragraphs_handler_relationship.inc
+files[] = tests/paragraphs.test
+
+; Information added by Drupal.org packaging script on 2020-05-25
+version = "7.x-1.0-rc5+37-dev"
+core = "7.x"
+project = "paragraphs"
+datestamp = "1590430493"

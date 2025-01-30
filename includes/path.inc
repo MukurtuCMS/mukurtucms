@@ -347,7 +347,8 @@ function drupal_match_path($path, $patterns) {
  * drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL) makes this function available.
  *
  * @return
- *   The current Drupal URL path.
+ *   The current Drupal URL path. The path is untrusted user input and must be
+ *   treated as such.
  *
  * @see request_path()
  */
@@ -416,6 +417,8 @@ function path_load($conditions) {
   }
   return $select
     ->fields('url_alias')
+    ->orderBy('pid', 'DESC')
+    ->range(0, 1)
     ->execute()
     ->fetchAssoc();
 }
@@ -465,13 +468,15 @@ function path_delete($criteria) {
     $criteria = array('pid' => $criteria);
   }
   $path = path_load($criteria);
-  $query = db_delete('url_alias');
-  foreach ($criteria as $field => $value) {
-    $query->condition($field, $value);
+  if (isset($path['source'])) {
+    $query = db_delete('url_alias');
+    foreach ($criteria as $field => $value) {
+      $query->condition($field, $value);
+    }
+    $query->execute();
+    module_invoke_all('path_delete', $path);
+    drupal_clear_path_cache($path['source']);
   }
-  $query->execute();
-  module_invoke_all('path_delete', $path);
-  drupal_clear_path_cache($path['source']);
 }
 
 /**

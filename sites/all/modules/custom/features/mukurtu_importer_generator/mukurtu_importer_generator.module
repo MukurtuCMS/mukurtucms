@@ -1,0 +1,282 @@
+<?php
+/**
+ * @file
+ * Code for the Mukurtu Importer Generator feature.
+ */
+
+include_once 'mukurtu_importer_generator.features.inc';
+
+define('MUKURTU_IMPORT_DOCUMENTATION', 'mukurtu_importer_documentation');
+
+/**
+ * Lookup function for our per field documentation.
+ */
+function mukurtu_importer_generator_get_default_documentation($field_mapping, $entity_type = NULL, $bundle_name = NULL) {
+  $target = $field_mapping['target'];
+
+  // Special fields or fields that are the same regardless of entity type or bundle.
+  switch ($target) {
+    case 'guid':
+      return "GUIDs are 'Globally Unique Identifiers' and are used to uniquely identify content. This is a single value, plain text field. The GUID is created by you and is useful for situations where you do not know the internal ID of a piece of content. This field can be nearly anything as long as it is unique to the content across the entire system.";
+    case 'nid':
+      return "NID stands for ‘Node ID’ and uniquely identifies a Node (e.g., Digital Heritage, Dictionary Word) on a specific site . This field must only contain a single integer value. Node IDs are not consistent between sites.";
+    case 'sid':
+      return "SID stands for “Scald ID’ and uniquely identifies a Scald Atom on a specific site. This field must only contain a single integer value. Scald IDs are not consistent between sites.";
+    case 'tid':
+      return "TID stands for “Taxonomy ID’ and uniquely identifies a taxonomy term on a specific site. This field must only contain a single integer value. Taxonomy IDs are not consistent between sites.";
+    case 'title':
+      return "A single value plain text field.";
+    case 'item_id':
+      return 'This field must contain a single integer value that is the item_id of the target paragraph. The item_id is the local unique identifier for a paragraph.';
+    case 'user_name':
+      return "The single, plain text username of the user that should be the author of the imported item.";
+    case 'host_entity':
+      return "A single value field that should contain the GUID or local ID of the host entity for this paragraph (e.g., the GUID or NID of a dictionary word that contains a 'dictionary_word_bundle' paragraph).";
+  }
+
+  // Scald Specific.
+  if ($entity_type == 'scald_atom') {
+    switch ($target) {
+      case 'provider':
+        if (!function_exists('ma_importexport_get_valid_scald_providers')) {
+          return "A single value identifying which scald provider should be used for the atom.";
+        }
+        $valid_providers = implode(', ', ma_importexport_get_valid_scald_providers($bundle_name));
+        return "A single value identifying which scald provider should be used for the atom. Valid options for this importer are '{$valid_providers}'.";
+      case 'file_source':
+        return "A single value identifying the media source (audio/video/image file, YouTube URL or ID, etc) for a scald atom. The format of this will depend on which scald provider is selected. In general it is either a file path or a URL.";
+    }
+  }
+
+  $field_name = $target;
+  $modifier = "";
+  if (strpos($target, ':') !== FALSE) {
+    list($field_name, $modifier) = explode(":", $target);
+  }
+
+  $field_info = field_info_field($field_name);
+  if ($field_info) {
+    $fields_info = field_info_instances($entity_type, $bundle_name)[$field_name];
+
+    // Number of values allowed.
+    if ($field_info['cardinality'] == FIELD_CARDINALITY_UNLIMITED) {
+      $cardinalaity = "A multi-value field (unlimited).";
+    }
+
+    if ($field_info['cardinality'] > 1) {
+      $cardinalaity = "A multi-value field (up to {$field_info['cardinality']} values).";
+    }
+
+    if ($field_info['cardinality'] == 1) {
+      $cardinalaity = "A single value field.";
+    }
+
+    // Type description.
+    if ($modifier == 'guid_or_target_id') {
+      $target_id_name = array_shift($field_info['foreign keys'])['columns']['target_id'] ?? NULL;
+      switch ($target_id_name) {
+        case 'nid':
+          $target_id_desc = "node ID (nid)";
+          break;
+
+        case 'sid':
+          $target_id_desc = "scald atom ID (sid)";
+          break;
+
+        case 'tid':
+          $target_id_desc = "taxonomy term ID (tid)";
+          break;
+
+        default:
+          $target_id_desc = $target_id_name;
+      }
+
+      $valid_text = "";
+      if (!empty($field_info['settings']['handler_settings']['target_bundles'])) {
+        $valid_refs = implode(',', $field_info['settings']['handler_settings']['target_bundles']);
+        $valid_text = " Values must reference one of the following types: $valid_refs.";
+      }
+
+      $value_type = "Values must be a valid GUID or {$target_id_desc}. Values will be used as GUIDs first. If no content is found with that GUID, the value will be used as a {$target_id_name}.$valid_text";
+    }
+
+    switch ($field_info['type']) {
+      case 'text':
+        $length = isset($field_info['settings']['max_length']) ? " of no more than {$field_info['settings']['max_length']} characters each." : '.';
+        $text_type = isset($fields_info['settings']['text_processing']) && $fields_info['settings']['text_processing'] ? "filtered text (e.g., Filtered HTML, Full HTML, depending on importer)" : "plain text";
+        $value_type = "Values will be used as $text_type{$length}";
+        break;
+
+      case 'list_text':
+      case 'list_boolean':
+      case 'list_integer':
+        $allowed_values = implode('<br>', array_keys($field_info['settings']['allowed_values']));
+        $value_type = "Values must be one of:<br>$allowed_values";
+        break;
+
+      case 'text_long':
+      case 'text_with_summary':
+        $text_type = isset($fields_info['settings']['text_processing']) && $fields_info['settings']['text_processing'] ? "filtered text (e.g., Filtered HTML, Full HTML, depending on importer)" : "plain text";
+        $value_type = "Values will be used as $text_type, and can be of any length.";
+        break;
+
+      case 'taxonomy_term_reference':
+        $vocabulary = $field_info['settings']['allowed_values'][0]['vocabulary'];
+        $taxonomy = taxonomy_vocabulary_machine_name_load($vocabulary);
+        $value_type = "Values must be plain text taxonomy term names from the '{$taxonomy->name}' taxonomy. Values not found in that taxonomy will be auto-created.";
+        break;
+
+      case 'atom_reference':
+        foreach ($fields_info['settings']['referencable_types'] as $bundle) {
+          if ($bundle) {
+            $valid_refs[] = $bundle;
+          }
+        }
+        $valid_text = "";
+        if (!empty($valid_refs)) {
+          $valid_refs = implode(',', $valid_refs);
+          $valid_text = " Referenced atoms must be of type $valid_refs.";
+        }
+
+        $value_type = "Values must be either GUIDs or scald atom IDs (sid).$valid_text";
+        break;
+
+      case 'node_reference':
+        foreach ($field_info['settings']['referenceable_types'] as $bundle) {
+          if ($bundle) {
+            $valid_refs[] = $bundle;
+          }
+        }
+        $valid_refs = implode(',', $valid_refs);
+        $value_type = "Values must be either GUIDs or node IDs (nid). Referenced nodes must be of type $valid_refs.";
+        break;
+
+      case 'paragraphs':
+        foreach ($fields_info['settings']['allowed_bundles'] as $bundle) {
+          if ($bundle != -1) {
+            $valid_paragraphs[] = $bundle;
+          }
+        }
+        $valid_paragraphs = implode(',', $valid_paragraphs);
+        $value_type = "Values must be either GUIDs or paragraph IDs. Referenced paragraphs must be of type $valid_paragraphs.";
+        break;
+
+      case 'datetime':
+        $date_format = $fields_info['widget']['settings']['input_format'];
+        $value_type = "Values must be dates formatted as $date_format.";
+        break;
+
+      case 'partial_date_range':
+        $value_type = "Values must be dates formatted as YYYY-mm-dd, YYYY-mm, or YYYY.";
+        break;
+
+      case 'geofield':
+        break;
+
+      case 'link_field':
+        $value_type = "Values must be formatted as URL||Title||Attributes.";
+        break;
+
+      case 'audio':
+      case 'file':
+      case 'image':
+        $value_type = "Values must be local file paths or URLs to media.";
+        break;
+
+      case 'number_integer':
+        $value_type = "Values must be integers.";
+        break;
+
+    }
+
+    if (!isset($value_type)) {
+      $value_type = "Values must be of type {$field_info['type']}.";
+    }
+
+    return "$cardinalaity $value_type";
+  }
+
+  return "No documentation available for $target.";
+}
+
+/**
+ * Take feeds importer processor mappings and create documentation for fields.
+ */
+function mukurtu_importer_generator_set_mapping_documentation($mapping, $entity_type, $bundle_name) {
+  $import_documenation = variable_get(MUKURTU_IMPORT_DOCUMENTATION, array());
+  foreach ($mapping as $field) {
+    // Use provided documentation if present.
+    if (isset($field['documentation'])) {
+      $import_documenation[$entity_type][$bundle_name][$field['source']] = $field['documentation'];
+    }
+    // Otherwise get default documentation for that field.
+    else {
+      $default_documentation = mukurtu_importer_generator_get_default_documentation($field, $entity_type, $bundle_name);
+      $import_documenation[$entity_type][$bundle_name][$field['source']] = $default_documentation;
+    }
+  }
+
+  variable_set(MUKURTU_IMPORT_DOCUMENTATION, $import_documenation);
+}
+
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Adds our field documenation to import forms.
+ */
+function mukurtu_importer_generator_form_feeds_import_form_alter(&$form, &$form_state, $form_id) {
+  // Load the feed.
+  $feed_source = feeds_source($form['#importer_id']);
+  $source_config = $feed_source->getConfig();
+
+  // Only handling Mukurtu CSV parsers currently.
+  if(!isset($source_config['FeedsCSVParser']) || (substr($form['#importer_id'], 0, strlen("mukurtu_import_")) != "mukurtu_import_")) {
+    return;
+  }
+  $processor = $feed_source->importer->processor->pluginDefinition;
+
+  // Figure out which entity type we are importing.
+  if ($processor['module'] == 'feeds_entity_processor') {
+    $entity_type = $processor['type'];
+  } else {
+    $entity_type = 'node';
+  }
+
+  // Get the specific processor config to find mappings and bundle name.
+  $config = $feed_source->importer->processor->getConfig();
+  $mappings = $config['mappings'];
+  $bundle_name = $config['bundle'];
+  $input_format = $config['input_format'];
+
+  // Leave without doing anything if we don't recognize the importer.
+  if(!$entity_type || !$bundle_name || empty($mappings)) {
+    return;
+  }
+
+  // Get the documentation.
+  $import_documenation = variable_get(MUKURTU_IMPORT_DOCUMENTATION, array());
+  foreach ($mappings as $field) {
+    $fields[$field['target']]['source'] = $field['source'];
+    $fields[$field['target']]['documentation'] = t($import_documenation[$entity_type][$bundle_name][$field['source']]);
+  }
+
+  // Create the form elements.
+  $header = array(
+    'source' => 'Field Name',
+    'documentation' => "Field Format Information",
+  );
+
+  $form['feeds']['FeedsCSVParser']['help']['mukurtu_import_documentation_fieldset'] = array(
+    '#title' => t("Field Format Information"),
+    '#type' => 'fieldset',
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    'field_documentation' => array(
+      '#type' => 'markup',
+      '#theme' => 'table',
+      '#header' => $header,
+      '#rows' => $fields,
+    ),
+  );
+}

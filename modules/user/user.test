@@ -144,10 +144,7 @@ class UserRegistrationTestCase extends DrupalWebTestCase {
     variable_set('configurable_timezones', 1);
     variable_set('date_default_timezone', 'Europe/Brussels');
 
-    // Check that the account information fieldset's options are not displayed
-    // is a fieldset if there is not more than one fieldset in the form.
     $this->drupalGet('user/register');
-    $this->assertNoRaw('<fieldset id="edit-account"><legend>Account information</legend>', 'Account settings fieldset was hidden.');
 
     $edit = array();
     $edit['name'] = $name = $this->randomName();
@@ -164,6 +161,7 @@ class UserRegistrationTestCase extends DrupalWebTestCase {
     $this->assertEqual($new_user->theme, '', 'Correct theme field.');
     $this->assertEqual($new_user->signature, '', 'Correct signature field.');
     $this->assertTrue(($new_user->created > REQUEST_TIME - 20 ), 'Correct creation time.');
+    $this->assertEqual($new_user->changed,  $new_user->created, 'Correct changed time.');
     $this->assertEqual($new_user->status, variable_get('user_register', USER_REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL) == USER_REGISTER_VISITORS ? 1 : 0, 'Correct status field.');
     $this->assertEqual($new_user->timezone, variable_get('date_default_timezone'), 'Correct time zone field.');
     $this->assertEqual($new_user->language, '', 'Correct language field.');
@@ -276,6 +274,7 @@ class UserValidationTestCase extends DrupalWebTestCase {
       'foo@example.com'        => array('Valid username', 'assertNull'),
       'foo@-example.com'       => array('Valid username', 'assertNull'), // invalid domains are allowed in usernames
       'þòøÇßªř€'               => array('Valid username', 'assertNull'),
+      'foo+bar'                => array('Valid username', 'assertNull'), // '+' symbol is allowed
       'ᚠᛇᚻ᛫ᛒᛦᚦ'                => array('Valid UTF8 username', 'assertNull'), // runes
       ' foo'                   => array('Invalid username that starts with a space', 'assertNotNull'),
       'foo '                   => array('Invalid username that ends with a space', 'assertNotNull'),
@@ -306,6 +305,17 @@ class UserValidationTestCase extends DrupalWebTestCase {
       $this->$test($result, $description . ' (' . $name . ')');
     }
   }
+
+  // Test altered e-mail validation.
+  function testAlteredMailValidation() {
+    // This e-mail is considered as valid.
+    $mail = 'foo@example.local';
+    $this->assertNull(user_validate_mail($mail), 'E-mail address is valid.');
+
+    // Invalidate all emails ending with .local in alter hook.
+    module_enable(array('user_email_validation_test'));
+    $this->assertNotNull(user_validate_mail($mail), 'E-mail address is invalid.');
+  }
 }
 
 /**
@@ -318,6 +328,10 @@ class UserLoginTestCase extends DrupalWebTestCase {
       'description' => 'Ensure that login works as expected.',
       'group' => 'User',
     );
+  }
+
+  function setUp() {
+    parent::setUp('user_session_test', 'user_flood_test');
   }
 
   /**
@@ -354,6 +368,13 @@ class UserLoginTestCase extends DrupalWebTestCase {
     // A login with the correct password should also result in a flood error
     // message.
     $this->assertFailedLogin($user1, 'ip');
+
+    // A login attempt after resetting the password should still fail, since the
+    // IP-based flood control count is not cleared after a password reset.
+    $this->resetUserPassword($user1);
+    $this->drupalLogout();
+    $this->assertFailedLogin($user1, 'ip');
+    $this->assertRaw(t('Sorry, too many failed login attempts from your IP address. This IP address is temporarily blocked. Try again later or <a href="@url">request a new password</a>.', array('@url' => url('user/password'))));
   }
 
   /**
@@ -393,6 +414,12 @@ class UserLoginTestCase extends DrupalWebTestCase {
     // Try one more attempt for user 1, it should be rejected, even if the
     // correct password has been used.
     $this->assertFailedLogin($user1, 'user');
+    $this->resetUserPassword($user1);
+    $this->drupalLogout();
+
+    // Try to log in as user 1, it should be successful.
+    $this->drupalLogin($user1);
+    $this->assertRaw('Member for');
   }
 
   /**
@@ -421,6 +448,17 @@ class UserLoginTestCase extends DrupalWebTestCase {
   }
 
   /**
+   * Test logging in when an anon session already exists.
+   */
+  function testLoginWithAnonSession() {
+    // Visit the callback to generate a session for this anon user.
+    $this->drupalGet('user_session_test_anon_session');
+    // Now login.
+    $account = $this->drupalCreateUser(array());
+    $this->drupalLogin($account);
+  }
+
+  /**
    * Make an unsuccessful login attempt.
    *
    * @param $account
@@ -437,18 +475,45 @@ class UserLoginTestCase extends DrupalWebTestCase {
     $this->drupalPost('user', $edit, t('Log in'));
     $this->assertNoFieldByXPath("//input[@name='pass' and @value!='']", NULL, 'Password value attribute is blank.');
     if (isset($flood_trigger)) {
+      $this->assertResponse(403);
+      $user_log = db_query_range('SELECT message FROM {watchdog} WHERE type = :type ORDER BY wid DESC', 0, 1, array(':type' => 'user'))->fetchField();
+      $user_flood_test_log = db_query_range('SELECT message FROM {watchdog} WHERE type = :type ORDER BY wid DESC', 0, 1, array(':type' => 'user_flood_test'))->fetchField();
       if ($flood_trigger == 'user') {
-        $this->assertRaw(format_plural(variable_get('user_failed_login_user_limit', 5), 'Sorry, there has been more than one failed login attempt for this account. It is temporarily blocked. Try again later or <a href="@url">request a new password</a>.', 'Sorry, there have been more than @count failed login attempts for this account. It is temporarily blocked. Try again later or <a href="@url">request a new password</a>.', array('@url' => url('user/password'))));
+        $this->assertRaw(t('Sorry, there have been more than @count failed login attempts for this account. It is temporarily blocked. Try again later or <a href="@url">request a new password</a>.', array('@url' => url('user/password'), '@count' => variable_get('user_failed_login_user_limit', 5))));
+        $this->assertEqual('Flood control blocked login attempt for %user from %ip.', $user_log, 'A watchdog message was logged for the login attempt blocked by flood control per user');
+        $this->assertEqual('hook_user_flood_control was passed username %username and IP %ip.', $user_flood_test_log, 'hook_user_flood_control was invoked by flood control per user');
       }
       else {
         // No uid, so the limit is IP-based.
         $this->assertRaw(t('Sorry, too many failed login attempts from your IP address. This IP address is temporarily blocked. Try again later or <a href="@url">request a new password</a>.', array('@url' => url('user/password'))));
+        $this->assertEqual('Flood control blocked login attempt from %ip.', $user_log, 'A watchdog message was logged for the login attempt blocked by flood control per IP');
+        $this->assertEqual('hook_user_flood_control was passed IP %ip.', $user_flood_test_log, 'hook_user_flood_control was invoked by flood control per IP');
       }
     }
     else {
       $this->assertText(t('Sorry, unrecognized username or password. Have you forgotten your password?'));
     }
   }
+
+  /**
+   * Resets the user password and logs the user in.
+   *
+   * @param object $user
+   *   The account to reset the password for.
+   */
+  protected function resetUserPassword($user) {
+    $this->drupalGet('user/password');
+    $edit['name'] = $user->name;
+    $this->drupalPost(NULL, $edit, 'E-mail new password');
+    $emails = $this->drupalGetMails();
+    $email = end($emails);
+    $urls = array();
+    preg_match('#.+user/reset/.+#', $email['body'], $urls);
+    $resetURL = $urls[0];
+    $this->drupalGet($resetURL);
+    $this->drupalPost(NULL, NULL, 'Log in');
+  }
+
 }
 
 /**
@@ -456,6 +521,10 @@ class UserLoginTestCase extends DrupalWebTestCase {
  */
 class UserPasswordResetTestCase extends DrupalWebTestCase {
   protected $profile = 'standard';
+
+  function setUp() {
+    parent::setUp('user_form_test');
+  }
 
   public static function getInfo() {
     return array(
@@ -466,9 +535,40 @@ class UserPasswordResetTestCase extends DrupalWebTestCase {
   }
 
   /**
+   * Retrieves password reset email and extracts the login link.
+   */
+  public function getResetURL($bypass_form = FALSE) {
+    // Assume the most recent email.
+    $_emails = $this->drupalGetMails();
+    $email = end($_emails);
+    $urls = array();
+    preg_match('#.+user/reset/.+#', $email['body'], $urls);
+
+    return $urls[0] . ($bypass_form ? '/login' : '');
+  }
+
+  /**
+   * Generates login link.
+   */
+  public function generateResetURL($account, $bypass_form = FALSE) {
+    return user_pass_reset_url($account) . ($bypass_form ? '/login' : '');
+  }
+
+  /**
+   * Turns a password reset URL into a 'confirm' URL.
+   */
+  public function getConfirmURL($reset_url) {
+    // Last part is always the hash; replace with "confirm".
+    $parts = explode('/', $reset_url);
+    array_pop($parts);
+    array_push($parts, 'confirm');
+    return implode('/', $parts);
+  }
+
+  /**
    * Tests password reset functionality.
    */
-  function testUserPasswordReset() {
+  function testUserPasswordReset($use_direct_login_link = FALSE) {
     // Create a user.
     $account = $this->drupalCreateUser();
     $this->drupalLogin($account);
@@ -476,8 +576,232 @@ class UserPasswordResetTestCase extends DrupalWebTestCase {
     // Attempt to reset password.
     $edit = array('name' => $account->name);
     $this->drupalPost('user/password', $edit, t('E-mail new password'));
-    // Confirm the password reset.
-    $this->assertText(t('Further instructions have been sent to your e-mail address.'), 'Password reset instructions mailed message displayed.');
+    // Ensure the correct message is shown for a valid user name.
+    $password_reset_text = variable_get('user_password_reset_text', t('If %identifier is a valid account, an email will be sent with instructions to reset your password.'));
+    $this->assertRaw(format_string($password_reset_text, array('%identifier' => $account->name)), 'Password reset instructions mailed message displayed for a valid user.');
+
+    // Ensure that flood control was not triggered.
+    $this->assertNoText(t('is temporarily blocked. Try again later'), 'Flood control was not triggered by single password reset.');
+
+    // Ensure the correct message is shown for a non-existent user name.
+    $name = $this->randomName();
+    $edit = array('name' => $name);
+    $this->drupalPost('user/password', $edit, t('E-mail new password'));
+    $password_reset_text = variable_get('user_password_reset_text', t('If %identifier is a valid account, an email will be sent with instructions to reset your password.'));
+    $this->assertRaw(format_string($password_reset_text, array('%identifier' => $name)), 'Password reset instructions mailed message displayed for a non-existent user.');
+
+    // Create an image field to enable an Ajax request on the user profile page.
+    $field = array(
+      'field_name' => 'field_avatar',
+      'type' => 'image',
+      'settings' => array(),
+      'cardinality' => 1,
+    );
+    field_create_field($field);
+
+    $instance = array(
+      'field_name' => $field['field_name'],
+      'entity_type' => 'user',
+      'label' => 'Avatar',
+      'bundle' => 'user',
+      'required' => FALSE,
+      'settings' => array(),
+      'widget' => array(
+        'type' => 'image_image',
+        'settings' => array(),
+      ),
+    );
+    field_create_instance($instance);
+
+    variable_del("user_test_pass_reset_form_submit_{$account->uid}");
+    $resetURL = $this->getResetURL($use_direct_login_link);
+    $this->drupalGet($resetURL);
+
+    // Check successful login.
+    if (!$use_direct_login_link) {
+      $this->assertUrl($this->getConfirmURL($resetURL), array(), 'The user is redirected to the reset password confirm form.');
+      $this->drupalPost(NULL, NULL, t('Log in'));
+      // The form was fully processed before redirecting.
+      $form_submit_handled = variable_get("user_test_pass_reset_form_submit_{$account->uid}", FALSE);
+      $this->assertTrue($form_submit_handled, 'A custom submit handler executed.');
+    }
+    $this->assertText('You have just used your one-time login link. It is no longer necessary to use this link to log in. Please change your password.');
+
+    // Make sure the Ajax request from uploading a file does not invalidate the
+    // reset token.
+    $image = current($this->drupalGetTestFiles('image'));
+    $edit = array(
+      'files[field_avatar_und_0]' => drupal_realpath($image->uri),
+    );
+    $this->drupalPostAJAX(NULL, $edit, 'field_avatar_und_0_upload_button');
+
+    // Change the forgotten password.
+    $password = user_password();
+    $edit = array('pass[pass1]' => $password, 'pass[pass2]' => $password);
+    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->assertText(t('The changes have been saved.'), 'Forgotten password changed.');
+
+    // Ensure blocked and deleted accounts can't access the direct login link.
+    $this->drupalLogout();
+    $reset_url = $this->generateResetURL($account, $use_direct_login_link);
+    user_save($account, array('status' => 0));
+    $this->drupalGet($reset_url);
+    $this->assertResponse(403);
+    user_delete($account->uid);
+    $this->drupalGet($reset_url);
+    $this->assertResponse(403);
+  }
+
+  /**
+   * Test user-based flood control on password reset.
+   */
+  function testPasswordResetFloodControlPerUser() {
+    // Set a very low limit for testing.
+    variable_set('user_pass_reset_user_limit', 2);
+
+    // Create a user.
+    $account = $this->drupalCreateUser();
+    $this->drupalLogin($account);
+    $this->drupalLogout();
+
+    $edit = array('name' => $account->name);
+
+    // Try 2 requests that should not trigger flood control.
+    for ($i = 0; $i < 2; $i++) {
+      $this->drupalPost('user/password', $edit, t('E-mail new password'));
+      // Confirm the password reset.
+      $password_reset_text = variable_get('user_password_reset_text', t('If %identifier is a valid account, an email will be sent with instructions to reset your password.'));
+      $this->assertRaw(format_string($password_reset_text, array('%identifier' => $account->name)), 'Password reset instructions mailed message displayed.');
+      // Ensure that flood control was not triggered.
+      $this->assertNoText(t('is temporarily blocked. Try again later'), 'Flood control was not triggered by password reset.');
+    }
+
+    // A successful password reset should clear flood events.
+    $resetURL = $this->getResetURL();
+    $this->drupalGet($resetURL);
+
+    // Check successful login.
+    $this->drupalPost(NULL, NULL, t('Log in'));
+    $this->drupalLogout();
+
+    // Try 2 requests that should not trigger flood control.
+    for ($i = 0; $i < 2; $i++) {
+      $this->drupalPost('user/password', $edit, t('E-mail new password'));
+      // Confirm the password reset.
+      $password_reset_text = variable_get('user_password_reset_text', t('If %identifier is a valid account, an email will be sent with instructions to reset your password.'));
+      $this->assertRaw(format_string($password_reset_text, array('%identifier' => $account->name)), 'Password reset instructions mailed message displayed.');
+      // Ensure that flood control was not triggered.
+      $this->assertNoText(t('is temporarily blocked. Try again later'), 'Flood control was not triggered by password reset.');
+    }
+
+    // The next request should trigger flood control
+    $this->drupalPost('user/password', $edit, t('E-mail new password'));
+    // Confirm the password reset was blocked.
+    $this->assertNoText(t('Further instructions have been sent to your e-mail address.'), 'Password reset instructions mailed message not displayed for excessive password resets.');
+    // Ensure that flood control was triggered.
+    $this->assertText(t('Sorry, there have been more than 2 password reset attempts for this account. It is temporarily blocked.'), 'Flood control was triggered by excessive password resets for one user.');
+  }
+
+  /**
+   * Test IP-based flood control on password reset.
+   */
+  function testPasswordResetFloodControlPerIp() {
+    // Set a very low limit for testing.
+    variable_set('user_pass_reset_ip_limit', 2);
+
+    // Try 2 requests that should not trigger flood control.
+    for ($i = 0; $i < 2; $i++) {
+      $name = $this->randomName();
+      $edit = array('name' => $name);
+      $this->drupalPost('user/password', $edit, t('E-mail new password'));
+      // Confirm the password reset was not blocked.
+      $password_reset_text = variable_get('user_password_reset_text', t('If %identifier is a valid account, an email will be sent with instructions to reset your password.'));
+      $this->assertRaw(format_string($password_reset_text, array('%identifier' => $name)), 'Password reset instructions mailed message displayed.');
+      // Ensure that flood control was not triggered.
+      $this->assertNoText(t('is temporarily blocked. Try again later'), 'Flood control was not triggered by password reset.');
+    }
+
+    // The next request should trigger flood control
+    $name = $this->randomName();
+    $edit = array('name' => $name);
+    $this->drupalPost('user/password', $edit, t('E-mail new password'));
+    // Confirm the password reset was blocked early. Note that @name is used
+    // instead of %name as assertText() works with plain text not HTML.
+    $this->assertNoText(t('Sorry, @name is not recognized as a user name or an e-mail address.', array('@name' => $name)), 'User name not recognized message not displayed.');
+    // Ensure that flood control was triggered.
+    $this->assertText(t('Sorry, too many password reset attempts from your IP address. This IP address is temporarily blocked.'), 'Flood control was triggered by excessive password resets from one IP.');
+  }
+
+  /**
+   * Test user password reset while logged in.
+   */
+  function testUserPasswordResetLoggedIn($use_direct_login_link = FALSE) {
+    $another_account = $this->drupalCreateUser();
+    $account = $this->drupalCreateUser();
+    $this->drupalLogin($account);
+    // Make sure the test account has a valid password.
+    user_save($account, array('pass' => user_password()));
+
+    // Try to use the login link while logged in as a different user.
+    // Generate one time login link.
+    $reset_url = $this->generateResetURL($another_account, $use_direct_login_link);
+    $this->drupalGet($reset_url);
+    $this->assertRaw(t(
+      'Another user (%other_user) is already logged into the site on this computer, but you tried to use a one-time link for user %resetting_user. Please <a href="!logout">logout</a> and try using the link again.',
+      array('%other_user' => $account->name, '%resetting_user' => $another_account->name, '!logout' => url('user/logout'))
+    ));
+
+    // Verify that the invalid password reset page does not show the user name.
+    $attack_reset_url = "user/reset/" . $another_account->uid . "/1/1";
+    $this->drupalGet($attack_reset_url);
+    $this->assertNoText($another_account->name);
+    $this->assertText('The one-time login link you clicked is invalid.');
+
+    // Test the link for a deleted user while logged in.
+    user_delete($another_account->uid);
+    $this->drupalGet($reset_url);
+    $this->assertText('The one-time login link you clicked is invalid.');
+
+    // Generate a one time login link for the logged-in user.
+    $fapi_action = $use_direct_login_link ? 'build' : 'submit';
+    variable_del("user_test_pass_reset_form_{$fapi_action}_{$account->uid}");
+    $reset_url = $this->generateResetURL($account, $use_direct_login_link);
+    $this->drupalGet($reset_url);
+    if ($use_direct_login_link) {
+      // The form is never fully built; user is logged out (session destroyed)
+      // and redirected to the same URL, then logged in again and redirected
+      // during form build.
+      $form_built = variable_get("user_test_pass_reset_form_build_{$account->uid}", FALSE);
+      $this->assertTrue(!$form_built, 'The password reset form was never fully built.');
+    }
+    else {
+      $this->assertUrl($this->getConfirmURL($reset_url), array(), 'The user is redirected to the reset password confirm form.');
+      $this->assertText('Reset password');
+      $this->drupalPost(NULL, NULL, t('Log in'));
+      // The form was fully processed before redirecting.
+      $form_submit_handled = variable_get("user_test_pass_reset_form_submit_{$account->uid}", FALSE);
+      $this->assertTrue($form_submit_handled, 'A custom submit handler executed.');
+    }
+    $this->assertText('You have just used your one-time login link. It is no longer necessary to use this link to log in. Please change your password.');
+
+    // The user can change the forgotten password on the page they are
+    // redirected to.
+    $pass = user_password();
+    $edit = array(
+      'pass[pass1]' => $pass,
+      'pass[pass2]' => $pass,
+    );
+    $this->drupalPost(NULL, $edit, t('Save'));
+
+    $this->assertText('The changes have been saved.');
+  }
+
+  /**
+   * Test direct login link that bypasses the password reset form.
+   */
+  function testUserDirectLogin() {
+    $this->testUserPasswordReset(TRUE);
+    $this->testUserPasswordResetLoggedIn(TRUE);
   }
 
   /**
@@ -498,25 +822,34 @@ class UserPasswordResetTestCase extends DrupalWebTestCase {
     // To attempt an expired password reset, create a password reset link as if
     // its request time was 60 seconds older than the allowed limit of timeout.
     $bogus_timestamp = REQUEST_TIME - variable_get('user_password_reset_timeout', 86400) - 60;
-    $this->drupalGet("user/reset/$account->uid/$bogus_timestamp/" . user_pass_rehash($account->pass, $bogus_timestamp, $account->login, $account->uid));
+    $this->drupalGet("user/reset/$account->uid/$bogus_timestamp/" . user_pass_rehash($account->pass, $bogus_timestamp, $account->login, $account->uid, $account->mail));
     $this->assertText(t('You have tried to use a one-time login link that has expired. Please request a new one using the form below.'), 'Expired password reset request rejected.');
   }
 
   /**
-   * Prefill the text box on incorrect login via link to password reset page.
+   * Tests the text box on incorrect login via link to password reset page.
    */
-  function testUserPasswordTextboxFilled() {
+  function testUserPasswordTextboxNotFilled() {
     $this->drupalGet('user/login');
     $edit = array(
       'name' => $this->randomName(),
       'pass' => $this->randomName(),
     );
     $this->drupalPost('user', $edit, t('Log in'));
-    $this->assertRaw(t('Sorry, unrecognized username or password. <a href="@password">Have you forgotten your password?</a>',
+    // Verify we don't pass the username as a query parameter.
+    $this->assertNoRaw(t('Sorry, unrecognized username or password. <a href="@password">Have you forgotten your password?</a>',
       array('@password' => url('user/password', array('query' => array('name' => $edit['name']))))));
+    $this->assertRaw(t('Sorry, unrecognized username or password. <a href="@password">Have you forgotten your password?</a>',
+      array('@password' => url('user/password'))));
     unset($edit['pass']);
+    // Verify the field is empty by default.
+    $this->drupalGet('user/password');
+    $this->assertFieldByName('name', '', 'User name not found.');
+    // Ensure the name field value is not cached.
     $this->drupalGet('user/password', array('query' => array('name' => $edit['name'])));
     $this->assertFieldByName('name', $edit['name'], 'User name found.');
+    $this->drupalGet('user/password');
+    $this->assertNoFieldByName('name', $edit['name'], 'User name not found.');
   }
 
   /**
@@ -583,8 +916,45 @@ class UserPasswordResetTestCase extends DrupalWebTestCase {
     $reset_url = url("user/reset/$user1->uid/$timestamp/$reset_url_token", array('absolute' => TRUE));
     $this->drupalGet($reset_url);
     $this->assertText($user1->name, 'The valid password reset page shows the user name.');
-    $this->assertUrl($reset_url, array(), 'The user remains on the password reset login page.');
+    $this->assertUrl($this->getConfirmURL($reset_url), array(), 'The user is redirected to the reset password confirm form.');
     $this->assertNoText('You have tried to use a one-time login link that has either been used or is no longer valid. Please request a new one using the form below.');
+  }
+
+  /**
+   * Make sure that password reset URLs are invalidated when the user's email
+   * address changes.
+   */
+  function testResetInvalidation() {
+    $account = $this->drupalCreateUser();
+    $original_reset_url = user_pass_reset_url($account);
+    user_save($account, array('mail' => '1' . $account->mail));
+    $this->drupalGet($original_reset_url);
+    $this->assertText('You have tried to use a one-time login link that has either been used or is no longer valid. Please request a new one using the form below.');
+  }
+
+  /**
+   * Test uniqueness of output from user_pass_rehash() with no passwords.
+   */
+  function testUniqueHashNoPasswordValue() {
+    $timestamp = REQUEST_TIME;
+
+    // Minimal user objects are sufficient.
+    $user = drupal_anonymous_user();
+    $user->login = $timestamp - 1000;
+    $user->pass = '';
+
+    $user_a = clone $user;
+    $user_a->uid = 12;
+    $user_a->mail = '3user@example.com';
+
+    $user_b = clone $user;
+    $user_b->uid = 123;
+    $user_b->mail = 'user@example.com';
+
+    $hash_a = user_pass_rehash($user_a->pass, $timestamp, $user_a->login, $user_a->uid, $user_a->mail);
+    $hash_b = user_pass_rehash($user_b->pass, $timestamp, $user_b->login, $user_b->uid, $user_b->mail);
+
+    $this->assertNotEqual($hash_a, $hash_b, "No user_pass_rehash() hash collision for different users with no stored password.");
   }
 
 }
@@ -593,6 +963,8 @@ class UserPasswordResetTestCase extends DrupalWebTestCase {
  * Test cancelling a user.
  */
 class UserCancelTestCase extends DrupalWebTestCase {
+  protected $admin_user;
+
   public static function getInfo() {
     return array(
       'name' => 'Cancel account',
@@ -626,7 +998,7 @@ class UserCancelTestCase extends DrupalWebTestCase {
 
     // Attempt bogus account cancellation request confirmation.
     $timestamp = $account->login;
-    $this->drupalGet("user/$account->uid/cancel/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid));
+    $this->drupalGet("user/$account->uid/cancel/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid, $account->mail));
     $this->assertResponse(403, 'Bogus cancelling request rejected.');
     $account = user_load($account->uid);
     $this->assertTrue($account->status == 1, 'User account was not canceled.');
@@ -699,14 +1071,14 @@ class UserCancelTestCase extends DrupalWebTestCase {
 
     // Attempt bogus account cancellation request confirmation.
     $bogus_timestamp = $timestamp + 60;
-    $this->drupalGet("user/$account->uid/cancel/confirm/$bogus_timestamp/" . user_pass_rehash($account->pass, $bogus_timestamp, $account->login, $account->uid));
+    $this->drupalGet("user/$account->uid/cancel/confirm/$bogus_timestamp/" . user_pass_rehash($account->pass, $bogus_timestamp, $account->login, $account->uid, $account->mail));
     $this->assertText(t('You have tried to use an account cancellation link that has expired. Please request a new one using the form below.'), 'Bogus cancelling request rejected.');
     $account = user_load($account->uid);
     $this->assertTrue($account->status == 1, 'User account was not canceled.');
 
     // Attempt expired account cancellation request confirmation.
     $bogus_timestamp = $timestamp - 86400 - 60;
-    $this->drupalGet("user/$account->uid/cancel/confirm/$bogus_timestamp/" . user_pass_rehash($account->pass, $bogus_timestamp, $account->login, $account->uid));
+    $this->drupalGet("user/$account->uid/cancel/confirm/$bogus_timestamp/" . user_pass_rehash($account->pass, $bogus_timestamp, $account->login, $account->uid, $account->mail));
     $this->assertText(t('You have tried to use an account cancellation link that has expired. Please request a new one using the form below.'), 'Expired cancel account request rejected.');
     $accounts = user_load_multiple(array($account->uid), array('status' => 1));
     $this->assertTrue(reset($accounts), 'User account was not canceled.');
@@ -743,7 +1115,7 @@ class UserCancelTestCase extends DrupalWebTestCase {
     $this->assertText(t('A confirmation request to cancel your account has been sent to your e-mail address.'), 'Account cancellation request mailed message displayed.');
 
     // Confirm account cancellation request.
-    $this->drupalGet("user/$account->uid/cancel/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid));
+    $this->drupalGet("user/$account->uid/cancel/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid, $account->mail));
     $account = user_load($account->uid, TRUE);
     $this->assertTrue($account->status == 0, 'User has been blocked.');
 
@@ -781,7 +1153,7 @@ class UserCancelTestCase extends DrupalWebTestCase {
     $this->assertText(t('A confirmation request to cancel your account has been sent to your e-mail address.'), 'Account cancellation request mailed message displayed.');
 
     // Confirm account cancellation request.
-    $this->drupalGet("user/$account->uid/cancel/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid));
+    $this->drupalGet("user/$account->uid/cancel/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid, $account->mail));
     $account = user_load($account->uid, TRUE);
     $this->assertTrue($account->status == 0, 'User has been blocked.');
 
@@ -831,7 +1203,7 @@ class UserCancelTestCase extends DrupalWebTestCase {
     $this->assertText(t('A confirmation request to cancel your account has been sent to your e-mail address.'), 'Account cancellation request mailed message displayed.');
 
     // Confirm account cancellation request.
-    $this->drupalGet("user/$account->uid/cancel/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid));
+    $this->drupalGet("user/$account->uid/cancel/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid, $account->mail));
     $this->assertFalse(user_load($account->uid, TRUE), 'User is not found in the database.');
 
     // Confirm that user's content has been attributed to anonymous user.
@@ -895,7 +1267,7 @@ class UserCancelTestCase extends DrupalWebTestCase {
     $this->assertText(t('A confirmation request to cancel your account has been sent to your e-mail address.'), 'Account cancellation request mailed message displayed.');
 
     // Confirm account cancellation request.
-    $this->drupalGet("user/$account->uid/cancel/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid));
+    $this->drupalGet("user/$account->uid/cancel/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid, $account->mail));
     $this->assertFalse(user_load($account->uid, TRUE), 'User is not found in the database.');
 
     // Confirm that user's content has been deleted.
@@ -1023,9 +1395,10 @@ class UserPictureTestCase extends DrupalWebTestCase {
     $this->drupalLogin($this->user);
 
     // Try to upload a file that is not an image for the user picture.
-    $not_an_image = current($this->drupalGetTestFiles('html'));
-    $this->saveUserPicture($not_an_image);
+    $not_an_image = $this->drupalGetTestFiles('html');
+    $this->saveUserPicture($not_an_image[1]);
     $this->assertRaw(t('Only JPEG, PNG and GIF images are allowed.'), 'Non-image files are not accepted.');
+    $this->assertNoRaw(t('Only files with the following extensions are allowed:'), 'Additional error message not displayed.');
   }
 
   /**
@@ -1093,7 +1466,7 @@ class UserPictureTestCase extends DrupalWebTestCase {
       $this->assertRaw($text, 'File size cited as reason for failure.');
 
       // Check if file is not uploaded.
-      $this->assertFalse(is_file($pic_path), 'File was not uploaded.');
+      $this->assertFalse(is_file((string) $pic_path), 'File was not uploaded.');
     }
   }
 
@@ -1501,7 +1874,13 @@ class UserTimeZoneFunctionalTest extends DrupalWebTestCase {
     // Setup date/time settings for Los Angeles time.
     variable_set('date_default_timezone', 'America/Los_Angeles');
     variable_set('configurable_timezones', 1);
-    variable_set('date_format_medium', 'Y-m-d H:i T');
+
+    // Override the 'medium' date format, which is the default for node
+    // creation time. Since we are testing time zones with Daylight Saving
+    // Time, and need to future proof against changes to the zoneinfo database,
+    // we choose the 'I' format placeholder instead of a human-readable zone
+    // name. With 'I', a 1 means the date is in DST, and 0 if not.
+    variable_set('date_format_medium', 'Y-m-d H:i I');
 
     // Create a user account and login.
     $web_user = $this->drupalCreateUser();
@@ -1519,11 +1898,11 @@ class UserTimeZoneFunctionalTest extends DrupalWebTestCase {
 
     // Confirm date format and time zone.
     $this->drupalGet("node/$node1->nid");
-    $this->assertText('2007-03-09 21:00 PST', 'Date should be PST.');
+    $this->assertText('2007-03-09 21:00 0', 'Date should be PST.');
     $this->drupalGet("node/$node2->nid");
-    $this->assertText('2007-03-11 01:00 PST', 'Date should be PST.');
+    $this->assertText('2007-03-11 01:00 0', 'Date should be PST.');
     $this->drupalGet("node/$node3->nid");
-    $this->assertText('2007-03-20 21:00 PDT', 'Date should be PDT.');
+    $this->assertText('2007-03-20 21:00 1', 'Date should be PDT.');
 
     // Change user time zone to Santiago time.
     $edit = array();
@@ -1534,11 +1913,11 @@ class UserTimeZoneFunctionalTest extends DrupalWebTestCase {
 
     // Confirm date format and time zone.
     $this->drupalGet("node/$node1->nid");
-    $this->assertText('2007-03-10 02:00 CLST', 'Date should be Chile summer time; five hours ahead of PST.');
+    $this->assertText('2007-03-10 02:00 1', 'Date should be Chile summer time; five hours ahead of PST.');
     $this->drupalGet("node/$node2->nid");
-    $this->assertText('2007-03-11 05:00 CLT', 'Date should be Chile time; four hours ahead of PST');
+    $this->assertText('2007-03-11 05:00 0', 'Date should be Chile time; four hours ahead of PST');
     $this->drupalGet("node/$node3->nid");
-    $this->assertText('2007-03-21 00:00 CLT', 'Date should be Chile time; three hours ahead of PDT.');
+    $this->assertText('2007-03-21 00:00 0', 'Date should be Chile time; three hours ahead of PDT.');
   }
 }
 
@@ -1546,6 +1925,9 @@ class UserTimeZoneFunctionalTest extends DrupalWebTestCase {
  * Test user autocompletion.
  */
 class UserAutocompleteTestCase extends DrupalWebTestCase {
+  protected $unprivileged_user;
+  protected $privileged_user;
+
   public static function getInfo() {
     return array(
       'name' => 'User autocompletion',
@@ -1849,6 +2231,19 @@ class UserCreateTestCase extends DrupalWebTestCase {
       $this->drupalGet('admin/people');
       $this->assertText($edit['name'], 'User found in list of users');
     }
+
+    // Test that the password '0' is considered a password.
+    $name = $this->randomName();
+    $edit = array(
+      'name' => $name,
+      'mail' => $name . '@example.com',
+      'pass[pass1]' => 0,
+      'pass[pass2]' => 0,
+      'notify' => FALSE,
+    );
+    $this->drupalPost('admin/people/create', $edit, t('Create new account'));
+    $this->assertText(t('Created a new user account for @name. No e-mail has been sent.', array('@name' => $edit['name'])), 'User created with password 0');
+    $this->assertNoText('Password field is required');
   }
 }
 
@@ -1926,12 +2321,121 @@ class UserEditTestCase extends DrupalWebTestCase {
     $this->drupalLogin($user1);
     $this->drupalLogout();
   }
+
+  /**
+   * Tests setting the password to "0".
+   */
+  public function testUserWith0Password() {
+    $admin = $this->drupalCreateUser(array('administer users'));
+    $this->drupalLogin($admin);
+    // Create a regular user.
+    $user1 = $this->drupalCreateUser(array());
+
+    $edit = array('pass[pass1]' => '0', 'pass[pass2]' => '0');
+    $this->drupalPost("user/" . $user1->uid . "/edit", $edit, t('Save'));
+    $this->assertRaw(t("The changes have been saved."));
+
+    $this->drupalLogout();
+    $user1->pass_raw = '0';
+    $this->drupalLogin($user1);
+    $this->drupalLogout();
+  }
+
+  /**
+   * Tests that the user can edit the account when another user with the same
+   * e-mail address exists.
+   */
+  public function testUserEditDuplicateEmail() {
+    // Create two regular users.
+    $user1 = $this->drupalCreateUser(array('change own username'));
+    $user2 = $this->drupalCreateUser(array('change own username'));
+
+    // Change the e-mail address of the user2 to have the same e-mail address
+    // as the user1.
+    db_update('users')
+      ->fields(array('mail' => $user1->mail))
+      ->condition('uid', $user2->uid)
+      ->execute();
+
+    $this->drupalLogin($user2);
+    $edit['name'] = $user2->name;
+    $this->drupalPost("user/" . $user2->uid . "/edit", $edit, t('Save'));
+    $this->assertRaw(t("The changes have been saved."));
+    $this->drupalLogout();
+
+    // Change the e-mail address of the user2 to have the same e-mail address
+    // as the user1, except that the first letter will be uppercase.
+    db_update('users')
+      ->fields(array('mail' => ucfirst($user1->mail)))
+      ->condition('uid', $user2->uid)
+      ->execute();
+
+    $this->drupalLogin($user2);
+    $edit['name'] = $user2->name;
+    $this->drupalPost("user/" . $user2->uid . "/edit", $edit, t('Save'));
+    $this->assertRaw(t("The changes have been saved."));
+    $this->drupalLogout();
+  }
+}
+
+/**
+ * Tests editing a user account with and without a form rebuild.
+ */
+class UserEditRebuildTestCase extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'User edit with form rebuild',
+      'description' => 'Test user edit page when a form rebuild is triggered.',
+      'group' => 'User',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('user_form_test');
+  }
+
+  /**
+   * Test user edit page when the form is set to rebuild.
+   */
+  function testUserEditFormRebuild() {
+    $user1 = $this->drupalCreateUser(array('change own username'));
+    $this->drupalLogin($user1);
+
+    $roles = array_keys($user1->roles);
+    // Save the user form twice.
+    $edit = array();
+    $edit['current_pass'] = $user1->pass_raw;
+    $this->drupalPost("user/$user1->uid/edit", $edit, t('Save'));
+    $this->assertRaw(t("The changes have been saved."));
+    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->assertRaw(t("The changes have been saved."));
+    $saved_user1 = entity_load_unchanged('user', $user1->uid);
+    $this->assertEqual(count($roles), count($saved_user1->roles), 'Count of user roles in database matches original count.');
+    $diff = array_diff(array_keys($saved_user1->roles), $roles);
+    $this->assertTrue(empty($diff), format_string('User roles in database match original: @roles', array('@roles' => implode(', ', $saved_user1->roles))));
+    // Set variable that causes the form to be rebuilt in user_form_test.module.
+    variable_set('user_form_test_user_profile_form_rebuild', TRUE);
+    $this->drupalPost("user/$user1->uid/edit", $edit, t('Save'));
+    $this->assertRaw(t("The changes have been saved."));
+    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->assertRaw(t("The changes have been saved."));
+    $saved_user1 = entity_load_unchanged('user', $user1->uid);
+    $this->assertEqual(count($roles), count($saved_user1->roles), 'Count of user roles in database matches original count.');
+    $diff = array_diff(array_keys($saved_user1->roles), $roles);
+    $this->assertTrue(empty($diff), format_string('User roles in database match original: @roles', array('@roles' => implode(', ', $saved_user1->roles))));
+  }
 }
 
 /**
  * Test case for user signatures.
  */
 class UserSignatureTestCase extends DrupalWebTestCase {
+  protected $admin_user;
+  protected $web_user;
+  protected $full_html_format;
+  protected $plain_text_format;
+
   public static function getInfo() {
     return array(
       'name' => 'User signatures',
@@ -2052,6 +2556,7 @@ class UserEditedOwnAccountTestCase extends DrupalWebTestCase {
  * Test case to test adding, editing and deleting roles.
  */
 class UserRoleAdminTestCase extends DrupalWebTestCase {
+  protected $admin_user;
 
   public static function getInfo() {
     return array(
@@ -2134,6 +2639,10 @@ class UserRoleAdminTestCase extends DrupalWebTestCase {
     $role = user_role_load($rid);
     $new_weight = $role->weight;
     $this->assertTrue(($old_weight + 1) == $new_weight, 'Role weight updated successfully.');
+
+    // Check if the updated weight is displayed on the roles settings page.
+    $this->drupalGet('admin/people/permissions/roles');
+    $this->assertFieldByXPath("//input[@name='roles[$rid][weight]']", $new_weight, 'The role weight is displayed correctly.');
   }
 }
 
@@ -2180,6 +2689,8 @@ class UserTokenReplaceTestCase extends DrupalWebTestCase {
     $tests['[user:last-login:short]'] = format_date($account->login, 'short', '', NULL, $language->language);
     $tests['[user:created]'] = format_date($account->created, 'medium', '', NULL, $language->language);
     $tests['[user:created:short]'] = format_date($account->created, 'short', '', NULL, $language->language);
+    $tests['[user:changed]'] = format_date($account->changed, 'medium', '', NULL, $language->language);
+    $tests['[user:changed:short]'] = format_date($account->changed, 'short', '', NULL, $language->language);
     $tests['[current-user:name]'] = check_plain(format_username($global_account));
 
     // Test to make sure that we generated something for each token.
@@ -2200,6 +2711,25 @@ class UserTokenReplaceTestCase extends DrupalWebTestCase {
       $this->assertEqual($output, $expected, format_string('Unsanitized user token %token replaced.', array('%token' => $input)));
     }
   }
+
+  /**
+   * Uses an anonymous user, then tests the tokens generated from it.
+   */
+  function testAnonymousUserTokenReplacement() {
+    global $language;
+
+    // Load anonymous user data.
+    $account = drupal_anonymous_user();
+
+    // Generate and test sanitized tokens.
+    $tests = array();
+    $tests['[user:mail]'] = '';
+
+    foreach ($tests as $input => $expected) {
+      $output = token_replace($input, array('user' => $account), array('language' => $language));
+      $this->assertEqual($output, $expected, format_string('Sanitized user token %token replaced.', array('%token' => $input)));
+    }
+  }
 }
 
 /**
@@ -2215,7 +2745,13 @@ class UserUserSearchTestCase extends DrupalWebTestCase {
   }
 
   function testUserSearch() {
+    // Verify that a user without 'administer users' permission cannot search
+    // for users by email address. Additionally, ensure that the username has a
+    // plus sign to ensure searching works with that.
     $user1 = $this->drupalCreateUser(array('access user profiles', 'search content', 'use advanced search'));
+    $edit['name'] = 'foo+bar';
+    $edit['mail'] = $edit['name'] . '@example.com';
+    user_save($user1, $edit);
     $this->drupalLogin($user1);
     $keys = $user1->mail;
     $edit = array('keys' => $keys);
@@ -2229,6 +2765,20 @@ class UserUserSearchTestCase extends DrupalWebTestCase {
     $edit = array('keys' => $keys);
     $this->drupalPost('search/user/', $edit, t('Search'));
     $this->assertText($keys);
+
+    // Verify that wildcard search works.
+    $keys = $user1->name;
+    $keys = substr($keys, 0, 2) . '*' . substr($keys, 4, 2);
+    $edit = array('keys' => $keys);
+    $this->drupalPost('search/user/', $edit, t('Search'));
+    $this->assertText($user1->name, 'Search for username wildcard resulted in user name on page for administrative user.');
+
+    // Verify that wildcard search works for email.
+    $keys = $user1->mail;
+    $keys = substr($keys, 0, 2) . '*' . substr($keys, 4, 2);
+    $edit = array('keys' => $keys);
+    $this->drupalPost('search/user/', $edit, t('Search'));
+    $this->assertText($user1->name, 'Search for email wildcard resulted in user name on page for administrative user.');
 
     // Create a blocked user.
     $blocked_user = $this->drupalCreateUser();
@@ -2447,5 +2997,69 @@ class UserValidateCurrentPassCustomForm extends DrupalWebTestCase {
     $edit['current_pass'] = $this->accessUser->pass_raw;
     $this->drupalPost('user_form_test_current_password/' . $this->accessUser->uid, $edit, t('Test'));
     $this->assertText(t('The password has been validated and the form submitted successfully.'));
+  }
+}
+
+/**
+ * Tests actions provided by the User module.
+ */
+class UserActionsTest extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'User actions',
+      'description' => 'Test actions provided by the user module.',
+      'group' => 'User',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('dblog', 'anonymous_user_unblock_test');
+  }
+
+  /**
+   * Tests user block and unblock actions.
+   */
+  function testUserBlockUnBlockActions() {
+    $unblocked_user = $this->drupalCreateUser();
+
+    db_truncate('watchdog')->execute();
+
+    // Block a user.
+    user_block_user_action($unblocked_user);
+
+    $blocked_user = user_load($unblocked_user->uid, TRUE);
+    $this->assertEqual($blocked_user->status, 0, 'User is blocked');
+
+    // Assert that a watchdog message was logged.
+    $status = (bool) db_query_range('SELECT 1 FROM {watchdog} WHERE message = :message AND variables = :variables', 0, 1, array(':message' => 'Blocked user %name.', ':variables' => serialize(array('%name' => $blocked_user->name))))->fetchField();
+    $this->assert($status, 'A watchdog message was logged by user block action.');
+
+    // Unblock a user.
+    user_unblock_user_action($blocked_user);
+
+    $unblocked_user = user_load($unblocked_user->uid, TRUE);
+    $this->assertEqual($unblocked_user->status, 1, 'User is unblocked');
+
+    // Assert that a watchdog message was logged.
+    $status = (bool) db_query_range('SELECT 1 FROM {watchdog} WHERE message = :message AND variables = :variables', 0, 1, array(':message' => 'Unblocked user %name.', ':variables' => serialize(array('%name' => $unblocked_user->name))))->fetchField();
+    $this->assert($status, 'A watchdog message was logged by user unblock action.');
+
+    // Try to unblock the anonymous user.
+    db_truncate('watchdog')->execute();
+    $anonymous_user = user_load(0);
+
+    // Assert anonymous user is blocked.
+    $this->assertEqual($anonymous_user->status, 0, 'Anonymous user is blocked');
+
+    user_unblock_user_action($anonymous_user);
+
+    // Assert anonymous user remains blocked.
+    $anonymous_user = user_load(0, TRUE);
+    $this->assertEqual($anonymous_user->status, 0, 'Anonymous user remains blocked');
+
+    // Assert that a watchdog message was logged.
+    $status = (bool) db_query_range('SELECT 1 FROM {watchdog} WHERE message = :message', 0, 1, array(':message' => 'Anonymous user should not be unblocked.'))->fetchField();
+    $this->assert($status, 'A watchdog message was logged by user unblock action.');
   }
 }

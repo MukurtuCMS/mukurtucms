@@ -160,7 +160,7 @@ function system_requirements($phase) {
       if (empty($drivers)) {
         $database_ok = FALSE;
         $pdo_message = $t('Your web server does not appear to support any common PDO database extensions. Check with your hosting provider to see if they support PDO (PHP Data Objects) and offer any databases that <a href="@drupal-databases">Drupal supports</a>.', array(
-          '@drupal-databases' => 'http://drupal.org/node/270#database',
+          '@drupal-databases' => 'https://www.drupal.org/requirements/database',
         ));
       }
       // Make sure the native PDO extension is available, not the older PEAR
@@ -194,6 +194,12 @@ function system_requirements($phase) {
       'title' => $t('Database system version'),
       'value' => Database::getConnection()->version(),
     );
+  }
+
+  // Test database-specific multi-byte UTF-8 related requirements.
+  $charset_requirements = _system_check_db_utf8mb4_requirements($phase);
+  if (!empty($charset_requirements)) {
+    $requirements['database_charset'] = $charset_requirements;
   }
 
   // Test PHP memory_limit
@@ -230,20 +236,36 @@ function system_requirements($phase) {
 
   // Test settings.php file writability
   if ($phase == 'runtime') {
-    $conf_dir = drupal_verify_install_file(conf_path(), FILE_NOT_WRITABLE, 'dir');
-    $conf_file = drupal_verify_install_file(conf_path() . '/settings.php', FILE_EXIST|FILE_READABLE|FILE_NOT_WRITABLE);
-    if (!$conf_dir || !$conf_file) {
+    $conf_errors = array();
+    // Allow system administrators to ignore permissions hardening for the site
+    // directory. This allows additional files in the site directory to be
+    // updated when they are managed in a version control system.
+    $skip_permissions_hardening = variable_get('skip_permissions_hardening', FALSE);
+
+    if ($skip_permissions_hardening) {
+      $error_value = t('Protection disabled');
+      // If permissions hardening is disabled, then only show a warning for a
+      // writable file, as a reminder, rather than an error.
+      $file_protection_severity = REQUIREMENT_WARNING;
+    }
+    else {
+      $error_value = t('Not protected');
+      // In normal operation, writable files or directories are an error.
+      $file_protection_severity = REQUIREMENT_ERROR;
+      if (!drupal_verify_install_file(conf_path(), FILE_NOT_WRITABLE, 'dir')) {
+        $conf_errors[] = $t('The directory %file is not protected from modifications and poses a security risk. You must change the directory\'s permissions to be non-writable. ', array('%file' => conf_path()));
+      }
+    }
+    if (!drupal_verify_install_file(conf_path() . '/settings.php', FILE_EXIST | FILE_READABLE | FILE_NOT_WRITABLE, 'file', !$skip_permissions_hardening)) {
+      $conf_errors[] = $t('The file %file is not protected from modifications and poses a security risk. You must change the file\'s permissions to be non-writable.', array('%file' => conf_path() . '/settings.php'));
+    }
+
+    if (!empty($conf_errors)) {
       $requirements['settings.php'] = array(
-        'value' => $t('Not protected'),
-        'severity' => REQUIREMENT_ERROR,
-        'description' => '',
+        'value' => $error_value,
+        'severity' => $file_protection_severity,
+        'description' => implode('<br />', $conf_errors),
       );
-      if (!$conf_dir) {
-        $requirements['settings.php']['description'] .= $t('The directory %file is not protected from modifications and poses a security risk. You must change the directory\'s permissions to be non-writable. ', array('%file' => conf_path()));
-      }
-      if (!$conf_file) {
-        $requirements['settings.php']['description'] .= $t('The file %file is not protected from modifications and poses a security risk. You must change the file\'s permissions to be non-writable.', array('%file' => conf_path() . '/settings.php'));
-      }
     }
     else {
       $requirements['settings.php'] = array(
@@ -317,7 +339,7 @@ function system_requirements($phase) {
       $description = $t('Cron has not run recently.') . ' ' . $help;
     }
 
-    $description .= ' ' . $t('You can <a href="@cron">run cron manually</a>.', array('@cron' => url('admin/reports/status/run-cron')));
+    $description .= ' ' . $t('You can <a href="@cron">run cron manually</a>.', array('@cron' => url('admin/reports/status/run-cron', array('query' => array('token' => drupal_get_token('run-cron'))))));
     $description .= '<br />' . $t('To run cron from outside the site, go to <a href="!cron">!cron</a>', array('!cron' => url($base_url . '/cron.php', array('external' => TRUE, 'query' => array('cron_key' => variable_get('cron_key', 'drupal'))))));
 
     $requirements['cron'] = array(
@@ -467,7 +489,7 @@ function system_requirements($phase) {
         // Check for an incompatible version.
         $required_file = $files[$required_module];
         $required_name = $required_file->info['name'];
-        $version = str_replace(DRUPAL_CORE_COMPATIBILITY . '-', '', $required_file->info['version']);
+        $version = str_replace(DRUPAL_CORE_COMPATIBILITY . '-', '', (string) $required_file->info['version']);
         $compatibility = drupal_check_incompatibility($requirement, $version);
         if ($compatibility) {
           $compatibility = rtrim(substr($compatibility, 2), ')');
@@ -514,6 +536,127 @@ function system_requirements($phase) {
     }
   }
 
+  // Warning for httpoxy on IIS with affected PHP versions.
+  // @see https://www.drupal.org/node/2783079
+  if (strpos((string) $software, 'Microsoft-IIS') !== FALSE && (version_compare(PHP_VERSION, '5.5.38', '<')
+    || (version_compare(PHP_VERSION, '5.6.0', '>=') && version_compare(PHP_VERSION, '5.6.24', '<'))
+    || (version_compare(PHP_VERSION, '7.0.0', '>=') && version_compare(PHP_VERSION, '7.0.9', '<'))
+    )) {
+    $dom = new \DOMDocument('1.0', 'UTF-8');
+    $webconfig = file_get_contents('web.config');
+    // If you are here the web.config file must - of course - be well formed.
+    // But the PHP DOM component will throw warnings on some XML compliant
+    // stuff, so silently parse the configuration file.
+    @$dom->loadHTML($webconfig);
+    $httpoxy_rewrite = FALSE;
+    foreach ($dom->getElementsByTagName('rule') as $rule) {
+      foreach ($rule->attributes as $attr) {
+        if (@$attr->name == 'name' && @$attr->nodeValue == 'Erase HTTP_PROXY') {
+          $httpoxy_rewrite = TRUE;
+          break 2;
+        }
+      }
+    }
+    if (!$httpoxy_rewrite) {
+      $requirements['iis_httpoxy_protection'] = array(
+        'title' => t('IIS httpoxy protection'),
+        'value' => t('Your PHP runtime version is affected by the httpoxy vulnerability.'),
+        'description' => t('Either update your PHP runtime version or uncomment the "Erase HTTP_PROXY" rule in your web.config file and add HTTP_PROXY to the allowed headers list. See more details in the <a href="@link">security advisory</a>.', array('@link' => 'https://www.drupal.org/SA-CORE-2016-003')),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+  }
+
+  // See if trusted hostnames have been configured, and warn the user if they
+  // are not set.
+  if ($phase == 'runtime') {
+    $trusted_host_patterns = variable_get('trusted_host_patterns', array());
+    if (empty($trusted_host_patterns)) {
+      $requirements['trusted_host_patterns'] = array(
+        'title' => $t('Trusted Host Settings'),
+        'value' => $t('Not enabled'),
+        'description' => $t('The trusted_host_patterns setting is not configured in settings.php. This can lead to security vulnerabilities. It is <strong>highly recommended</strong> that you configure this. See <a href="@url">Protecting against HTTP HOST Header attacks</a> for more information.', array('@url' => 'https://www.drupal.org/node/1992030')),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+    else {
+      $requirements['trusted_host_patterns'] = array(
+        'title' => $t('Trusted Host Settings'),
+        'value' => $t('Enabled'),
+        'description' => $t('The trusted_host_patterns setting is set to allow %trusted_host_patterns', array('%trusted_host_patterns' => implode(', ', $trusted_host_patterns))),
+      );
+    }
+  }
+
+  return $requirements;
+}
+
+/**
+ * Checks whether the requirements for multi-byte UTF-8 support are met.
+ *
+ * @param string $phase
+ *   The hook_requirements() stage.
+ *
+ * @return array
+ *   A requirements array with the result of the charset check.
+ */
+function _system_check_db_utf8mb4_requirements($phase) {
+  global $install_state;
+  // In the requirements check of the installer, skip the utf8mb4 check unless
+  // the database connection info has been preconfigured by hand with valid
+  // information before running the installer, as otherwise we cannot get a
+  // valid database connection object.
+  if (isset($install_state['settings_verified']) && !$install_state['settings_verified']) {
+    return array();
+  }
+
+  $connection = Database::getConnection();
+  $t = get_t();
+  $requirements['title'] = $t('Database 4 byte UTF-8 support');
+
+  $utf8mb4_configurable = $connection->utf8mb4IsConfigurable();
+  $utf8mb4_active = $connection->utf8mb4IsActive();
+  $utf8mb4_supported = $connection->utf8mb4IsSupported();
+  $driver = $connection->driver();
+  $documentation_url = 'https://www.drupal.org/node/2754539';
+
+  if ($utf8mb4_active) {
+    if ($utf8mb4_supported) {
+      if ($phase != 'install' && $utf8mb4_configurable && !variable_get('drupal_all_databases_are_utf8mb4', FALSE)) {
+        // Supported, active, and configurable, but not all database tables
+        // have been converted yet.
+        $requirements['value'] = $t('Enabled, but database tables need conversion');
+        $requirements['description'] = $t('Please convert all database tables to utf8mb4 prior to enabling it in settings.php. See the <a href="@url">documentation on adding 4 byte UTF-8 support</a> for more information.', array('@url' => $documentation_url));
+        $requirements['severity'] = REQUIREMENT_ERROR;
+      }
+      else {
+        // Supported, active.
+        $requirements['value'] = $t('Enabled');
+        $requirements['description'] = $t('4 byte UTF-8 for @driver is enabled.', array('@driver' => $driver));
+        $requirements['severity'] = REQUIREMENT_OK;
+      }
+    }
+    else {
+      // Not supported, active.
+      $requirements['value'] = $t('Not supported');
+      $requirements['description'] = $t('4 byte UTF-8 for @driver is activated, but not supported on your system. Please turn this off in settings.php, or ensure that all database-related requirements are met. See the <a href="@url">documentation on adding 4 byte UTF-8 support</a> for more information.', array('@driver' => $driver, '@url' => $documentation_url));
+      $requirements['severity'] = REQUIREMENT_ERROR;
+    }
+  }
+  else {
+    if ($utf8mb4_supported) {
+      // Supported, not active.
+      $requirements['value'] = $t('Not enabled');
+      $requirements['description'] = $t('4 byte UTF-8 for @driver is not activated, but it is supported on your system. It is recommended that you enable this to allow 4-byte UTF-8 input such as emojis, Asian symbols and mathematical symbols to be stored correctly. See the <a href="@url">documentation on adding 4 byte UTF-8 support</a> for more information.', array('@driver' => $driver, '@url' => $documentation_url));
+      $requirements['severity'] = REQUIREMENT_INFO;
+    }
+    else {
+      // Not supported, not active.
+      $requirements['value'] = $t('Disabled');
+      $requirements['description'] = $t('4 byte UTF-8 for @driver is disabled. See the <a href="@url">documentation on adding 4 byte UTF-8 support</a> for more information.', array('@driver' => $driver, '@url' => $documentation_url));
+      $requirements['severity'] = REQUIREMENT_INFO;
+    }
+  }
   return $requirements;
 }
 
@@ -532,6 +675,9 @@ function system_install() {
   module_list(TRUE);
   module_implements('', FALSE, TRUE);
 
+  // Ensure the schema versions are not based on a previous module list.
+  drupal_static_reset('drupal_get_schema_versions');
+
   // Load system theme data appropriately.
   system_rebuild_theme_data();
 
@@ -546,6 +692,9 @@ function system_install() {
   // Populate the cron key variable.
   $cron_key = drupal_random_key();
   variable_set('cron_key', $cron_key);
+
+  // This variable indicates that the database is ready for hashed session ids.
+  variable_set('hashed_session_ids_supported', TRUE);
 }
 
 /**
@@ -1486,13 +1635,13 @@ function system_schema() {
         'not null' => TRUE,
       ),
       'sid' => array(
-        'description' => "A session ID. The value is generated by Drupal's session handlers.",
+        'description' => "A session ID (hashed). The value is generated by Drupal's session handlers.",
         'type' => 'varchar',
         'length' => 128,
         'not null' => TRUE,
       ),
       'ssid' => array(
-        'description' => "Secure session ID. The value is generated by Drupal's session handlers.",
+        'description' => "Secure session ID (hashed). The value is generated by Drupal's session handlers.",
         'type' => 'varchar',
         'length' => 128,
         'not null' => TRUE,
@@ -2792,7 +2941,7 @@ function system_update_7061(&$sandbox) {
     if (!db_table_exists('system_update_7061')) {
       $table = array(
         'description' => t('Stores temporary data for system_update_7061.'),
-        'fields' => array('vid' => array('type' => 'int')),
+        'fields' => array('vid' => array('type' => 'int', 'not null' => TRUE)),
         'primary key' => array('vid'),
       );
       db_create_table('system_update_7061', $table);
@@ -3190,6 +3339,113 @@ function system_update_7080() {
     'binary' => TRUE,
   );
   db_change_field('date_format_locale', 'format', 'format', $spec);
+}
+
+/**
+ * Remove the Drupal 6 default install profile if it is still in the database.
+ */
+function system_update_7081() {
+  // Sites which used the default install profile in Drupal 6 and then updated
+  // to Drupal 7.44 or earlier will still have a record of this install profile
+  // in the database that needs to be deleted.
+  db_delete('system')
+    ->condition('filename', 'profiles/default/default.profile')
+    ->condition('type', 'module')
+    ->condition('status', 0)
+    ->condition('schema_version', 0)
+    ->execute();
+}
+
+/**
+ * Add 'jquery-extend-3.4.0.js' to the 'jquery' library.
+ */
+function system_update_7082() {
+  // Empty update to force a rebuild of hook_library() and JS aggregates.
+}
+
+/**
+ * Add 'jquery-html-prefilter-3.5.0-backport.js' to the 'jquery' library.
+ */
+function system_update_7083() {
+  // Empty update to force a rebuild of hook_library() and JS aggregates.
+}
+
+/**
+ * Rebuild JavaScript aggregates to include 'ajax.js' fix for Chrome 83.
+ */
+function system_update_7084() {
+  // Empty update to force a rebuild of JS aggregates.
+}
+
+/**
+ * Remove FLoC-blocking variable.
+ */
+function system_update_7085() {
+  variable_del('block_interest_cohort');
+}
+
+/**
+ * Prepare the schema and data of the sessions table for hashed session ids.
+ */
+function system_update_7086() {
+  // Update the session ID fields' description.
+  $spec = array(
+    'description' => "A session ID (hashed). The value is generated by Drupal's session handlers.",
+    'type' => 'varchar',
+    'length' => 128,
+    'not null' => TRUE,
+  );
+  db_drop_primary_key('sessions');
+  db_change_field('sessions', 'sid', 'sid', $spec, array('primary key' => array('sid', 'ssid')));
+  // Updates the secure session ID field's description.
+  $spec = array(
+    'description' => "Secure session ID (hashed). The value is generated by Drupal's session handlers.",
+    'type' => 'varchar',
+    'length' => 128,
+    'not null' => TRUE,
+    'default' => '',
+  );
+  db_drop_primary_key('sessions');
+  db_change_field('sessions', 'ssid', 'ssid', $spec, array('primary key' => array('sid', 'ssid')));
+
+  // Update all existing sessions.
+  if (!variable_get('do_not_hash_session_ids', FALSE)) {
+    $sessions = db_query('SELECT sid, ssid FROM {sessions}');
+    while ($session = $sessions->fetchAssoc()) {
+      $query = db_update('sessions');
+      $fields = array();
+      if (!empty($session['sid'])) {
+        $fields['sid'] = drupal_hash_base64($session['sid']);
+        $query->condition('sid', $session['sid']);
+      }
+      if (!empty($session['ssid'])) {
+        $fields['ssid'] = drupal_hash_base64($session['ssid']);
+        $query->condition('ssid', $session['ssid']);
+      }
+      $query
+        ->fields($fields)
+        ->execute();
+    }
+  }
+
+  // This variable indicates that the database is ready for hashed session ids.
+  variable_set('hashed_session_ids_supported', TRUE);
+}
+
+/**
+ * Enable the Announcements module; see 7.100 Release Notes for opt-out details.
+ */
+function system_update_7087() {
+  if (!variable_get('announcements_feed_enable_by_default_opt_out', FALSE)) {
+    module_enable(array('announcements_feed'), FALSE);
+  }
+}
+
+/**
+ * Clear caches as registry has been altered.
+ */
+function system_update_7088() {
+  // Empty update to clear caches.
 }
 
 /**

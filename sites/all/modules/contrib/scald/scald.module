@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * The Scald Core, which handles all Scald Registries and dispatch.
@@ -75,6 +76,7 @@ function scald_type_get_names() {
  * Add a Scald unified type.
  *
  * @deprecated
+ *
  * @see ScaldAtomController::addType()
  */
 function scald_add_type($type, $title, $description) {
@@ -85,6 +87,7 @@ function scald_add_type($type, $title, $description) {
  * Remove a Scald unified type.
  *
  * @deprecated
+ *
  * @see ScaldAtomController::removeType()
  */
 function scald_remove_type($type) {
@@ -121,6 +124,21 @@ function scald_contexts($reset = FALSE) {
 }
 
 /**
+ * Returns the list of public context.
+ */
+function scald_contexts_public($reset = FALSE) {
+  $public = array();
+  $contexts = scald_contexts($reset);
+  foreach ($contexts as $name => $context) {
+    if (empty($context['hidden'])) {
+      $public[$name] = $context;
+    }
+  }
+
+  return $public;
+}
+
+/**
  * Implements hook_scald_contexts_alter().
  *
  * Adds informations on the configured transcoder formats to
@@ -133,6 +151,10 @@ function scald_scald_contexts_alter(&$contexts) {
     if (!empty($contexts[$name])) {
       // This is the old and deprecated structure.
       foreach ($config->transcoder as $type => $transcoder) {
+        if ($transcoder['*'] == 'style-Library') {
+          $transcoder['*'] = 'style-library';
+          $config->transcoder[$type]['*'] = 'style-library';
+        }
         $contexts[$name]['type_format'][$type] = array(
           'file_format' => '*',
           'transcoder' => $transcoder['*'],
@@ -144,6 +166,7 @@ function scald_scald_contexts_alter(&$contexts) {
     }
   }
 }
+
 /**
  * Get the available Scald Actions.
  *
@@ -254,7 +277,8 @@ function scald_scald_player() {
 /**
  * Get the list of module that have registered themselves as atom providers.
  *
- * This function returns an associative array with the following formats:
+ * This function returns an associative array with the following format.
+ *
  * array(
  *   'type-slug1' => array(
  *     'module-name1' => 'label1',
@@ -266,14 +290,60 @@ function scald_scald_player() {
  *   The Scald Atom Providers array.
  */
 function scald_atom_providers($reset = FALSE) {
-  $types = array();
-  $hook = 'scald_atom_providers';
-  foreach (module_implements($hook) as $module) {
-    foreach (module_invoke($module, $hook) as $type => $label) {
-      $types[$type][$module] = $label;
+  $types = &drupal_static(__FUNCTION__, NULL, $reset);
+  if (!isset($types)) {
+    $types = array();
+    $hook = 'scald_atom_providers';
+    foreach (module_implements($hook) as $module) {
+      foreach (module_invoke($module, $hook) as $type => $label) {
+        $types[$type][$module] = $label;
+      }
     }
+    drupal_alter($hook, $types);
   }
-  drupal_alter($hook, $types);
+  return $types;
+}
+
+/**
+ * Get the list of module options registered for atom providers.
+ *
+ * This function returns an associative array with the following format.
+ *
+ * array(
+ *   'type-slug1' => array(
+ *     'module-name1' => array(
+ *       'data-param1' => 'data_value1',
+ *       'data-param2' => 'data_value2',
+ *     ),
+ *     'module-name2' => array(
+ *       'label' => 'label2',
+ *     ),
+ *   )
+ * );
+ *
+ * @return array
+ *   The Scald Atom Provider Options array.
+ */
+function scald_atom_providers_opt($reset = FALSE) {
+  $types = &drupal_static(__FUNCTION__, NULL, $reset);
+  if (!isset($types)) {
+    $types = array();
+    $providers = scald_atom_providers();
+    // Collect provider options for registered providers only.
+    $hook = 'scald_atom_providers_opt';
+    foreach ($providers as $type => $module_items) {
+      foreach ($module_items as $module => $label) {
+        if (module_hook($module, $hook)) {
+          foreach (module_invoke($module, $hook) as $type => $item) {
+            $types[$type][$module] = $item;
+          }
+        }
+        $types[$type][$module]['label'] = $label;
+      }
+    }
+    // Invoke options alters. Do not alter the label here.
+    drupal_alter($hook, $types);
+  }
   return $types;
 }
 
@@ -363,7 +433,6 @@ function scald_atom_defaults($type) {
   return $defaults[$type] = $default;
 }
 
-
 /*******************************************************************************
  * SCALD ATOM CRUD
  */
@@ -379,22 +448,46 @@ function scald_atom_defaults($type) {
  *   FALSE upon failure
  */
 function scald_atom_load($sid) {
+  if (!is_numeric($sid)) {
+    return FALSE;
+  }
   $atom = scald_atom_load_multiple(array($sid));
   return $atom ? $atom[$sid] : FALSE;
+}
+
+/**
+ * Load a Scald Atom and provide a fallback if that fails.
+ */
+function scald_atom_fallback_load($sid) {
+  if (!is_numeric($sid)) {
+    return FALSE;
+  }
+  $atom = scald_atom_load_multiple(array($sid));
+  if (empty($atom)) {
+    return new ScaldAtom('scald_atom_fallback', 'scald', array(
+      'sid' => $sid,
+    ));
+  }
+  else {
+    return $atom[$sid];
+  }
 }
 
 /**
  * Load multiple Scald atoms.
  *
  * @param array $sids
- *   An array of Scald ID's being loaded
+ *   An array of Scald ID's being loaded.
  *
  * @return mixed
  *   An array of populated Scald Atom objects keyed by the sid. Value might be
  *   FALSE if SID is invalid or if $user is not permitted to fetch the Scald
  *   Atom
+ *
+ * @codingStandardsIgnoreStart
  */
 function scald_atom_load_multiple($sids) {
+  // @codingStandardsIgnoreEnd
   $atoms = scald_fetch_multiple($sids);
   return $atoms;
 }
@@ -423,8 +516,11 @@ function scald_atom_delete($sid) {
  *
  * @param array $sids
  *   An array of Scald atom IDs.
+ *
+ * @codingStandardsIgnoreStart
  */
 function scald_atom_delete_multiple($sids) {
+  // @codingStandardsIgnoreEnd
   $atoms = scald_atom_load_multiple($sids);
   if ($atoms) {
     $transaction = db_transaction();
@@ -548,6 +644,11 @@ function scald_is_registered($sid, $rebuild = FALSE) {
  */
 function scald_fetch($sid, $rebuild = FALSE) {
   $atoms = scald_fetch_multiple(array($sid), $rebuild);
+  // The $atoms variable should be an array, otherwise return FALSE.
+  if (!is_array($atoms)) {
+    return FALSE;
+  }
+
   return $atoms[$sid];
 }
 
@@ -625,12 +726,15 @@ function scald_fetch_multiple(array $sids, $rebuild = FALSE) {
  * Determine if a Scald Atom is fetched.
  *
  * @param ScaldAtom $atom
- *   The Scald Atom to test
+ *   The Scald Atom to test.
  *
  * @return bool
  *   TRUE/FALSE
+ *
+ * @codingStandardsIgnoreStart
  */
 function scald_is_fetched($atom = NULL) {
+  // @codingStandardsIgnoreEnd
   return (
     is_object($atom)
     && isset($atom->fetched)
@@ -648,7 +752,7 @@ function scald_is_fetched($atom = NULL) {
  *   - 'base_id'
  *   - 'publisher'
  *   - 'actions'
- *   - 'title'
+ *   - 'title'.
  * @param bool $fuzzy
  *   A boolean that if set to TRUE broadens the search to include partial
  *   matches on all parameters.
@@ -703,9 +807,6 @@ function scald_search($query = array(), $fuzzy = FALSE, $singular = FALSE) {
       case 'actions':
         $efq->propertyCondition($field, $value);
         break;
-
-      default:
-        continue;
     }
   }
 
@@ -744,6 +845,9 @@ function scald_search($query = array(), $fuzzy = FALSE, $singular = FALSE) {
  * @param bool $override
  *   A boolean used to determine if the Scald Context specified in the SAS
  *    should be used or not.
+ * @param string[] $allowed_contexts
+ *   An array of contexts slugs that are allowed to be used in the passed-in
+ *   string. If empty, any context that's not hidden will be allowed.
  *
  * @return string
  *   The same text string, but with all the Scald Atom Shorthands replaced with
@@ -752,38 +856,59 @@ function scald_search($query = array(), $fuzzy = FALSE, $singular = FALSE) {
  *
  * @see scald_rendered_to_sas()
  */
-function scald_sas_to_rendered($string, $context = NULL, $override = FALSE) {
-  if (empty($context)) {
+function scald_sas_to_rendered($string, $context = NULL, $override = FALSE, $allowed_contexts = array()) {
+  if (empty($context) || !array_key_exists($context, scald_contexts())) {
     $context = 'title';
   }
 
-  global $_scald_override;
-  $_scald_override = $override;
+  if (empty($allowed_contexts)) {
+    $allowed_contexts = array_keys(scald_contexts_public());
+  }
+
+  _scald_sas_to_rendered_callback('set', $context, $override, $allowed_contexts);
   $rendered = preg_replace_callback(
     SCALD_SAS_MATCH_PATTERN,
-    create_function(
-      '$matches',
-      '
-        global $_scald_override;
-        return scald_render(
-          $matches[1],
-          (!empty($matches[2]) && !$_scald_override ? $matches[2] : \'' . $context . '\'),
-          (!empty($matches[3]) ? $matches[3] : NULL)
-        );
-      '
-    ),
+    '_scald_sas_to_rendered_callback',
     $string
   );
 
-  unset($_scald_override);
   return $rendered;
+}
+
+/**
+ * Sas to rendered callback.
+ */
+function _scald_sas_to_rendered_callback($matches, $context = NULL, $override = NULL, $allowed_contexts = NULL) {
+  // Not using drupal_static here, because those static will
+  // always be reset by the parent using a 'set' call before
+  // they're value is actually used.
+  static $callback_context, $callback_override, $callback_allowed_contexts;
+
+  if ($matches === 'set') {
+    $callback_context = $context;
+    $callback_override = $override;
+    $callback_allowed_contexts = $allowed_contexts;
+  }
+  else {
+    if ($callback_override || empty($matches[2]) || !in_array($matches[2], $callback_allowed_contexts, TRUE)) {
+      $render_context = $callback_context;
+    }
+    else {
+      $render_context = $matches[2];
+    }
+    return scald_render(
+      $matches[1],
+      $render_context,
+      !empty($matches[3]) ? $matches[3] : NULL
+    );
+  }
 }
 
 /**
  * Determine atoms (expressed as SAS) embedded in a string.
  *
  * @param string $string
- *   The string to search for SAS
+ *   The string to search for SAS.
  *
  * @return array
  *   An array of SIDs which are included in the string in SAS form.
@@ -843,14 +968,22 @@ function scald_rendered_to_sas($string, $render_language = 'XHTML') {
 
   return preg_replace_callback(
     SCALD_RENDERED_MATCH_PATTERN,
-    create_function(
-      '$matches',
-      '
-        return \'[scald=\' . $matches[1] . (!empty($matches[2]) ? \':\' . $matches[2] : \'\') . (!empty($matches[3]) ? \' \' . $matches[3] : \'\') . \']\';
-      '
-    ),
+    '_scald_rendered_to_sas_callback',
     $string
   );
+}
+
+/**
+ * Callback for the scald_rendered_to_sas.
+ *
+ * @param array $matches
+ *   Matches found by preg_match using SCALD_RENDERED_MATCH_PATTERN.
+ *
+ * @return string
+ *   Scald SAS representation.
+ */
+function _scald_rendered_to_sas_callback($matches) {
+  return '[scald=' . $matches[1] . (!empty($matches[2]) ? ':' . $matches[2] : '') . (!empty($matches[3]) ? ' ' . $matches[3] : '') . ']';
 }
 
 /*******************************************************************************
@@ -863,20 +996,27 @@ function scald_rendered_to_sas($string, $render_language = 'XHTML') {
  * Requires the same parameters as the hook itself.
  *
  * - Deny: at least one of the hook implementations denies access.
- * - Allow: none denies and at least one of the hook implementations allows access.
+ * - Allow: none denies and at least one of the hook implementations
+ * allows access.
  * - Ignore: otherwise.
  *
- * @param $atom
+ * @param ScaldAtom $atom
+ *   A Scald Atom.
+ * @param string $action
+ *   The string with action.
  *
- * @param $action
+ * @param mixed $account
+ *   (Optional).
  *
- * @param $account
- *   (Optional)
+ * @return mixed
+ *   SCALD_ATOM_ACCESS_ALLOW or SCALD_ATOM_ACCESS_DENY
+ *   or SCALD_ATOM_ACCESS_IGNORE.
  *
- * @return SCALD_ATOM_ACCESS_ALLOW or SCALD_ATOM_ACCESS_DENY or SCALD_ATOM_ACCESS_IGNORE
+ * @codingStandardsIgnoreStart
  */
 function scald_invoke_atom_access($atom, $action, $account = NULL) {
-  if (user_access('administer scald atoms')) {
+  // @codingStandardsIgnoreEnd
+  if (user_access('administer scald atoms', $account)) {
     return SCALD_ATOM_ACCESS_ALLOW;
   }
 
@@ -894,21 +1034,26 @@ function scald_invoke_atom_access($atom, $action, $account = NULL) {
 /**
  * Determine the Scald Actions Bitstring for a given Atom for a given User.
  *
- * The action bitstring is built based on the user permission system and does not take into account hook_scald_atom_access(). It is preferred to use scald_action_permitted().
+ * The action bitstring is built based on the user permission system
+ * and does not take into account hook_scald_atom_access().
+ * It is preferred to use scald_action_permitted().
  *
  * @param ScaldAtom $atom
- *   A Scald Atom
+ *   A Scald Atom.
  * @param object $account
  *   A Drupal user account
- *   Defaults to the current $user
+ *   Defaults to the current $user.
  *
  * @return mixed
  *   A Scald Actions Bitstring
  *   FALSE if the Atom is invalid
  *
  * @see scald_action_permitted
+ *
+ * @codingStandardsIgnoreStart
  */
 function scald_user_actions($atom, $account = NULL) {
+  // @codingStandardsIgnoreEnd
   // Validate the function arguments.
   if (is_null($account)) {
     global $user;
@@ -941,19 +1086,22 @@ function scald_user_actions($atom, $account = NULL) {
  * Determines if a given User can act on a given Atom in a given way.
  *
  * @param ScaldAtom $atom
- *   A Scald Atom
+ *   A Scald Atom.
  * @param mixed $action
  *   A Scald Action slug or an array of actions with operator AND or OR (by
  *   default). Examples:
  *   - 'fetch'
- *   - array('fetch', 'view', 'op' => 'AND')
+ *   - array('fetch', 'view', 'op' => 'AND').
  * @param object $account
  *   A Drupal user account. Defaults to the current $user.
  *
  * @return bool
  *   TRUE if the action is allowed, FALSE otherwise.
+ *
+ * @codingStandardsIgnoreStart
  */
 function scald_action_permitted($atom, $action = 'fetch', $account = NULL) {
+  // @codingStandardsIgnoreEnd
   if (is_array($action)) {
     $operator = (!isset($actions['op']) || $actions['op'] !== 'AND') ? 'OR' : 'AND';
     foreach ($action as $key => $name) {
@@ -1073,11 +1221,14 @@ function _scald_user_combine_actions($account) {
  * @param ScaldAtom $atom
  *   The atom to prerender.
  * @param string $context
- *   The context in which to render the atom?
+ *   The context in which to render the atom?.
  * @param array $options
  *   An array of options to pass down to the rendering pipeline.
+ *
+ * @codingStandardsIgnoreStart
  */
 function scald_prerender(&$atom, $context, $options) {
+  // @codingStandardsIgnoreEnd
   $types = scald_types();
   $contexts = scald_contexts();
   $transcoders = scald_transcoders();
@@ -1162,8 +1313,8 @@ function scald_prerender(&$atom, $context, $options) {
 /**
  * Render a Scald Atom.
  *
- * "Rendering" takes an Atom and generates output (typically XHTML) based on the
- *  "Context" which is specified.  The Context is essentially a template.
+ * Info: "Rendering" takes an Atom and generates output (typically XHTML) based
+ *  on the "Context" which is specified.  The Context is essentially a template.
  *
  * NOTE: scald_render() gets called recursively until a viable output is
  *  generated.  It may return FALSE on a given call, but it will ultimately fall
@@ -1173,7 +1324,7 @@ function scald_prerender(&$atom, $context, $options) {
  * @param mixed $sid
  *   A Scald ID *OR* a Scald Atom object.
  * @param string $context
- *   A valid Scald Context slug (a text string)
+ *   A valid Scald Context slug (a text string).
  * @param mixed $options
  *   An optional text string or array specifying additional Scald
  *   Context-specific options that get passed to the Scald Context for rendering
@@ -1233,7 +1384,15 @@ function scald_render($sid, $context, $options = array(), $rebuild = FALSE) {
   $cache_parts[] = $GLOBALS['is_https'] ? 'secure' : 'plain';
 
   if (!empty($options)) {
-    $cache_parts[] = $options;
+    if (is_array($options)) {
+      $cache_parts[] = md5(drupal_json_encode($options));
+    }
+    elseif (is_string($options)) {
+      $cache_parts[] = md5($options);
+    }
+    else {
+      $cache_parts[] = $options;
+    }
   }
   $cache_id = implode(':', $cache_parts);
 
@@ -1258,7 +1417,7 @@ function scald_render($sid, $context, $options = array(), $rebuild = FALSE) {
 
   // If $options is not a JSON string or a single value, give other modules a
   // chance to handle it.
-  if ($options) {
+  if ($options && !is_array($options)) {
     if (!is_array($decoded = drupal_json_decode($options))) {
       $options = array('option' => $options);
       drupal_alter('scald_render_options', $options, $atom, $context);
@@ -1296,6 +1455,9 @@ function scald_render($sid, $context, $options = array(), $rebuild = FALSE) {
     $content['#suffix'] .= '<!-- END scald=' . $atom->sid . ' -->';
   }
 
+  // Mukurtu added hook for content warnings
+  drupal_alter('scald_display', $content, $atom, $context);
+
   // Only cache the Atom if Contexts, etc. have not indicated that the rendering
   // is not cacheable (e.g. it contains the current user's username).
   if (!$atom->rendered->nocache) {
@@ -1316,36 +1478,42 @@ function scald_render($sid, $context, $options = array(), $rebuild = FALSE) {
  * Render multiple atoms.
  *
  * @param array $atoms
- *   An array of Scald Atoms
+ *   An array of Scald Atoms.
  * @param string $context
- *   A valid Scald Context slug (machine name)
+ *   A valid Scald Context slug (machine name).
  *
  * @return array
  *   A renderable array containing the representations of
  *   the atoms in the choosen context.
+ *
+ * @codingStandardsIgnoreStart
  */
 function scald_render_multiple($atoms, $context) {
-  $output = array();
+  // @codingStandardsIgnoreEnd
+  $view = array();
   foreach ($atoms as $atom) {
-    $output[] = array(
+    $view['scald_atom'][$atom->sid] = array(
       '#markup' => scald_render($atom, $context),
     );
   }
-  return $output;
+  return $view;
 }
 
 /**
  * Determine the next Context in the Context fallback order for this type.
  *
  * @param string $type
- *   A Scald Unified Type slug
+ *   A Scald Unified Type slug.
  * @param string $context
  *   The Scald Context which is being fallen back from.
  *
  * @return string
  *   The next Scald Context in the fallback order
+ *
+ * @codingStandardsIgnoreStart
  */
 function _scald_context_fallback($type, $context) {
+  // @codingStandardsIgnoreEnd
   $contexts = scald_contexts();
   $render_language = !empty($contexts[$context]) ? $contexts[$context]['render_language'] : 'XHTML';
   $scald_context_fallbacks = variable_get('scald_context_fallbacks', 0);
@@ -1363,7 +1531,7 @@ function _scald_context_fallback($type, $context) {
   // Determine where in the order the current Context falls so that "next" has a
   // definitive meaning.
   $current_index = array_search($context, $fallbacks);
-  if (!$current_index) {
+  if ($current_index === FALSE) {
     $current_index = -1;
   }
 
@@ -1377,16 +1545,6 @@ function _scald_context_fallback($type, $context) {
  */
 function _scald_system_contexts() {
   return array(
-    'debug' => array(
-      'title'           => t('Debuging Display'),
-      'description'     => t('A useful debugging display of a Scald Atom.'),
-      'render_language' => 'XHTML',
-      'parseable'       => FALSE,
-      'hidden'          => TRUE,
-      'formats'         => array(
-        '<all>' => 'passthrough',
-      ),
-    ),
     'no-access' => array(
       'title'           => t('No Access'),
       'description'     => t('Built-in Context used when an Atom cannot be viewed by the current User.'),
@@ -1427,7 +1585,6 @@ function _scald_system_contexts() {
     ),
   );
 }
-
 
 /*******************************************************************************
  * SCALD HOOK IMPLEMENTATIONS
@@ -1489,8 +1646,8 @@ function scald_scald_actions() {
  * Implements hook_scald_prerender().
  *
  * Scald Core implements this hook for its role as a Scald Context Provider of
- * Scald Contexts 'debug', 'no-access', 'invalid-id', 'deleted', 'title' and
- * UI-created contexts, and for its role as a Scald Transcoder Provider of Scald
+ * Scald Contexts 'no-access', 'invalid-id', 'deleted', 'title' and UI-created
+ * contexts, and for its role as a Scald Transcoder Provider of Scald
  * Transcoder 'passthrough'.
  */
 function scald_scald_prerender($atom, $context, $options, $mode) {
@@ -1521,20 +1678,28 @@ function scald_scald_prerender($atom, $context, $options, $mode) {
  */
 function scald_scald_render($atom, $context, $options = array()) {
   switch ($context) {
-    case 'debug':
-      $output = '<pre class="debug">' . print_r($atom, TRUE) . '</pre>';
-      break;
-
     case 'no-access':
-      $output = theme('scald_render_error', array('context' => $context, 'message' => t('You do not have access to view this Atom.'), 'atom' => $atom));
+      $output = theme('scald_render_error', array(
+        'context' => $context,
+        'message' => t('You do not have access to view this Atom.'),
+        'atom' => $atom,
+      ));
       break;
 
     case 'invalid-id':
-      $output = theme('scald_render_error', array('context' => $context, 'message' => t('Invalid Scald ID.'), 'atom' => $atom));
+      $output = theme('scald_render_error', array(
+        'context' => $context,
+        'message' => t('Invalid Scald ID.'),
+        'atom' => $atom,
+      ));
       break;
 
     case 'deleted':
-      $output = theme('scald_render_error', array('context' => $context, 'message' => t('Atom deleted!'), 'atom' => $atom));
+      $output = theme('scald_render_error', array(
+        'context' => $context,
+        'message' => t('Atom deleted!'),
+        'atom' => $atom,
+      ));
       break;
 
     default:
@@ -1581,6 +1746,27 @@ function scald_scald_atom_access($atom, $action, $account = NULL) {
  * Define a new entity type for the Atoms.
  */
 function scald_entity_info() {
+  $translatable_field = array(
+    'type' => 'text',
+    'cardinality' => 1,
+    'translatable' => TRUE,
+  );
+
+  $translatable_field_instance = array(
+    'required' => TRUE,
+    'settings' => array(
+      'text_processing' => 0,
+    ),
+    'widget' => array(
+      'weight' => -5,
+    ),
+    'display' => array(
+      'default' => array(
+        'type' => 'hidden',
+      ),
+    ),
+  );
+
   $return = array(
     'scald_atom' => array(
       'label' => t('Atoms'),
@@ -1606,11 +1792,22 @@ function scald_entity_info() {
       'save callback' => 'scald_atom_save',
       'translation' => array(
         'entity_translation' => array(
+          'class' => 'EntityTranslationScaldHandler',
           'base path' => 'atom/%scald_atom',
           'edit path' => 'atom/%scald_atom/edit/%ctools_js',
           'edit form' => 'atom',
         ),
       ),
+      'field replacement' => array(
+        'title' => array(
+          'field' => $translatable_field,
+          'instance' => array(
+            'label' => t('Title'),
+            'description' => '',
+          ) + $translatable_field_instance,
+        ),
+      ),
+      'efq bundle conditions' => TRUE,
     ),
   );
 
@@ -1700,12 +1897,12 @@ function scald_entity_property_info() {
     'computed' => TRUE,
   );
   $properties['actions'] = array(
-    'label' => t("Status"),
+    'label' => t("Actions"),
     'description' => t("The actions that are allowed for this atom."),
     'type' => 'integer',
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer scald atoms',
-    'schema field' => 'status',
+    'schema field' => 'actions',
   );
   $properties['publisher'] = array(
     'label' => t("Publisher"),
@@ -1996,7 +2193,17 @@ function scald_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
-  // AJAX callback allowing to fetch atoms, which provides is usefull
+  $items['atom/%scald_atom/delete/%ctools_js'] = array(
+    'title' => 'Delete Atom',
+    'page callback' => 'scald_atom_delete_confirm_ajax',
+    'page arguments' => array(3, 1),
+    'access callback' => 'scald_action_permitted',
+    'access arguments' => array(1, 'delete'),
+    'theme callback' => 'ajax_base_page_theme',
+    'file' => 'includes/scald.pages.inc',
+  );
+
+  // JSON callback allowing to fetch atoms, which provides is usefull
   // for library implementations and RTE integrations.
   $items['atom/fetch/%'] = array(
     'title' => 'Fetch atoms',
@@ -2005,17 +2212,6 @@ function scald_menu() {
     'access callback' => TRUE,
     'file' => 'includes/scald.pages.inc',
     'theme callback' => 'ajax_base_page_theme',
-  );
-
-  $items['atom/%/debug'] = array(
-    'title' => 'Debug',
-    'page callback' => 'scald_debug_console',
-    'page arguments' => array(1),
-    'access callback' => 'user_access',
-    'access arguments' => array('administer scald'),
-    'file' => 'includes/scald.debug.inc',
-    'weight' => 90,
-    'type' => MENU_LOCAL_TASK,
   );
 
   // Optional devel module integration.
@@ -2053,17 +2249,19 @@ function scald_menu() {
  * Implements hook_locale().
  */
 function scald_locale($op = 'groups') {
-  switch ($op) {
-    case 'groups':
-      return array('scald' => t('Scald'));
+  if (!module_exists('i18n_string')) {
+    switch ($op) {
+      case 'groups':
+        return array('scald' => t('Scald'));
+    }
   }
 }
 
 /**
  * Implements hook_i18n_string_info().
  */
-function scald_18n_string_info() {
-  $groups['scald_type'] = array(
+function scald_i18n_string_info() {
+  $groups['scald'] = array(
     'title' => t('Scald atom type'),
     'description' => t('The title and description of the different atom types supported by Scald.'),
     'format' => FALSE,
@@ -2151,7 +2349,9 @@ function scald_string_translate($name, $string, $options = array()) {
     // If i18n_string is not enabled, fall back to t() to translate the string.
     // @see https://www.drupal.org/node/2291875
     $options = array_intersect_key($options, array_flip(array('langcode')));
+    // @codingStandardsIgnoreStart
     $string = t($string, array(), $options);
+    // @codingStandardsIgnoreEnd
   }
   return $string;
 }
@@ -2205,8 +2405,11 @@ function scald_context_load($context) {
  *
  * @param array $context
  *   The context definition.
+ *
+ * @codingStandardsIgnoreStart
  */
 function scald_context_save($context) {
+  // @codingStandardsIgnoreEnd
   $contexts = variable_get('scald_custom_contexts', array());
   $contexts[$context['name']] = $context;
   variable_set('scald_custom_contexts', $contexts);
@@ -2233,7 +2436,7 @@ function scald_context_config_load($name) {
     if (!isset($context_config->player[$type->type]['*'])) {
       $context_config->player[$type->type]['*'] = 'default';
     }
-    if(!isset($context_config->data)) {
+    if (!isset($context_config->data)) {
       $context_config->data = array();
     }
   }
@@ -2336,20 +2539,20 @@ function theme_scald_render_error($vars) {
 }
 
 /**
- * Processes variables for scald-atom.tpl.php
+ * Processes variables for scald-atom.tpl.php.
  *
  * The $variables array contains the following arguments:
  * - $atom
- * - $view_mode
+ * - $view_mode.
  *
  * @see scald-atom.tpl.php
  */
 function template_preprocess_scald_atom(&$variables) {
   $variables['view_mode'] = $variables['elements']['#view_mode'];
-  $variables['atom'] = $variables['elements']['#atom'];
+  $variables['atom'] = $variables['elements']['#entity'];
   // In DS Token support, it requires entity to be accessed by entity name.
   // Maybe we should get rid of one of these?
-  $variables['scald_atom'] = $variables['elements']['#atom'];
+  $variables['scald_atom'] = $variables['elements']['#entity'];
   $atom = $variables['atom'];
 
   // Flatten the scald_atom object's member fields.
@@ -2366,6 +2569,26 @@ function template_preprocess_scald_atom(&$variables) {
 
   // Clean up name so there are no underscores.
   $variables['theme_hook_suggestions'][] = 'scald_atom__' . $atom->type;
+}
+
+/**
+ * Field update instance.
+ *
+ * Make sure to clear scald cache in case field instance
+ * configuration changes.
+ *
+ * @param array $instance
+ *   Array of instance.
+ * @param mixed $prior_instance
+ *   Prior instance.
+ *
+ * @codingStandardsIgnoreStart
+ */
+function scald_field_update_instance($instance, $prior_instance) {
+  // @codingStandardsIgnoreEnd
+  if ($instance['entity_type'] == 'scald_atom') {
+    cache_clear_all('*', 'cache_scald', TRUE);
+  }
 }
 
 /**
@@ -2411,11 +2634,35 @@ function scald_compute_role_actions($role) {
 /**
  * Implements hook_form_FORM_ID_alter().
  *
- * Hook into the permissions submit form to compute our bitstrings
+ * Hook into the permissions submit form to compute our bitstrings.
  */
 function scald_form_user_admin_permissions_alter(&$form, &$form_state, $form_id) {
   // Add our custom submit handler.
   $form['#submit'][] = 'scald_permissions_submit';
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * In case the title module is used the title field has to be populated
+ * from the title attribute when the user comes from the add step.
+ */
+function scald_form_scald_atom_add_form_options_alter(&$form, &$form_state, $form_id) {
+  if (module_exists('title')) {
+    $scald = $form_state['scald'];
+    if (isset($scald['type']) && title_field_replacement_enabled('scald_atom', $scald['type']->type, 'title')) {
+      // Setting default values for each created atom.
+      $fr_info = title_field_replacement_info('scald_atom', 'title');
+      foreach ($form as $key => $data) {
+        if (strpos($key, 'atom') === 0) {
+          if (!empty($form[$key]['title']['#default_value'])) {
+            $langcode = $form['language']['#value'];
+            $form[$key][$fr_info['field']['field_name']][$langcode][0]['value']['#default_value'] = $form[$key]['title']['#default_value'];
+          }
+        }
+      }
+    }
+  }
 }
 
 /**
@@ -2457,7 +2704,7 @@ function scald_atom_user_build_actions_links($atom, $query = NULL) {
       );
 
       // The 'edit' action supports CTools Modal.
-      if ($action == 'edit') {
+      if ($action == 'edit' || $action == 'delete') {
         $links[$action]['attributes'] = array(
           'class' => array('ctools-use-modal', 'ctools-modal-custom-style'),
         );
@@ -2470,6 +2717,8 @@ function scald_atom_user_build_actions_links($atom, $query = NULL) {
     }
   }
 
+  drupal_alter('scald_atom_user_build_actions_links', $links, $atom);
+
   return $links;
 }
 
@@ -2477,8 +2726,69 @@ function scald_atom_user_build_actions_links($atom, $query = NULL) {
  * Prepares and returns the default thumbnail path for an atom type.
  *
  * @deprecated
+ *
  * @see ScaldAtomController::getThumbnailPath()
  */
 function scald_atom_thumbnail_path($type) {
   return ScaldAtomController::getThumbnailPath($type);
+}
+
+/**
+ * Entity_view_mode_prepare() (introduced in Drupal version 7.33) fallback.
+ */
+if (!function_exists('entity_view_mode_prepare')) {
+
+  /**
+   * Function: entity_view_mode_prepare.
+   */
+  function entity_view_mode_prepare($entity_type, $entities, $view_mode, $langcode = NULL) {
+    if (!isset($langcode)) {
+      $langcode = $GLOBALS['language_content']->language;
+    }
+
+    // To ensure hooks are never run after field_attach_prepare_view() only
+    // process items without the entity_view_prepared flag.
+    $entities_by_view_mode = array();
+    foreach ($entities as $id => $entity) {
+      $entity_view_mode = $view_mode;
+      if (empty($entity->entity_view_prepared)) {
+
+        // Allow modules to change the view mode.
+        $context = array(
+          'entity_type' => $entity_type,
+          'entity' => $entity,
+          'langcode' => $langcode,
+        );
+        drupal_alter('entity_view_mode', $entity_view_mode, $context);
+      }
+
+      $entities_by_view_mode[$entity_view_mode][$id] = $entity;
+    }
+
+    return $entities_by_view_mode;
+  }
+
+}
+
+/**
+ * Implements hook_features_api().
+ *
+ * If the user did choose to switch to Features exportable.
+ */
+if (variable_get('scald_switch_feature_export', FALSE)) {
+
+  /**
+   * Function: scald_features_api.
+   */
+  function scald_features_api() {
+    return array(
+      'scald_context_type' => array(
+        'name' => 'Scald Context Configurations by type',
+        'file' => drupal_get_path('module', 'scald') . '/scald.features.inc',
+        'default_hook' => 'scald_default_context_types',
+        'feature_source' => TRUE,
+      ),
+    );
+  }
+
 }
