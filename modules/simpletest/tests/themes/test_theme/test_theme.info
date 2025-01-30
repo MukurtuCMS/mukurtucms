@@ -17,7 +17,7 @@ stylesheets[all][] = system.base.css
 
 settings[theme_test_setting] = default value
 
-; Information added by Drupal.org packaging script on 2024-11-20
-version = "7.102"
+; Information added by Drupal.org packaging script on 2024-12-04
+version = "7.103"
 project = "drupal"
-datestamp = "1732133210"
+datestamp = "1733324608"
