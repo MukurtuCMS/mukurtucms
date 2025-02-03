@@ -1,3 +1,13 @@
+## Mukurtu 3.0.7
+- Added pre-migration summary report tool
+- Updated to Drupal 7.103
+- Fixed bug that crashed the atoms page if no cultural protocols exist
+- Fixed bug that broke the formatting of the modules page
+
+#### Manual Upgrade Steps
+This version requires a database update.
+- database update: `drush updb`
+
 ## Mukurtu 3.0.6
 - Updated to Drupal 7.102
 - Updated jQuery Update module to 7.x-4.1
