@@ -94,6 +94,12 @@ $handler->display->display_options['fields']['views_bulk_operations']['vbo_opera
     'label' => '',
   ),
 );
+/* Field: Atom: Scald ID */
+$handler->display->display_options['fields']['sid']['id'] = 'sid';
+$handler->display->display_options['fields']['sid']['table'] = 'scald_atoms';
+$handler->display->display_options['fields']['sid']['field'] = 'sid';
+$handler->display->display_options['fields']['sid']['alter']['make_link'] = TRUE;
+$handler->display->display_options['fields']['sid']['alter']['path'] = '/atom/[sid]';
 /* Field: Atom: Title */
 $handler->display->display_options['fields']['title']['id'] = 'title';
 $handler->display->display_options['fields']['title']['table'] = 'scald_atoms';
@@ -104,12 +110,6 @@ $handler->display->display_options['fields']['title']['alter']['path'] = '/atom/
 $handler->display->display_options['fields']['type']['id'] = 'type';
 $handler->display->display_options['fields']['type']['table'] = 'scald_atoms';
 $handler->display->display_options['fields']['type']['field'] = 'type';
-/* Field: Atom: Scald ID */
-$handler->display->display_options['fields']['sid']['id'] = 'sid';
-$handler->display->display_options['fields']['sid']['table'] = 'scald_atoms';
-$handler->display->display_options['fields']['sid']['field'] = 'sid';
-$handler->display->display_options['fields']['sid']['alter']['make_link'] = TRUE;
-$handler->display->display_options['fields']['sid']['alter']['path'] = '/atom/[sid]';
 /* Field: Atoms: Protocol */
 $handler->display->display_options['fields']['field_scald_protocol']['id'] = 'field_scald_protocol';
 $handler->display->display_options['fields']['field_scald_protocol']['table'] = 'field_data_field_scald_protocol';
@@ -161,9 +161,9 @@ $translatables['migration_scald_atoms_with_missing_cultural_protocols'] = array(
   t('<a href="/admin/reports/migration/summary">Back to Migration Summary</a>'),
   t('Atom'),
   t('- Choose an operation -'),
+  t('Scald ID'),
   t('Title'),
   t('Type'),
-  t('Scald ID'),
   t('Protocol'),
   t('Page'),
 );
