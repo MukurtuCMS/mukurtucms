@@ -110,7 +110,7 @@ function mukurtu_migration_prep_summary_report_form($form, &$form_state) {
     '#type' => 'submit',
     '#value' => t('Run Pre-migration Report'),
   ];
-
+  drupal_flush_all_caches();
   return $form;
 }
 
