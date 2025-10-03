@@ -485,7 +485,8 @@ function mukurtu_protocol_field_node_access($node, $op, $account) {
             return $node->status ? NODE_ACCESS_ALLOW : NODE_ACCESS_IGNORE; // Pass if user is a member of the group
           }
           $group_emw = entity_metadata_wrapper('node', $group);
-          if ($group_emw->group_access->value() == 0) {
+          $propInfo = $group_emw->refPropertyInfo();
+          if (isset($propInfo['properties']['group_access']) && $group_emw->group_access->value() == 0) {
             return $node->status ? NODE_ACCESS_ALLOW : NODE_ACCESS_IGNORE; // Pass if it's an open group
           }
         }
@@ -497,7 +498,8 @@ function mukurtu_protocol_field_node_access($node, $op, $account) {
         foreach ($groups_on_node as $group) {
           if (!og_is_member('node', $group, 'user', $account)) { // Pass if user is a member of the group
             $group_emw = entity_metadata_wrapper('node', $group);
-            if (!empty($group_emw->group_access)) {
+            $propInfo = $group_emw->refPropertyInfo();
+            if (isset($propInfo['properties']['group_access']) && !empty($group_emw->group_access)) {
               if ($group_emw->group_access->value() <> 0) { // Pass if it's an open group
                 return NODE_ACCESS_DENY;
               }
