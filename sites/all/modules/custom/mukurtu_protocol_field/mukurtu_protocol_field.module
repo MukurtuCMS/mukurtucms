@@ -484,9 +484,13 @@ function mukurtu_protocol_field_node_access($node, $op, $account) {
           if (og_is_member('node', $group)) {
             return $node->status ? NODE_ACCESS_ALLOW : NODE_ACCESS_IGNORE; // Pass if user is a member of the group
           }
-          $group_emw = entity_metadata_wrapper('node', $group);
-          $propInfo = $group_emw->refPropertyInfo();
-          if (isset($propInfo['properties']['group_access']) && $group_emw->group_access->value() == 0) {
+          // We need to pass the node's bundle type to entity_metadata_wrapper()
+          // or else the 'group_access' field info will not be available. See
+          // https://www.drupal.org/docs/7/api/entity-api/entity-metadata-wrappers#get-prop-field-info
+          $loaded_node = node_load($group);
+          $group_emw = entity_metadata_wrapper('node', $group, array('bundle' => $loaded_node->type));
+          $info = $group_emw->getPropertyInfo();
+          if (isset($info['group_access']) && $group_emw->group_access->value == 0) {
             return $node->status ? NODE_ACCESS_ALLOW : NODE_ACCESS_IGNORE; // Pass if it's an open group
           }
         }
@@ -497,10 +501,11 @@ function mukurtu_protocol_field_node_access($node, $op, $account) {
       else {
         foreach ($groups_on_node as $group) {
           if (!og_is_member('node', $group, 'user', $account)) { // Pass if user is a member of the group
-            $group_emw = entity_metadata_wrapper('node', $group);
-            $propInfo = $group_emw->refPropertyInfo();
-            if (isset($propInfo['properties']['group_access']) && !empty($group_emw->group_access)) {
-              if ($group_emw->group_access->value() <> 0) { // Pass if it's an open group
+            $loaded_node = node_load($group);
+            $group_emw = entity_metadata_wrapper('node', $group, array('bundle' => $loaded_node->type));
+            $info = $group_emw->getPropertyInfo();
+            if (isset($info['group_access']) && !empty($group_emw->group_access)) {
+              if ($group_emw->group_access->value() <> 0) { // Deny if it's a private group
                 return NODE_ACCESS_DENY;
               }
             }
