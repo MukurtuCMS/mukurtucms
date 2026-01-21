@@ -41,4 +41,7 @@ function mukurtu_install() {
     ->execute();
   variable_set('admin_theme', 'seven');
   variable_set('node_admin_theme', '0');
+
+  // Set default 403 page.
+  variable_set('site_403', 'mukurtu/access-denied');
 }

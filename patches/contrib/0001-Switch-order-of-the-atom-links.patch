@@ -1,0 +1,25 @@
+From 44b7d36d4ddfa8f104a8bbb43679cd6f3c3f9a58 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Tue, 25 Apr 2023 15:48:08 -0700
+Subject: [PATCH] Switch order of the atom links
+
+---
+ .../scald/modules/fields/atom_reference/atom_reference.js       | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/fields/atom_reference/atom_reference.js b/modules/fields/atom_reference/atom_reference.js
+index 39e08de8..47af8cae 100644
+--- a/modules/fields/atom_reference/atom_reference.js
++++ b/modules/fields/atom_reference/atom_reference.js
+@@ -50,7 +50,7 @@ Drupal.behaviors.atom_reference = {
+       var $operation_wrapper = $('<div class="atom_reference_operations">');
+       var $operation_buttons = $('<div id="ctools-button-0" class="buttons ctools-no-js ctools-button">')
+         .append('<div class="ctools-link"><a href="#" class="ctools-twisty ctools-text"><span class="element-invisible">' + Drupal.t('Operation') + '</span></a></div>')
+-        .append('<div class="ctools-content"><ul><li class="remove"><li class="edit"><li class="view"></ul></div>')
++        .append('<div class="ctools-content"><ul><li class="edit"><li class="remove"><li class="view"></ul></div>')
+         .prependTo($operation_wrapper);
+ 
+       // Add the remove link
+-- 
+2.34.1
+

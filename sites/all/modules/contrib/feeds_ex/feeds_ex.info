@@ -1,0 +1,30 @@
+name = Feeds extensible parser
+description = A generic Feeds parser used to create extensible parsers.
+package = Feeds
+
+dependencies[] = feeds
+test_dependencies[] = tunit
+test_dependencies[] = querypath
+
+files[] = src/File/FeedsExLineIterator.php
+files[] = src/Json/Utility.php
+files[] = src/Text/Utility.php
+files[] = src/Xml/Utility.php
+
+files[] = src/Tests/FeedsExUnitTests.test
+files[] = src/Tests/FeedsExHtml.test
+files[] = src/Tests/FeedsExJsonPath.test
+files[] = src/Tests/FeedsExJsonPathLines.test
+files[] = src/Tests/FeedsExQueryPathHtml.test
+files[] = src/Tests/FeedsExQueryPathXml.test
+files[] = src/Tests/FeedsExUi.test
+files[] = src/Tests/FeedsExXml.test
+
+core = 7.x
+
+; Information added by Drupal.org packaging script on 2015-04-10
+version = "7.x-1.0-beta2"
+core = "7.x"
+project = "feeds_ex"
+datestamp = "1428707882"
+

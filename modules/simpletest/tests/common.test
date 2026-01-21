@@ -76,7 +76,7 @@ class DrupalAlterTestCase extends DrupalWebTestCase {
 class CommonURLUnitTest extends DrupalWebTestCase {
   public static function getInfo() {
     return array(
-      'name' => 'URL generation tests',
+      'name' => 'URL generation unit tests',
       'description' => 'Confirm that url(), drupal_get_query_parameters(), drupal_http_build_query(), and l() work correctly with various input.',
       'group' => 'System',
     );
@@ -91,6 +91,26 @@ class CommonURLUnitTest extends DrupalWebTestCase {
     $link = l($text, $path);
     $sanitized_path = check_url(url($path));
     $this->assertTrue(strpos($link, $sanitized_path) !== FALSE, format_string('XSS attack @path was filtered', array('@path' => $path)));
+
+    // Verify that a dangerous protocol is sanitized.
+    $text = $this->randomName();
+    $path = "javascript:alert('XSS')";
+    $link = l($text, $path, array('external' => TRUE));
+    $this->assertTrue(strpos($link, 'javascript:') === FALSE, 'Dangerous protocol javascript: was sanitized.');
+
+    // Verify that these harmless javascript paths are left intact for BC.
+    $special_case_js_paths = array(
+      'javascript:void()',
+      'javascript:void();',
+      'javascript:void(0)',
+      'javascript:void(0);',
+      'JavaScript:Void(0)'
+    );
+    foreach ($special_case_js_paths as $path) {
+      $text = $this->randomName();
+      $link = l($text, $path, array('external' => TRUE));
+      $this->assertTrue(strpos($link, $path) !== FALSE, format_string('Harmless @path was not sanitized.', array('@path' => $path)));
+    }
   }
 
   /*
@@ -169,7 +189,7 @@ class CommonURLUnitTest extends DrupalWebTestCase {
     $this->assertEqual(drupal_http_build_query(array('a' => ' &#//+%20@۞')), 'a=%20%26%23//%2B%2520%40%DB%9E', 'Value was properly encoded.');
     $this->assertEqual(drupal_http_build_query(array(' &#//+%20@۞' => 'a')), '%20%26%23%2F%2F%2B%2520%40%DB%9E=a', 'Key was properly encoded.');
     $this->assertEqual(drupal_http_build_query(array('a' => '1', 'b' => '2', 'c' => '3')), 'a=1&b=2&c=3', 'Multiple values were properly concatenated.');
-    $this->assertEqual(drupal_http_build_query(array('a' => array('b' => '2', 'c' => '3'), 'd' => 'foo')), 'a[b]=2&a[c]=3&d=foo', 'Nested array was properly encoded.');
+    $this->assertEqual(drupal_http_build_query(array('a' => array('b' => '2', 'c' => '3'), 'd' => 'foo')), 'a%5Bb%5D=2&a%5Bc%5D=3&d=foo', 'Nested array was properly encoded.');
   }
 
   /**
@@ -373,6 +393,97 @@ class CommonURLUnitTest extends DrupalWebTestCase {
 }
 
 /**
+ * Web tests for URL generation functions.
+ */
+class CommonURLWebTest extends DrupalWebTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'URL generation web tests',
+      'description' => 'Confirm that URL-generating functions work correctly on specific site paths.',
+      'group' => 'System',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('common_test');
+  }
+
+  /**
+   * Tests the url() function on internal paths which mimic external URLs.
+   */
+  function testInternalPathMimicsExternal() {
+    // Ensure that calling url(current_path()) on "/http://example.com" (an
+    // internal path which mimics an external URL) always links to the internal
+    // path, not the external URL. This helps protect against external URL link
+    // injection vulnerabilities.
+    variable_set('common_test_link_to_current_path', TRUE);
+    $this->drupalGet('/http://example.com');
+    $this->clickLink('link which should point to the current path');
+    $this->assertUrl('/http://example.com');
+    $this->assertText('link which should point to the current path');
+  }
+}
+
+/**
+ * Tests url_is_external().
+ */
+class UrlIsExternalUnitTest extends DrupalUnitTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'External URL checking',
+      'description' => 'Performs tests on url_is_external().',
+      'group' => 'System',
+    );
+  }
+
+  /**
+   * Tests if each URL is external or not.
+   */
+  function testUrlIsExternal() {
+    foreach ($this->examples() as $path => $expected) {
+      $this->assertIdentical(url_is_external($path), $expected, $path);
+    }
+  }
+
+  /**
+   * Provides data for testUrlIsExternal().
+   *
+   * @return array
+   *   An array of test data, keyed by a path, with the expected value where
+   *   TRUE is external, and FALSE is not external.
+   */
+  protected function examples() {
+    return array(
+      // Simple external URLs.
+      'http://example.com' => TRUE,
+      'https://example.com' => TRUE,
+      'http://drupal.org/foo/bar?foo=bar&bar=baz&baz#foo' => TRUE,
+      '//drupal.org' => TRUE,
+      // Some browsers ignore or strip leading control characters.
+      "\x00//www.example.com" => TRUE,
+      "\x08//www.example.com" => TRUE,
+      "\x1F//www.example.com" => TRUE,
+      "\n//www.example.com" => TRUE,
+      // JSON supports decoding directly from UTF-8 code points.
+      json_decode('"\u00AD"') . "//www.example.com" => TRUE,
+      json_decode('"\u200E"') . "//www.example.com" => TRUE,
+      json_decode('"\uE0020"') . "//www.example.com" => TRUE,
+      json_decode('"\uE000"')  . "//www.example.com" => TRUE,
+      // Backslashes should be normalized to forward.
+      '\\\\example.com' => TRUE,
+      // Local URLs.
+      'node' => FALSE,
+      '/system/ajax' => FALSE,
+      '?q=foo:bar' => FALSE,
+      'node/edit:me' => FALSE,
+      '/drupal.org' => FALSE,
+      '<front>' => FALSE,
+    );
+  }
+}
+
+/**
  * Tests for check_plain(), filter_xss(), format_string(), and check_url().
  */
 class CommonXssUnitTest extends DrupalUnitTestCase {
@@ -389,6 +500,15 @@ class CommonXssUnitTest extends DrupalUnitTestCase {
    * Check that invalid multi-byte sequences are rejected.
    */
   function testInvalidMultiByte() {
+     // Ignore PHP 8.0+ null deprecations.
+     $text = check_plain(NULL);
+     $this->assertEqual($text, '', 'check_plain() casts null to string');
+     $text = check_plain(FALSE);
+     $this->assertEqual($text, '', 'check_plain() casts boolean to string');
+     $text = filter_xss(NULL);
+     $this->assertEqual($text, '', 'filter_xss() casts null to string');
+     $text = filter_xss(FALSE);
+     $this->assertEqual($text, '', 'filter_xss() casts boolean to string');
      // Ignore PHP 5.3+ invalid multibyte sequence warning.
      $text = @check_plain("Foo\xC0barbaz");
      $this->assertEqual($text, '', 'check_plain() rejects invalid sequence "Foo\xC0barbaz"');
@@ -434,13 +554,34 @@ class CommonXssUnitTest extends DrupalUnitTestCase {
    */
   function testBadProtocolStripping() {
     // Ensure that check_url() strips out harmful protocols, and encodes for
-    // HTML. Ensure drupal_strip_dangerous_protocols() can be used to return a
-    // plain-text string stripped of harmful protocols.
+    // HTML.
     $url = 'javascript:http://www.example.com/?x=1&y=2';
-    $expected_plain = 'http://www.example.com/?x=1&y=2';
     $expected_html = 'http://www.example.com/?x=1&amp;y=2';
     $this->assertIdentical(check_url($url), $expected_html, 'check_url() filters a URL and encodes it for HTML.');
-    $this->assertIdentical(drupal_strip_dangerous_protocols($url), $expected_plain, 'drupal_strip_dangerous_protocols() filters a URL and returns plain text.');
+
+    // Ensure that drupal_strip_dangerous_protocols() can be used to return a
+    // plain-text string stripped of harmful protocols.
+    $data = array(
+      'javascript:http://www.example.com/?x=1&y=2' => 'http://www.example.com/?x=1&y=2',
+      'foo://disallowed.com' => '//disallowed.com',
+      'http://example.com' => 'http://example.com',
+      'https://example.com' => 'https://example.com',
+      'www.example.com' => 'www.example.com',
+      'mailto:person2@example.com' => 'mailto:person2@example.com',
+      'person2@example.com' => 'person2@example.com',
+      'ftp://example.com' => 'ftp://example.com',
+      'sftp://secure.host' => 'sftp://secure.host',
+      'ssh://odd.geek' => 'ssh://odd.geek',
+      'news://example.net' => 'news://example.net',
+      'telnet://example' => 'telnet://example',
+      'irc://example.host' => 'irc://example.host',
+      'webcal://calendar' => 'webcal://calendar',
+      'rtsp://127.0.0.1' => 'rtsp://127.0.0.1',
+      'tel:111111111' => 'tel:111111111',
+    );
+    foreach ($data as $url => $expected_plain) {
+      $this->assertIdentical(drupal_strip_dangerous_protocols($url), $expected_plain, 'drupal_strip_dangerous_protocols() filters a URL and returns plain text.');
+    }
   }
 }
 
@@ -888,6 +1029,31 @@ class DrupalHTMLIdentifierTestCase extends DrupalUnitTestCase {
 
     // Verify that invalid characters (including non-breaking space) are stripped from the identifier.
     $this->assertIdentical(drupal_clean_css_identifier('invalid !"#$%&\'()*+,./:;<=>?@[\\]^`{|}~ identifier', array()), 'invalididentifier', 'Strip invalid characters.');
+
+    // Verify that double underscores are replaced in the identifier by default.
+    $identifier = 'css__identifier__with__double__underscores';
+    $expected = 'css--identifier--with--double--underscores';
+    $this->assertIdentical(drupal_clean_css_identifier($identifier), $expected, 'Verify double underscores are replaced with double hyphens by default.');
+
+    // Verify that double underscores are preserved in the identifier if the
+    // variable allow_css_double_underscores is set to TRUE.
+    $this->setAllowCSSDoubleUnderscores(TRUE);
+    $this->assertIdentical(drupal_clean_css_identifier($identifier), $identifier, 'Verify double underscores are preserved if the allow_css_double_underscores set to TRUE.');
+
+    // To avoid affecting other test cases, set the variable
+    // allow_css_double_underscores to FALSE which is the default value.
+    $this->setAllowCSSDoubleUnderscores(FALSE);
+  }
+
+  /**
+   * Set the variable allow_css_double_underscores and reset the cache.
+   *
+   * @param $value bool
+   *   A new value to be set to allow_css_double_underscores.
+   */
+  function setAllowCSSDoubleUnderscores($value) {
+    $GLOBALS['conf']['allow_css_double_underscores'] = $value;
+    drupal_static_reset('drupal_clean_css_identifier:allow_css_double_underscores');
   }
 
   /**
@@ -953,7 +1119,8 @@ class CascadingStylesheetsUnitTest extends DrupalUnitTestCase {
       'css_input_without_import.css',
       'css_input_with_import.css',
       'css_subfolder/css_input_with_import.css',
-      'comment_hacks.css'
+      'comment_hacks.css',
+      'quotes.css',
     );
     $path = drupal_get_path('module', 'simpletest') . '/files/css_test_files';
     foreach ($testfiles as $file) {
@@ -1008,9 +1175,15 @@ class DrupalHTTPRequestTestCase extends DrupalWebTestCase {
     $this->assertEqual($unable_to_parse->code, -1001, 'Returned with "-1001" error code.');
     $this->assertEqual($unable_to_parse->error, 'unable to parse URL', 'Returned with "unable to parse URL" error message.');
 
-    // Fetch page.
-    $result = drupal_http_request(url('node', array('absolute' => TRUE)));
+    // Fetch page and check that the data parameter works with both array and string.
+    $data_array = array($this->randomName() => $this->randomString() . ' "\'');
+    $data_string = drupal_http_build_query($data_array);
+    $result = drupal_http_request(url('node', array('absolute' => TRUE)), array('data' => $data_array));
     $this->assertEqual($result->code, 200, 'Fetched page successfully.');
+    $this->assertTrue(substr($result->request, -strlen($data_string)) === $data_string, 'Request ends with URL-encoded data when drupal_http_request() called using array.');
+    $result = drupal_http_request(url('node', array('absolute' => TRUE)), array('data' => $data_string));
+    $this->assertTrue(substr($result->request, -strlen($data_string)) === $data_string, 'Request ends with URL-encoded data when drupal_http_request() called using string.');
+
     $this->drupalSetContent($result->data);
     $this->assertTitle(t('Welcome to @site-name | @site-name', array('@site-name' => variable_get('site_name', 'Drupal'))), 'Site title matches.');
 
@@ -1059,6 +1232,10 @@ class DrupalHTTPRequestTestCase extends DrupalWebTestCase {
     $redirect_301 = drupal_http_request(url('system-test/redirect/301', array('absolute' => TRUE)), array('max_redirects' => 0));
     $this->assertFalse(isset($redirect_301->redirect_code), 'drupal_http_request does not follow 301 redirect if max_redirects = 0.');
 
+    $redirect_invalid = drupal_http_request(url('system-test/redirect-protocol-relative', array('absolute' => TRUE)), array('max_redirects' => 1));
+    $this->assertEqual($redirect_invalid->code, -1002, format_string('301 redirect to protocol-relative URL returned with error code !error.', array('!error' => $redirect_invalid->error)));
+    $this->assertEqual($redirect_invalid->error, 'missing schema', format_string('301 redirect to protocol-relative URL returned with error message "!error".', array('!error' => $redirect_invalid->error)));
+
     $redirect_invalid = drupal_http_request(url('system-test/redirect-noscheme', array('absolute' => TRUE)), array('max_redirects' => 1));
     $this->assertEqual($redirect_invalid->code, -1002, format_string('301 redirect to invalid URL returned with error code !error.', array('!error' => $redirect_invalid->error)));
     $this->assertEqual($redirect_invalid->error, 'missing schema', format_string('301 redirect to invalid URL returned with error message "!error".', array('!error' => $redirect_invalid->error)));
@@ -1105,6 +1282,44 @@ class DrupalHTTPRequestTestCase extends DrupalWebTestCase {
     // Request front page and check for matching Content-Language.
     $request = drupal_http_request(url('<front>', array('absolute' => TRUE)));
     $this->assertEqual($request->headers['content-language'], 'de', 'Content-Language HTTP header is German.');
+  }
+}
+
+/**
+ * Unit tests for processing of http redirects.
+ */
+class DrupalHTTPRedirectTest extends DrupalUnitTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Drupal HTTP redirect processing',
+      'description' => 'Perform unit tests on processing of http redirects.',
+      'group' => 'System',
+    );
+  }
+
+  public function testHttpsDowngrade() {
+    $url = 'https://example.com/foo';
+    $location = 'http://example.com/bar';
+    $this->assertTrue(_drupal_should_strip_sensitive_headers_on_http_redirect($url, $location), 'Sensitive headers are stripped on HTTPS downgrade.');
+  }
+
+  public function testNoHttpsDowngrade() {
+    $url = 'https://example.com/foo';
+    $location = 'https://example.com/bar';
+    $this->assertFalse(_drupal_should_strip_sensitive_headers_on_http_redirect($url, $location), 'Sensitive headers are not stripped without HTTPS downgrade.');
+  }
+
+  public function testHostChange() {
+    $url = 'https://example.com/foo';
+    $location = 'https://www.example.com/bar';
+    $this->assertTrue(_drupal_should_strip_sensitive_headers_on_http_redirect($url, $location), 'Sensitive headers are stripped on change of host.');
+  }
+
+  public function testNoHostChange() {
+    $url = 'http://example.com/foo';
+    $location = 'http://example.com/bar';
+    $this->assertFalse(_drupal_should_strip_sensitive_headers_on_http_redirect($url, $location), 'Sensitive headers are not stripped without change of host.');
   }
 }
 
@@ -1195,7 +1410,7 @@ class DrupalSetContentTestCase extends DrupalWebTestCase {
   function testRegions() {
     global $theme_key;
 
-    $block_regions = array_keys(system_region_list($theme_key));
+    $block_regions = system_region_list($theme_key, REGIONS_ALL, FALSE);
     $delimiter = $this->randomName(32);
     $values = array();
     // Set some random content for each region available.
@@ -1256,6 +1471,15 @@ class DrupalGotoTest extends DrupalWebTestCase {
     $this->assertText('drupal_goto', 'Drupal goto redirect succeeded.');
     $this->assertEqual($this->getUrl(), url('common-test/drupal_goto', array('query' => array('foo' => '123'), 'absolute' => TRUE)), 'Drupal goto redirected to expected URL.');
 
+    // Test that calling drupal_goto() on the current path is not dangerous.
+    variable_set('common_test_redirect_current_path', TRUE);
+    $this->drupalGet('', array('query' => array('q' => 'http://www.example.com/')));
+    $headers = $this->drupalGetHeaders(TRUE);
+    list(, $status) = explode(' ', $headers[0][':status'], 3);
+    $this->assertEqual($status, 302, 'Expected response code was sent.');
+    $this->assertNotEqual($this->getUrl(), 'http://www.example.com/', 'Drupal goto did not redirect to external URL.');
+    $this->assertTrue(strpos($this->getUrl(), url('<front>', array('absolute' => TRUE))) === 0, 'Drupal redirected to itself.');
+    variable_del('common_test_redirect_current_path');
     // Test that drupal_goto() respects ?destination=xxx. Use an complicated URL
     // to test that the path is encoded and decoded properly.
     $destination = 'common-test/drupal_goto/destination?foo=%2525&bar=123';
@@ -1352,8 +1576,8 @@ class JavaScriptTestCase extends DrupalWebTestCase {
    */
   function testAddSetting() {
     $javascript = drupal_add_js(array('drupal' => 'rocks', 'dries' => 280342800), 'setting');
-    $this->assertEqual(280342800, $javascript['settings']['data'][2]['dries'], 'JavaScript setting is set correctly.');
-    $this->assertEqual('rocks', $javascript['settings']['data'][2]['drupal'], 'The other JavaScript setting is set correctly.');
+    $this->assertEqual(280342800, $javascript['settings']['data'][3]['dries'], 'JavaScript setting is set correctly.');
+    $this->assertEqual('rocks', $javascript['settings']['data'][3]['drupal'], 'The other JavaScript setting is set correctly.');
   }
 
   /**
@@ -1560,6 +1784,29 @@ class JavaScriptTestCase extends DrupalWebTestCase {
     $this->assertTrue(strpos($javascript, 'misc/collapse.js') !== FALSE, 'When "javascript_always_use_jquery" is FALSE: The JavaScript returned by drupal_get_js() when at least one custom JavaScript file that requires jQuery has been added includes the first custom file.');
     $this->assertTrue(strpos($javascript, 'misc/ajax.js') !== FALSE, 'When "javascript_always_use_jquery" is FALSE: The JavaScript returned by drupal_get_js() when at least one custom JavaScript file that requires jQuery has been added includes the second custom file.');
     variable_del('javascript_always_use_jquery');
+  }
+
+  /**
+   * Tests the double submit form protection and
+   * 'javascript_use_double_submit_protection' variable.
+   */
+  function testDoubleSubmitFormProtection() {
+    // The default front page of the site should have the double submit
+    // protection enabled as there is a login block.
+    $this->drupalGet('');
+    $this->assertRaw('misc/form-single-submit.js', 'Default behavior: Double submit protection is enabled.');
+
+    // The default front page should have the double submit protection disabled
+    // when the 'javascript_always_use_jquery' variable is set to FALSE or the
+    // 'javascript_use_double_submit_protection' variable is set to FALSE.
+    variable_set('javascript_always_use_jquery', FALSE);
+    $this->drupalGet('');
+    $this->assertNoRaw('misc/form-single-submit.js', 'When "javascript_always_use_jquery" is FALSE: Double submit protection is disabled.');
+    variable_del('javascript_always_use_jquery');
+    variable_set('javascript_use_double_submit_protection', FALSE);
+    $this->drupalGet('');
+    $this->assertNoRaw('misc/form-single-submit.js', 'When "javascript_use_double_submit_protection" is FALSE: Double submit protection is disabled.');
+    variable_del('javascript_use_double_submit_protection');
   }
 
   /**
@@ -1792,6 +2039,18 @@ class JavaScriptTestCase extends DrupalWebTestCase {
   }
 
   /**
+   * Tests that the set_has_js_cookie variable is reflected in Drupal.settings.
+   */
+  function testSetHasJsCookie() {
+    $this->drupalGet('');
+    $this->assertRaw('"setHasJsCookie":0', 'setHasJsCookie set to 0 by default.');
+
+    variable_set('set_has_js_cookie', TRUE);
+    $this->drupalGet('');
+    $this->assertRaw('"setHasJsCookie":1', 'setHasJsCookie set to 1 when set_has_js_cookie is set to TRUE.');
+  }
+
+  /**
    * Resets static variables related to adding JavaScript to a page.
    */
   function resetStaticVariables() {
@@ -1834,6 +2093,11 @@ class DrupalRenderTestCase extends DrupalWebTestCase {
       array(
         'name' => 'empty string',
         'value' => '',
+        'expected' => '',
+      ),
+      array(
+        'name' => 'not a render array',
+        'value' => 'this is not an array',
         'expected' => '',
       ),
       array(
@@ -1920,6 +2184,32 @@ class DrupalRenderTestCase extends DrupalWebTestCase {
 
     // The elements should appear in output in the same order as the array.
     $this->assertTrue(strpos($output, $second) < strpos($output, $first), 'Elements were not sorted.');
+
+    // The order of children with same weight should be preserved.
+    $element_mixed_weight = array(
+      'child5' => array('#weight' => 10),
+      'child3' => array('#weight' => -10),
+      'child1' => array(),
+      'child4' => array('#weight' => 10),
+      'child2' => array(),
+      'child6' => array('#weight' => 10),
+      'child9' => array(),
+      'child8' => array('#weight' => 10),
+      'child7' => array(),
+    );
+
+    $expected = array(
+      'child3',
+      'child1',
+      'child2',
+      'child9',
+      'child7',
+      'child5',
+      'child4',
+      'child6',
+      'child8',
+      );
+    $this->assertEqual($expected, element_children($element_mixed_weight, TRUE), 'Order of elements with the same weight is preserved.');
   }
 
   /**
@@ -2436,6 +2726,12 @@ class DrupalDataApiTest extends DrupalWebTestCase {
     // Update the record.
     $update_result = drupal_write_record('node_access', $node_access, array('nid', 'gid', 'realm'));
     $this->assertTrue($update_result == SAVED_UPDATED, 'Correct value returned when a record is updated with drupal_write_record() for a table with a multi-field primary key.');
+
+    // Insert a new record to the table with a database specific data type.
+    $person = new stdClass();
+    $person->age = 25;
+    $insert_result = drupal_write_record('test_db_specific_datatype', $person);
+    $this->assertTrue($insert_result == SAVED_NEW, 'Correct value returned when a record is inserted with drupal_write_record() for a table with a database specific data type.');
   }
 
 }
@@ -2476,8 +2772,8 @@ class DrupalErrorCollectionUnitTest extends DrupalWebTestCase {
     $this->assertEqual(count($this->collectedErrors), 3, 'Three errors were collected');
 
     if (count($this->collectedErrors) == 3) {
-      $this->assertError($this->collectedErrors[0], 'Notice', 'error_test_generate_warnings()', 'error_test.module', 'Undefined variable: bananas');
-      $this->assertError($this->collectedErrors[1], 'Warning', 'error_test_generate_warnings()', 'error_test.module', 'Division by zero');
+      $this->assertError($this->collectedErrors[0], 'Notice', 'error_test_generate_warnings()', 'error_test.module', 'Object of class stdClass could not be converted to int');
+      $this->assertError($this->collectedErrors[1], 'Warning', 'error_test_generate_warnings()', 'error_test.module', \PHP_VERSION_ID < 80000 ? 'Invalid argument supplied for foreach()' : 'foreach() argument must be of type array|object, string given');
       $this->assertError($this->collectedErrors[2], 'User warning', 'error_test_generate_warnings()', 'error_test.module', 'Drupal is awesome');
     }
     else {
@@ -2618,6 +2914,7 @@ class DrupalSystemListingTestCase extends DrupalWebTestCase {
  * Tests for the format_date() function.
  */
 class FormatDateUnitTest extends DrupalWebTestCase {
+  protected $admin_user;
 
   /**
    * Arbitrary langcode for a custom language.
@@ -3084,6 +3381,51 @@ class DrupalGetQueryArrayTestCase extends DrupalWebTestCase {
     $parsed = parse_url($url);
     $result = drupal_get_query_array($parsed['query']);
     $this->assertEqual($result['foo'], "/content/folder[@name='foo']/folder[@name='bar']", 'drupal_get_query_array() should only explode parameters on the first equals sign.');
+  }
+
+}
+
+/**
+ * Test for drupal_add_html_head_link().
+ */
+class DrupalAddHtmlHeadLinkTest extends DrupalWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Add HTML head link',
+      'description' => 'Test for drupal_add_html_head_link().',
+      'group' => 'System',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function setUp() {
+    parent::setUp('common_test');
+  }
+
+  /**
+   * Tests drupal_add_html_head_link().
+   */
+  function testDrupalAddHtmlHeadLink() {
+    $this->drupalGet('common-test/html_head_link');
+    $expected_link_header = implode(',', array(
+      '</foo?bar=baz>; rel="alternate"',
+      '</foo/bar>; hreflang="nl"; rel="alternate"',
+      '</foo/bar>; hreflang="de"; rel="alternate"',
+      '</foo?bar=baz&baz=false>; hreflang="en"; rel="alternate"',
+    ));
+    $this->assertEqual($this->drupalGetHeader('Link'), $expected_link_header);
+
+    // Check that duplicate alternate URLs with different hreflangs are allowed.
+    $test_link = $this->xpath('//head/link[@rel="alternate"][@href="/foo/bar"]');
+    $this->assertEqual(count($test_link), 2, 'Duplicate alternate URLs are allowed.');
+    // Check that link element attributes are HTML-encoded.
+    $this->assertRaw('<link href="/foo?bar=baz&amp;baz=false" hreflang="en" rel="alternate" />');
   }
 
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_community.strongarm.inc
@@ -112,6 +113,39 @@ function ma_community_strongarm() {
       'thumbed' => array(
         'custom_settings' => TRUE,
       ),
+      'featured_content' => array(
+        'custom_settings' => TRUE,
+      ),
+      'collections_browse' => array(
+        'custom_settings' => FALSE,
+      ),
+      'dictionary_word_summary' => array(
+        'custom_settings' => FALSE,
+      ),
+      'related_person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'community_record' => array(
+        'custom_settings' => FALSE,
+      ),
+      'map_popup' => array(
+        'custom_settings' => FALSE,
+      ),
+      'taxonomy_record_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
+      ),
+      'ical' => array(
+        'custom_settings' => FALSE,
+      ),
+      'teacher_view' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -119,10 +153,10 @@ function ma_community_strongarm() {
           'weight' => '0',
         ),
         'path' => array(
-          'weight' => '2',
+          'weight' => '3',
         ),
         'redirect' => array(
-          'weight' => '1',
+          'weight' => '2',
         ),
       ),
       'display' => array(),

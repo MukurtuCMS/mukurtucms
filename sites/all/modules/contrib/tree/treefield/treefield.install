@@ -1,0 +1,81 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the Treefield module.
+ */
+
+/**
+ * Add a 'depth' column for tree fields which are stored in SQL.
+ */
+function treefield_update_7000() {
+  if (!module_exists('field_sql_storage')) {
+    return;
+  }
+
+  foreach (field_info_fields() as $field_name => $field) {
+    if (!($field['type'] == 'entityreference'
+      && $field['storage']['type'] == 'field_sql_storage'
+      && (isset($field['settings']['handler_settings']['behaviors']['treefield_sql']['status']) && $field['settings']['handler_settings']['behaviors']['treefield_sql']['status'] == 1))) {
+      // Not an entity reference field, doesn't use SQL storage or no tree
+      // behavior.
+      continue;
+    }
+
+    $depth_column = array(
+      'description' => 'The depth of the entity in the tree structure.',
+      'type' => 'int',
+      'not null' => FALSE,
+      'default' => 0,
+    );
+    $table_name = _field_sql_storage_tablename($field);
+    $revision_name = _field_sql_storage_revision_tablename($field);
+
+    // Add the depth column.
+    db_add_field($table_name, $field_name . '_depth', $depth_column);
+    db_add_field($revision_name, $field_name . '_depth', $depth_column);
+
+    // And populate it.
+    $result = db_select($table_name, 't')
+      ->fields('t', array('entity_id', $field_name . '_target_id'))
+      ->orderBy($field_name . '_target_id')
+      ->orderBy('entity_id')
+      ->execute()
+      ->fetchAllKeyed();
+
+    // Nothing to do if there's no data in this field.
+    if (empty($result)) {
+      continue;
+    }
+
+    $tree_depth = array();
+    do {
+      $entity_id = key($result);
+      $parent_id = reset($result);
+
+      if ($parent_id === NULL) {
+        $tree_depth[$entity_id] = 0;
+        unset($result[$entity_id]);
+      }
+      elseif (isset($tree_depth[$parent_id])) {
+        $tree_depth[$entity_id] = $tree_depth[$parent_id] + 1;
+        unset($result[$entity_id]);
+      }
+      else {
+        // Remove this result from the current position and move it at the end
+        // of the array.
+        unset($result[$entity_id]);
+        $result[$entity_id] = $parent_id;
+        continue;
+      }
+
+      // Update the field data table with the depth value. The revision table
+      // doesn't need to be updated because the depth is computed automatically
+      // if someone reverts the field data from a previous/different revision.
+      db_query("UPDATE {" . $table_name . "} SET " . $field_name . "_depth = :depth WHERE entity_id = :entity_id", array(
+        ':depth' => $tree_depth[$entity_id],
+        ':entity_id' => $entity_id,
+      ));
+    } while (!empty($result));
+  }
+}

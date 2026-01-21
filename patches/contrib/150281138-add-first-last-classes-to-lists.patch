@@ -1,0 +1,42 @@
+From a8577927155d37950303fd150ee24bf103e15bc1 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Tue, 29 Aug 2017 10:52:07 -0700
+Subject: [PATCH] Add old Bootstrap code to add first/last classes to lists
+
+---
+ templates/system/item-list.func.php | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/templates/system/item-list.func.php b/templates/system/item-list.func.php
+index 7a10d70..b527bb6 100644
+--- a/templates/system/item-list.func.php
++++ b/templates/system/item-list.func.php
+@@ -66,8 +66,11 @@ function bootstrap_item_list($variables) {
+   $output = '';
+   if ($items) {
+     $output .= '<' . $type . drupal_attributes($list_attributes) . '>';
++    $num_items = count($items);
++    $i = 0;
+     foreach ($items as $key => $item) {
+       $attributes = array();
++      $i++;
+
+       if (is_array($item)) {
+         $value = '';
+@@ -104,7 +107,12 @@ function bootstrap_item_list($variables) {
+       else {
+         $value = $item;
+       }
+-
++      if ($i == 1) {
++        $attributes['class'][] = 'first';
++      }
++      if ($i == $num_items) {
++        $attributes['class'][] = 'last';
++      }
+       $output .= '<li' . drupal_attributes($attributes) . '>' . $value . "</li>\n";
+     }
+     $output .= "</$type>";
+--
+2.7.4
+

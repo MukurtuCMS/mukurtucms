@@ -38,11 +38,11 @@ CKEDITOR.dialog.add( 'mediaembedDialog', function( editor ) {
         var realElement = CKEDITOR.dom.element.createFromHtml('<div class="media_embed"></div>');
         realElement.setHtml(content);
         var fakeElement = editor.createFakeElement( realElement , 'cke_mediaembed', 'div', true);
-        var matches = content.match(/width=(["']?)(\d+)\1/i);
+        var matches = content.match(/width=(["']?)([\w\.\%]*)\1/i);
         if (matches && matches.length == 3) {
           fakeElement.setStyle('width', cssifyLength(matches[2]));
         }
-        matches = content.match(/height=([\"\']?)(\d+)\1/i);
+        matches = content.match(/height=(["']?)([\w\.\%]*)\1/i);
         if (matches && matches.length == 3) {
           fakeElement.setStyle('height', cssifyLength(matches[2]));
         }

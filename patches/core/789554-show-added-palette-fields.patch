@@ -1,0 +1,16 @@
+Index: color.module
+===================================================================
+RCS file: /cvs/drupal/drupal/color.module,v
+retrieving revision 1.88
+diff -u -p -r1.88 color.module
+--- color.module	16 Jul 2010 02:37:05 -0000	1.88
++++ color.module	26 Jul 2010 13:23:50 -0000
+@@ -139,7 +139,7 @@ function color_get_palette($theme, $defa
+   $palette = $info['schemes']['default']['colors'];
+
+   // Load variable.
+-  return $default ? $palette : variable_get('color_' . $theme . '_palette', $palette);
++  return $default ? $palette : variable_get('color_' . $theme . '_palette', $palette) + $palette;
+ }
+
+ /**

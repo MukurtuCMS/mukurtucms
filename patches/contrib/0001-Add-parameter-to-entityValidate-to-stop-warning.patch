@@ -1,0 +1,25 @@
+From cc4f2b3f047dd8468f9f93b5758a3f38ed485d42 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Wed, 27 Jan 2021 10:32:05 -0800
+Subject: [PATCH] Add parameter to entityValidate to stop warning
+
+---
+ .../plugins/FeedsFileProcessor.inc  | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plugins/FeedsFileProcessor.inc b/plugins/FeedsFileProcessor.inc
+index 42c25f96..4ce1ee01 100644
+--- a/plugins/FeedsFileProcessor.inc
++++ b/plugins/FeedsFileProcessor.inc
+@@ -83,7 +83,7 @@ class FeedsFileProcessor extends FeedsProcessor {
+    * @throws FeedsValidationException $e
+    *   If validation fails.
+    */
+-  protected function entityValidate($entity) {
++  protected function entityValidate($entity, $source = NULL) {
+
+   }
+
+--
+2.19.0.windows.1
+

@@ -118,10 +118,12 @@ class UnicodeUnitTest extends DrupalUnitTestCase {
     $testcase = array(
       'tHe QUIcK bRoWn' => 15,
       'ÜBER-åwesome' => 12,
+      'NULL' => 0,
     );
 
     foreach ($testcase as $input => $output) {
-      $this->assertEqual(drupal_strlen($input), $output, format_string('%input length is %output', array('%input' => $input, '%output' => $output)));
+      $tested_value = ($input === 'NULL' ? NULL : $input);
+      $this->assertEqual(drupal_strlen($tested_value), $output, format_string('%input length is %output', array('%input' => $input, '%output' => $output)));
     }
   }
 
@@ -215,6 +217,8 @@ class UnicodeUnitTest extends DrupalUnitTestCase {
     foreach ($testcase as $input => $output) {
       $this->assertEqual(decode_entities($input), $output, format_string('Make sure the decoded entity of @input is @output', array('@input' => $input, '@output' => $output)));
     }
+    // Test NULL value.
+    $this->assertEqual(decode_entities(NULL), '', format_string('Make sure the decoded entity of NULL is empty string'));
   }
 
   /**

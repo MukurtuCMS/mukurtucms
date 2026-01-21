@@ -1,0 +1,6 @@
+name = Mukurtu Migration Reports
+description = Provides reports for preparing to migration to Mukurtu CMS v4
+core = 7.x
+package = Mukurtu
+dependencies[] = ma_core
+dependencies[] = ma_culturalprotocol

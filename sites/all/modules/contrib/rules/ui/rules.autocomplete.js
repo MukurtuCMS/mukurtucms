@@ -81,7 +81,7 @@ Drupal.rules = Drupal.rules || {};
 
     this.jqObject.bind("autocompleteselect", function(event, ui) {
       // If a group was selected then set the groupSelected to true for the
-      // overriden close function from jquery autocomplete.
+      // overridden close function from jquery autocomplete.
       if (ui.item.value.substring(ui.item.value.length - 1, ui.item.value.length) == ":") {
         instance.groupSelected = true;
       }
@@ -180,7 +180,7 @@ Drupal.rules = Drupal.rules || {};
   };
 
   /**
-   * Toogle the autcomplete window.
+   * Toggle the autocomplete window.
    */
   Drupal.rules.autocomplete.prototype.toggle = function() {
     if (this.jqObject.autocomplete("widget").is(":visible")) {

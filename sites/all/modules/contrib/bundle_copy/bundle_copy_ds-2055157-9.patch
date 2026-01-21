@@ -1,0 +1,132 @@
+diff --git a/bundle_copy.module b/bundle_copy.module
+index 037ff3e..0a7b910 100755
+--- a/bundle_copy.module
++++ b/bundle_copy.module
+@@ -459,6 +459,45 @@ function bundle_copy_import_process($data) {
+     }
+   }
+
++  //Import display Suite configuration.
++  if (isset($data['display_suite'])) {
++    if (module_exists('ds')) {
++      ctools_include('export');
++
++      //publishing_message|new_imported_machine_name|form'
++      foreach($data['display_suite'] as $identifier => $ds_config) {
++
++        $tables = array(
++          'ds_field_settings',
++          'ds_layout_settings',
++        );
++
++        foreach ($tables as $table) {
++          //New imports set to export in code
++          $ds_config->export_type = 2;
++
++          $existing_data = ctools_export_crud_load_all($table);
++          foreach ($existing_data as $id => $existing) {
++            if ($existing->entity_type == $entity_type && $existing->bundle == $ds_config->bundle) {
++              //exiting imports set to export in db
++              $ds_config->export_type = 1;
++              break;
++            }
++          }
++
++          unset($ds_config->export_module);
++
++          // Save the object to DB.
++          ctools_export_crud_save($table, $ds_config);
++          ctools_export_crud_set_status($table, $ds_config, $ds_config->disabled);
++        }
++      }
++    }
++    else {
++      drupal_set_message(t('The Display Suite settings could not be saved because the <em>Display Suite</em> module is disabled or missing.'), 'error');
++    }
++  }
++
+   // Clear caches.
+   field_info_cache_clear();
+   if (module_exists('field_group')) {
+@@ -563,6 +602,38 @@ function _bundle_copy_export_data($entity_type, $selected_data) {
+         }
+       }
+     }
++
++    // Export Display Suite configuration.
++    if (module_exists('ds')) {
++
++      $tables = array(
++        'ds_field_settings',
++        'ds_layout_settings',
++      );
++
++      foreach ($tables as $table) {
++        // Load CTools exportable objects for this table.
++        $exportables = ctools_export_crud_load_all($table);
++
++        foreach ($exportables as $id => $export) {
++          if ($export->entity_type == $entity_type && $export->bundle == $bkey) {
++
++            // Modify exported object.
++            $export->id = $entity_type . '|' . $bkey . '|' . $export->view_mode;
++            $export->export_type = 2;
++            if (!isset($export->disabled)) {
++              $export->disabled = FALSE;
++            }
++            $export->bundle = $bkey;
++            unset($export->export_module);
++
++            $data['display_suite'][$export->id] = $export;
++
++          }
++        }
++      }
++    }
++
+   }
+   ksort($instances);
+   $data['instances'] = $instances;
+@@ -731,6 +802,42 @@ function bundle_copy_clone_submit($form, &$form_state) {
+         }
+       }
+     }
++
++    // Clone Display Suite configuration.
++    if (module_exists('ds')) {
++      ctools_include('export');
++
++      // To clone DS settings, we will export, modify, and import ctools objects
++      // from DS tables.
++      $tables = array(
++        'ds_field_settings',
++        'ds_layout_settings',
++      );
++
++      foreach ($tables as $table) {
++        // Load CTools exportable objects for this table.
++        $exportables = ctools_export_crud_load_all($table);
++
++        foreach ($exportables as $id => $export) {
++          if ($export->entity_type == $entity_type && $export->bundle == $src_btype) {
++
++            // Modify exported object.
++            $export->id = $entity_type . '|' . $new_btype . '|' . $export->view_mode;
++            $export->export_type = 2;
++            if (!isset($export->disabled)) {
++              $export->disabled = FALSE;
++            }
++            $export->bundle = $new_btype;
++            unset($export->export_module);
++
++            // Save the object to DB.
++            ctools_export_crud_save($table, $export);
++            ctools_export_crud_set_status($table, $export, $export->disabled);
++          }
++        }
++      }
++    }
++
+     field_info_cache_clear();
+     $form_state['redirect'] = str_replace("clone", "list", $bc_info[$entity_type]['clone_menu']['path']);
+   }

@@ -1,0 +1,137 @@
+<?php
+
+/**
+ * @file
+ * Tests for the textformatter module.
+ */
+
+class TextformatterTestCase extends DrupalWebTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Textformatter tests',
+      'description' => 'Tests textformatter module functionality',
+      'group' => 'Textformatter',
+    );
+  }
+
+  protected function setUp() {
+    parent::setUp(array('textformatter'));
+
+    $this->admin_user = $this->drupalCreateUser(array('bypass node access'));
+
+    $this->field_name = drupal_strtolower($this->randomName() . '_field_name');
+    $this->field = array('field_name' => $this->field_name, 'type' => 'text', 'cardinality' => -1);
+    $this->field = field_create_field($this->field);
+
+    $this->field_id = $this->field['id'];
+
+    $this->instance = array(
+      'field_name' => $this->field_name,
+      'entity_type' => 'node',
+      'bundle' => 'page',
+      'label' => $this->randomName() . '_label',
+      'description' => $this->randomName() . '_description',
+      'weight' => mt_rand(0, 127),
+      'settings' => array(
+        'max_length' => 255,
+      ),
+      'widget' => array(
+        'type' => 'text_textfield',
+        'label' => 'Test Field',
+      ),
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'module' => 'textformatter',
+          'settings' => array(
+            'textformatter_class' => 'textformatter-list',
+            'textformatter_comma_and' => 0,
+            'textformatter_comma_full_stop' => 0,
+            'textformatter_comma_override' => 0,
+            'textformatter_comma_tag' => 'div',
+            'textformatter_contrib' => array(),
+            'textformatter_separator_custom' => '',
+            'textformatter_separator_custom_class' => 'textformatter-separator',
+            'textformatter_separator_custom_tag' => 'span',
+            'textformatter_term_plain' => 0,
+            'textformatter_type' => 'ul',
+          ),
+          'type' => 'textformatter_list',
+          'weight' => '10',
+        ),
+      ),
+    );
+    field_create_instance($this->instance);
+  }
+
+  /**
+   * Test the general output of the display formatter.
+   */
+  public function testFormatterOutput() {
+    $this->drupalLogin($this->admin_user);
+
+    $field_values = array(LANGUAGE_NONE => array());
+    for ($i = 0; $i < 10; $i++) {
+      $field_values[LANGUAGE_NONE][] = array('value' => $this->randomName());
+    }
+
+    $node = $this->drupalCreateNode(array($this->field_name => $field_values));
+    $this->verbose('Node: ' . var_export($node, TRUE));
+
+    $page = $this->drupalGet('node/' . $node->nid);
+
+    $this->verbose('Page: ' . $page);
+
+    $this->drupalSetContent($page);
+    $this->assertResponse(200);
+
+    foreach ($field_values[LANGUAGE_NONE] as $delta => $item) {
+      $this->assertText($item['value'], t('Field value !delta output on node.', array('!delta' => $delta)));
+    }
+
+    $items = array();
+    foreach ($field_values[LANGUAGE_NONE] as $item) {
+      $items[] = $item['value'];
+    }
+
+    // Test the default ul list.
+    $options = array(
+      'type' => 'ul',
+      'items' => $items,
+      'attributes' => array(
+        'class' => array('textformatter-list'),
+      ),
+    );
+    $ul = theme('item_list', $options);
+
+    $this->assertRaw($ul, 'The expected unordered list markup was produced.');
+
+    // Update the field settings for ol list.
+    $field_instance = field_info_instance('node', $this->field_name, $node->type);
+    $field_instance['display']['default']['settings']['textformatter_type'] = 'ol';
+    field_update_instance($field_instance);
+
+    // Get the node page again.
+    $this->drupalGet('node/' . $node->nid);
+
+    // Test the default ol list.
+    $options['type'] = 'ol';
+    $ol = theme('item_list', $options);
+
+    $this->assertRaw($ol, 'The expected ordered list markup was produced.');
+
+    // Update the field settings for comma list.
+    $field_instance['display']['default']['settings']['textformatter_type'] = 'comma';
+    field_update_instance($field_instance);
+
+    // Get the node page again.
+    $this->drupalGet('node/' . $node->nid);
+
+    // Test the default comma list.
+    unset($options['type']);
+    $comma = theme('textformatter_comma', $options);
+
+    $this->assertRaw($comma, 'The expected comma list markup was produced.');
+  }
+
+}

@@ -1,0 +1,366 @@
+<?php
+/**
+ * @file
+ * Code for the Open Atrium Buttons feature.
+ */
+
+include_once 'oa_buttons.features.inc';
+
+define('OA_BUTTONS_CLEAR_CACHE_ALL', 0);
+
+/**
+ * Implements hook_ctools_plugin_directory
+ */
+function oa_buttons_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'ctools' && $plugin_type == 'content_types') {
+    return 'plugins/content_types';
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function oa_buttons_form_oa_section_node_form_alter(&$form, &$form_state, $form_id) {
+  oa_buttons_node_overrides($form, $form_state, $form_id);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function oa_buttons_form_oa_space_node_form_alter(&$form, &$form_state, $form_id) {
+  oa_buttons_node_overrides($form, $form_state, $form_id);
+}
+
+/**
+ * Provides override for node pages which implement sections and spaces.
+ */
+function oa_buttons_node_overrides(&$form, &$form_state, $form_id) {
+
+  $form['#attached']['js'][] = array(
+    'data' => drupal_get_path('module', 'oa_buttons') . '/oa_buttons.js',
+    'type' => 'file',
+  );
+}
+
+/**
+ * Implements hook_oa_core_space_type_options().
+ */
+function oa_buttons_oa_core_space_type_options($term, $vocab_name) {
+  $options = array(
+    'node_options' => array(),
+  );
+
+  $node_types = field_get_items('taxonomy_term', $term, 'field_oa_node_types', LANGUAGE_NONE);
+  if (!empty($node_types)) {
+    foreach ($node_types as $option) {
+      $options['node_options'][] = $option['value'];
+    }
+  }
+
+  return $options;
+}
+
+/**
+ * Returns an option list of buttons in the node_add bundle..
+ */
+function oa_buttons_get_command_buttons_options() {
+  $node_type_options = &drupal_static(__FUNCTION__, array());
+  if (!$node_type_options) {
+    $result = db_select('command_buttons', 'b')
+      ->fields('b', array('name', 'title'));
+  
+    $result = $result->execute();
+  
+    while ($button = $result->fetchAssoc()) {
+      $node_type_options[$button['name']] = $button['title'];
+    }
+  }
+
+  return $node_type_options;
+}
+
+/**
+ * Determines which command buttons should be shown within the current context.
+ * @param $all if FALSE and within a section, only return commands for that section
+ *   if TRUE, return commands for all sections regardless of current context
+ */
+function oa_buttons_get_command_buttons($node, $all = FALSE) {
+  $buttons = array();
+  $node_types = array_flip(node_type_get_names());
+  _oa_buttons_get_space_command_buttons($node, $buttons, $all);
+  _oa_buttons_get_parent_command_buttons($node, $buttons);
+  // look for node_add command buttons and check the 'create X content'
+  // node_access dynamically so we don't show command buttons the user
+  // cannot acccess
+  foreach ($buttons as $button) {
+    $entity_type = $button['value'];
+    if (in_array($entity_type, $node_types) && !node_access('create', $entity_type)) {
+      unset($buttons[$entity_type]);
+    }
+  }
+  drupal_alter('oa_buttons_add_content', $buttons, $node);
+  return $buttons;
+}
+
+/**
+ * Get the command buttons allowed by a single node.
+ */
+function _oa_buttons_get_node_command_buttons($node, &$buttons) {
+  $override_node_options = field_get_items('node', $node, 'field_oa_section_override');
+
+  // Grab from the taxonomy term.
+  if (empty($override_node_options[0]['value'])) {
+    if ($node->type == 'oa_section') {
+      $items = field_get_items('node', $node, 'field_oa_section');
+    }
+    else {
+      $items = field_get_items('node', $node, 'field_oa_space_type');
+    }
+
+    if (!empty($items) && ($tid = reset($items)) && ($term = taxonomy_term_load($tid['tid']))) {
+      $node_options = field_get_items('taxonomy_term', $term, 'field_oa_node_types');
+    }
+  }
+  else {
+    $node_options = field_get_items('node', $node, 'field_oa_node_types');
+  }
+
+  if (!empty($node_options)) {
+    foreach ($node_options as $opt) {
+      // There may be more than one node created using the same content type. If
+      // we want to add each possibility to the command button list we need to
+      // add the nid to the array key so they are unique.
+      if (!isset($buttons[$opt['value'] . ':' . $node->nid])) {
+        $buttons[$opt['value'] . ':' . $node->nid] = array(
+          'value' => $opt['value'],
+          'provider_type' => $node->type,
+          'id' => $node->nid,
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Get the command buttons allowed by all parent groups of type oa_space.
+ */
+function _oa_buttons_get_parent_command_buttons($node, &$buttons) {
+  if (!module_exists('og_subgroups')) {
+    return;
+  }
+
+  module_load_include('inc', 'og_subgroups', 'og_subgroups.common');
+
+  // Now get options set from parent spaces.
+  $parent_nids = og_subgroups_parents_load('node', $node->nid, FALSE);
+
+  if (!empty($parent_nids)) {
+    $spaces = db_select('node', 'n')
+      ->fields('n', array('nid'))
+      ->condition('n.type', 'oa_space')
+      ->condition('n.nid', $parent_nids['node'], 'IN')
+      ->execute()
+      ->fetchAllAssoc('nid');
+
+    if (!empty($spaces)) {
+      $parent_groups = node_load_multiple(array_keys($spaces));
+
+      if (!empty($parent_groups)) {
+        foreach ($parent_groups as $parent) {
+          // The urls for the allowed buttons are checked seperately,
+          // but for now ensure they at least have view access on the parent
+          // group.
+          if ($parent->type == 'oa_space' && node_access('view', $node)) {
+            _oa_buttons_get_node_command_buttons($parent, $buttons);
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Get the command buttons allowed by a single space, as well as any sections
+ * within it.
+ */
+function _oa_buttons_get_space_command_buttons($node, &$buttons, $all = FALSE) {
+  _oa_buttons_get_node_command_buttons($node, $buttons);
+
+  if ($node->type == 'oa_space') {
+    $sections = oa_core_space_sections($node->nid, NODE_PUBLISHED);
+    if (count($sections)) {
+      // If we are within a section only show the buttons for this specific section.
+      if (!$all && ($section = oa_core_get_section_context())) {
+        if (isset($sections[$section])) {
+          $section_node = node_load($section);
+          _oa_buttons_get_space_command_buttons($section_node, $buttons, $all);
+        }
+      }
+      else {
+        // Otherwise show the buttons for all sections.
+        foreach ($sections as $nid => $section) {
+          $section_node = node_load($nid);
+          _oa_buttons_get_space_command_buttons($section_node, $buttons, $all);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Helper to return a permission for oa_button for given vocabulary and term
+ * @param $machine_name
+ * @param $tid
+ * @return string
+ */
+function _oa_buttons_perm_name($machine_name, $tid) {
+  return 'use oa button ' . $machine_name . ' for ' . $tid . ' term';
+}
+
+/**
+ * Implements hook_og_permission().
+ */
+function oa_buttons_og_permission() {
+  $perms = array();
+  if (module_exists('oa_subspaces') && ($vocabulary = oa_core_taxonomy_vocabulary('space_type')) && ($terms = taxonomy_get_tree($vocabulary->vid, 0))) {
+    $perms['use any oa button space_type'] = array(
+      'title' => t('Use any space type'),
+      'description' => t('Users may use any of the available space types..'),
+      'restrict access' => TRUE,
+      'default role' => array(OG_ADMINISTRATOR_ROLE),
+    );
+    foreach ($terms as $term) {
+      $perms[_oa_buttons_perm_name('space_type', $term->tid)] = array(
+        'title' => t('Use @name space type', array('@name' => $term->name)),
+        'description' => t('Users may select @name space type on create space form. This permission will be ignored if user can create space globally or if they can administer current group.', array('@name' => $term->name)),
+        'restrict access' => TRUE,
+        'default role' => array(OG_ADMINISTRATOR_ROLE),
+      );
+    }
+  }
+  return $perms;
+}
+
+/**
+ * Implements hook_node_insert().
+ */
+function oa_buttons_node_insert($node) {
+  if ($node->type == OA_SPACE_TYPE) {
+    oa_buttons_clear_section_button_cache(OA_BUTTONS_CLEAR_CACHE_ALL);
+  }
+  elseif ($node->type == OA_SECTION_TYPE) {
+    $gid = (!empty($node->{OG_AUDIENCE_FIELD}[LANGUAGE_NONE][0]['target_id'])) ? $node->{OG_AUDIENCE_FIELD}[LANGUAGE_NONE][0]['target_id'] : OA_BUTTONS_CLEAR_CACHE_ALL;
+    oa_buttons_clear_section_button_cache($gid);
+  }
+}
+
+/**
+ * Implements hook_node_update().
+ */
+function oa_buttons_node_update($node) {
+  if ($node->type == OA_SPACE_TYPE) {
+    oa_buttons_clear_section_button_cache($node->nid);
+  }
+  elseif ($node->type == OA_SECTION_TYPE) {
+    $gid = (!empty($node->{OG_AUDIENCE_FIELD}[LANGUAGE_NONE][0]['target_id'])) ? $node->{OG_AUDIENCE_FIELD}[LANGUAGE_NONE][0]['target_id'] : OA_BUTTONS_CLEAR_CACHE_ALL;
+    oa_buttons_clear_section_button_cache($gid);
+  }
+}
+
+/**
+ * Implements hook_flag_flag().
+ */
+function oa_buttons_flag_flag($flag, $content_id, $account, $flagging) {
+  oa_buttons_trigger_flag('flag', $flag, $content_id, $account);
+}
+
+/**
+ * Implements hook_flag_unflag().
+ */
+function oa_buttons_flag_unflag($flag, $content_id, $account, $flagging) {
+  oa_buttons_trigger_flag('unflag', $flag, $content_id, $account);
+}
+
+/**
+ * Helper function for flag and unflag hooks.
+ */
+function oa_buttons_trigger_flag($op, $flag, $content_id, $account) {
+  if ($flag->name == 'trash' && ($node = node_load($content_id)) && $node->type == OA_SECTION_TYPE) {
+    $gid = (!empty($node->{OG_AUDIENCE_FIELD}[LANGUAGE_NONE][0]['target_id']))
+      ? $node->{OG_AUDIENCE_FIELD}[LANGUAGE_NONE][0]['target_id']
+      : OA_BUTTONS_CLEAR_CACHE_ALL;
+    oa_buttons_clear_section_button_cache($gid);
+  }
+}
+
+/**
+ * Implements hook_og_membership_insert().
+ */
+function oa_buttons_og_membership_insert($og_membership) {
+  if ($og_membership->entity_type == 'user') {
+    oa_buttons_clear_section_button_cache();
+  }
+}
+
+/**
+ * Implements hook_og_membership_update().
+ */
+function oa_buttons_og_membership_update($og_membership) {
+  if ($og_membership->entity_type == 'user') {
+    oa_buttons_clear_section_button_cache();
+  }
+}
+
+/**
+ * Implements hook_og_membership_delete().
+ */
+function oa_buttons_og_membership_delete($og_membership) {
+  if ($og_membership->entity_type == 'user') {
+    oa_buttons_clear_section_button_cache();
+  }
+}
+
+/**
+ * Implements hook_og_role_change_permissions().
+ */
+function oa_buttons_og_role_change_permissions($role, $grant, $revoke) {
+  oa_buttons_clear_section_button_cache();
+}
+
+/**
+ * Clear the button cache for the given group
+ * @param null $gid.  If NULL, use current space context.  If 0, clear all groups
+ */
+function oa_buttons_clear_section_button_cache($gid = NULL) {
+  if (!isset($gid)) {
+    $gid = oa_core_get_space_context();
+  }
+
+  $cache_name = 'oa_section_buttons:';
+  $bin = 'cache_oa_section_buttons';
+  if (!empty($gid)) {
+    $cache_key = $cache_name . $gid;
+    cache_clear_all($cache_key, $bin, TRUE);
+
+    if (module_exists('og_subgroups')) {
+      // Clear button cache for any associated subgroups as well.
+      $subgroups = og_subgroups_children_load('node', $gid, TRUE, FALSE);
+      if (!empty($subgroups['node'])) {
+        foreach ($subgroups['node'] as $nid) {
+          $cache_key = $cache_name . $nid;
+          cache_clear_all($cache_key, $bin, TRUE);
+        }
+      }
+    }
+  }
+  else {
+    cache_clear_all($cache_name, $bin, TRUE);
+  }
+}
+
+/**
+ * Implements hook_flush_caches().
+ */
+function oa_buttons_flush_caches() {
+  return array('cache_oa_section_buttons');
+}

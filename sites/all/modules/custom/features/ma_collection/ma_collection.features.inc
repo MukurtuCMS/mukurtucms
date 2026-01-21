@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_collection.features.inc
@@ -9,13 +10,13 @@
  */
 function ma_collection_default_cer() {
   $items = array();
-  $items['node:collection:field_digital_heritage_items*node:digital_heritage:field_collection'] = entity_import('cer', '{
-    "identifier" : "node:collection:field_digital_heritage_items*node:digital_heritage:field_collection",
+  $items['node:collection:field_collections_parent_coll*node:collection:field_collections_child_coll'] = entity_import('cer', '{
     "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
     "cer_enabled" : { "und" : [ { "value" : "1" } ] },
+    "cer_left" : { "und" : [ { "path" : "node:collection:field_collections_parent_coll" } ] },
+    "cer_right" : { "und" : [ { "path" : "node:collection:field_collections_child_coll" } ] },
     "cer_weight" : { "und" : [ { "value" : "0" } ] },
-    "cer_left" : { "und" : [ { "path" : "node:collection:field_digital_heritage_items" } ] },
-    "cer_right" : { "und" : [ { "path" : "node:digital_heritage:field_collection" } ] },
+    "identifier" : "node:collection:field_collections_parent_coll*node:collection:field_collections_child_coll",
     "rdf_mapping" : []
   }');
   return $items;
@@ -66,6 +67,14 @@ function ma_collection_node_info() {
       'description' => t('A collection of digital heritage items.'),
       'has_title' => '1',
       'title_label' => t('Collection Name'),
+      'help' => '',
+    ),
+    'personal_collection' => array(
+      'name' => t('Personal Collection'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Personal Collection Name'),
       'help' => '',
     ),
   );

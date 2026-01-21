@@ -1,0 +1,20 @@
+name = Owl Carousel Views
+description = "Provides Owl Carousel integration into Drupal Views."
+core = 7.x
+package = Owl Carousel
+
+dependencies[] = views
+dependencies[] = owlcarousel
+
+files[] = owlcarousel_views.module
+files[] = owlcarousel_views.views.inc
+files[] = owlcarousel_views_plugin_style_owlcarousel.inc
+files[] = owlcarousel_views_plugin_pager_owlcarousel.inc
+
+
+
+; Information added by Drupal.org packaging script on 2019-03-05
+version = "7.x-2.0-alpha0"
+core = "7.x"
+project = "owlcarousel"
+datestamp = "1551800591"

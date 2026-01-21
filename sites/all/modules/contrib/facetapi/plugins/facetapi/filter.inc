@@ -118,7 +118,7 @@ class FacetapiFilterActiveItems extends FacetapiFilter {
 /**
  * Callback for array_filter() that strips out active items.
  *
- * @param arrat $build
+ * @param array $build
  *   The facet item's render array.
  *
  * @return bool
@@ -131,7 +131,7 @@ function facetapi_filter_active(array $build) {
 /**
  * Plugin that filters all items not in current hierarchy.
  *
- * For hierarchical facets such as taxonomy, it might be adventageous to only
+ * For hierarchical facets such as taxonomy, it might be advantageous to only
  * display the current level of the hierarchy to implement the progressive
  * disclosure pattern inside of the facet. For example, if your taxonomy tree
  * is Make -> Model -> Year for cars, you might want to only display one level

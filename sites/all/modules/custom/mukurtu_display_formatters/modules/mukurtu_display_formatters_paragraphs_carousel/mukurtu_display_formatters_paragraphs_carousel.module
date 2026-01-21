@@ -1,0 +1,81 @@
+<?php
+/**
+* @file
+* Define Mukurtu paragraphs carousel display formatter
+*
+*/
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function mukurtu_display_formatters_paragraphs_carousel_field_formatter_info() {
+    return array(
+        'mukurtu_paragraphs_carousel_formatter' => array(
+            'label' => t('Mukurtu Paragraphs Carousel'),
+            'field types' => array('paragraphs'),
+            'settings' => array()
+        ),
+    );
+}
+
+/**
+* Implements hook_field_formatter_settings_form().
+*/
+function mukurtu_display_formatters_paragraphs_carousel_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+    $display = $instance['display'][$view_mode];
+    $settings = $display['settings'];
+    $element = array();
+    return $element;
+}
+
+/**
+* Implements hook_field_formatter_settings_summary().
+*/
+function mukurtu_display_formatters_paragraphs_carousel_field_formatter_settings_summary($field, $instance, $view_mode) {
+    $display = $instance['display'][$view_mode];
+    $settings = $display['settings'];
+    $summary = t('Display paragraphs in a carousel');
+    return $summary;
+}
+
+/**
+* Implements hook_field_formatter_view().
+*/
+function mukurtu_display_formatters_paragraphs_carousel_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+    $paragraphs = array();
+    $settings = $display['settings'];
+
+    // Render each paragraph item
+    foreach ($items as $delta => $item) {
+        if(isset($item['value'])) {
+            $entity = entity_load('paragraphs_item', array($item['value']));
+            if($entity) {
+                $paragraphs_view = entity_view('paragraphs_item', $entity, 'full');
+                if(isset($paragraphs_view['paragraphs_item'])) {
+                    foreach($paragraphs_view['paragraphs_item'] as $id => $render) {
+                        $paragraphs[$id]['row'] = drupal_render($render);
+                    }
+                }
+            }
+        }
+    }
+
+    if(!empty($paragraphs)) {
+        // Render the carousel
+        $element[] = array(
+            '#theme' => 'owlcarousel',
+            '#items' => $paragraphs,
+            '#settings' => array(
+                // The settings group to apply.
+                'instance' => 'owlcarousel_settings_mukurtu_paragraphs',
+                // Attributes are rendered via drupal_attributes on the wrapper element.
+                'attributes' => array(
+                    'id' => array(
+                        'default' => drupal_html_id('paragraph_carousel_' . $instance['field_id'])
+                    ),
+                )
+            )
+        );
+    }
+    return $element;
+}

@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Describes hooks provided by the textformatter module.
+ */
+
+/**
  * hook_textformatter_field_list_info().
  *
  * Declare new field types/callbacks that are available as text formatter lists.
@@ -8,10 +13,21 @@
 function hook_textformatter_field_info() {
   $info = array();
 
-  $info['example'] = array( // key array with module name.
-    'fields' => array('example', 'example_other'), // This must be an array.
-    // Callback to process $items from hook_field_formatter_view.
+  // key array with module name.
+  $info['example'] = array(
+    // An array of fields that textformatter can be used on. Typically you
+    // would add the name(s) of the fields you are integrating here.
+    'fields' => array('example', 'example_other'),
+    // Callback to process $items from hook_field_formatter_view, and format
+    // an array of values that will be used in the displayed list.
     'callback' => 'textformatter_example_field_create_list',
+    // An array of settings/default settings that will be used. Anything
+    // defined in here will be merged into the textformatter_contrib array in
+    // The field formatter info. If your settings are not declared here, no
+    // defaults wil exist.
+    'settings' => array(
+      'textformatter_example_setting' => TRUE,
+    ),
   );
 
   return $info;
@@ -19,7 +35,7 @@ function hook_textformatter_field_info() {
 
 /**
  * Sample callback implementation.
- * @see textformatter_default_field_create_list.
+ * @see textformatter_default_field_create_list()
  */
 function textformatter_example_field_create_list($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $list_items = array();

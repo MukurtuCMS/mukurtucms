@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @file
+ * Contains FeedsExJmesPathLinesUnitTests.
+ */
+
+/**
+ * Unit tests for FeedsExJmesPathLines.
+ */
+class FeedsExJmesPathLinesUnitTests extends FeedsExJsonPathLinesUnitTests {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'JMESPath JSON lines parser unit tests',
+      'description' => 'Unit tests for FeedsExJmesPathLines.',
+      'group' => 'Feeds EX',
+    );
+  }
+
+  public function setUp() {
+    parent::setUp();
+
+    require_once $this->moduleDir . '/src/FeedsExJmesPath.inc';
+    require_once $this->moduleDir . '/src/FeedsExJmesPathLines.inc';
+
+    $this->source = $this->getMockFeedsSource();
+    $this->parser = FeedsConfigurable::instance('FeedsExJmesPathLines', strtolower($this->randomName()));
+    $this->parser->setMessenger(new FeedsExTestMessenger());
+
+    // Set compile directory manually.
+    $this->variableDel('feeds_ex_jmespath_compile_dir');
+    $path = file_directory_temp() . '/' . drupal_base64_encode(drupal_random_bytes(40)) . '_feeds_ex_jmespath_dir';
+    $this->variableSet('feeds_ex_jmespath_compile_dir', $path);
+
+    $this->parser->setConfig(array(
+      'sources' => array(
+        'title' => array(
+          'name' => 'Title',
+          'value' => 'name',
+        ),
+      ),
+    ));
+    $this->fetcherResult = new FeedsFileFetcherResult($this->moduleDir . '/tests/resources/test.jsonl');
+    // Tests are in FeedsExJsonPathLinesUnitTests.
+  }
+
+}

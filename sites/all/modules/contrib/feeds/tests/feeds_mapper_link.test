@@ -24,6 +24,9 @@ class FeedsMapperLinkTestCase extends FeedsMapperTestCase {
    */
   private $contentType;
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Mapper: Link',
@@ -33,6 +36,9 @@ class FeedsMapperLinkTestCase extends FeedsMapperTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp(array('link'));
 
@@ -59,7 +65,7 @@ class FeedsMapperLinkTestCase extends FeedsMapperTestCase {
         ),
       ),
       'omega' => array(
-      'type' => 'link_field',
+        'type' => 'link_field',
         'instance_settings' => array(
           'instance[settings][title]' => 'value',
           'instance[settings][title_value]' => $this->staticTitle,
@@ -73,44 +79,46 @@ class FeedsMapperLinkTestCase extends FeedsMapperTestCase {
    */
   public function test() {
     // Create importer configuration.
-    $this->createImporterConfiguration(); //Create a default importer configuration
-    $this->setSettings('syndication', 'FeedsNodeProcessor', array('bundle' => $this->contentType)); //Processor settings
+    // Create a default importer configuration.
+    $this->createImporterConfiguration();
+    // Processor settings.
+    $this->setSettings('syndication', 'FeedsNodeProcessor', array('bundle' => $this->contentType));
     $this->addMappings('syndication', array(
       0 => array(
         'source' => 'title',
-        'target' => 'title'
+        'target' => 'title',
       ),
       1 => array(
         'source' => 'timestamp',
-        'target' => 'created'
+        'target' => 'created',
       ),
       2 => array(
         'source' => 'description',
-        'target' => 'body'
+        'target' => 'body',
       ),
       3 => array(
         'source' => 'url',
-        'target' => 'field_alpha:url'
+        'target' => 'field_alpha:url',
       ),
       4 => array(
         'source' => 'title',
-        'target' => 'field_alpha:title'
+        'target' => 'field_alpha:title',
       ),
       5 => array(
         'source' => 'url',
-        'target' => 'field_beta:url'
+        'target' => 'field_beta:url',
       ),
       6 => array(
         'source' => 'url',
-        'target' => 'field_gamma:url'
+        'target' => 'field_gamma:url',
       ),
       7 => array(
         'source' => 'title',
-        'target' => 'field_gamma:title'
+        'target' => 'field_gamma:title',
       ),
       8 => array(
         'source' => 'url',
-        'target' => 'field_omega:url'
+        'target' => 'field_omega:url',
       ),
     ));
 
@@ -125,7 +133,7 @@ class FeedsMapperLinkTestCase extends FeedsMapperTestCase {
     $url = 'http://developmentseed.org/blog/2009/oct/06/open-atrium-translation-workflow-two-way-updating';
     $title = 'Open Atrium Translation Workflow: Two Way Translation Updates';
     $this->assertNodeFieldValue('alpha', array('url' => $url, 'static' => $title));
-    $this->assertNodeFieldValue('beta', array('url' =>  $url));
+    $this->assertNodeFieldValue('beta', array('url' => $url));
     $this->assertNodeFieldValue('gamma', array('url' => $url, 'static' => $title));
     $this->assertNodeFieldValue('omega', array('url' => $url, 'static' => $this->staticTitle));
 
@@ -159,39 +167,39 @@ class FeedsMapperLinkTestCase extends FeedsMapperTestCase {
       ),
       1 => array(
         'source' => 'title',
-        'target' => 'title'
+        'target' => 'title',
       ),
       2 => array(
         'source' => 'url',
-        'target' => 'field_alpha:url'
+        'target' => 'field_alpha:url',
       ),
       3 => array(
         'source' => 'link_title',
-        'target' => 'field_alpha:title'
+        'target' => 'field_alpha:title',
       ),
       4 => array(
         'source' => 'url',
-        'target' => 'field_beta:url'
+        'target' => 'field_beta:url',
       ),
       5 => array(
         'source' => 'link_title',
-        'target' => 'field_beta:title'
+        'target' => 'field_beta:title',
       ),
       6 => array(
         'source' => 'url',
-        'target' => 'field_gamma:url'
+        'target' => 'field_gamma:url',
       ),
       7 => array(
         'source' => 'link_title',
-        'target' => 'field_gamma:title'
+        'target' => 'field_gamma:title',
       ),
       8 => array(
         'source' => 'url',
-        'target' => 'field_omega:url'
+        'target' => 'field_omega:url',
       ),
       9 => array(
         'source' => 'link_title',
-        'target' => 'field_omega:title'
+        'target' => 'field_omega:title',
       ),
     ));
 
@@ -314,6 +322,41 @@ class FeedsMapperLinkTestCase extends FeedsMapperTestCase {
 
     // Assert that the static title is no longer shown.
     $this->assertNoText($this->staticTitle, 'Static title link not found.');
+  }
+
+  /**
+   * Tests link field validation.
+   */
+  public function testLinkFieldValidation() {
+    // Create and configure importer.
+    $this->createImporterConfiguration('CSV', 'csv');
+    $this->setSettings('csv', NULL, array(
+      'content_type' => '',
+      'import_period' => FEEDS_SCHEDULE_NEVER,
+    ));
+    $this->setPlugin('csv', 'FeedsFileFetcher');
+    $this->setPlugin('csv', 'FeedsCSVParser');
+    $this->setSettings('csv', 'FeedsNodeProcessor', array(
+      'bundle' => $this->contentType,
+    ));
+    $this->addMappings('csv', array(
+      0 => array(
+        'source' => 'title',
+        'target' => 'title',
+      ),
+      1 => array(
+        'source' => 'alpha',
+        'target' => 'field_alpha:title',
+      ),
+      2 => array(
+        'source' => 'alpha',
+        'target' => 'field_alpha:url',
+      ),
+    ));
+    $this->importFile('csv', $this->absolutePath() . '/tests/feeds/content.csv');
+    $this->assertText('Failed importing 1 node.');
+    $this->assertText("Field validation errors in item 'Ut wisi enim ad minim veniam'");
+    $this->assertText('The value Ut wisi provided for alpha_link_field_label is not a valid URL.');
   }
 
   /**

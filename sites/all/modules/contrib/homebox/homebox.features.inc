@@ -51,7 +51,7 @@ function homebox_features_export($data, &$export, $module_name = '') {
 /**
  * Implements hook_features_export_render().
  */
-function homebox_features_export_render($module = 'foo', $data) {
+function homebox_features_export_render($module, $data) {
   $code = array();
 
   // Begin code
@@ -72,7 +72,7 @@ function homebox_features_export_render($module = 'foo', $data) {
   $code[] = "\n" . '  return $homeboxes;';
 
   // Put code into a string
-  $code = implode($code, "\n");
+  $code = implode("\n", $code);
 
   return array('homebox' => $code);
 }
@@ -84,11 +84,9 @@ function homebox_features_revert($module = NULL) {
   // Get homebox pages from feature
   if (module_hook($module, 'homebox')) {
     $pages = module_invoke($module, 'homebox');
-    foreach($pages as $page) {
-      $pageToSave = new stdClass();
-      $pageToSave->name = $page['title'];
-      $pageToSave->settings = $page;
-      $saved = homebox_save_page($pageToSave);
+
+    foreach ($pages as $name => $settings) {
+      homebox_delete_page($name);
     }
   }
 }

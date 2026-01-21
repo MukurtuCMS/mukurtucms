@@ -1,0 +1,14 @@
+diff --git a/treeable/treeable.module b/treeable/treeable.module
+index ca6dff1..180731c 100644
+--- a/treeable/treeable.module
++++ b/treeable/treeable.module
+@@ -549,6 +549,9 @@ function treeable_field_formatter_view($entity_type, $entity, $field, $instance,
+  */
+ function treeable_preprocess_field(&$variables) {
+
++  // Mukurtu patch. We are not using this formatter, and it returns PHP notices, so get out of here.
++  return;
++
+   $element = $variables['element'];
+
+   if ($element['#formatter'] == 'treeable_list') {

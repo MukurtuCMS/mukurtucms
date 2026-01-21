@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_importexport_users.views_default.inc
@@ -168,7 +169,7 @@ function ma_importexport_users_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
-  /* Field: Content: Sharing Protocol */
+  /* Field: Content: Sharing protocol */
   $handler->display->display_options['fields']['group_access']['id'] = 'group_access';
   $handler->display->display_options['fields']['group_access']['table'] = 'field_data_group_access';
   $handler->display->display_options['fields']['group_access']['field'] = 'group_access';
@@ -246,7 +247,7 @@ print $output;
   $handler->display->display_options['fields']['type']['table'] = 'node';
   $handler->display->display_options['fields']['type']['field'] = 'type';
   $handler->display->display_options['fields']['type']['element_label_colon'] = FALSE;
-  /* Field: Content: Sharing Protocol */
+  /* Field: Content: Sharing protocol */
   $handler->display->display_options['fields']['group_access_1']['id'] = 'group_access_1';
   $handler->display->display_options['fields']['group_access_1']['table'] = 'field_data_group_access';
   $handler->display->display_options['fields']['group_access_1']['field'] = 'group_access';
@@ -303,7 +304,7 @@ print $output;
     t('uid'),
     t('Updated date'),
     t('Type'),
-    t('Sharing Protocol'),
+    t('Sharing protocol'),
     t('Page'),
     t('Data export'),
   );
@@ -357,7 +358,7 @@ print $output;
   $handler->display->display_options['fields']['body']['table'] = 'field_data_body';
   $handler->display->display_options['fields']['body']['field'] = 'body';
   $handler->display->display_options['fields']['body']['element_label_colon'] = FALSE;
-  /* Field: Content: Sharing Protocol */
+  /* Field: Content: Sharing protocol */
   $handler->display->display_options['fields']['group_access']['id'] = 'group_access';
   $handler->display->display_options['fields']['group_access']['table'] = 'field_data_group_access';
   $handler->display->display_options['fields']['group_access']['field'] = 'group_access';
@@ -380,7 +381,7 @@ print $output;
   $handler->display->display_options['fields']['type']['table'] = 'node';
   $handler->display->display_options['fields']['type']['field'] = 'type';
   $handler->display->display_options['fields']['type']['element_label_colon'] = FALSE;
-  /* Field: Content: Sharing Protocol */
+  /* Field: Content: Sharing protocol */
   $handler->display->display_options['fields']['group_access_1']['id'] = 'group_access_1';
   $handler->display->display_options['fields']['group_access_1']['table'] = 'field_data_group_access';
   $handler->display->display_options['fields']['group_access_1']['field'] = 'group_access';
@@ -436,7 +437,7 @@ print $output;
     t('uid'),
     t('Updated date'),
     t('Type'),
-    t('Sharing Protocol'),
+    t('Sharing protocol'),
     t('Page'),
     t('Data export'),
   );

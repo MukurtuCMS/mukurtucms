@@ -1,0 +1,63 @@
+<?php
+/**
+ * @file
+ * Integrates the unsplash service with the dummyimage module.
+ */
+
+/**
+ * Implements hook_dummyimage_service().
+ */
+function unsplash_dummyimage_service() {
+  return array(
+    'unsplash' => array(
+      'title' => t('Unsplash'),
+      'url' => 'https://source.unsplash.com/',
+      'form builder' => unsplash_form(),
+      'options' => unsplash_options(),
+    ),
+  );
+}
+
+/**
+ * Form builder function for the unsplash service.
+ */
+function unsplash_form() {
+  $form = array();
+
+  $form['unsplash'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Unsplash'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  $form['unsplash']['unsplash_category'] = array(
+    '#type' => 'select',
+    '#title' => t('Category'),
+    '#description' => t('Select an image category.'),
+    '#default_value' => variable_get('unsplash_category', ''),
+    '#required' => TRUE,
+    '#options' => array(
+      'food' => t('Food'),
+      'nature' => t('Nature'),
+      'people' => t('People'),
+      'technology' => t('Technology'),
+      'objects' => t('Objects'),
+    ),
+  );
+
+  return $form;
+}
+
+/**
+ * Provides the generate callback for the unsplash service.
+ */
+function unsplash_options() {
+  return array(
+    'pattern' => 'https://source.unsplash.com/category/%category/%dimensions',
+    'separator' => 'x',
+    'replacements' => array(
+      '%category' => variable_get('unsplash_category', ''),
+    ),
+  );
+}

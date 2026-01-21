@@ -1,0 +1,18 @@
+name = Tree Field
+description = "Extends Entity Reference to provide a tree of entities."
+core = 7.x
+package = Fields
+
+dependencies[] = tree
+dependencies[] = entity
+dependencies[] = entityreference
+
+files[] = tree/storage/Tree_Storage_SQL_Field.class.php
+
+files[] = views/treefield_views_handler_field_draggable.inc
+
+; Information added by Drupal.org packaging script on 2018-10-12
+version = "7.x-1.0-alpha1+12-dev"
+core = "7.x"
+project = "tree"
+datestamp = "1539322383"

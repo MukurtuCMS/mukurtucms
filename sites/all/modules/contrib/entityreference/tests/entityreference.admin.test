@@ -21,7 +21,7 @@ class EntityReferenceAdminTestCase extends DrupalWebTestCase {
     parent::setUp(array('field_ui', 'entity', 'ctools', 'entityreference'));
 
     // Create test user.
-    $this->admin_user = $this->drupalCreateUser(array('access content', 'administer content types'));
+    $this->admin_user = $this->drupalCreateUser(array('access content', 'administer content types', 'administer fields'));
     $this->drupalLogin($this->admin_user);
 
     // Create content type, with underscores.

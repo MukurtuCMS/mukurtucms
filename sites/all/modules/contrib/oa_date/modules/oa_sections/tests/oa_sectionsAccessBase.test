@@ -1,0 +1,100 @@
+<?php
+
+/**
+ * @file
+ * Base class for section access tests.
+ */
+
+abstract class oa_sectionsAccessBase extends oa_coreBaseWebTest {
+
+  /**
+   * Tests access to sections.
+   *
+   * @param $text
+   *   Text to use for asserts.
+   * @param $test_space
+   *   Space to add sections to
+   * @param $space_admin
+   *   Administer of that space
+   * @param $space_member
+   *   Member of that space
+   * @param $space_member_2
+   *   A different member of that space.
+   * @param $group_for_section
+   *   A group that space member is part of.
+   */
+  protected function oaTestOaSectionAccess($text, $test_space, $space_admin, $space_member, $space_member_2, $non_member, $group_for_section = NULL, $team_for_section = NULL) {
+    $this->drupalLogin($space_admin);
+    $this->drupalGet('node/' . $test_space->nid);
+    $anon = user_load(0);
+    $section_public = $this->createNodeInOaSpace($test_space, array('type' => 'oa_section'));
+    $section_space_member_only = $this->createNodeInOaSpace($test_space, array('type' => 'oa_section', 'field_oa_user_ref' => array(LANGUAGE_NONE => array(array('target_id' => $space_member->uid)))));
+    if ($group_for_section) {
+      $section_space_group_only = $this->createNodeInOaSpace($test_space, array('type' => 'oa_section', 'field_oa_group_ref' => array(LANGUAGE_NONE => array(array('target_id' => $group_for_section->nid)))));
+    }
+    if ($team_for_section) {
+      $section_space_team_only = $this->createNodeInOaSpace($test_space, array('type' => 'oa_section', 'field_oa_team_ref' => array(LANGUAGE_NONE => array(array('target_id' => $team_for_section->nid)))));
+    }
+    drupal_static_reset('node_access_grants');
+
+    // Test access to public section.
+    $this->oaTestOaSectionAccessToSection($text, 'member', 'public', $test_space, $section_public, $space_member, TRUE);
+    $this->oaTestOaSectionAccessToSection($text, 'member 2', 'public', $test_space, $section_public, $space_member_2, TRUE);
+    $this->oaTestOaSectionAccessToSection($text, 'admin', 'public', $test_space, $section_public, $space_admin, TRUE);
+    $this->oaTestOaSectionAccessToSection($text, 'anonymous', 'public', $test_space, $section_public, $anon, $this->oaSpaceIsPublic($test_space));
+    $this->oaTestOaSectionAccessToSection($text, 'non-member', 'public', $test_space, $section_public, $non_member, $this->oaSpaceIsPublic($test_space));
+
+    // Test access to private sections done by specific user.
+    $this->oaTestOaSectionAccessToSection($text, 'admin/author', 'private', $test_space, $section_space_member_only, $space_admin, TRUE);
+    $this->oaTestOaSectionAccessToSection($text, 'member', 'private', $test_space, $section_space_member_only, $space_member, TRUE);
+    $this->oaTestOaSectionAccessToSection($text, 'member 2', 'private', $test_space, $section_space_member_only, $space_member_2, FALSE);
+    $this->oaTestOaSectionAccessToSection($text, 'anonymous', 'private', $test_space, $section_space_member_only, $anon, FALSE);
+    $this->oaTestOaSectionAccessToSection($text, 'non-member', 'private', $test_space, $section_space_member_only, $non_member, FALSE);
+
+    // Test access to private sections done by group.
+    if ($group_for_section) {
+      $this->oaTestOaSectionAccessToSection($text, 'admin', 'private by group', $test_space, $section_space_group_only, $space_admin, TRUE);
+      $this->oaTestOaSectionAccessToSection($text, 'member', 'private by group', $test_space, $section_space_group_only, $space_member, TRUE);
+      $this->oaTestOaSectionAccessToSection($text, 'member 2', 'private by group', $test_space, $section_space_group_only, $space_member_2, FALSE);
+      $this->oaTestOaSectionAccessToSection($text, 'anonymous', 'private by group', $test_space, $section_space_group_only, $anon, FALSE);
+      $this->oaTestOaSectionAccessToSection($text, 'non-member', 'private by group', $test_space, $section_space_group_only, $non_member, FALSE);
+    }
+    if ($team_for_section) {
+      $this->oaTestOaSectionAccessToSection($text, 'admin', 'private by team', $test_space, $section_space_team_only, $space_admin, TRUE);
+      $this->oaTestOaSectionAccessToSection($text, 'member', 'private by team', $test_space, $section_space_team_only, $space_member, TRUE);
+      $this->oaTestOaSectionAccessToSection($text, 'member 2', 'private by team', $test_space, $section_space_team_only, $space_member_2, FALSE);
+      $this->oaTestOaSectionAccessToSection($text, 'anonymous', 'private by team', $test_space, $section_space_team_only, $anon, FALSE);
+      $this->oaTestOaSectionAccessToSection($text, 'non-member', 'private by team', $test_space, $section_space_team_only, $non_member, FALSE);
+    }
+  }
+
+
+  /**
+   * Tests access to a specfic section.
+   *
+   * @param $space_text
+   *   Text to use for asserts.
+   * @param $member_text
+   *   Text to use for asserts.
+   * @param $section_text
+   *   Text to use for asserts.
+   * @param $space
+   *   Space the section is part of.
+   * @param $section
+   *   Section to test.
+   * @param $account
+   *   Account to test access for.
+   * @param $has_access
+   *   Whether $account should have access to this space.
+   */
+  protected function oaTestOaSectionAccessToSection($space_text, $member_text, $section_text, $space, $section, $account, $has_access) {
+
+    if ($has_access) {
+      $this->assertTrue(node_access('view', $section, $account), t('@member has view access to @section section for @space', array('@space' => $space_text, '@member' => $member_text, '@section' => $section_text)));
+    }
+    else {
+      $this->assertFalse(node_access('view', $section, $account), t('@member does not have view access to @section section for @space', array('@space' => $space_text, '@member' => $member_text, '@section' => $section_text)));
+    }
+  }
+
+}

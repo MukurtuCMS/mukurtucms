@@ -46,4 +46,45 @@ class EntityLoadTestCase extends DrupalWebTestCase {
     $this->assertIdentical($nodes_loaded[$node_2->nid], $all_nodes[$node_2->nid], 'Loaded node 2 is identical to cached node.');
     $this->assertIdentical($nodes_loaded[$node_3->nid], $all_nodes[$node_3->nid], 'Loaded node 3 is identical to cached node.');
   }
+
+  public function testEntityLoadIds() {
+    $this->drupalCreateNode(array('title' => 'Node 1'));
+    $this->drupalCreateNode(array('title' => 'Node 2'));
+
+    $nodes_loaded = entity_load('node', array('1', '2'));
+    $this->assertEqual(count($nodes_loaded), 2);
+
+    // Ensure that an id with a trailing decimal place is ignored.
+    $nodes_loaded = entity_load('node', array('1.', '2'));
+    $this->assertEqual(count($nodes_loaded), 1);
+  }
+
+  /**
+   * Tests the controller class loading functionality on non-existing entity
+   * types and on entities without valid controller class.
+   */
+  public function testEntityLoadInvalidControllerClass() {
+    // Ensure that loading a non-existing entity type will throw an
+    // EntityMalformedException.
+    try {
+      entity_load('test', array('1'));
+      $this->fail(t('Cannot load a controller class on non-existing entity type.'));
+    }
+    catch (EntityMalformedException $e) {
+      $this->pass(t('Cannot load a controller class on non-existing entity type.'));
+    }
+
+    // Ensure that loading an entity without valid controller class will throw
+    // an EntityMalformedException.
+    module_enable(array('entity_crud_hook_test'));
+    variable_set('entity_crud_hook_test_alter_controller_class', TRUE);
+    try {
+      entity_load('node', array('1'));
+      $this->fail(t('Cannot load a missing or non-existent controller class.'));
+    }
+    catch (EntityMalformedException $e) {
+      $this->pass(t('Cannot load a missing or non-existent controller class.'));
+    }
+    variable_set('entity_crud_hook_test_alter_controller_class', FALSE);
+  }
 }

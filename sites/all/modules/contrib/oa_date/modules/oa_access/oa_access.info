@@ -1,0 +1,15 @@
+name = Open Atrium Access
+description = Access control API based on Open Atrium Groups and Teams.
+package = Open Atrium
+core = 7.x
+
+files[] = tests/oa_access.test
+
+dependencies[] = og_ui
+dependencies[] = oa_core
+
+; Information added by Drupal.org packaging script on 2018-10-18
+version = "7.x-2.91"
+core = "7.x"
+project = "oa_core"
+datestamp = "1539884795"

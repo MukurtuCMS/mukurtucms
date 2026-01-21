@@ -10,6 +10,9 @@
  */
 class FeedsMapperHookTestCase extends FeedsMapperTestCase {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Mapper: Hooks and callbacks',

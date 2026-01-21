@@ -20,21 +20,16 @@ function geophp_load() {
     
     if (module_exists('libraries')) {
       $path = libraries_get_path('geoPHP');
-      $file = $path . '/geoPHP.inc';
+      $file = DRUPAL_ROOT . '/' . $path . '/geoPHP.inc';
       if (file_exists($file) && $static_cache !== TRUE) {
         include_once($file);
         $already_found = TRUE;
+        $static_cache = $file;
       }
-      $static_cache = $file;
     }
     // If other options don't exist, load module's copy of geoPHP.
     if (!$already_found) {
-      $path = drupal_get_path('module', 'geophp');
-      $file = $path . '/geoPHP/geoPHP.inc';
-      if (file_exists($file)) {
-        include_once($file);
-        $static_cache = $file;
-      }
+      $static_cache = module_load_include('inc', 'geophp', 'geoPHP/geoPHP');
     }
   }
   

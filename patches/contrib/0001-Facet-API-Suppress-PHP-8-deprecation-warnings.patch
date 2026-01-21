@@ -1,0 +1,48 @@
+From a466501ccf92897c3435262c3b587e036df02276 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Thu, 27 Apr 2023 08:39:58 -0700
+Subject: [PATCH] Facet API Suppress PHP 8 deprecation warnings
+
+---
+ .../plugins/facetapi/adapter.inc | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/plugins/facetapi/adapter.inc b/plugins/facetapi/adapter.inc
+index b65671f7..5a729571 100644
+--- a/plugins/facetapi/adapter.inc
++++ b/plugins/facetapi/adapter.inc
+@@ -1176,6 +1176,7 @@ class FacetapiFacet implements ArrayAccess {
+   /**
+    * Implements ArrayAccess::offsetExists().
+    */
++  #[\ReturnTypeWillChange]
+   public function offsetExists($offset) {
+     return isset($this->facet[$offset]);
+   }
+@@ -1183,6 +1184,7 @@ class FacetapiFacet implements ArrayAccess {
+   /**
+    * Implements ArrayAccess::offsetGet().
+    */
++  #[\ReturnTypeWillChange]
+   public function offsetGet($offset) {
+     return isset($this->facet[$offset]) ? $this->facet[$offset] : NULL;
+   }
+@@ -1190,6 +1192,7 @@ class FacetapiFacet implements ArrayAccess {
+   /**
+    * Implements ArrayAccess::offsetSet().
+    */
++  #[\ReturnTypeWillChange]
+   public function offsetSet($offset, $value) {
+     if (NULL === $offset) {
+       $this->facet[] = $value;
+@@ -1202,6 +1205,7 @@ class FacetapiFacet implements ArrayAccess {
+   /**
+    * Implements ArrayAccess::offsetUnset().
+    */
++  #[\ReturnTypeWillChange]
+   public function offsetUnset($offset) {
+     unset($this->facet[$offset]);
+   }
+-- 
+2.34.1
+

@@ -1,0 +1,17 @@
+name = Inline entity form test
+description = Contains all content types required for IEF testing
+core = 7.x
+package = Testing
+hidden = TRUE
+
+dependencies[] = entityreference
+dependencies[] = image
+dependencies[] = inline_entity_form
+dependencies[] = number
+dependencies[] = text
+
+; Information added by Drupal.org packaging script on 2019-09-10
+version = "7.x-1.9"
+core = "7.x"
+project = "inline_entity_form"
+datestamp = "1568130787"

@@ -1,0 +1,23 @@
+; Mailhandler ignores
+
+; Drupal theme function: http://drupal.org/node/898200
+mailhandler.module:36:coder_tough_love
+mailhandler.module:39:coder_tough_love
+mailhandler.install:77:coder_tough_love
+plugins/ctools/export_ui/mailhandler_mailbox_ui.class.php:22:coder_tough_love
+plugins/ctools/export_ui/mailhandler_mailbox_ui.class.php:93:coder_tough_love
+plugins/ctools/export_ui/mailhandler_mailbox_ui.class.php:184:coder_tough_love
+plugins/ctools/export_ui/mailhandler_mailbox_ui.class.php:187:coder_tough_love
+modules/mailhandler_php_imap/plugins/mailhandler/retrieve/MailhandlerPhpImapRetrieve.class.php:30:coder_tough_love
+
+; Sentence case: http://drupal.org/node/337393
+modules/mailhandler_default/mailhandler_default.feeds_importer_default.inc:32:coder_tough_love
+modules/mailhandler_default/mailhandler_default.feeds_importer_default.inc:33:coder_tough_love
+modules/mailhandler_php_imap/plugins/mailhandler/retrieve/MailhandlerPhpImapRetrieve.class.php:335:coder_tough_love
+mailhandler.install:133:coder_tough_love
+mailhandler.install:134:coder_tough_love
+mailhandler.install:165:coder_tough_love
+
+; Filtered text warning
+mailhandler.module:195:security
+

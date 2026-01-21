@@ -33,6 +33,7 @@ files[] = tests/pager.test
 files[] = tests/password.test
 files[] = tests/path.test
 files[] = tests/registry.test
+files[] = tests/request_sanitizer.test
 files[] = tests/schema.test
 files[] = tests/session.test
 files[] = tests/tablesort.test
@@ -57,8 +58,7 @@ files[] = tests/upgrade/update.trigger.test
 files[] = tests/upgrade/update.field.test
 files[] = tests/upgrade/update.user.test
 
-; Information added by Drupal.org packaging script on 2015-10-21
-version = "7.41"
+; Information added by Drupal.org packaging script on 2024-12-04
+version = "7.103"
 project = "drupal"
-datestamp = "1445457729"
-
+datestamp = "1733324608"

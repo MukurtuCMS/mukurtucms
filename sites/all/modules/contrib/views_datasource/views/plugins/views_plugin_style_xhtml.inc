@@ -15,14 +15,32 @@ class views_plugin_style_xhtml extends views_plugin_style {
     $options = parent::option_definition();
     $author_default = isset($GLOBALS['user']->name) ? $GLOBALS['user']->name : variable_get('anonymous', t('Anonymous'));
     $options['format'] = array('default' => 'hcard', 'translatable' => FALSE);
-    $options['field_output'] = array('default' => 'normal', 'translatable' => FALSE);
-    $options['plaintext_output'] = array('default' => TRUE, 'translatable' => FALSE);
+    $options['field_output'] = array(
+      'default' => 'normal',
+      'translatable' => FALSE
+    );
+    $options['plaintext_output'] = array(
+      'default' => TRUE,
+      'translatable' => FALSE
+    );
     //$options['skip_empty_fields'] = array('default' => TRUE, 'translatable' => FALSE);
-    $options['escape_as_CDATA'] = array('default' => 'no', 'translatable' => FALSE);
-    $options['content_type'] = array('default' => 'text/xhtml', 'translatable' => FALSE);
+    $options['escape_as_CDATA'] = array(
+      'default' => 'no',
+      'translatable' => FALSE
+    );
+    $options['content_type'] = array(
+      'default' => 'text/xhtml',
+      'translatable' => FALSE
+    );
     $options['header'] = array('default' => NULL, 'translatable' => FALSE);
-    $options['author'] = array('default' => $author_default, 'translatable' => FALSE);
-    $options['using_views_api_mode'] = array('default' => FALSE, 'translatable' => FALSE);
+    $options['author'] = array(
+      'default' => $author_default,
+      'translatable' => FALSE
+    );
+    $options['using_views_api_mode'] = array(
+      'default' => FALSE,
+      'translatable' => FALSE
+    );
     //$options['action_on_missing_field'] = array('default' => 'none', 'translatable' => FALSE);
     return $options;
   }
@@ -37,7 +55,7 @@ class views_plugin_style_xhtml extends views_plugin_style {
       '#options' => views_xhtml_views_formats(),
       '#default_value' => $this->options['format'],
     );
-    $form['field_output']  = array(
+    $form['field_output'] = array(
       '#type' => 'radios',
       '#title' => t('Field output'),
       '#description' => t('For each row in the view, fields can be output as either the field rendered by Views, or by the raw content of the field.'),
@@ -76,9 +94,9 @@ class views_plugin_style_xhtml extends views_plugin_style {
       '#type' => 'radios',
       '#title' => ('Content-Type'),
       '#options' => array(
-         'default' => t('Default: text/xhtml'),
-         'text/xml' => t('text/xml'),
-         'text/html' => t('text/html'),
+        'default' => t('Default: text/xhtml'),
+        'text/xml' => t('text/xml'),
+        'text/html' => t('text/html'),
       ),
       '#default_value' => $this->options['content_type'],
       '#description' => t('The Content-Type header that will be sent with the XHTML output.'),
@@ -88,7 +106,7 @@ class views_plugin_style_xhtml extends views_plugin_style {
       '#title' => 'View author',
       '#description' => 'The Drupal user name of the person who authored this view.',
       '#default_value' => $this->options['author'],
-      );
+    );
     $form['using_views_api_mode'] = array(
       '#type' => 'checkbox',
       '#title' => t('Views API mode'),
@@ -131,6 +149,10 @@ class views_plugin_style_xhtml extends views_plugin_style {
     }
     unset($view->row_index);
 
-    return theme($this->theme_functions(), array('view' => $view, 'options' => $options, 'rows' => $rows));
+    return theme($this->theme_functions(), array(
+        'view' => $view,
+        'options' => $options,
+        'rows' => $rows
+      ));
   }
 }

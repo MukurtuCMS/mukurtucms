@@ -1,0 +1,52 @@
+.panel-panel {
+    &.left {
+        padding-top: 50px;
+    }
+
+    a {
+        &:hover,
+        &:focus {
+            text-decoration: none;
+        }
+
+        .pane-title {
+            &:hover {
+                background-color: @mukurtu-default-container-bg-hover-color;
+            }
+        }
+    }
+
+    .pane-title {
+        .mukurtu-pane-label;
+        background-image: url(@mukurtu-panel-chevron-down-path);
+        background-repeat: no-repeat;
+        background-position: 95% 50%;
+        background-size: 20px;
+    }
+
+    .pane-content {
+        &.collapse {
+            background-color: @mukurtu-panel-pane-content-background-color;
+        }
+
+        .facetapi-facetapi-checkbox-links {
+            padding: 10px 20px 20px 14px;
+
+            .leaf,
+            .collapsed {
+                padding-bottom: 5px;
+                overflow: auto;
+
+                input {
+                    margin: auto;
+                    width: 10%;
+                }
+
+                a {
+                    float: right;
+                    width: 80%;
+                }
+            }
+        }
+    }
+}

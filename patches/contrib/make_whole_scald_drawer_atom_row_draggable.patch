@@ -1,0 +1,46 @@
+diff --git a/modules/library/dnd/js/dnd-library.js b/modules/library/dnd/js/dnd-library.js
+index 8c7ceb5..4c23612 100644
+--- a/modules/library/dnd/js/dnd-library.js
++++ b/modules/library/dnd/js/dnd-library.js
+@@ -364,7 +364,8 @@ renderLibrary: function(data, editor) {
+       })
+       .bind('dragstart', function(e) {
+         var dt = e.originalEvent.dataTransfer, $this = $(this);
+-        var $img = $this.is('img') ? $this : $this.find('img');
++        // Mukurtu patch to allow dragging of div elements in addition to img elements.
++        var $img = ($this.is('img') || $this.is('div')) ? $this : $this.find('img');
+         var id = $img.data('atom-id');
+         dt.dropEffect = 'copy';
+         dt.setData("Text", Drupal.dnd.Atoms[id].sas);
+diff --git a/modules/library/scald_dnd_library/scald_dnd_library.module b/modules/library/scald_dnd_library/scald_dnd_library.module
+index dae3a1a..045b2cc 100644
+--- a/modules/library/scald_dnd_library/scald_dnd_library.module
++++ b/modules/library/scald_dnd_library/scald_dnd_library.module
+@@ -175,7 +175,8 @@ function scald_dnd_library_scald_render($atom, $context, $options) {
+
+   $attributes = array();
+   if ($context == 'sdl_library_item') {
+-    $attributes += array('class' => 'drop', 'draggable' => 'TRUE', 'data-atom-id' => $atom->sid);
++    // Mukurtu patch. Do not pass drag attributes because we have made the whole row draggable.
++    $attributes += array('draggable' => 'FALSE');
+   }
+   elseif ($context == 'sdl_preview') {
+     $attributes += array('class' => 'drop', 'draggable' => 'TRUE', 'data-atom-id' => $atom->sid);
+@@ -247,12 +248,14 @@ function theme_sdl_library_item($variables) {
+     $authors = '';
+   }
+
+-  $return = "<div class='image'>{$image}</div>
+-  <div class='meta type-" . drupal_html_class($atom->type) . " clearfix'>
++  // Mukurtu patch to make the whole row draggable.
++  $return =  "<div class='drop' draggable='TRUE' data-atom-id='" . $atom->sid . "'>";
++  $return .= "<div class='image'>{$image}</div>
++    <div class='meta type-" . drupal_html_class($atom->type) . " clearfix'>
+     <div class='title'>{$informations->title}</div>
+     <div class='author'>{$authors}</div>
+     {$rendered_links}
+-  </div>
++  </div></div>
+   ";
+   return $return;
+ }

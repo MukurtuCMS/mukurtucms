@@ -1,0 +1,86 @@
+/* Force contents to wrap */
+.fc-event {
+  word-wrap: break-word;
+}
+
+/* Undo Drupal default theme link colors */
+.fc-content a:link,
+.fc-content a:visited {
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Reset FullCalendar generic style */
+.fc-event,
+.fc-event .fc-event-skin,
+.fc-event .fc-event-time,
+.fc-event a {
+  border-style: none;
+  background-color: transparent;
+  color: inherit;
+}
+
+/* Set FullCalendar default style */
+.fc-event-default,
+.fc-event-default .fc-event-skin,
+.fc-event-default .fc-event-time,
+.fc-event-default a {
+  border-color: #36c;
+  border-style: solid;
+  background-color: #36c;
+  color: #fff;
+}
+
+/* Styling for updated message */
+.fullcalendar-status {
+  background: #ecf8f4;
+  border: 1px solid #fff;
+  color: #687;
+  display: none;
+  margin: 0 0 10px 0;
+  padding: 15px;
+  text-align: center;
+}
+.fullcalendar-status-close {
+  text-transform: lowercase;
+}
+
+.fc table {
+  margin: 0;
+}
+
+table.fc-header {
+  margin-bottom: 10px;
+}
+
+.fc-header tr {
+  background-color: transparent;
+}
+
+.fc-header-title {
+  text-align: center;
+}
+
+.fc-header tbody,
+.fc-header th,
+.fc-header td {
+  border: 0;
+}
+
+.fc-header .fc-state-default,
+.fc-header .ui-state-default {
+  margin-bottom: 0;
+}
+
+/* Hide plain text events when javascript is enabled */
+.js .fullcalendar-content {
+  display: none;
+}
+
+/* Reposition the throbber. */
+.fullcalendar .ajax-progress {
+  left: 50%;
+  position: absolute;
+  top: 1.6em;
+  z-index: 1;
+}

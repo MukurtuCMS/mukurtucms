@@ -1,0 +1,13 @@
+diff --git a/treeable/treeable.module b/treeable/treeable.module
+index f45f472..e25c641 100644
+--- a/treeable/treeable.module
++++ b/treeable/treeable.module
+@@ -159,7 +159,7 @@ function treeable_form_field_ui_field_edit_form_alter(&$form, $form_state) {
+   );
+ 
+   if (field_behaviors_widget('multiple values', $instance) != FIELD_BEHAVIOR_DEFAULT) {
+-    $form['instance']['widget']['settings']['treeable']['#description'] += '<br/>' . t('The currently active widget handles multiple value by itself. The hierarchical edit form cannot be enabled.');
++    $form['instance']['widget']['settings']['treeable']['#description'] .= '<br/>' . t('The currently active widget handles multiple value by itself. The hierarchical edit form cannot be enabled.');
+     $form['instance']['widget']['settings']['treeable']['#value'] = 0;
+     $form['instance']['widget']['settings']['treeable']['#disabled'] = TRUE;
+   }

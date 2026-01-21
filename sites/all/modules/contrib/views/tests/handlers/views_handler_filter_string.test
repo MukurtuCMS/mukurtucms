@@ -19,8 +19,12 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
     );
   }
 
-  function setUp() {
-    parent::setUp();
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    parent::setUp($modules);
+
     $this->column_map = array(
       'views_test_name' => 'name',
     );
@@ -75,7 +79,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
   function testFilterStringEqual() {
     $view = $this->getBasicView();
 
-    // Change the filtering
+    // Change the filtering.
     $view->display['default']->handler->override_option('filters', array(
       'name' => array(
         'id' => 'name',
@@ -100,7 +104,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
     $filters = $this->getGroupedExposedFilters();
     $view = $this->getBasicPageView();
 
-    // Filter: Name, Operator: =, Value: Ringo
+    // Filter: Name, Operator: =, Value: Ringo.
     $filters['name']['group_info']['default_group'] = 1;
     $view->set_display('page_1');
     $view->display['page_1']->handler->override_option('filters', $filters);
@@ -119,7 +123,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
   function testFilterStringNotEqual() {
     $view = $this->getBasicView();
 
-    // Change the filtering
+    // Change the filtering.
     $view->display['default']->handler->override_option('filters', array(
       'name' => array(
         'id' => 'name',
@@ -153,7 +157,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
     $filters = $this->getGroupedExposedFilters();
     $view = $this->getBasicPageView();
 
-    // Filter: Name, Operator: !=, Value: Ringo
+    // Filter: Name, Operator: !=, Value: Ringo.
     $filters['name']['group_info']['default_group'] = '2';
 
     $view->set_display('page_1');
@@ -182,7 +186,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
   function testFilterStringContains() {
     $view = $this->getBasicView();
 
-    // Change the filtering
+    // Change the filtering.
     $view->display['default']->handler->override_option('filters', array(
       'name' => array(
         'id' => 'name',
@@ -208,7 +212,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
     $filters = $this->getGroupedExposedFilters();
     $view = $this->getBasicPageView();
 
-    // Filter: Name, Operator: contains, Value: ing
+    // Filter: Name, Operator: contains, Value: ing.
     $filters['name']['group_info']['default_group'] = '3';
     $view->set_display('page_1');
     $view->display['page_1']->handler->override_option('filters', $filters);
@@ -228,7 +232,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
   function testFilterStringWord() {
     $view = $this->getBasicView();
 
-    // Change the filtering
+    // Change the filtering.
     $view->display['default']->handler->override_option('filters', array(
       'description' => array(
         'id' => 'description',
@@ -254,7 +258,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
 
     $view = $this->getBasicView();
 
-    // Change the filtering
+    // Change the filtering.
     $view->display['default']->handler->override_option('filters', array(
       'description' => array(
         'id' => 'description',
@@ -277,10 +281,10 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
 
 
   function testFilterStringGroupedExposedWord() {
-      $filters = $this->getGroupedExposedFilters();
+    $filters = $this->getGroupedExposedFilters();
     $view = $this->getBasicPageView();
 
-    // Filter: Name, Operator: contains, Value: ing
+    // Filter: Name, Operator: contains, Value: ing.
     $filters['name']['group_info']['default_group'] = '3';
     $view->set_display('page_1');
     $view->display['page_1']->handler->override_option('filters', $filters);
@@ -299,7 +303,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
     $filters = $this->getGroupedExposedFilters();
     $view = $this->getBasicPageView();
 
-    // Filter: Description, Operator: contains, Value: actor
+    // Filter: Description, Operator: contains, Value: actor.
     $filters['description']['group_info']['default_group'] = '1';
     $view->set_display('page_1');
     $view->display['page_1']->handler->override_option('filters', $filters);
@@ -319,7 +323,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
   function testFilterStringStarts() {
     $view = $this->getBasicView();
 
-    // Change the filtering
+    // Change the filtering.
     $view->display['default']->handler->override_option('filters', array(
       'description' => array(
         'id' => 'description',
@@ -344,7 +348,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
     $filters = $this->getGroupedExposedFilters();
     $view = $this->getBasicPageView();
 
-    // Filter: Name, Operator: starts, Value: George
+    // Filter: Name, Operator: starts, Value: George.
     $filters['description']['group_info']['default_group'] = 2;
     $view->set_display('page_1');
     $view->display['page_1']->handler->override_option('filters', $filters);
@@ -362,7 +366,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
   function testFilterStringNotStarts() {
     $view = $this->getBasicView();
 
-    // Change the filtering
+    // Change the filtering.
     $view->display['default']->handler->override_option('filters', array(
       'description' => array(
         'id' => 'description',
@@ -385,7 +389,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
       array(
         'name' => 'Paul',
       ),
-      // There is no Meredith returned because his description is empty
+      // There is no Meredith returned because his description is empty.
     );
     $this->assertIdenticalResultset($view, $resultset, $this->column_map);
   }
@@ -394,7 +398,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
     $filters = $this->getGroupedExposedFilters();
     $view = $this->getBasicPageView();
 
-    // Filter: Name, Operator: not_starts, Value: George
+    // Filter: Name, Operator: not_starts, Value: George.
     $filters['description']['group_info']['default_group'] = 3;
     $view->set_display('page_1');
     $view->display['page_1']->handler->override_option('filters', $filters);
@@ -411,7 +415,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
       array(
         'name' => 'Paul',
       ),
-      // There is no Meredith returned because his description is empty
+      // There is no Meredith returned because his description is empty.
     );
     $this->assertIdenticalResultset($view, $resultset, $this->column_map);
   }
@@ -419,7 +423,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
   function testFilterStringEnds() {
     $view = $this->getBasicView();
 
-    // Change the filtering
+    // Change the filtering.
     $view->display['default']->handler->override_option('filters', array(
       'description' => array(
         'id' => 'description',
@@ -447,7 +451,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
     $filters = $this->getGroupedExposedFilters();
     $view = $this->getBasicPageView();
 
-    // Filter: Descriptino, Operator: ends, Value: Beatles
+    // Filter: Descriptino, Operator: ends, Value: Beatles.
     $filters['description']['group_info']['default_group'] = 4;
     $view->set_display('page_1');
     $view->display['page_1']->handler->override_option('filters', $filters);
@@ -468,7 +472,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
   function testFilterStringNotEnds() {
     $view = $this->getBasicView();
 
-    // Change the filtering
+    // Change the filtering.
     $view->display['default']->handler->override_option('filters', array(
       'description' => array(
         'id' => 'description',
@@ -488,7 +492,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
       array(
         'name' => 'Paul',
       ),
-      // There is no Meredith returned because his description is empty
+      // There is no Meredith returned because his description is empty.
     );
     $this->assertIdenticalResultset($view, $resultset, $this->column_map);
   }
@@ -497,7 +501,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
     $filters = $this->getGroupedExposedFilters();
     $view = $this->getBasicPageView();
 
-    // Filter: Description, Operator: not_ends, Value: Beatles
+    // Filter: Description, Operator: not_ends, Value: Beatles.
     $filters['description']['group_info']['default_group'] = 5;
     $view->set_display('page_1');
     $view->display['page_1']->handler->override_option('filters', $filters);
@@ -511,7 +515,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
       array(
         'name' => 'Paul',
       ),
-      // There is no Meredith returned because his description is empty
+      // There is no Meredith returned because his description is empty.
     );
     $this->assertIdenticalResultset($view, $resultset, $this->column_map);
   }
@@ -519,7 +523,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
   function testFilterStringNot() {
     $view = $this->getBasicView();
 
-    // Change the filtering
+    // Change the filtering.
     $view->display['default']->handler->override_option('filters', array(
       'description' => array(
         'id' => 'description',
@@ -539,7 +543,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
       array(
         'name' => 'Paul',
       ),
-      // There is no Meredith returned because his description is empty
+      // There is no Meredith returned because his description is empty.
     );
     $this->assertIdenticalResultset($view, $resultset, $this->column_map);
   }
@@ -549,7 +553,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
     $filters = $this->getGroupedExposedFilters();
     $view = $this->getBasicPageView();
 
-    // Filter: Description, Operator: not (does not contains), Value: Beatles
+    // Filter: Description, Operator: not (does not contains), Value: Beatles.
     $filters['description']['group_info']['default_group'] = 6;
     $view->set_display('page_1');
     $view->display['page_1']->handler->override_option('filters', $filters);
@@ -563,7 +567,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
       array(
         'name' => 'Paul',
       ),
-      // There is no Meredith returned because his description is empty
+      // There is no Meredith returned because his description is empty.
     );
     $this->assertIdenticalResultset($view, $resultset, $this->column_map);
 
@@ -572,7 +576,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
   function testFilterStringShorter() {
     $view = $this->getBasicView();
 
-    // Change the filtering
+    // Change the filtering.
     $view->display['default']->handler->override_option('filters', array(
       'name' => array(
         'id' => 'name',
@@ -620,7 +624,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
   function testFilterStringLonger() {
     $view = $this->getBasicView();
 
-    // Change the filtering
+    // Change the filtering.
     $view->display['default']->handler->override_option('filters', array(
       'name' => array(
         'id' => 'name',
@@ -663,7 +667,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
   function testFilterStringEmpty() {
     $view = $this->getBasicView();
 
-    // Change the filtering
+    // Change the filtering.
     $view->display['default']->handler->override_option('filters', array(
       'description' => array(
         'id' => 'description',
@@ -687,7 +691,7 @@ class ViewsHandlerFilterStringTest extends ViewsSqlTest {
     $filters = $this->getGroupedExposedFilters();
     $view = $this->getBasicPageView();
 
-    // Filter: Description, Operator: empty, Value:
+    // Filter: Description, Operator: empty, Value.
     $filters['description']['group_info']['default_group'] = 7;
     $view->set_display('page_1');
     $view->display['page_1']->handler->override_option('filters', $filters);

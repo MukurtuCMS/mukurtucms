@@ -1,3 +1,96 @@
+7.x-1.x-dev
+Development snapshot
+
+2023-03-23
+New stable release: 7.x-1.23
+
+[#1203846] by soulfroys, StephenN, martichka5, caiosba, vokiel: CKEditor interface language does not use $user->language variable
+[#3349695] by longwave: Update CKEditor 4 to 4.21.0
+
+2021-11-22
+New stable release: 7.x-1.22
+
+[#3236569] by VladimirAus, vokiel: Error during updb: "Error: Call to undefined function ckeditor_module_path() in ckeditor_update_7006()"
+[#3250088] by hargobind: UI Color Picker broken with custom skins path
+[#3243038] by Pavel_SPN: Notice on ckeditor_load_by_field() after switching to PHP7.4
+[#3250036] by vokiel: Upgrade CKEditor to 4.17.1 (CVE-2021-41165 & CVE-2021-41164)
+
+2021-08-30
+New stable release: 7.x-1.21
+Reverted [#2648232] by vokiel, jordisan: Drupal is not defined
+
+2021-08-27
+New stable release: 7.x-1.20
+
+[#2648232] by vokiel, jordisan: Drupal is not defined
+[#2330515] by jwilson3, vokiel, alcroito: Cache-bust CKEditor Styles and Config files
+[#2710817] by slpearce, kaloyan.damyanov, vokiel: Errors after update from 7.x-1.16 to 7.x-1.17
+by Vokiel: Update COPY_HERE.txt download link
+[#764100] by izmeez: Enable browser native spell checker by default (Backport for D7)
+[#764100] by izmeez: Enable browser native spell checker by default (Backport for D7)
+[#3216026] by generalredneck, mcdruid, jcisio: Update the CKEditor library to 4.16.2 - Hai-Nam Nguyen
+[#3134399] by vokiel: PDOException with CKEditor enabled
+[#3120705] by vokiel, jwilson3, Mile23: Valid JS configurations in js_conf break parser
+[#1635788] by wiifm, jddh, rakenodiax, vokiel: Media embed is stripping width and height from embedding media
+[#3043966] by asierrajr, vokiel: DrupalPageBreak button not visible with Smart Paging module
+[#2671786] by ron_s, aritrika.d: ckfinder_path function typos - aritrika.d
+[#1507852] by vokiel, solideogloria, dczepierga: [D7] 'drush ckeditor-download' fails if svn not installed
+[#2973080] by tristangraves, vokiel: Add field for setting ckeditor.config.js path manually
+[#3185298] by vokiel, joelpittet: Notice: Trying to access array offset on value of type bool in ckeditor_file_download()
+[#2976408] by tristangraves: ajax_html_ids sent during ajax request hits server limit
+[#3132694] by vokiel Unknown PHP function causes errors: rtrimtrim
+[#2671806] by ron_s, vokiel: Add custom skin support
+[#3127108] by vokiel Remove security.drupal.org issue IDs from changelog
+[#3120684] by darrell_ulm, vokiel: Fix resolving default skin when using the CDN version of CKEditor
+
+2020-03-17
+New stable release: 7.x-1.19
+
+[#2349885] by hass, Dieter Geiling: Add config.smiley_path for relative image urls
+[#2993053] by stefan.korn: DocBlock missing for hook_user_presave()
+[#2211217] by bwaindwain, gifad: Using "theme css", CKEditor fails to translate URI to valid URL
+[#3120618] by vokiel: Fix (remove) the eval() usage inside JavaScript files. SA-CONTRIB-2020-007 - Cross site scripting
+[#2679179] by Dave Reid, ron_s: CKEditor uses separate cache-busting query string from Drupal's
+[#2795603] by hgoto: drush ckeditor-download command raises warning with undefined offset
+[#2947109] by jstoller: New default CKEditor skin not recognized
+[#2898012] bump CKEditor to 4.9.2
+[#2790539] by Johnny vd Laar: prepare callback is optional, ckeditor_filter_xss causes notices
+
+2017-06-26
+New stable release: 7.x-1.18
+
+[#2463187] by Devin Carlson: Allow plugins to specify custom paths for button icons
+[#2299617] by ben.kyriakou: IMCE browser in CKEditor plugin doesn't respect current language
+[#1330794] by m4olivei, bwaindwain, ConfuciusDa1st, fearlsgroove: Use theme css in sub-theme does not include base theme
+[#2886073] by anrikun: Mistake in feature dependencies
+[#2644124] by drclaw: Some CKEditor plugins buttons don't appear in the Drag & Drop toolbar wizard
+[#2540528] by neerajsingh: In filemanager.config.php, Building $baseDir
+[#2705773] by japerry: ckeditor missing the 'prepare callback' from input filters
+[#2745809] by alvar0hurtad0: Add some tests to avoid failed testing of all patches
+
+2015-11-30
+New stable release: 7.x-1.17
+
+[#2550535] by jcisio, donquixote: $plugin_settings['active'] is messing with features
+[#2574253] by karenann: User specific "Default state" setting is not obeyed
+[#2514938] by themic8, jcisio: Use the latest version from CDN
+[#2542566] by jcisio: remove leftover icon.gif
+[#2542566] by bneil, srjosh, jcisio: Remove Media integration
+[#2437749] by Perignon, david.gil, jcisio: Infinity bucle in some cases in ckeditor_file_download
+[#2463461] by Luukyb: Cleanup .gitignore file from git
+[#1154730] by Sutharsan: CKEditor not following body rows setting Drupal 7
+[#2292575] by Hai-Nam Nguyen: mistakenly added a new line
+[#2292575] by Angry Dan: Naming of mediaembed plugin is confusing
+[#2323149] by kaare: ckeditor.admin.css: url() for tick.png and delete.png must point to ../images/
+[#2159403] by das-peter, aDarkling, Devin Carlson, wwalc, Angry Dan, brantwynn, agoradesign, micbar, joelpittet, brockfanning, iKb: Make CKEditor plugin system modular and clean
+[#2324383] by eugene.ilyin: Toolbar in Ckeditor profile is not saved: incompatibility with jQuery 1.10
+[#2367913] by yched: Fixed ckeditor_help() issues one uncached locale query on each page.
+
+2014-10-14
+New stable release: 7.x-1.16
+
+[#2357029] SA-CONTRIB-2014-098 - CKEditor - Cross Site Scripting (XSS)
+
 2013-07-15
 New stable release 7.x-1.15
 

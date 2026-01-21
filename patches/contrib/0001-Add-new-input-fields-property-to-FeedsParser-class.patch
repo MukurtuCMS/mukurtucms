@@ -1,0 +1,42 @@
+From 0ab7e626c16efdd5c680e3bb5ad4b596c16019ca Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Fri, 8 Dec 2017 13:57:02 -0800
+Subject: [PATCH] Add new input fields property to FeedsParser class
+
+We want to keep track of which fields were actually provided in the
+input. This will enable us to partial updates for existing content.
+---
+ sites/all/modules/contrib/feeds/plugins/FeedsParser.inc | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/sites/all/modules/contrib/feeds/plugins/FeedsParser.inc b/sites/all/modules/contrib/feeds/plugins/FeedsParser.inc
+index e4fb66c..c3a9490 100644
+--- a/plugins/FeedsParser.inc
++++ b/plugins/FeedsParser.inc
+@@ -15,14 +15,22 @@ class FeedsParserResult extends FeedsResult {
+   public $items;
+   public $current_item;
+
++  // Mukurtu specific change. We want to keep track of which
++  // fields were actually provided in the input. We'll use
++  // this information in the processor later to allow
++  // partial update of content (leaving unspecified fields
++  // intact for existing entities).
++  public $input_fields;
++
+   /**
+    * Constructor.
+    */
+-  public function __construct($items = array()) {
++  public function __construct($items = array(), $nid = NULL, $input_fields = array()) {
+     $this->title = '';
+     $this->description = '';
+     $this->link = '';
+     $this->items = $items;
++    $this->input_fields = $input_fields;
+   }
+
+   /**
+--
+2.7.4
+

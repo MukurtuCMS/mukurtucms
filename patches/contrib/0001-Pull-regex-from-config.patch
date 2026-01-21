@@ -1,0 +1,56 @@
+From b580f8a2c33604ee3545304dcd6fbc6a25457e17 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Fri, 21 Jan 2022 13:47:19 -0800
+Subject: [PATCH] Pull regex from config
+
+---
+ service.inc | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/service.inc b/service.inc
+index 0d1bb7a3..4873e432 100644
+--- a/service.inc
++++ b/service.inc
+@@ -1041,7 +1041,8 @@ class SearchApiDbService extends SearchApiAbstractService {
+           $value = format_date($value, 'custom', 'Y y F M n m j d l D');
+         }
+         $ret = array();
+-        foreach (preg_split('/[^\p{L}\p{N}]+/u', $value, -1, PREG_SPLIT_NO_EMPTY) as $v) {
++        $spaces_regex = ma_search_api_get_whitespace_tokenizer_regex();
++        foreach (preg_split('/' . $spaces_regex . '+/u', $value, -1, PREG_SPLIT_NO_EMPTY) as $v) {
+           if ($v) {
+             $ret[] = array(
+               'value' => $v,
+@@ -1058,7 +1059,8 @@ class SearchApiDbService extends SearchApiAbstractService {
+             $score = $v['score'];
+             $v = $v['value'];
+             if (drupal_strlen($v) > 50) {
+-              $words = preg_split('/[^\p{L}\p{N}]+/u', $v, -1, PREG_SPLIT_NO_EMPTY);
++              $spaces_regex = ma_search_api_get_whitespace_tokenizer_regex();
++              $words = preg_split('/' . $spaces_regex . '+/u', $v, -1, PREG_SPLIT_NO_EMPTY);
+               if (count($words) > 1 && max(array_map('drupal_strlen', $words)) <= 50) {
+                 // Overlong token is due to bad tokenizing.
+                 // Check for "Tokenizer" preprocessor on index.
+@@ -1419,7 +1421,8 @@ class SearchApiDbService extends SearchApiAbstractService {
+         $words = array_filter(explode(' ', $proc), 'strlen');
+       }
+       else {
+-        $words = preg_split('/[^\p{L}\p{N}]+/u', $proc, -1, PREG_SPLIT_NO_EMPTY);
++        $spaces_regex = ma_search_api_get_whitespace_tokenizer_regex();
++        $words = preg_split('/' . $spaces_regex . '+/u', $proc, -1, PREG_SPLIT_NO_EMPTY);
+       }
+
+       if (count($words) > 1) {
+@@ -2165,7 +2168,8 @@ class SearchApiDbService extends SearchApiAbstractService {
+
+     // Also collect all keywords already contained in the query so we don't
+     // suggest them.
+-    $keys = drupal_map_assoc(preg_split('/[^\p{L}\p{N}]+/u', $user_input, -1, PREG_SPLIT_NO_EMPTY));
++    $spaces_regex = ma_search_api_get_whitespace_tokenizer_regex();
++    $keys = drupal_map_assoc(preg_split('/' . $spaces_regex . '+/u', $user_input, -1, PREG_SPLIT_NO_EMPTY));
+     if ($incomplete_key) {
+       $keys[$incomplete_key] = $incomplete_key;
+     }
+--
+2.25.1
+

@@ -9,7 +9,7 @@
  * Implementation of hook_views_plugins().
  */
 function zip_export_media_views_plugins() {
-  $module_path = drupal_get_path('module', 'views_fluid_grid');
+  $module_path = drupal_get_path('module', 'views');
   return array(
     'module' => 'zip_export_media', // This just tells our themes are elsewhere.
     'style' => array(

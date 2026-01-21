@@ -1,0 +1,13 @@
+diff --git a/modules/system/system.base.css b/modules/system/system.base.css
+index 7e9220da..94e8b065 100644
+--- a/modules/system/system.base.css
++++ b/modules/system/system.base.css
+@@ -55,7 +55,7 @@ html.js fieldset.collapsed .fieldset-wrapper {
+   display: none;
+ }
+ fieldset.collapsible {
+-  position: relative;
++  position: inherit;
+ }
+ fieldset.collapsible .fieldset-legend {
+   display: block;

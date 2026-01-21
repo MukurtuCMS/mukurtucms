@@ -4,9 +4,8 @@
  * @file
  * Contains the content type plugin for a mini panel. While this does not
  * need to be broken out into a .inc file, it's convenient that we do so
- * that we don't load code unneccessarily. Plus it demonstrates plugins
+ * that we don't load code unnecessarily. Plus it demonstrates plugins
  * in modules other than Panels itself.
- *
  */
 
 /**
@@ -68,8 +67,13 @@ function _panels_mini_panels_mini_content_type_content_type($mini) {
     $type['required context'] = array();
     foreach ($mini->requiredcontexts as $context) {
       $info = ctools_get_context($context['name']);
-      // TODO: allow an optional setting
-      $type['required context'][] = new ctools_context_required($context['identifier'], $info['context name']);
+      // Check if the required context is actually required.
+      if (!empty($context['optional'])) {
+        $type['required context'][] = new ctools_context_optional($context['identifier'], $info['context name']);
+      }
+      else {
+        $type['required context'][] = new ctools_context_required($context['identifier'], $info['context name']);
+      }
     }
   }
   return $type;
@@ -100,7 +104,7 @@ function panels_mini_panels_mini_content_type_render($subtype, $conf, $panel_arg
   $mini->display->args = $panel_args;
   $mini->display->css_id = panels_mini_get_id($subtype);
   $mini->display->owner = $mini;
-  // unique ID of this mini.
+  // Unique ID of this mini.
   $mini->display->owner->id = $mini->name;
 
   $block = new stdClass();
@@ -108,6 +112,16 @@ function panels_mini_panels_mini_content_type_render($subtype, $conf, $panel_arg
   $block->delta   = $subtype;
   $block->content = panels_render_display($mini->display);
   $block->title = $mini->display->get_title();
+
+  if (user_access('administer mini panels')) {
+    $block->admin_links = array(
+      array(
+        'title' => t('Configure mini panel'),
+        'href' => "admin/structure/mini-panels/list/$subtype/edit/content",
+        'query' => drupal_get_destination(),
+      ),
+    );
+  }
 
   unset($viewing[$mini->name]);
   return $block;
@@ -137,3 +151,30 @@ function panels_mini_panels_mini_content_type_admin_title($subtype, $conf) {
   return $title;
 }
 
+/**
+ * Callback to provide administrative info. Provide links to edit the mini
+ * panel.
+ */
+function panels_mini_panels_mini_content_type_admin_info($subtype, $conf) {
+  $mini = panels_mini_load($subtype);
+  if (!$mini) {
+    return FALSE;
+  }
+
+  $block = new stdClass();
+  $block->title = $mini->admin_title;
+  $admin_pages = array(
+    t('Settings') => 'basic',
+    t('Context') => 'context',
+    t('Layout') => 'layout',
+    t('Content') => 'content',
+  );
+
+  $links = array();
+  foreach ($admin_pages as $title => $tail) {
+    $links[] = l($title, 'admin/structure/mini-panels/list/' . $subtype . '/edit/' . $tail, array('query' => drupal_get_destination()));
+  }
+
+  $block->content = theme('item_list', array('items' => $links));
+  return $block;
+}

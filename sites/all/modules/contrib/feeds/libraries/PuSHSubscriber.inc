@@ -5,10 +5,10 @@
  * Pubsubhubbub subscriber library.
  *
  * Readme
- * http://github.com/lxbarth/PuSHSubscriber
+ * @see http://github.com/lxbarth/PuSHSubscriber
  *
  * License
- * http://github.com/lxbarth/PuSHSubscriber/blob/master/LICENSE.txt
+ * @see http://github.com/lxbarth/PuSHSubscriber/blob/master/LICENSE.txt
  */
 
 /**
@@ -227,6 +227,8 @@ class PuSHSubscriber {
   /**
    * Issue a subscribe or unsubcribe request to a PubsubHubbub hub.
    *
+   * Compare to http://pubsubhubbub.googlecode.com/svn/trunk/pubsubhubbub-core-0.2.html#anchor5
+   *
    * @param $hub
    *   The URL of the hub's subscription endpoint.
    * @param $topic
@@ -235,8 +237,6 @@ class PuSHSubscriber {
    *   'subscribe' or 'unsubscribe'.
    * @param $callback_url
    *   The subscriber's notifications callback URL.
-   *
-   * Compare to http://pubsubhubbub.googlecode.com/svn/trunk/pubsubhubbub-core-0.2.html#anchor5
    *
    * @todo Make concurrency safe.
    */
@@ -247,7 +247,8 @@ class PuSHSubscriber {
       'hub.mode' => $mode,
       'hub.topic' => $topic,
       'hub.verify' => 'sync',
-      'hub.lease_seconds' => '', // Permanent subscription.
+      // Permanent subscription.
+      'hub.lease_seconds' => '',
       'hub.secret' => $secret,
     );
     $sub = new $this->subscription_class($this->domain, $this->subscriber_id, $hub, $topic, $secret, $mode, $post_fields);
@@ -325,6 +326,7 @@ class PuSHSubscriber {
  * variables.
  */
 interface PuSHSubscriptionInterface {
+
   /**
    * @param $domain
    *   A string that defines the domain in which the subscriber_id is unique.
@@ -367,6 +369,7 @@ interface PuSHSubscriptionInterface {
    * Delete a subscription.
    */
   public function delete();
+
 }
 
 /**
@@ -374,6 +377,7 @@ interface PuSHSubscriptionInterface {
  * logging.
  */
 interface PuSHSubscriberEnvironmentInterface {
+
   /**
    * A message to be displayed to the user on the current page load.
    *
@@ -393,4 +397,5 @@ interface PuSHSubscriberEnvironmentInterface {
    *   A string that is either 'status', 'warning' or 'error'.
    */
   public function log($msg, $level = 'status');
+
 }

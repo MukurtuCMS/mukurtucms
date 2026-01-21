@@ -1,12 +1,12 @@
 <?php
 /**
  * @file
- * 
- * 
  *
- * @author Kálmán Hosszu - hosszu.kalman@gmail.com - http://premiumcmsthemes.com http://www.kalman-hosszu.com
+ *
+ *
+ * @author Kálmán Hosszu - http://drupal.org/user/267481
  */
- 
+
 /* ====================== */
 /* ==== DRUPAL HOOKS ==== */
 /* ====================== */
@@ -26,7 +26,7 @@ function multiform_test_menu() {
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
-  
+
   $items['multiform-test/2'] = array(
     'title' => 'Multiform test page 2',
     'page callback' => 'multiform_get_form',
@@ -50,7 +50,7 @@ function multiform_test_menu() {
  *
  * @param type $form
  * @param type $form_state
- * @return array 
+ * @return array
  */
 function multiform_test1_1($form, $form_state) {
   $form['submit'] = array(
@@ -58,13 +58,13 @@ function multiform_test1_1($form, $form_state) {
     '#value' => 'save',
     '#submit' => array('multiform_test1_submit_button'),
   );
-  
+
   $form['delete'] = array(
     '#type' => 'submit',
     '#value' => 'delete',
     '#submit' => array('multiform_test1_delete_button'),
   );
-  
+
   return $form;
 }
 
@@ -73,7 +73,7 @@ function multiform_test1_1($form, $form_state) {
  *
  * @param type $form
  * @param type $form_state
- * @return string 
+ * @return string
  */
 function multiform_test1_2($form, $form_state) {
   $form['submit'] = array(
@@ -81,13 +81,13 @@ function multiform_test1_2($form, $form_state) {
     '#value' => 'save',
     '#submit' => array('multiform_test1_submit_button'),
   );
-  
+
   $form['delete'] = array(
     '#type' => 'submit',
     '#value' => 'delete',
     '#submit' => array('multiform_test1_delete_button'),
   );
-  
+
   return $form;
 }
 
@@ -95,7 +95,7 @@ function multiform_test1_2($form, $form_state) {
  * Submit handing.
  *
  * @param type $form
- * @param type $form_state 
+ * @param type $form_state
  */
 function multiform_test1_submit_button($form, $form_state) {
   drupal_set_message($form['#form_id'] . 'multiform_test1_submit_button');
@@ -105,7 +105,7 @@ function multiform_test1_submit_button($form, $form_state) {
  * Handling delete.
  *
  * @param type $form
- * @param type $form_state 
+ * @param type $form_state
  */
 function multiform_test1_delete_button($form, $form_state) {
   drupal_set_message($form['#form_id'] . 'multiform_test1_delete_button');
@@ -119,7 +119,7 @@ function multiform_test1_delete_button($form, $form_state) {
  *
  * @param type $form
  * @param type $form_state
- * @return array 
+ * @return array
  */
 function multiform_test2_1($form, $form_state) {
   $form['required_text_1'] = array(
@@ -127,13 +127,13 @@ function multiform_test2_1($form, $form_state) {
     '#title' => 'test1',
     '#required' => TRUE,
   );
-  
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'save',
     '#submit' => array('multiform_test2_submit_button'),
   );
-  
+
   return $form;
 }
 
@@ -142,7 +142,7 @@ function multiform_test2_1($form, $form_state) {
  *
  * @param type $form
  * @param type $form_state
- * @return array 
+ * @return array
  */
 function multiform_test2_2($form, $form_state) {
   $form['required_text_2'] = array(
@@ -150,13 +150,13 @@ function multiform_test2_2($form, $form_state) {
     '#title' => 'test2',
     '#required' => TRUE,
   );
-  
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'save',
     '#submit' => array('multiform_test2_submit_button'),
   );
-  
+
   return $form;
 }
 
@@ -164,7 +164,7 @@ function multiform_test2_2($form, $form_state) {
  * Submit handing.
  *
  * @param type $form
- * @param type $form_state 
+ * @param type $form_state
  */
 function multiform_test2_submit_button($form, $form_state) {
   drupal_set_message($form['#form_id'] . 'multiform_test2_submit_button');

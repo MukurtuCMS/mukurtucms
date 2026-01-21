@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * @file
  * Core Panels API include file containing various display-editing functions.
  * This includes all the basic editing forms (content, layout, layout settings)
@@ -40,7 +40,7 @@ function _panels_edit($display, $destination, $content_types, $title = FALSE) {
 }
 
 /**
- * Form definition for the panels display editor
+ * Form definition for the panels display editor.
  *
  * No validation function is necessary, as all 'validation' is handled
  * either in the lead-up to form rendering (through the selection of
@@ -48,6 +48,7 @@ function _panels_edit($display, $destination, $content_types, $title = FALSE) {
  * the ajax modals & content types.
  *
  * @ingroup forms
+ *
  * @see panels_edit_display_submit()
  */
 function panels_edit_display_form($form, &$form_state) {
@@ -157,7 +158,7 @@ function panels_edit_display_form_submit($form, &$form_state) {
       $display->panels[$region_id] = array();
       if ($panes) {
         $pids = explode(',', $panes);
-        // need to filter the array, b/c passing it in a hidden field can generate trash
+        // Need to filter the array, b/c passing it in a hidden field can generate trash.
         foreach (array_filter($pids) as $pid) {
           if ($old_content[$pid]) {
             $display->panels[$region_id][] = $pid;
@@ -221,7 +222,7 @@ function panels_edit_display_settings_form($form, &$form_state) {
   ctools_include('dependent');
 
   if ($form_state['display_title']) {
-    $form['display_title'] = array (
+    $form['display_title'] = array(
       '#tree' => TRUE,
     );
 
@@ -240,7 +241,7 @@ function panels_edit_display_settings_form($form, &$form_state) {
       '#type' => 'textfield',
       '#default_value' => $display->title,
       '#title' => t('Title'),
-      '#description' => t('The title of this panel. If left blank, a default title may be used. Set to No Title if you want the title to actually be blank.'),
+      '#description' => t('The title of this panel. If left blank, a default title may be used. If you want the title actually to be blank, change the "Title type" dropdown from "Manually Set" to "No Title".'),
       '#process' => array('ctools_dependent_process'),
       '#dependency' => array('edit-display-title-hide-title' => array(PANELS_TITLE_FIXED)),
       '#maxlength' => 255,
@@ -252,16 +253,15 @@ function panels_edit_display_settings_form($form, &$form_state) {
       // We have to create a manual fieldset because fieldsets do not support IDs.
       // Use 'hidden' instead of 'markup' so that the process will run.
       // Add js for collapsible fieldsets manually
-//      drupal_add_js('misc/form.js');
-//      drupal_add_js('misc/collapse.js');
-//      $form['display_title']['contexts_prefix'] = array(
-//        '#type' => 'hidden',
-//        '#id' => 'edit-display-substitutions',
-//        '#prefix' => '<div><fieldset id="edit-display-substitutions" class="collapsed collapsible"><legend>' . t('Substitutions') . '</legend><div class="fieldset-wrapper">',
-//        '#process' => array('ctools_dependent_process'),
-//        '#dependency' => array('edit-display-title-hide-title' => array(PANELS_TITLE_FIXED)),
-//      );
-
+      //      drupal_add_js('misc/form.js');
+      //      drupal_add_js('misc/collapse.js');
+      //      $form['display_title']['contexts_prefix'] = array(
+      //        '#type' => 'hidden',
+      //        '#id' => 'edit-display-substitutions',
+      //        '#prefix' => '<div><fieldset id="edit-display-substitutions" class="collapsed collapsible"><legend>' . t('Substitutions') . '</legend><div class="fieldset-wrapper">',
+      //        '#process' => array('ctools_dependent_process'),
+      //        '#dependency' => array('edit-display-title-hide-title' => array(PANELS_TITLE_FIXED)),
+      //      );
       $rows = array();
       foreach ($display->context as $context) {
         foreach (ctools_context_get_converters('%' . check_plain($context->keyword) . ':', $context) as $keyword => $title) {
@@ -279,17 +279,15 @@ function panels_edit_display_settings_form($form, &$form_state) {
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
         '#value' => theme('table', array('header' => $header, 'rows' => $rows)),
-//        '#process' => array('form_process_fieldset', 'ctools_dependent_process'),
-//        '#id' => 'edit-display-title-context',
-//        '#dependency' => array('edit-display-title-hide-title' => array(PANELS_TITLE_FIXED)),
+      // '#process' => array('form_process_fieldset', 'ctools_dependent_process'),      //        '#id' => 'edit-display-title-context',
+      //        '#dependency' => array('edit-display-title-hide-title' => array(PANELS_TITLE_FIXED)),
       );
-//      $form['display_title']['contexts_suffix'] = array(
-//        '#value' => '</div></fieldset></div>',
-//      );
+      // $form['display_title']['contexts_suffix'] = array(      //        '#value' => '</div></fieldset></div>',
+      //      );.
     }
   }
 
-  // TODO doc the ability to do this as part of the API
+  // TODO doc the ability to do this as part of the API.
   if (!empty($layout['settings form']) && function_exists($layout['settings form'])) {
     $form['layout_settings'] = $layout['settings form']($display, $layout, $display->layout_settings);
   }
@@ -302,7 +300,7 @@ function panels_edit_display_settings_form($form, &$form_state) {
  * Validate the layout settings form.
  */
 function panels_edit_display_settings_form_validate($form, &$form_state) {
-  if ($function = panels_plugin_get_function('layout', $form_state['layout'], 'settings validate')) {
+  if ($function = panels_plugin_get_function('layouts', $form_state['layout'], 'settings validate')) {
     $function($form_state['values']['layout_settings'], $form['layout_settings'], $form_state['display'], $form_state['layout'], $form_state['display']->layout_settings);
   }
 }
@@ -312,7 +310,7 @@ function panels_edit_display_settings_form_validate($form, &$form_state) {
  */
 function panels_edit_display_settings_form_submit($form, &$form_state) {
   $display = &$form_state['display'];
-  if ($function = panels_plugin_get_function('layout', $form_state['layout'], 'settings submit')) {
+  if ($function = panels_plugin_get_function('layouts', $form_state['layout'], 'settings submit')) {
     $function($form_state['values']['layout_settings'], $display, $form_state['layout'], $display->layout_settings);
   }
 

@@ -25,6 +25,7 @@ regions[page_bottom]    = 'Page bottom'
 ;;;;;;;;;;;;;;;;;;;;;
 
 stylesheets[all][] = css/style.css
+stylesheets[all][] = font-awesome/css/font-awesome.min.css
 
 
 ; For information on choosing the desired method, please read the Drupal
@@ -40,23 +41,25 @@ stylesheets[all][] = css/style.css
 ; ;;;;;;;;;;;;;;;;;;;;;
 ;
 scripts[] = js/scripts.js
+scripts[] = js/mukurturesize.js
 scripts[] = js/masonry.pkgd.min.js
-; scripts[] = 'bootstrap/js/affix.js'
-; scripts[] = 'bootstrap/js/alert.js'
-; scripts[] = 'bootstrap/js/button.js'
-; scripts[] = 'bootstrap/js/carousel.js'
-; scripts[] = 'bootstrap/js/collapse.js'
-; scripts[] = 'bootstrap/js/dropdown.js'
-; scripts[] = 'bootstrap/js/modal.js'
-; scripts[] = 'bootstrap/js/tooltip.js'
-; scripts[] = 'bootstrap/js/popover.js'
-; scripts[] = 'bootstrap/js/scrollspy.js'
-; scripts[] = 'bootstrap/js/tab.js'
-; scripts[] = 'bootstrap/js/transition.js'
-;
-; ; Disable BootstrapCDN if using Bootstrap source files in your sub-theme.
-; settings[bootstrap_cdn] = ''
+scripts[] = 'bootstrap/js/affix.js'
+scripts[] = 'bootstrap/js/alert.js'
+scripts[] = 'bootstrap/js/button.js'
+scripts[] = 'bootstrap/js/carousel.js'
+scripts[] = 'bootstrap/js/collapse.js'
+scripts[] = 'bootstrap/js/dropdown.js'
+scripts[] = 'bootstrap/js/modal.js'
+scripts[] = 'bootstrap/js/tooltip.js'
+scripts[] = 'bootstrap/js/popover.js'
+scripts[] = 'bootstrap/js/scrollspy.js'
+scripts[] = 'bootstrap/js/tab.js'
+scripts[] = 'bootstrap/js/transition.js'
 
+; Disable BootstrapCDN if using Bootstrap source files in your sub-theme.
+settings[bootstrap_cdn] = ''
+settings[bootstrap_tooltip_placement] = 'auto bottom'
+settings[bootstrap_forms_smart_descriptions_limit] = 1000
 
 ; ;-------------------------
 ; ; METHOD 2: Bootstrap CDN

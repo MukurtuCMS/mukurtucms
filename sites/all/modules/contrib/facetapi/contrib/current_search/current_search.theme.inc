@@ -87,35 +87,36 @@ function theme_current_search_group_wrapper(array $variables) {
 }
 
 /**
- * Returns HTML for a grouped active facet item.
+ * Returns HTML for an active facet item.
  *
  * @param $variables
- *   An associative array containing the keys 'text', 'path', 'options', and
- *   'count'.
+ *   An associative array containing the keys 'text', 'path', and 'options'. See
+ *   the l() function for information about these variables.
  *
  * @ingroup themeable
  */
 function theme_current_search_link_active($variables) {
-  // Builds accessible markup.
+  // Sanitizes the link text if necessary.
+  $sanitize = empty($variables['options']['html']);
+  $link_text = ($sanitize) ? check_plain($variables['text']) : $variables['text'];
+
+  // Theme function variables fro accessible markup.
   // @see http://drupal.org/node/1316580
   $accessible_vars = array(
     'text' => $variables['text'],
     'active' => TRUE,
   );
-  $accessible_markup = theme('facetapi_accessible_markup', $accessible_vars);
 
-  // Sanitizes the link text if necessary.
-  $sanitize = empty($variables['options']['html']);
-  $variables['text'] = ($sanitize) ? check_plain($variables['text']) : $variables['text'];
-
-  // Adds the deactivation widget.
-  $variables['text'] .= theme('current_search_deactivate_widget');
-
-  // Resets link text, sets to options to HTML since we already sanitized the
-  // link text and are providing additional markup for accessibility.
-  $variables['text'] .= ' ' . $accessible_markup;
+  // Builds link, passes through t() which gives us the ability to change the
+  // position of the widget on a per-language basis.
+  $replacements = array(
+    '!current_search_deactivate_widget' => theme('current_search_deactivate_widget', $variables),
+    '!current_search_accessible_markup' => theme('current_search_accessible_markup', $accessible_vars),
+  );
+  $variables['text'] = t('!current_search_deactivate_widget !current_search_accessible_markup', $replacements);
   $variables['options']['html'] = TRUE;
-  return theme_link($variables);
+  $variables['options']['attributes']['class'][] = 'active';
+  return l($variables['text'], $variables['path'], $variables['options']) . $link_text;
 }
 
 /**
@@ -134,13 +135,16 @@ function theme_current_search_keys($variables) {
  * Returns HTML for the deactivation widget.
  *
  * @param $variables
- *   An associative array containing the keys 'text', 'path', 'options', and
- *   'count'.
+ *   An associative array containing the keys 'text', 'path', and 'options'. See
+ *   the l() function for information about these variables.
  *
- * @ingroup themeable
+ * @see l()
+ * @see theme_facetapi_link_active()
+ *
+ * @ingroup themable
  */
 function theme_current_search_deactivate_widget($variables) {
-  return ' [X]';
+  return '(-)';
 }
 
 /**
@@ -171,10 +175,32 @@ function theme_current_search_sort_settings_table($variables) {
     );
   }
 
-  // Builds table with drabble rows, returns output.
+  // Builds table with draggable rows, returns output.
   $table_id = 'current-search-sort-settings';
   drupal_add_tabledrag($table_id, 'order', 'sibling', 'current-search-sort-weight');
   $output .= drupal_render_children($variables['element']);
   $output .= theme('table', array('rows' => $rows, 'attributes' => array('id' => $table_id)));
   return $output;
+}
+
+/**
+ * Returns HTML that adds accessible markup to facet links.
+ *
+ * @param $variables
+ *   An associative array containing:
+ *   - text: The text of the facet link.
+ *   - active: Whether the item is active or not.
+ *
+ * @ingroup themeable
+ *
+ * @see http://drupal.org/node/1316580
+ */
+function theme_current_search_accessible_markup($variables) {
+  $vars = array('@text' => $variables['text']);
+  $text = ($variables['active']) ? t('Remove @text filter', $vars) : t('Apply @text filter', $vars);
+  // Add spaces before and after the text, since other content may be displayed
+  // inline with this and we don't want the words to run together. However, the
+  // spaces must be inside the <span> so as not to disrupt the layout for
+  // sighted users.
+  return '<span class="element-invisible"> ' . $text . ' </span>';
 }

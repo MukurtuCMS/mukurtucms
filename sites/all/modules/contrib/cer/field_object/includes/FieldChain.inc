@@ -78,6 +78,7 @@ class FieldChain implements SeekableIterator {
   /**
    * Implements SeekableIterator::seek().
    */
+  #[\ReturnTypeWillChange]
   public function seek($position) {
     if ($position >= 0 && $position < sizeof($this->chain)) {
       $this->index = $position;
@@ -90,6 +91,7 @@ class FieldChain implements SeekableIterator {
   /**
    * Implements Iterator::current().
    */
+  #[\ReturnTypeWillChange]
   public function current() {
     return $this->chain[$this->index];
   }
@@ -97,6 +99,7 @@ class FieldChain implements SeekableIterator {
   /**
    * Implements Iterator::key().
    */
+  #[\ReturnTypeWillChange]
   public function key() {
     return $this->current()->__toString();
   }
@@ -104,6 +107,7 @@ class FieldChain implements SeekableIterator {
   /**
    * Implements Iterator::next().
    */
+  #[\ReturnTypeWillChange]
   public function next() {
     $this->index++;
   }
@@ -111,6 +115,7 @@ class FieldChain implements SeekableIterator {
   /**
    * Implements Iterator::rewind().
    */
+  #[\ReturnTypeWillChange]
   public function rewind() {
     $this->index = 0;
   }
@@ -118,6 +123,7 @@ class FieldChain implements SeekableIterator {
   /**
    * Implements Iterator::valid().
    */
+  #[\ReturnTypeWillChange]
   public function valid() {
     return ($this->index < sizeof($this->chain));
   }

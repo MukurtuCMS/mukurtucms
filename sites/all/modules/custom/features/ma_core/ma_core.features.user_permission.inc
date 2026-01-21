@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_core.features.user_permission.inc
@@ -24,7 +25,6 @@ function ma_core_user_default_permissions() {
   $permissions['access all views'] = array(
     'name' => 'access all views',
     'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'views',
@@ -83,20 +83,22 @@ function ma_core_user_default_permissions() {
   $permissions['access contextual links'] = array(
     'name' => 'access contextual links',
     'roles' => array(
+      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
+      'authenticated user' => 'authenticated user',
     ),
     'module' => 'contextual',
   );
 
-  // Exported permission: 'access mollom statistics'.
-  $permissions['access mollom statistics'] = array(
-    'name' => 'access mollom statistics',
+  // Exported permission: 'access mail logger'.
+  $permissions['access mail logger'] = array(
+    'name' => 'access mail logger',
     'roles' => array(
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
-    'module' => 'mollom',
+    'module' => 'mail_logger',
   );
 
   // Exported permission: 'access site in maintenance mode'.
@@ -207,7 +209,6 @@ function ma_core_user_default_permissions() {
   $permissions['administer category vocabulary terms'] = array(
     'name' => 'administer category vocabulary terms',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -305,13 +306,24 @@ function ma_core_user_default_permissions() {
     'module' => 'filter',
   );
 
-  // Exported permission: 'administer flags'.
-  $permissions['administer flags'] = array(
-    'name' => 'administer flags',
+  // Exported permission: 'administer geofield_gmap'.
+  $permissions['administer geofield_gmap'] = array(
+    'name' => 'administer geofield_gmap',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
-    'module' => 'flag',
+    'module' => 'geofield_gmap',
+  );
+
+  // Exported permission: 'administer geofield_map configuration'.
+  $permissions['administer geofield_map configuration'] = array(
+    'name' => 'administer geofield_map configuration',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'geofield_map',
   );
 
   // Exported permission: 'administer google analytics'.
@@ -344,6 +356,16 @@ function ma_core_user_default_permissions() {
     'module' => 'homebox',
   );
 
+  // Exported permission: 'administer honeypot'.
+  $permissions['administer honeypot'] = array(
+    'name' => 'administer honeypot',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'honeypot',
+  );
+
   // Exported permission: 'administer image styles'.
   $permissions['administer image styles'] = array(
     'name' => 'administer image styles',
@@ -351,6 +373,17 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'image',
+  );
+
+  // Exported permission: 'administer language vocabulary terms'.
+  $permissions['administer language vocabulary terms'] = array(
+    'name' => 'administer language vocabulary terms',
+    'roles' => array(
+      'Community Administrator' => 'Community Administrator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'vppr',
   );
 
   // Exported permission: 'administer languages'.
@@ -361,15 +394,6 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'locale',
-  );
-
-  // Exported permission: 'administer maillog'.
-  $permissions['administer maillog'] = array(
-    'name' => 'administer maillog',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'maillog',
   );
 
   // Exported permission: 'administer menu'.
@@ -407,16 +431,6 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'system',
-  );
-
-  // Exported permission: 'administer mollom'.
-  $permissions['administer mollom'] = array(
-    'name' => 'administer mollom',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
-    'module' => 'mollom',
   );
 
   // Exported permission: 'administer nodes'.
@@ -553,7 +567,6 @@ function ma_core_user_default_permissions() {
   $permissions['administer tags vocabulary terms'] = array(
     'name' => 'administer tags vocabulary terms',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -564,6 +577,7 @@ function ma_core_user_default_permissions() {
   $permissions['administer taxonomy'] = array(
     'name' => 'administer taxonomy',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -628,21 +642,20 @@ function ma_core_user_default_permissions() {
     'module' => 'system',
   );
 
-  // Exported permission: 'bypass mollom protection'.
-  $permissions['bypass mollom protection'] = array(
-    'name' => 'bypass mollom protection',
+  // Exported permission: 'bypass honeypot protection'.
+  $permissions['bypass honeypot protection'] = array(
+    'name' => 'bypass honeypot protection',
     'roles' => array(
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
-    'module' => 'mollom',
+    'module' => 'honeypot',
   );
 
   // Exported permission: 'bypass node access'.
   $permissions['bypass node access'] = array(
     'name' => 'bypass node access',
     'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -675,52 +688,6 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'user',
-  );
-
-  // Exported permission: 'clear import_categories feeds'.
-  $permissions['clear import_categories feeds'] = array(
-    'name' => 'clear import_categories feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'clear import_communities feeds'.
-  $permissions['clear import_communities feeds'] = array(
-    'name' => 'clear import_communities feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'clear import_cultural_protocols feeds'.
-  $permissions['clear import_cultural_protocols feeds'] = array(
-    'name' => 'clear import_cultural_protocols feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'clear import_digital_heritage_metadata_xml feeds'.
-  $permissions['clear import_digital_heritage_metadata_xml feeds'] = array(
-    'name' => 'clear import_digital_heritage_metadata_xml feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'clear import_users feeds'.
-  $permissions['clear import_users feeds'] = array(
-    'name' => 'clear import_users feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
   );
 
   // Exported permission: 'create article content'.
@@ -761,15 +728,6 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'node',
-  );
-
-  // Exported permission: 'create panel-nodes'.
-  $permissions['create panel-nodes'] = array(
-    'name' => 'create panel-nodes',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'panels_node',
   );
 
   // Exported permission: 'create url aliases'.
@@ -821,15 +779,6 @@ function ma_core_user_default_permissions() {
     'module' => 'node',
   );
 
-  // Exported permission: 'delete any panel-nodes'.
-  $permissions['delete any panel-nodes'] = array(
-    'name' => 'delete any panel-nodes',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'panels_node',
-  );
-
   // Exported permission: 'delete backup files'.
   $permissions['delete backup files'] = array(
     'name' => 'delete backup files',
@@ -837,15 +786,6 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'backup_migrate',
-  );
-
-  // Exported permission: 'delete maillog'.
-  $permissions['delete maillog'] = array(
-    'name' => 'delete maillog',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'maillog',
   );
 
   // Exported permission: 'delete own article content'.
@@ -879,15 +819,6 @@ function ma_core_user_default_permissions() {
     'module' => 'node',
   );
 
-  // Exported permission: 'delete own panel-nodes'.
-  $permissions['delete own panel-nodes'] = array(
-    'name' => 'delete own panel-nodes',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'panels_node',
-  );
-
   // Exported permission: 'delete revisions'.
   $permissions['delete revisions'] = array(
     'name' => 'delete revisions',
@@ -902,7 +833,6 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in category'] = array(
     'name' => 'delete terms in category',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -913,6 +843,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in contributor'] = array(
     'name' => 'delete terms in contributor',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -922,6 +853,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in creator'] = array(
     'name' => 'delete terms in creator',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -931,6 +863,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in dh_type'] = array(
     'name' => 'delete terms in dh_type',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -940,6 +873,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in format'] = array(
     'name' => 'delete terms in format',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -949,6 +883,8 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in language'] = array(
     'name' => 'delete terms in language',
     'roles' => array(
+      'Community Administrator' => 'Community Administrator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -958,6 +894,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in media_folders'] = array(
     'name' => 'delete terms in media_folders',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -967,6 +904,17 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in media_type'] = array(
     'name' => 'delete terms in media_type',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'taxonomy',
+  );
+
+  // Exported permission: 'delete terms in people'.
+  $permissions['delete terms in people'] = array(
+    'name' => 'delete terms in people',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -976,6 +924,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in publisher'] = array(
     'name' => 'delete terms in publisher',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -985,6 +934,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in subject'] = array(
     'name' => 'delete terms in subject',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -994,7 +944,6 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in tags'] = array(
     'name' => 'delete terms in tags',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -1030,15 +979,6 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'node',
-  );
-
-  // Exported permission: 'edit any panel-nodes'.
-  $permissions['edit any panel-nodes'] = array(
-    'name' => 'edit any panel-nodes',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'panels_node',
   );
 
   // Exported permission: 'edit boxes'.
@@ -1101,30 +1041,10 @@ function ma_core_user_default_permissions() {
     'module' => 'node',
   );
 
-  // Exported permission: 'edit own panel-nodes'.
-  $permissions['edit own panel-nodes'] = array(
-    'name' => 'edit own panel-nodes',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'panels_node',
-  );
-
-  // Exported permission: 'edit own tags'.
-  $permissions['edit own tags'] = array(
-    'name' => 'edit own tags',
-    'roles' => array(
-      'administrator' => 'administrator',
-      'authenticated user' => 'authenticated user',
-    ),
-    'module' => 'community_tags',
-  );
-
   // Exported permission: 'edit terms in category'.
   $permissions['edit terms in category'] = array(
     'name' => 'edit terms in category',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -1135,6 +1055,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in contributor'] = array(
     'name' => 'edit terms in contributor',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1144,6 +1065,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in creator'] = array(
     'name' => 'edit terms in creator',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1153,6 +1075,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in dh_type'] = array(
     'name' => 'edit terms in dh_type',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1162,6 +1085,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in format'] = array(
     'name' => 'edit terms in format',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1171,6 +1095,8 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in language'] = array(
     'name' => 'edit terms in language',
     'roles' => array(
+      'Community Administrator' => 'Community Administrator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1180,6 +1106,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in media_folders'] = array(
     'name' => 'edit terms in media_folders',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1189,6 +1116,17 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in media_type'] = array(
     'name' => 'edit terms in media_type',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'taxonomy',
+  );
+
+  // Exported permission: 'edit terms in people'.
+  $permissions['edit terms in people'] = array(
+    'name' => 'edit terms in people',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1198,6 +1136,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in publisher'] = array(
     'name' => 'edit terms in publisher',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1207,6 +1146,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in subject'] = array(
     'name' => 'edit terms in subject',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1216,57 +1156,10 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in tags'] = array(
     'name' => 'edit terms in tags',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
-  );
-
-  // Exported permission: 'import import_categories feeds'.
-  $permissions['import import_categories feeds'] = array(
-    'name' => 'import import_categories feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'import import_communities feeds'.
-  $permissions['import import_communities feeds'] = array(
-    'name' => 'import import_communities feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'import import_cultural_protocols feeds'.
-  $permissions['import import_cultural_protocols feeds'] = array(
-    'name' => 'import import_cultural_protocols feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'import import_digital_heritage_metadata_xml feeds'.
-  $permissions['import import_digital_heritage_metadata_xml feeds'] = array(
-    'name' => 'import import_digital_heritage_metadata_xml feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'import import_users feeds'.
-  $permissions['import import_users feeds'] = array(
-    'name' => 'import import_users feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
   );
 
   // Exported permission: 'import media'.
@@ -1287,11 +1180,21 @@ function ma_core_user_default_permissions() {
     'module' => 'features',
   );
 
+  // Exported permission: 'merge language terms'.
+  $permissions['merge language terms'] = array(
+    'name' => 'merge language terms',
+    'roles' => array(
+      'Community Administrator' => 'Community Administrator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'term_merge',
+  );
+
   // Exported permission: 'merge tags terms'.
   $permissions['merge tags terms'] = array(
     'name' => 'merge tags terms',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -1334,16 +1237,6 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'backup_migrate',
-  );
-
-  // Exported permission: 'report to mollom'.
-  $permissions['report to mollom'] = array(
-    'name' => 'report to mollom',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
-    'module' => 'mollom',
   );
 
   // Exported permission: 'restore from backup'.
@@ -1393,6 +1286,7 @@ function ma_core_user_default_permissions() {
       'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
+      'authenticated user' => 'authenticated user',
     ),
     'module' => 'comment',
   );
@@ -1404,60 +1298,6 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'shortcut',
-  );
-
-  // Exported permission: 'tag content'.
-  $permissions['tag content'] = array(
-    'name' => 'tag content',
-    'roles' => array(
-      'authenticated user' => 'authenticated user',
-    ),
-    'module' => 'community_tags',
-  );
-
-  // Exported permission: 'tamper import_categories'.
-  $permissions['tamper import_categories'] = array(
-    'name' => 'tamper import_categories',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds_tamper',
-  );
-
-  // Exported permission: 'tamper import_communities'.
-  $permissions['tamper import_communities'] = array(
-    'name' => 'tamper import_communities',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds_tamper',
-  );
-
-  // Exported permission: 'tamper import_cultural_protocols'.
-  $permissions['tamper import_cultural_protocols'] = array(
-    'name' => 'tamper import_cultural_protocols',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds_tamper',
-  );
-
-  // Exported permission: 'tamper import_digital_heritage_metadata_xml'.
-  $permissions['tamper import_digital_heritage_metadata_xml'] = array(
-    'name' => 'tamper import_digital_heritage_metadata_xml',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds_tamper',
-  );
-
-  // Exported permission: 'tamper import_users'.
-  $permissions['tamper import_users'] = array(
-    'name' => 'tamper import_users',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds_tamper',
   );
 
   // Exported permission: 'translate content'.
@@ -1606,16 +1446,6 @@ function ma_core_user_default_permissions() {
       'authenticated user' => 'authenticated user',
     ),
     'module' => 'advanced_help',
-  );
-
-  // Exported permission: 'view maillog'.
-  $permissions['view maillog'] = array(
-    'name' => 'view maillog',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
-    'module' => 'maillog',
   );
 
   // Exported permission: 'view own unpublished content'.

@@ -1,0 +1,264 @@
+<?php
+
+/**
+ * @file
+ * Contains unit tests for feeds_ex.
+ */
+
+/**
+ * Base class for units tests.
+ */
+abstract class FeedsExUnitTestBase extends TUnit {
+
+  /**
+   * The module directory.
+   *
+   * @var string
+   */
+  protected $moduleDir;
+
+  public function setUp() {
+    parent::setUp();
+
+    // Isn't this fun!
+    drupal_load('module', 'feeds');
+    $feeds = DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds');
+    require_once $feeds . '/includes/FeedsConfigurable.inc';
+    require_once $feeds . '/includes/FeedsSource.inc';
+    require_once $feeds . '/includes/FeedsImporter.inc';
+    require_once $feeds . '/plugins/FeedsPlugin.inc';
+    require_once $feeds . '/plugins/FeedsFetcher.inc';
+    require_once $feeds . '/plugins/FeedsFileFetcher.inc';
+    require_once $feeds . '/plugins/FeedsParser.inc';
+    require_once $feeds . '/plugins/FeedsProcessor.inc';
+    require_once $feeds . '/plugins/FeedsNodeProcessor.inc';
+
+    // This is out test feed source.
+    require_once dirname(__FILE__) . '/FeedsExTestFeedsSource.inc';
+
+    drupal_load('module', 'feeds_ex');
+    $this->moduleDir = DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds_ex');
+    require_once $this->moduleDir . '/src/Json/Utility.php';
+    require_once $this->moduleDir . '/src/Text/Utility.php';
+    require_once $this->moduleDir . '/src/Xml/Utility.php';
+    require_once $this->moduleDir . '/src/File/FeedsExLineIterator.php';
+    require_once $this->moduleDir . '/src/FeedsExBase.inc';
+  }
+
+  /**
+   * Returns a mocked FeedsSource object.
+   *
+   * @param string $fetcher
+   *   (optional) The fetcher class. Defaults to FeedsFileFetcher
+   * @param string $processor
+   *   (optional) The processor class. Defaults to FeedsNodeProcessor.
+   *
+   * @return FeedsSource
+   *   The mocked FeedsSource object,
+   */
+  protected function getMockFeedsSource($fetcher = 'FeedsFileFetcher', $processor = 'FeedsNodeProcessor') {
+    $importer = $this->newInstanceWithoutConstructor('FeedsImporter');
+
+    $fetcher = $this->newInstanceWithoutConstructor($fetcher);
+    $this->setProperty($importer, 'fetcher', $fetcher);
+
+    $processor = $this->newInstanceWithoutConstructor($processor);
+    $this->setProperty($importer, 'processor', $processor);
+
+    $source = $this->newInstanceWithoutConstructor('FeedsExTestFeedsSource');
+    $this->setProperty($source, 'importer', $importer);
+
+    return $source;
+  }
+
+  /**
+   * Downloads JSONPath.
+   */
+  protected function downloadJsonPath() {
+    // We don't use a variable_set() here since we want this to be a unit test.
+    if (defined('FEEDS_EX_LIBRARY_PATH')) {
+      return;
+    }
+    $url = 'https://jsonpath.googlecode.com/svn/trunk/src/php/jsonpath.php';
+    $filename = 'jsonpath.php';
+
+    // Avoid downloading the file dozens of times.
+    $library_dir = $this->originalFileDirectory . '/simpletest/feeds_ex';
+    $jsonpath_library_dir = DRUPAL_ROOT . '/' . $library_dir . '/jsonpath';
+
+    if (!file_exists(DRUPAL_ROOT . '/' . $library_dir)) {
+      drupal_mkdir(DRUPAL_ROOT . '/' . $library_dir);
+    }
+
+    if (!file_exists($jsonpath_library_dir)) {
+      drupal_mkdir($jsonpath_library_dir);
+    }
+
+    // Local file name.
+    $local_file = $jsonpath_library_dir . '/' . $filename;
+
+    // Begin single threaded code.
+    if (function_exists('sem_get')) {
+      $semaphore = sem_get(ftok(__FILE__, 1));
+      sem_acquire($semaphore);
+    }
+
+    // Download and extact the archive, but only in one thread.
+    if (!file_exists($local_file)) {
+      $local_file = system_retrieve_file($url, $local_file, FALSE, FILE_EXISTS_REPLACE);
+    }
+
+    if (function_exists('sem_get')) {
+      sem_release($semaphore);
+    }
+
+    // Verify that the file was successfully downloaded.
+    $this->assertTrue(file_exists($local_file), format_string('@file found.', array('@file' => $local_file)));
+
+    // Set the library directory.
+    define('FEEDS_EX_LIBRARY_PATH', $library_dir);
+  }
+
+  /**
+   * Asserts that the correct number of items have been parsed.
+   *
+   * @param FeedsParserResult $result
+   *   The parser result.
+   * @param int $count
+   *   The number of items that should exist.
+   */
+  protected function assertParserResultItemCount(FeedsParserResult $result, $count) {
+    $this->assertEqual(count($result->items), $count, format_string('@count items parsed.', array('@count' => count($result->items))));
+  }
+
+  /**
+   * Asserts that the empty message is correct.
+   *
+   * @param array $messages
+   *   The list of error messages.
+   */
+  protected function assertEmptyFeedMessage(array $messages) {
+    $this->assertEqual(1, count($messages), 'The expected number of messages.');
+    $this->assertEqual($messages[0]['message'], 'The feed is empty.', 'Message text is correct.');
+    $this->assertEqual($messages[0]['type'], 'warning', 'Message type is warning.');
+    $this->assertFalse($messages[0]['repeat'], 'Repeat is set to false.');
+  }
+
+}
+
+/**
+ * Tests stripping default namespaces.
+ */
+class FeedsExRemoveDefaultNamespaces extends DrupalUnitTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Strip default namespaces',
+      'description' => 'Tests stripping default namespaces from XML.',
+      'group' => 'Feeds EX',
+    );
+  }
+
+  public function setUp() {
+    parent::setUp();
+    require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds_ex') . '/src/Text/Utility.php';
+    require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds_ex') . '/src/Xml/Utility.php';
+  }
+
+  /**
+   * Strip some namespaces out of XML.
+   */
+  public function test() {
+    $this->check('<feed xmlns="http://www.w3.org/2005/Atom">bleep blorp</feed>', '<feed>bleep blorp</feed>');
+    $this->check('<подача xmlns="http://www.w3.org/2005/Atom">bleep blorp</подача>', '<подача>bleep blorp</подача>');
+    $this->check('<по.дача xmlns="http://www.w3.org/2005/Atom">bleep blorp</по.дача>', '<по.дача>bleep blorp</по.дача>');
+    $this->check('<element other attrs xmlns="http://www.w3.org/2005/Atom">bleep blorp</element>', '<element other attrs>bleep blorp</element>');
+    $this->check('<cat xmlns="http://www.w3.org/2005/Atom" other attrs>bleep blorp</cat>', '<cat other attrs>bleep blorp</cat>');
+    $this->check('<飼料 thing="stuff" xmlns="http://www.w3.org/2005/Atom">bleep blorp</飼料>', '<飼料 thing="stuff">bleep blorp</飼料>');
+    $this->check('<飼-料 thing="stuff" xmlns="http://www.w3.org/2005/Atom">bleep blorp</飼-料>', '<飼-料 thing="stuff">bleep blorp</飼-料>');
+    $this->check('<self xmlns="http://www.w3.org/2005/Atom" />', '<self />');
+    $this->check('<self attr xmlns="http://www.w3.org/2005/Atom"/>', '<self attr/>');
+    $this->check('<a xmlns="http://www.w3.org/2005/Atom"/>', '<a/>');
+    $this->check('<a xmlns="http://www.w3.org/2005/Atom"></a>', '<a></a>');
+    $this->check('<a href="http://google.com" xmlns="http://www.w3.org/2005/Atom"></a>', '<a href="http://google.com"></a>');
+
+    // Test invalid XML element names.
+    $this->check('<1name href="http://google.com" xmlns="http://www.w3.org/2005/Atom"></1name>', '<1name href="http://google.com" xmlns="http://www.w3.org/2005/Atom"></1name>');
+
+    // Test other namespaces.
+    $this->check('<name href="http://google.com" xmlns:h="http://www.w3.org/2005/Atom"></name>', '<name href="http://google.com" xmlns:h="http://www.w3.org/2005/Atom"></name>');
+
+    // Test multiple default namespaces.
+    $this->check('<name xmlns="http://www.w3.org/2005/Atom"></name><name xmlns="http://www.w3.org/2005/Atom"></name>', '<name></name><name></name>');
+  }
+
+  /**
+   * Checks that the input and output are equal.
+   */
+  protected function check($in, $out) {
+    $this->assertEqual(FeedsExXmlUtility::removeDefaultNamespaces($in), $out);
+  }
+
+}
+
+/**
+ * Reading a line from a file.
+ */
+class FeedsExLineIteratorUnitTests extends DrupalUnitTestCase {
+
+  /**
+   * The module directory path.
+   *
+   * @var string
+   */
+  protected $moduleDir;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Unit tests for the line reading iterator',
+      'description' => 'Unit tests for FeedsExLineIterator.',
+      'group' => 'Feeds EX',
+    );
+  }
+
+  public function setUp() {
+    parent::setUp();
+    $this->moduleDir = drupal_get_path('module', 'feeds_ex');
+    require_once DRUPAL_ROOT . '/' . $this->moduleDir . '/src/File/FeedsExLineIterator.php';
+  }
+
+  /**
+   * Tests basic iteration.
+   */
+  public function test() {
+    $iterator = new FeedsExLineIterator($this->moduleDir . '/tests/resources/test.jsonl');
+    $this->assertEqual(count(iterator_to_array($iterator)), 4);
+  }
+
+  /**
+   * Tests settings line limits.
+   */
+  public function testLineLimit() {
+    foreach (range(1, 4) as $limit) {
+      $iterator = new FeedsExLineIterator($this->moduleDir . '/tests/resources/test.jsonl');
+      $iterator->setLineLimit($limit);
+      $array = iterator_to_array($iterator);
+      $this->assertEqual(count($array), $limit, format_string('@count lines read.', array('@count' => count($array))));
+    }
+  }
+
+  /**
+   * Tests resuming file position.
+   */
+  public function testFileResume() {
+    $iterator = new FeedsExLineIterator($this->moduleDir . '/tests/resources/test.jsonl');
+    $iterator->setLineLimit(1);
+    foreach (array('Gilbert', 'Alexa', 'May', 'Deloise') as $name) {
+      foreach ($iterator as $line) {
+        $line = drupal_json_decode($line);
+        $this->assertEqual($line['name'], $name);
+      }
+      $iterator->setStartPosition($iterator->ftell());
+    }
+  }
+
+}

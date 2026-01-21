@@ -1,12 +1,16 @@
 <?php
 
 /**
+ * @file
+ */
+
+/**
  * Specialized implementation of hook_page_manager_task_tasks(). See api-task.html for
  * more information.
  */
 function page_manager_node_edit_page_manager_tasks() {
   return array(
-    // This is a 'page' task and will fall under the page admin UI
+    // This is a 'page' task and will fall under the page admin UI.
     'task type' => 'page',
 
     'title' => t('Node add/edit form'),
@@ -83,7 +87,7 @@ function page_manager_node_edit_menu_alter(&$items, $task) {
  * node edit, which is node_page_edit().
  */
 function page_manager_node_edit($node) {
-  // Load my task plugin
+  // Load my task plugin.
   $task = page_manager_get_task('node_edit');
 
   // Load the node into a context.
@@ -91,13 +95,28 @@ function page_manager_node_edit($node) {
   ctools_include('context-task-handler');
   $contexts = ctools_context_handler_get_task_contexts($task, '', array($node));
 
+  // Set the default title for the node add/edit form. If the page has a custom
+  // title it'll override this.
+  $types = node_type_get_types();
+  $context = reset($contexts);
+  if (empty($context->data->nid)) {
+    drupal_set_title(t('Create @name', array(
+      '@name' => $types[$context->data->type]->name
+    )), PASS_THROUGH);
+  }
+  else {
+    drupal_set_title(t('<em>Edit @type</em> @title', array(
+      '@type' => $types[$context->node_type]->name,
+      '@title' => $context->data->title
+    )), PASS_THROUGH);
+  }
+
   $arg = array(isset($node->nid) ? $node->nid : $node->type);
   $output = ctools_context_handler_render($task, '', $contexts, $arg);
   if ($output === FALSE) {
     // Fall back!
     // We've already built the form with the context, so we can't build it again, or
     // form_clean_id will mess up our ids. But we don't really need to, either:
-    $context = reset($contexts);
     $output = $context->form;
   }
 
@@ -176,6 +195,7 @@ function page_manager_node_edit_enable($cache, $status) {
  *   The subtask id
  * @param $contexts
  *   The contexts loaded for the task.
+ *
  * @return
  *   TRUE if the current user can access the page.
  */

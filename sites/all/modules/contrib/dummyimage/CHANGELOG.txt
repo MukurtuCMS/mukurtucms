@@ -1,4 +1,8 @@
 CHANGELOG for Dummyimage for Drupal 7
+
+Dummyimage 7.x-1.6 (Mar 4, 2016)
+  * Issue #2617702 by tomgeekery: Unsplash
+
 Dummyimage 7.x-1.5 (Jan 13, 2014)
   * Issue 1540168 by danlinn: Add 'only replace default images' option.
   * Issue #1545674 by jojonaloha | danlinn: Zombies!.

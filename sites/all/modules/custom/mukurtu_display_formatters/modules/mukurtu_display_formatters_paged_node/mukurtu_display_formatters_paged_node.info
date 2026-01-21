@@ -1,0 +1,5 @@
+name = Mukurtu Paged Node Formatter
+description = Provides a paged node display for node reference fields.
+package = Mukurtu
+core = 7.x
+files[] = mukurtu_display_formatters_paged_node.module

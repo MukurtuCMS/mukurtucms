@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * @file
+ * Provides hook implementations and functionality for oa_widgets.
+ */
+
+include_once 'oa_widgets.theme.inc';
+
+/*
+ * Implements hook_ctools_plugin_directory
+ */
+function oa_widgets_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'ctools' && $plugin_type == 'content_types') {
+    return 'plugins/content_types';
+  }
+}
+
+/**
+ * Implements hook_oa_settings_form().
+ */
+function oa_widgets_oa_settings_form(&$form_state) {
+  $forms = array();
+
+  $form = array();
+  $form['oa_show_visibility_panel'] = array(
+    '#type' => 'checkbox',
+    '#title' => 'Show visibility panel widget',
+    '#default_value' => variable_get('oa_show_visibility_panel', TRUE),
+  );
+  $form['oa_show_visibility_toolbar'] = array(
+    '#type' => 'checkbox',
+    '#title' => 'Show visibility in toolbar',
+    '#default_value' => variable_get('oa_show_visibility_toolbar', TRUE),
+  );
+
+  $forms[] = array(
+    'caption' => t('Privacy'),
+    'form' => $form,
+  );
+  return $forms;
+}
+

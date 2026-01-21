@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_digitalheritage.strongarm.inc
@@ -81,14 +82,19 @@ function ma_digitalheritage_strongarm() {
     'tags' => array(
       'is_enabled' => 1,
       'types' => array(
-        'page' => array(
-          'is_valid' => TRUE,
+        'article' => array(
           'display_handler' => 'links',
+          'is_valid' => TRUE,
+          'opmode' => 1,
+        ),
+        'dictionary_word' => array(
+          'display_handler' => 'none',
+          'is_valid' => TRUE,
           'opmode' => 0,
         ),
         'digital_heritage' => array(
-          'is_valid' => TRUE,
           'display_handler' => 'links',
+          'is_valid' => TRUE,
           'opmode' => 2,
         ),
       ),
@@ -99,103 +105,23 @@ function ma_digitalheritage_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'ds_classes_fields';
-  $strongarm->value = 'col-md-8 col-md-pull-4
-col-md-4 col-md-push-8
-clearfix';
-  $export['ds_classes_fields'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_classes_regions';
-  $strongarm->value = 'col-md-8 col-md-pull-4
-col-md-4 col-md-push-8';
-  $export['ds_classes_regions'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_fields_extra';
-  $strongarm->value = 0;
-  $export['ds_extras_fields_extra'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_fields_extra_list';
-  $strongarm->value = '';
-  $export['ds_extras_fields_extra_list'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_field_permissions';
-  $strongarm->value = 0;
-  $export['ds_extras_field_permissions'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_field_template';
+  $strongarm->name = 'diff_enable_revisions_page_node_digital_heritage';
   $strongarm->value = 1;
-  $export['ds_extras_field_template'] = $strongarm;
+  $export['diff_enable_revisions_page_node_digital_heritage'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_flag';
-  $strongarm->value = 0;
-  $export['ds_extras_flag'] = $strongarm;
+  $strongarm->name = 'diff_show_preview_changes_node_digital_heritage';
+  $strongarm->value = 1;
+  $export['diff_show_preview_changes_node_digital_heritage'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_hidden_region';
-  $strongarm->value = 0;
-  $export['ds_extras_hidden_region'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_hide_page_sidebars';
-  $strongarm->value = 0;
-  $export['ds_extras_hide_page_sidebars'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_hide_page_title';
-  $strongarm->value = 0;
-  $export['ds_extras_hide_page_title'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_region_to_block';
-  $strongarm->value = 0;
-  $export['ds_extras_region_to_block'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_switch_field';
-  $strongarm->value = 0;
-  $export['ds_extras_switch_field'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_switch_view_mode';
-  $strongarm->value = 0;
-  $export['ds_extras_switch_view_mode'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_vd';
-  $strongarm->value = 0;
-  $export['ds_extras_vd'] = $strongarm;
+  $strongarm->name = 'diff_view_mode_preview_node_digital_heritage';
+  $strongarm->value = 'full';
+  $export['diff_view_mode_preview_node_digital_heritage'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -209,12 +135,65 @@ col-md-4 col-md-push-8';
   $strongarm->api_version = 1;
   $strongarm->name = 'field_bundle_settings_node__digital_heritage';
   $strongarm->value = array(
+    'extra_fields' => array(
+      'display' => array(),
+      'form' => array(
+        'path' => array(
+          'weight' => '3',
+        ),
+        'redirect' => array(
+          'weight' => '5',
+        ),
+        'title' => array(
+          'weight' => '2',
+        ),
+      ),
+    ),
     'view_modes' => array(
-      'teaser' => array(
+      'browse_teaser' => array(
+        'custom_settings' => TRUE,
+      ),
+      'collections_browse' => array(
+        'custom_settings' => FALSE,
+      ),
+      'community_record' => array(
+        'custom_settings' => TRUE,
+      ),
+      'dictionary_word_summary' => array(
+        'custom_settings' => FALSE,
+      ),
+      'diff_standard' => array(
+        'custom_settings' => FALSE,
+      ),
+      'featured' => array(
+        'custom_settings' => TRUE,
+      ),
+      'featured_content' => array(
         'custom_settings' => TRUE,
       ),
       'full' => array(
         'custom_settings' => TRUE,
+      ),
+      'ical' => array(
+        'custom_settings' => FALSE,
+      ),
+      'map_popup' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
+      ),
+      'person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'custom_settings' => TRUE,
+      ),
+      'related_person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'revision' => array(
+        'custom_settings' => FALSE,
       ),
       'rss' => array(
         'custom_settings' => FALSE,
@@ -225,47 +204,21 @@ col-md-4 col-md-push-8';
       'search_result' => array(
         'custom_settings' => TRUE,
       ),
-      'browse_teaser' => array(
+      'taxonomy_record_teaser' => array(
         'custom_settings' => TRUE,
       ),
-      'featured' => array(
+      'teacher_view' => array(
+        'custom_settings' => FALSE,
+      ),
+      'teaser' => array(
         'custom_settings' => TRUE,
-      ),
-      'token' => array(
-        'custom_settings' => FALSE,
-      ),
-      'revision' => array(
-        'custom_settings' => FALSE,
-      ),
-      'community_record' => array(
-        'custom_settings' => TRUE,
-      ),
-      'diff_standard' => array(
-        'custom_settings' => FALSE,
       ),
       'thumbed' => array(
         'custom_settings' => FALSE,
       ),
-      'related_items_teaser_map_popup' => array(
-        'custom_settings' => TRUE,
+      'token' => array(
+        'custom_settings' => FALSE,
       ),
-      'map_popup' => array(
-        'custom_settings' => TRUE,
-      ),
-    ),
-    'extra_fields' => array(
-      'form' => array(
-        'title' => array(
-          'weight' => '2',
-        ),
-        'path' => array(
-          'weight' => '3',
-        ),
-        'redirect' => array(
-          'weight' => '5',
-        ),
-      ),
-      'display' => array(),
     ),
   );
   $export['field_bundle_settings_node__digital_heritage'] = $strongarm;
@@ -328,6 +281,352 @@ col-md-4 col-md-push-8';
   $strongarm->name = 'node_submitted_digital_heritage';
   $strongarm->value = 1;
   $export['node_submitted_digital_heritage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_animate_in_owlcarousel_settings_multipage';
+  $strongarm->value = '';
+  $export['owlcarousel_animate_in_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_animate_out_owlcarousel_settings_multipage';
+  $strongarm->value = '';
+  $export['owlcarousel_animate_out_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_autoplay_hover_pause_owlcarousel_settings_multipage';
+  $strongarm->value = 0;
+  $export['owlcarousel_autoplay_hover_pause_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_autoplay_owlcarousel_settings_multipage';
+  $strongarm->value = 0;
+  $export['owlcarousel_autoplay_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_autoplay_speed_owlcarousel_settings_multipage';
+  $strongarm->value = '0';
+  $export['owlcarousel_autoplay_speed_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_autoplay_timeout_owlcarousel_settings_multipage';
+  $strongarm->value = '5000';
+  $export['owlcarousel_autoplay_timeout_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_auto_width_owlcarousel_settings_multipage';
+  $strongarm->value = 0;
+  $export['owlcarousel_auto_width_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_callbacks_owlcarousel_settings_multipage';
+  $strongarm->value = 0;
+  $export['owlcarousel_callbacks_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_center_owlcarousel_settings_multipage';
+  $strongarm->value = 0;
+  $export['owlcarousel_center_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_dots_container_owlcarousel_settings_multipage';
+  $strongarm->value = '';
+  $export['owlcarousel_dots_container_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_dots_each_owlcarousel_settings_multipage';
+  $strongarm->value = '0';
+  $export['owlcarousel_dots_each_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_dots_owlcarousel_settings_multipage';
+  $strongarm->value = 0;
+  $export['owlcarousel_dots_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_dots_speed_owlcarousel_settings_multipage';
+  $strongarm->value = '0';
+  $export['owlcarousel_dots_speed_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_dot_data_owlcarousel_settings_multipage';
+  $strongarm->value = 0;
+  $export['owlcarousel_dot_data_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_drag_end_speed_owlcarousel_settings_multipage';
+  $strongarm->value = '0';
+  $export['owlcarousel_drag_end_speed_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_fallback_easing_owlcarousel_settings_multipage';
+  $strongarm->value = 'swing';
+  $export['owlcarousel_fallback_easing_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_fluid_speed_owlcarousel_settings_multipage';
+  $strongarm->value = '250';
+  $export['owlcarousel_fluid_speed_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_free_drag_owlcarousel_settings_multipage';
+  $strongarm->value = 0;
+  $export['owlcarousel_free_drag_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_info_owlcarousel_settings_multipage';
+  $strongarm->value = '';
+  $export['owlcarousel_info_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_items_owlcarousel_settings_multipage';
+  $strongarm->value = '7';
+  $export['owlcarousel_items_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_item_element_owlcarousel_settings_multipage';
+  $strongarm->value = 'div';
+  $export['owlcarousel_item_element_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_lazy_content_owlcarousel_settings_multipage';
+  $strongarm->value = 0;
+  $export['owlcarousel_lazy_content_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_lazy_load_owlcarousel_settings_multipage';
+  $strongarm->value = 1;
+  $export['owlcarousel_lazy_load_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_loop_owlcarousel_settings_multipage';
+  $strongarm->value = 0;
+  $export['owlcarousel_loop_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_margin_owlcarousel_settings_multipage';
+  $strongarm->value = '10';
+  $export['owlcarousel_margin_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_merge_fit_owlcarousel_settings_multipage';
+  $strongarm->value = 1;
+  $export['owlcarousel_merge_fit_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_merge_owlcarousel_settings_multipage';
+  $strongarm->value = 0;
+  $export['owlcarousel_merge_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_mouse_drag_owlcarousel_settings_multipage';
+  $strongarm->value = 1;
+  $export['owlcarousel_mouse_drag_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_nav_container_owlcarousel_settings_multipage';
+  $strongarm->value = '';
+  $export['owlcarousel_nav_container_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_nav_owlcarousel_settings_multipage';
+  $strongarm->value = 1;
+  $export['owlcarousel_nav_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_nav_rewind_owlcarousel_settings_multipage';
+  $strongarm->value = 1;
+  $export['owlcarousel_nav_rewind_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_nav_speed_owlcarousel_settings_multipage';
+  $strongarm->value = '0';
+  $export['owlcarousel_nav_speed_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_nav_text_owlcarousel_settings_multipage';
+  $strongarm->value = array(
+    0 => '< previous',
+    1 => 'next >',
+  );
+  $export['owlcarousel_nav_text_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_nested_item_selector_owlcarousel_settings_multipage';
+  $strongarm->value = '';
+  $export['owlcarousel_nested_item_selector_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_pull_drag_owlcarousel_settings_multipage';
+  $strongarm->value = 1;
+  $export['owlcarousel_pull_drag_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_responsive_base_element_owlcarousel_settings_multipage';
+  $strongarm->value = 'window';
+  $export['owlcarousel_responsive_base_element_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_responsive_class_owlcarousel_settings_multipage';
+  $strongarm->value = 0;
+  $export['owlcarousel_responsive_class_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_responsive_refresh_rate_owlcarousel_settings_multipage';
+  $strongarm->value = '200';
+  $export['owlcarousel_responsive_refresh_rate_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_settings_multipage';
+  $strongarm->value = 'multipage';
+  $export['owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_slide_by_owlcarousel_settings_multipage';
+  $strongarm->value = '1';
+  $export['owlcarousel_slide_by_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_smart_speed_owlcarousel_settings_multipage';
+  $strongarm->value = '250';
+  $export['owlcarousel_smart_speed_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_stage_element_owlcarousel_settings_multipage';
+  $strongarm->value = 'div';
+  $export['owlcarousel_stage_element_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_stage_padding_owlcarousel_settings_multipage';
+  $strongarm->value = '0';
+  $export['owlcarousel_stage_padding_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_start_position_owlcarousel_settings_multipage';
+  $strongarm->value = '0';
+  $export['owlcarousel_start_position_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_touch_drag_owlcarousel_settings_multipage';
+  $strongarm->value = 1;
+  $export['owlcarousel_touch_drag_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_url_hash_listener_owlcarousel_settings_multipage';
+  $strongarm->value = 0;
+  $export['owlcarousel_url_hash_listener_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_video_height_owlcarousel_settings_multipage';
+  $strongarm->value = 0;
+  $export['owlcarousel_video_height_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_video_owlcarousel_settings_multipage';
+  $strongarm->value = 0;
+  $export['owlcarousel_video_owlcarousel_settings_multipage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'owlcarousel_video_width_owlcarousel_settings_multipage';
+  $strongarm->value = 0;
+  $export['owlcarousel_video_width_owlcarousel_settings_multipage'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */

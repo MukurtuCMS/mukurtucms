@@ -1,0 +1,14 @@
+diff --git a/js/fullcalendar_create.fullcalendar.js b/js/fullcalendar_create.fullcalendar.js
+index d5bfad6..901a9b7 100644
+--- a/js/fullcalendar_create.fullcalendar.js
++++ b/js/fullcalendar_create.fullcalendar.js
+@@ -101,7 +101,8 @@ function nodeadd (settings, submit) {
+       break;
+
+     default:
+-      window.location.assign('//' + window.location.host + '/node/add/' + settings.node_type + query);
++      // Mukurtu patch -- pass the calendar NID through the link to the add event form, then redirect to the current page (the CP, or if not on the CP, the calendar).
++      window.location.assign('//' + window.location.host + '/node/add/' + settings.node_type + '/' + Drupal.settings.calendarNid + query + '&destination=' + Drupal.settings.getQ);
+   }
+ }
+

@@ -37,12 +37,14 @@ function popupformat_features_export($data, &$export, $module_name = '') {
   foreach($data as $instance){
 
     if ($formats[$instance]['style']){
-      $matches = array();
-      preg_match('/\/modules\/([^\/]+)/', $styles[$formats[$instance]['style']], $matches);
-      $module = $matches[1];
-      $export['dependencies'][$module] = $module;
+      foreach (module_implements('popup_styles') as $module) {
+        $provided = module_invoke($module, 'popup_styles');
+        if (is_array($provided) && array_key_exists($formats[$instance]['style'], $provided)) {
+          $export['dependencies'][$module] = $module;
+          break;
+        }
+      }
     }
-
 
     if ($formats[$instance]['effect']){
       foreach(module_implements('popup_effects') as $module){

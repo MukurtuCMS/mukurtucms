@@ -99,7 +99,7 @@ else {
   // Nothing in session? Shouldn't happen... anyway let's try to upload it in the (almost) right place
   // Path to user files relative to the document root.
   $baseUrl = strtr(base_path(), array(
-        '/modules/ckeditor/ckfinder/core/connector/php' => '',
+        drupal_get_path('module','ckeditor') . '/ckfinder/core/connector/php' => '',
       )) . variable_get('file_private_path', conf_path() . '/files') . '/';
   $baseDir = resolveUrl($baseUrl);
 }

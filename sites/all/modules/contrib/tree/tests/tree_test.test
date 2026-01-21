@@ -1,0 +1,437 @@
+<?php
+
+abstract class TreeTestAbstract extends DrupalWebTestCase {
+
+  protected $profile = 'testing';
+
+  /**
+   * @var Tree_Storage_Testable
+   */
+  protected $storage;
+
+  /**
+   * @var Tree_Provider
+   */
+  protected $provider;
+
+  protected function createItems(Tree_Storage_Testable $storage) {
+    $this->root1 = $storage->create();
+    $storage->save($this->root1);
+
+    $this->root_child1 = $storage->create();
+    $this->root_child1->parent = $this->root1->id;
+    $storage->save($this->root_child1);
+
+    $this->child1_child = $storage->create();
+    $this->child1_child->parent = $this->root_child1->id;
+    $storage->save($this->child1_child);
+
+    $this->root_child2 = $storage->create();
+    $this->root_child2->parent = $this->root1->id;
+    $storage->save($this->root_child2);
+
+    $this->root2 = $storage->create();
+    $storage->save($this->root2);
+
+    $this->root3 = $storage->create();
+    $storage->save($this->root3);
+  }
+
+  public function testTraversal() {
+    // Test children.
+    $this->assertEqualItemListsWithOrder($this->provider->childrenOf($this->root1)->execute(), array($this->root_child1, $this->root_child2));
+    $this->assertEqualItemListsWithOrder($this->provider->childrenOf($this->root_child1)->execute(), array($this->child1_child));
+    $this->assertEqualItemListsWithOrder($this->provider->childrenOf($this->child1_child)->execute(), array());
+    $this->assertEqualItemListsWithOrder($this->provider->childrenOf($this->root_child2)->execute(), array());
+
+    // Test parent.
+    $this->assertEqualItemLists($this->provider->parentOf($this->root_child1)->execute(), array($this->root1));
+    $this->assertEqualItemLists($this->provider->parentOf($this->root_child1)->execute(), $this->provider->parentOf($this->root_child2)->execute());
+    $this->assertEqualItemLists($this->provider->parentOf($this->root1)->execute(), array());
+
+    // Test ancestors.
+    $this->assertEqualItemLists($this->provider->ancestorsOf($this->root1)->execute(), array());
+    $this->assertEqualItemLists($this->provider->ancestorsOf($this->root_child1)->execute(), array($this->root1));
+    $this->assertEqualItemLists($this->provider->ancestorsOf($this->child1_child)->execute(), array($this->root_child1, $this->root1));
+    $this->assertEqualItemLists($this->provider->ancestorsOf($this->root_child2)->execute(), array($this->root1));
+    $this->assertEqualItemLists($this->provider->ancestorsOf($this->root2)->execute(), array());
+    $this->assertEqualItemLists($this->provider->ancestorsOf($this->root3)->execute(), array());
+
+    // Test root.
+    $this->assertEqualItemLists($this->provider->rootOf($this->root1)->execute(), array($this->root1));
+    $this->assertEqualItemLists($this->provider->rootOf($this->root_child1)->execute(), array($this->root1));
+    $this->assertEqualItemLists($this->provider->rootOf($this->child1_child)->execute(), array($this->root1));
+    $this->assertEqualItemLists($this->provider->rootOf($this->root_child2)->execute(), array($this->root1));
+    $this->assertEqualItemLists($this->provider->rootOf($this->root2)->execute(), array($this->root2));
+    $this->assertEqualItemLists($this->provider->rootOf($this->root2)->execute(), array($this->root2));
+
+    // Test roots.
+    $this->assertEqualItemLists($this->provider->getRoots()->execute(), array($this->root1, $this->root2, $this->root3));
+
+    // Test siblings.
+    $this->assertEqualItemListsWithOrder($this->provider->siblingsOf($this->root1)->execute(), array($this->root1, $this->root2, $this->root3));
+    $this->assertEqualItemListsWithOrder($this->provider->siblingsOf($this->root_child1)->execute(), array($this->root_child1, $this->root_child2));
+    $this->assertEqualItemListsWithOrder($this->provider->siblingsOf($this->child1_child)->execute(), array($this->child1_child));
+    $this->assertEqualItemListsWithOrder($this->provider->siblingsOf($this->root_child2)->execute(), array($this->root_child1, $this->root_child2));
+    $this->assertEqualItemListsWithOrder($this->provider->siblingsOf($this->root2)->execute(), array($this->root1, $this->root2, $this->root3));
+    $this->assertEqualItemListsWithOrder($this->provider->siblingsOf($this->root3)->execute(), array($this->root1, $this->root2, $this->root3));
+  }
+
+  protected function assertEqualItemLists($item_list1, $item_list2, $with_order = FALSE) {
+    $item_ids1 = array();
+    foreach ($item_list1 as $item) {
+      $item_ids1[] = $item->id;
+    }
+    $item_ids2 = array();
+    foreach ($item_list2 as $item) {
+      $item_ids2[] = $item->id;
+    }
+    if (!$with_order) {
+      sort($item_ids1);
+      sort($item_ids2);
+    }
+    return $this->assertIdentical($item_ids1, $item_ids2);
+  }
+
+  protected function assertEqualItemListsWithOrder($item_list1, $item_list2) {
+    return $this->assertEqualItemLists($item_list1, $item_list2, TRUE);
+  }
+}
+
+class TreeTestSimple extends TreeTestAbstract {
+  public static function getInfo() {
+    return array(
+      'name' => 'Simple provider',
+      'description' => 'Test the basic tree provider.',
+      'group' => 'Tree',
+    );
+  }
+
+  function setUp() {
+    parent::setUp(array('entityreference', 'tree', 'tree_test'));
+
+    // Initialize the provider.
+    $storage = new Tree_Storage_SQL_Testable(Database::getConnection(), 'test_tree_table');
+    $this->provider = new Tree_Provider_Simple($storage);
+    $storage->setProvider($this->provider);
+
+    $this->createItems($storage);
+  }
+}
+
+class TreeTestNestedSet extends DrupalWebTestCase {
+
+  protected $profile = 'testing';
+
+  /**
+   * @var Tree_Provider_NestedSet
+   */
+  protected $provider;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Nested set provider',
+      'description' => 'Test the nested set tree provider.',
+      'group' => 'Tree',
+    );
+  }
+
+  public function setUp() {
+    parent::setUp(array('entityreference', 'tree', 'tree_test'));
+
+    // Initialize the provider.
+    $this->storage = new Tree_Storage_SQL_Testable(Database::getConnection(), 'test_tree_table');
+    $this->provider = new Tree_Provider_NestedSet($this->storage);
+    $this->storage->setProvider($this->provider);
+  }
+
+  protected function assertNestedTree($expected) {
+    $query = db_select($this->provider->treeTable, 't');
+    $query->addField('t', 'id', 'id');
+    $query->addField('t', 'nested_left', 'nested_left');
+    $query->addField('t', 'nested_right', 'nested_right');
+    $query->orderBy('nested_left');
+    $result = $query->execute()->fetchAll(PDO::FETCH_NUM);
+
+    foreach ($expected as &$line) {
+      $line = implode(', ', $line);
+    }
+    $expected = implode("\n", $expected);
+
+    foreach ($result as &$line) {
+      $line = implode(', ', $line);
+    }
+    $result = implode("\n", $result);
+
+    $this->verbose("<pre>Returned nested set:\n" . $result . "\n\nExpected:\n". $expected);
+
+    return $this->assertIdentical($expected, $result, t('Expected nested set returned.'));
+  }
+
+  /**
+   * Tests CRUD operations for the nested set implementation.
+   */
+  public function testCrud() {
+    // Create a first item.
+    $item1 = $this->storage->create();
+    $this->storage->save($item1);
+    $this->assertNestedTree(array(
+      array($item1->id, 1, 2),
+    ));
+
+    // Create a second item.
+    $item2 = $this->storage->create();
+    $item2->weight = 1;
+    $this->storage->save($item2);
+    $this->assertNestedTree(array(
+      array($item1->id, 1, 2),
+      array($item2->id, 3, 4),
+    ));
+
+    // Change the weight of the second item.
+    $item2->weight = -1;
+    $this->storage->save($item2);
+    $this->assertNestedTree(array(
+      array($item2->id, 1, 2),
+      array($item1->id, 3, 4),
+    ));
+
+    // Nest the second item under the first.
+    $item2->parent = $item1->id;
+    $item2->weight = 0;
+    $this->storage->save($item2);
+    $this->assertNestedTree(array(
+      array($item1->id, 1, 4),
+      array($item2->id, 2, 3),
+    ));
+
+    // Un-nest the item.
+    $item2->parent = NULL;
+    $item2->weight = 1;
+    $this->storage->save($item2);
+    $this->assertNestedTree(array(
+      array($item1->id, 1, 2),
+      array($item2->id, 3, 4),
+    ));
+
+    // Nest the first item under the second.
+    $item1->parent = $item2->id;
+    $this->storage->save($item1);
+    $this->assertNestedTree(array(
+      array($item2->id, 1, 4),
+      array($item1->id, 2, 3),
+    ));
+
+    // Un-nest the first item.
+    $item1->parent = NULL;
+    $this->storage->save($item1);
+    $this->assertNestedTree(array(
+      array($item1->id, 1, 2),
+      array($item2->id, 3, 4),
+    ));
+
+    // Add a child to the first item.
+    $item3 = $this->storage->create();
+    $item3->parent = $item1->id;
+    $this->storage->save($item3);
+    $this->assertNestedTree(array(
+      array($item1->id, 1, 4),
+      array($item3->id, 2, 3),
+      array($item2->id, 5, 6),
+    ));
+
+    // Add another child to the first item.
+    $item4 = $this->storage->create();
+    $item4->parent = $item1->id;
+    $item4->weight = 1;
+    $this->storage->save($item4);
+    $this->assertNestedTree(array(
+      array($item1->id, 1, 6),
+      array($item3->id, 2, 3),
+      array($item4->id, 4, 5),
+      array($item2->id, 7, 8),
+    ));
+
+    // Add a child to item4.
+    $item5 = $this->storage->create();
+    $item5->parent = $item4->id;
+    $this->storage->save($item5);
+    $this->assertNestedTree(array(
+      array($item1->id, 1, 8),
+      array($item3->id, 2, 3),
+      array($item4->id, 4, 7),
+      array($item5->id, 5, 6),
+      array($item2->id, 9, 10),
+    ));
+
+    // Move item3 as a child of item4.
+    $item3->parent = $item4->id;
+    $this->storage->save($item3);
+    $this->assertNestedTree(array(
+      array($item1->id, 1, 8),
+      array($item4->id, 2, 7),
+      array($item3->id, 3, 4),
+      array($item5->id, 5, 6),
+      array($item2->id, 9, 10),
+    ));
+
+    // Try to move item1 as a child of item3.
+    $item1->parent = $item3->id;
+    try {
+      $this->storage->save($item1);
+      $this->fail('Exception thrown when trying to move an item below one of its children.');
+    }
+    catch (Exception $e) {
+      $this->pass('Exception thrown when trying to move an item below one of its children.');
+    }
+    // The nested tree should have stayed the same.
+    $this->assertNestedTree(array(
+      array($item1->id, 1, 8),
+      array($item4->id, 2, 7),
+      array($item3->id, 3, 4),
+      array($item5->id, 5, 6),
+      array($item2->id, 9, 10),
+    ));
+    $result = $this->storage->query()
+      ->condition('id', $item1->id)
+      ->execute();
+    $this->assertIdentical($result[0]->parent, NULL, t('The parent has not been changed.'));
+  }
+
+  /**
+   * Tests all the insertions points of the nested set implementation:
+   *   - root
+   *   - child
+   *   - before
+   *   - after
+   */
+  public function testInsertionPoints() {
+    // Create the following initial structure:
+    // 1
+    // 2
+    // |\
+    // | 3
+    // | 4
+    // | 5
+    // 6
+
+    // The first item tests the 'root' insertion point.
+    $item1 = $this->storage->create();
+    $item1->weight = 0;
+    $this->storage->save($item1);
+
+    $item2 = $this->storage->create();
+    $item2->weight = 1;
+    $this->storage->save($item2);
+
+    $item3 = $this->storage->create();
+    $item3->parent = $item2->id;
+    $item3->weight = 0;
+    $this->storage->save($item3);
+
+    $item4 = $this->storage->create();
+    $item4->parent = $item2->id;
+    $item4->weight = 5;
+    $this->storage->save($item4);
+
+    $item5 = $this->storage->create();
+    $item5->parent = $item2->id;
+    $item5->weight = 10;
+    $this->storage->save($item5);
+
+    $item6 = $this->storage->create();
+    $item6->weight = 2;
+    $this->storage->save($item6);
+
+    $this->assertNestedTree(array(
+      array($item1->id, 1, 2),
+      array($item2->id, 3, 10),
+      array($item3->id, 4, 5),
+      array($item4->id, 6, 7),
+      array($item5->id, 8, 9),
+      array($item6->id, 11, 12),
+    ));
+
+    // Test the 'child' insertion point by adding a child to $item1, which
+    // doesn't have any other children.
+    // The new structure looks like this:
+    // 1
+    //   <- 7
+    // 2
+    // |\
+    // | 3
+    // | 4
+    // | 5
+    // 6
+    $child_item = $this->storage->create();
+    $child_item->parent = $item1->id;
+    $this->storage->save($child_item);
+    $this->assertNestedTree(array(
+      array($item1->id, 1, 4),
+      array($child_item->id, 2, 3),
+      array($item2->id, 5, 12),
+      array($item3->id, 6, 7),
+      array($item4->id, 8, 9),
+      array($item5->id, 10, 11),
+      array($item6->id, 13, 14),
+    ));
+
+    // Test the 'before' insertion point by adding a child to $item2 with a
+    // lower weight than all its other children.
+    // The new structure looks like this:
+    // 1
+    // |\
+    // | 7
+    // 2
+    // |\
+    // |   <- 8
+    // | 3
+    // | 4
+    // | 5
+    // 6
+    $before_item = $this->storage->create();
+    $before_item->parent = $item2->id;
+    $before_item->weight = -1;
+    $this->storage->save($before_item);
+    $this->assertNestedTree(array(
+      array($item1->id, 1, 4),
+      array($child_item->id, 2, 3),
+      array($item2->id, 5, 14),
+      array($before_item->id, 6, 7),
+      array($item3->id, 8, 9),
+      array($item4->id, 10, 11),
+      array($item5->id, 12, 13),
+      array($item6->id, 15, 16),
+    ));
+
+    // Test the 'after' insertion point by adding a child to $item2 with a
+    // higher weight than its $item3 child.
+    // The new structure looks like this:
+    // 1
+    // |\
+    // | 7
+    // 2
+    // |\
+    // | 8
+    // | 3
+    // |   <- 9
+    // | 4
+    // | 5
+    // 6
+    $after_item = $this->storage->create();
+    $after_item->parent = $item2->id;
+    $after_item->weight = 1;
+    $this->storage->save($after_item);
+    $this->assertNestedTree(array(
+      array($item1->id, 1, 4),
+      array($child_item->id, 2, 3),
+      array($item2->id, 5, 16),
+      array($before_item->id, 6, 7),
+      array($item3->id, 8, 9),
+      array($after_item->id, 10, 11),
+      array($item4->id, 12, 13),
+      array($item5->id, 14, 15),
+      array($item6->id, 17, 18),
+    ));
+  }
+}

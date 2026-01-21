@@ -1,0 +1,106 @@
+<?php
+/**
+ * @file
+ * Code for the Open Atrium Layouts feature.
+ */
+
+include_once 'oa_layouts.features.inc';
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function oa_layouts_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'ctools') {
+    return 'plugins/' . $plugin;
+  }
+}
+
+/**
+ * Implements hook_strongarm_alter().
+ */
+function oa_layouts_strongarm_alter(&$data) {
+  if (isset($data['variable_realm_list_og'])) {
+    // The assigned to settings.
+    if (!in_array('oa_layouts_minipanel_header', $data['variable_realm_list_og']->value)) {
+      $data['variable_realm_list_og']->value[] = 'oa_layouts_minipanel_header';
+    }
+    if (!in_array('oa_layouts_minipanel_footer', $data['variable_realm_list_og']->value)) {
+      $data['variable_realm_list_og']->value[] = 'oa_layouts_minipanel_footer';
+    }
+    if (!in_array('oa_layouts_layout_name', $data['variable_realm_list_og']->value)) {
+      $data['variable_realm_list_og']->value[] = 'oa_layouts_layout_name';
+    }
+  }
+}
+
+function oa_layouts_form_variable_realm_edit_variables_form_alter(&$form, $form_state) {
+  if (module_exists('panels_everywhere')) {
+    $form['variables']['oa_layouts']['#access'] = FALSE;
+  }
+  else {
+    $form['variables']['oa_site_layout']['#access'] = FALSE;
+  }
+}
+
+/**
+ * Callback for settings form #after_build
+ * Ensure variable.form.inc is loaded when submitting config form
+ */
+function oa_layouts_oa_settings_form_process($element, &$form_state) {
+  form_load_include($form_state, 'form.inc', 'variable');
+  return $element;
+}
+
+/**
+ * Implements hook_oa_core_add_panes().
+ */
+function oa_layouts_oa_core_add_panes() {
+  $info = array();
+  // Put comment form widget into sidebar for default node edit pages.
+  $info['node_edit_panel_context']['f2ca947f-f14f-4b9e-ac1f-2f8d94ca01a6'] = array(
+    'panel' => 'sidebar',
+    'type' => 'node_form_comment',
+    'subtype' => 'node_form_comment',
+    'configuration' => array(
+      'context' => 'argument_node_edit_1',
+      'override_title' => 0,
+      'override_title_text' => '',
+      'override_title_heading' => 'h2',
+    ),
+    'position' => 5.5,
+  );
+
+  // Add Topics and Replies widgets to default user dashboard.
+  $info['user:user:default']['f34b9365-3769-4c85-9788-bbfa336fdcad'] = array(
+    'panel' => 'contentheader',
+    'type' => 'views_panes',
+    'subtype' => 'oa_comment_topics-comment_user_topics',
+    'configuration' => array(
+      'view_settings' => 'fields',
+      'header_type' => 'none',
+      'view_mode' => 'teaser',
+    ),
+    'style' => array(
+      'settings' => NULL,
+      'style' => 'oa_styles_oa_pane',
+    ),
+    'position' => 1.2,
+  );
+  $info['user:user:default']['c068286a-0523-45cb-9190-9cc350ad6845'] = array(
+    'panel' => 'contentheader',
+    'type' => 'views_panes',
+    'subtype' => 'oa_comment_topics-comment_user_topics_replied',
+    'configuration' => array(
+      'view_settings' => 'fields',
+      'header_type' => 'none',
+      'view_mode' => 'teaser',
+    ),
+    'style' => array(
+      'settings' => NULL,
+      'style' => 'oa_styles_oa_pane',
+    ),
+    'position' => 1.3,
+  );
+
+  return $info;
+}

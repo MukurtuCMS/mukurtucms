@@ -60,7 +60,8 @@ function _feeds_feeds_plugins() {
     'name' => 'HTTP Fetcher',
     'description' => 'Download content from a URL.',
     'handler' => array(
-      'parent' => 'FeedsFetcher', // This is the key name, not the class name.
+      // This is the key name, not the class name.
+      'parent' => 'FeedsFetcher',
       'class' => 'FeedsHTTPFetcher',
       'file' => 'FeedsHTTPFetcher.inc',
       'path' => $path,

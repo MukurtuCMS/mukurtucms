@@ -2,13 +2,13 @@
  * Features packages.
  */
 div.features-form-links {
-  width:20%;
-  float:left;
+  width: 20%;
+  float: left;
 }
 
 div.features-form-content {
-  width:80%;
-  float:right;
+  width: 80%;
+  float: right;
 }
 
 /**
@@ -17,109 +17,111 @@ div.features-form-content {
 div.features-form-links ul#features-form-links,
 div.features-form-links ul#features-form-links li,
 div.features-form-links ul#features-form-links li a {
-  display:block;
-  float:none;
-  padding:0px;
-  margin:0px;
+  display: block;
+  float: none;
+  padding: 0;
+  margin: 0;
 }
 
 div.features-form-links ul#features-form-links {
-  margin:0px 0px 10px;
+  margin: 0 0 10px;
 }
 
 div.features-form-links ul#features-form-links li a {
-  background:#f8f8f8;
-  padding:5px 5px 4px 4px;
-  border-left:1px solid #eee;
-  border-bottom:1px solid #eee;
+  background: #f8f8f8;
+  padding: 5px 5px 4px 4px;
+  border-left: 1px solid #eee;
+  border-bottom: 1px solid #eee;
   color: #000;
-  cursor:pointer;
+  cursor: pointer;
 }
 
 div.features-form-links ul#features-form-links li a.features-package-active {
-  padding:4px 5px 4px 4px;
-  background:#fff;
-  border:1px solid #ccc;
-  border-right:0px;
+  padding: 4px 5px 4px 4px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-right: 0;
   color: #000;
-  margin-right:-1px;
+  margin-right: -1px;
 }
 
 /* Packages */
 div.features-form-package {
-  border:1px solid #ccc;
-  background:#fff;
+  border: 1px solid #ccc;
+  background: #fff;
   color: #000;
-  padding:10px;
-  margin:0px 0px 20px;
-  display:none;
+  padding: 10px;
+  margin: 0 0 20px;
+  display: none;
 }
 
 div.features-package-active {
-  display:block;
+  display: block;
 }
 
 /**
  * Features management form (admin/build/features).
  */
 div.features-empty {
-  margin:15px 0px;
-  font-size:1.5em;
-  text-align:center;
-  color:#999;
+  margin: 15px 0;
+  font-size: 1.5em;
+  text-align: center;
+  color: #999;
 }
 
 form div.buttons {
-  text-align:center;
+  text-align: center;
 }
 
 table.features .admin-loading,
 table.features tr.disabled {
-  color:#999;
+  color: #999;
 }
 
 table.features a.configure {
-  float:right;
-  font-style:italic;
+  float: right;
+  font-style: italic;
 }
 table.features div.feature {
-  float:left; width:85%;
+  float: left;
+  width: 85%;
 }
 table.features div.feature strong {
-  font-size:13px;
+  font-size: 13px;
 }
 table.features div.feature div.description {
-  font-size:11px; margin:0px;
+  font-size: 11px;
+  margin: 0;
 }
 
 table.features-manage td.name {
-  width:80%;
+  width: 80%;
 }
 table.features-manage td.sign {
-  width:20%;
+  width: 20%;
 }
 
 table.features-admin td.name {
-  width:60%;
+  width: 60%;
 }
 table.features-admin td.sign {
-  width:20%;
+  width: 20%;
 }
 table.features-admin td.state {
-  width:10%;
+  width: 10%;
 }
 table.features-admin td.actions {
-  width:10%;
+  width: 10%;
 }
 
 table.features td.sign {
-  font-size:9px;
-  line-height:15px;
-  white-space:nowrap;
+  font-size: 9px;
+  line-height: 15px;
+  white-space: nowrap;
 }
 
 table.features td.sign * {
-  margin:0px;
+  margin: 0;
 }
 
 table.features .admin-check,
@@ -127,34 +129,34 @@ table.features .admin-default,
 table.features .admin-overridden,
 table.features .admin-rebuilding,
 table.features .admin-needs-review {
-  display:none;
+  display: none;
 }
 
 /**
  * Feature export form (admin/build/features/export).
  */
 form.features-export-form table td {
-  width:50%;
+  width: 50%;
 }
 form.features-export-form table td {
-  vertical-align:top;
+  vertical-align: top;
 }
 form.features-export-form table div.description {
-  white-space:normal;
+  white-space: normal;
 }
 
 table.features-export div.form-item {
-  white-space:normal;
+  white-space: normal;
 }
 table.features-export select {
-  width:90%;
+  width: 90%;
 }
 table.features-export td {
-  vertical-align:top;
+  vertical-align: top;
 }
 
 form.features-export-form div.features-select {
-  display:none;
+  display: none;
 }
 
 /*
@@ -167,66 +169,66 @@ form.features-export-form div.form-checkboxes {
 
 form.features-export-form div#edit-components-wrapper,
 form.features-export-form div.features-select {
-  padding-right:20px;
+  padding-right: 20px;
 }
 
 /**
  * Feature component display (admin/build/features/%feature).
  */
 div.features-components div.column {
-  float:left;
-  width:50%;
+  float: left;
+  width: 50%;
 }
 
 div.features-components div.column div.info {
-  padding-right:20px;
+  padding-right: 20px;
 }
 div.features-components div.column div.components {
-  padding-left:20px;
+  padding-left: 20px;
 }
 
 h3.features-download,
 div.features-comparison h3,
 div.features-components h3 {
-  font-size:2em;
-  font-weight:bold;
-  letter-spacing:-1px;
-  margin:15px 0px;
+  font-size: 2em;
+  font-weight: bold;
+  letter-spacing: -1px;
+  margin: 15px 0;
 }
 
 h3.features-download {
-  text-align:center;
+  text-align: center;
 }
 
 div.features-components div.description {
-  font-size:11px;
-  margin:15px 0px;
+  font-size: 11px;
+  margin: 15px 0;
 }
 
 div.features-components table td {
-  font-size:11px;
+  font-size: 11px;
 }
 div.features-components table td.component {
-  padding-left:20px;
+  padding-left: 20px;
 }
 
 /**
  * Features component lists.
  */
 span.features-component-key {
-  font-size:11px;
+  font-size: 11px;
 }
 
 a.admin-update,
 a.features-storage,
 span.features-storage,
 span.features-component-list span {
-  white-space:nowrap;
-  margin-right:5px;
-  padding:2px 5px;
-  background:#eee;
-  -moz-border-radius:5px;
-  -webkit-border-radius:5px;
+  white-space: nowrap;
+  margin-right: 5px;
+  padding: 2px 5px;
+  background: #eee;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
 }
 
 div.features-key span.admin-conflict,
@@ -236,7 +238,7 @@ span.features-component-list span.features-conflict {
 }
 
 #features-export-wrapper .features-conflict,
-#features-export-wrapper .features-conflict label.option{
+#features-export-wrapper .features-conflict label.option {
   color: #c30 !important;
   font-weight: bold !important;
 }
@@ -246,65 +248,65 @@ div.conflicts span.admin-disabled {
 }
 
 a.admin-update {
-  background:transparent;
+  background: transparent;
 }
 
 /* These pseudo selectors are necessary for themes like Garland. */
 a.admin-overridden:link,
 a.admin-overridden:visited,
 span.admin-overridden {
-  color:#fff;
-  background:#666;
+  color: #fff;
+  background: #666;
 }
 
 a.admin-needs-review:link,
 a.admin-needs-review:visited,
 span.admin-needs-review {
-  color:#963;
-  background:#fe6;
+  color: #963;
+  background: #fe6;
 }
 
 a.admin-rebuilding:link,
 a.admin-rebuilding:visited,
 span.admin-rebuilding {
-  color:#fff;
-  background:#699;
+  color: #fff;
+  background: #699;
 }
 
 a.admin-conflict:link,
 a.admin-conflict:visited,
 span.admin-conflict {
-  color:#c30;
+  color: #c30;
 }
 
 table.features-diff td.diff-addedline,
 span.features-component-list .features-detected {
-  color:#68a;
-  background:#def;
+  color: #68a;
+  background: #def;
 }
 
 table.features-diff td.diff-deletedline,
 span.features-component-list .features-dependency {
-  color:#999;
-  background:#f8f8f8;
+  color: #999;
+  background: #f8f8f8;
 }
 
 /**
  * Features diff.
  */
 table.features-diff {
-  font-size:11px;
+  font-size: 11px;
 }
 
 table.features-diff td {
-  padding:0px 5px;
+  padding: 0 5px;
 }
 
 table.features-diff td.diff-deletedline,
 table.features-diff td.diff-addedline,
 table.features-diff td.diff-context {
-  width:50%;
-  font-family:'Andale Mono',monospace;
+  width: 50%;
+  font-family: 'Andale Mono',monospace;
 }
 
 /**
@@ -322,15 +324,15 @@ html.js #features-export-form fieldset.collapsed {
   top: 0;
   padding: 0 0 0 0;
 }
-fieldset.features-export-component  {
-  background: #F3F8FB;
+fieldset.features-export-component {
+  background: #f3f8fb;
   margin: 0.5em 0;
   font-weight: normal;
   font-size: 12px;
   top: 0;
 }
-fieldset.features-export-component.collapsed  {
-  background: #F3F8FB;
+fieldset.features-export-component.collapsed {
+  background: #f3f8fb;
 }
 fieldset.features-export-component legend {
   top: 0;
@@ -347,13 +349,13 @@ fieldset.features-export-component .fieldset-title span {
   text-transform: none;
   font-weight: normal;
 }
-#features-export-wrapper .fieldset-wrapper  {
+#features-export-wrapper .fieldset-wrapper {
   font-size: 12px;
 }
-div.features-export-list  {
+div.features-export-list {
   font-weight: normal;
   font-size: 12px;
-  border: 1px solid #CCC;
+  border: 1px solid #ccc;
   border-top-width: 0;
   overflow: hidden;
 }
@@ -389,7 +391,7 @@ fieldset.features-export-component .fieldset-wrapper .form-checkboxes {
 
 #features-export-wrapper .component-added .form-type-checkbox {
   font-weight: bold;
-  background: #EEE;
+  background: #eee;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
 }
@@ -398,8 +400,8 @@ fieldset.features-export-component .fieldset-wrapper .form-checkboxes {
 }
 #features-export-wrapper .component-detected .form-type-checkbox {
   font-style: italic;
-  color:#68a;
-  background:#def;
+  color: #68a;
+  background: #def;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
 }
@@ -497,13 +499,13 @@ input.form-submit.features-refresh-button {
   margin: 5px 5px;
   padding: 0 5px;
   background: transparent;
-  background: #EEE;
+  background: #eee;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   cursor: pointer;
 }
 #features-filter span:hover {
-  background:#def;
+  background: #def;
 }
 #features-autodetect .form-item {
   float: left;
@@ -541,7 +543,7 @@ input.form-submit.features-refresh-button {
   color: black;
   display: inline-block;
   background: transparent;
-  border: 1px solid #DDD;
+  border: 1px solid #ddd;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   white-space: nowrap;
@@ -550,19 +552,19 @@ input.form-submit.features-refresh-button {
 }
 #features-legend .fieldset-wrapper .component-detected {
   font-style: italic;
-  color:#68a;
-  background:#def;
+  color: #68a;
+  background: #def;
   border-width: 0;
 }
 #features-legend .fieldset-wrapper .component-added {
   font-weight: bold;
-  background: #EEE;
+  background: #eee;
   border-width: 0;
 }
 
 fieldset.features-export-component .fieldset-title .component-count {
-font-size: 12px;
-font-weight: bold;
+  font-size: 12px;
+  font-weight: bold;
 }
 
 .features-lock-icon {

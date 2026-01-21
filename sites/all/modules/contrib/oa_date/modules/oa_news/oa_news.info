@@ -1,0 +1,26 @@
+name = Open Atrium News
+description = News layout for Open Atrium
+core = 7.x
+package = Open Atrium
+dependencies[] = ctools
+dependencies[] = oa_core
+dependencies[] = oa_sections
+dependencies[] = panelizer
+dependencies[] = strongarm
+dependencies[] = views
+dependencies[] = views_content
+dependencies[] = views_load_more
+features[ctools][] = panelizer:panelizer:1
+features[ctools][] = strongarm:strongarm:1
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:2
+features[panelizer_defaults][] = node:oa_section:oa_section_news
+features[views_view][] = open_atrium_news
+features_exclude[dependencies][oa_layouts] = oa_layouts
+project path = sites/all/modules/contrib/oa_core/modules
+
+; Information added by Drupal.org packaging script on 2018-10-18
+version = "7.x-2.91"
+core = "7.x"
+project = "oa_core"
+datestamp = "1539884795"

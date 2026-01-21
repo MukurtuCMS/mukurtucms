@@ -7,9 +7,9 @@ files[] = jcarousel.module
 files[] = includes/jcarousel.views.inc
 files[] = includes/jcarousel_style_plugin.inc
 
-; Information added by drupal.org packaging script on 2011-11-24
-version = "7.x-2.6"
+; Information added by Drupal.org packaging script on 2015-01-05
+version = "7.x-2.7"
 core = "7.x"
 project = "jcarousel"
-datestamp = "1322116852"
+datestamp = "1420460282"
 

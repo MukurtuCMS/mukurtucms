@@ -106,8 +106,18 @@ function field_ui_menu() {
           $access = array_intersect_key($bundle_info['admin'], drupal_map_assoc(array('access callback', 'access arguments')));
           $access += array(
             'access callback' => 'user_access',
-            'access arguments' => array('administer site configuration'),
+            'access arguments' => array('administer fields'),
           );
+
+          // Add the "administer fields" permission on top of the access
+          // restriction because the field UI should only be accessible to
+          // trusted users.
+          if ($access['access callback'] != 'user_access' || $access['access arguments'] != array('administer fields')) {
+            $access = array(
+              'access callback' => 'field_ui_admin_access',
+              'access arguments' => array($access['access callback'], $access['access arguments']),
+            );
+          }
 
           $items["$path/fields"] = array(
             'title' => 'Manage fields',
@@ -255,6 +265,12 @@ function field_ui_menu_title($instance) {
  * Menu access callback for the 'view mode display settings' pages.
  */
 function _field_ui_view_mode_menu_access($entity_type, $bundle, $view_mode, $access_callback) {
+  // It's good practice to call func_get_args() at the beginning of a function
+  // to avoid problems with function parameters being modified later. The
+  // behavior of func_get_args() changed in PHP7.
+  // @see https://www.php.net/manual/en/migration70.incompatible.php#migration70.incompatible.other.func-parameter-modified
+  $all_args = func_get_args();
+
   // First, determine visibility according to the 'use custom display'
   // setting for the view mode.
   $bundle = field_extract_bundle($entity_type, $bundle);
@@ -265,7 +281,6 @@ function _field_ui_view_mode_menu_access($entity_type, $bundle, $view_mode, $acc
   // part of _menu_check_access().
   if ($visibility) {
     // Grab the variable 'access arguments' part.
-    $all_args = func_get_args();
     $args = array_slice($all_args, 4);
     $callback = empty($access_callback) ? 0 : trim($access_callback);
     if (is_numeric($callback)) {
@@ -391,4 +406,14 @@ function field_ui_form_node_type_form_submit($form, &$form_state) {
   if ($form_state['triggering_element']['#parents'][0] === 'save_continue') {
     $form_state['redirect'] = _field_ui_bundle_admin_path('node', $form_state['values']['type']) .'/fields';
   }
+}
+
+/**
+ * Access callback to determine if a user is allowed to use the field UI.
+ *
+ * Only grant access if the user has both the "administer fields" permission and
+ * is granted access by the entity specific restrictions.
+ */
+function field_ui_admin_access($access_callback, $access_arguments) {
+  return user_access('administer fields') && call_user_func_array($access_callback, $access_arguments);
 }

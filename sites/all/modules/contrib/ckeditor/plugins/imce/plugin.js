@@ -25,7 +25,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
           var width = editor.config.filebrowserWindowWidth || '80%',
           height = editor.config.filebrowserWindowHeight || '70%';
 
-          editor.popup(Drupal.settings.basePath + 'index.php?q=imce\x26app=ckeditor|sendto@ckeditor_setFile|&CKEditorFuncNum=' + editor._.filebrowserFnIMCE, width, height);
+          editor.popup(Drupal.settings.basePath + 'index.php?q=' + Drupal.settings.pathPrefix  + 'imce\x26app=ckeditor|sendto@ckeditor_setFile|&CKEditorFuncNum=' + editor._.filebrowserFnIMCE, width, height);
         }
       });
 

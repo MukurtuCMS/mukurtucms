@@ -36,7 +36,7 @@ function og_ui_subscribe($entity_type, $etid, $field_name = NULL) {
 
   $account = user_load($user->uid);
   if (empty($field_name)) {
-    $field_name = og_get_best_group_audience_field('user', $account, $entity_type, $bundle);
+    $field_name = og_get_best_group_audience_field('user', $account, $entity_type, $bundle, TRUE);
     if (empty($field_name)) {
       // User entity has no group audience field.
       drupal_not_found();
@@ -237,7 +237,7 @@ function og_ui_confirm_unsubscribe($form, &$form_state, $group_type, $group) {
 
   $label = entity_label($group_type, $group);
   $url = entity_uri($group_type, $group);
-  return confirm_form($form, t('Are you sure you want to unsubscribe from the group %title?', array('%title' => $label)), $url, NULL, t('Remove'), t('Cancel'));
+  return confirm_form($form, t('Are you sure you want to unsubscribe from the group %title?', array('%title' => $label)), $url, NULL, t('Unsubscribe'), t('Cancel'));
 }
 
 /**

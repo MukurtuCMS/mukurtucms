@@ -1,0 +1,7 @@
+name = Mukurtu Export
+description = "Allows users to export Mukurtu content."
+core = 7.x
+package = "Mukurtu"
+configure = admin/config/mukurtu_export
+core = "7.x"
+dependencies[] = mukurtu_importer_generator

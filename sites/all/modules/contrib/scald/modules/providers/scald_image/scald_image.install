@@ -21,7 +21,7 @@ function scald_image_install() {
   // Associate the image atom type to the "library" image style in the library
   // context.
   $context_config = scald_context_config_load('sdl_library_item');
-  $context_config->transcoder['image']['*'] = 'style-Library';
+  $context_config->transcoder['image']['*'] = 'style-library';
   scald_context_config_save($context_config);
 }
 

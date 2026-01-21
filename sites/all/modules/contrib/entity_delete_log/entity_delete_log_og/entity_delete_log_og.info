@@ -5,9 +5,8 @@ package = Other
 dependencies[] = entity_delete_log
 dependencies[] = og
 
-; Information added by drupal.org packaging script on 2013-04-05
-version = "7.x-1.1"
+; Information added by Drupal.org packaging script on 2018-12-03
+version = "7.x-1.1+6-dev"
 core = "7.x"
 project = "entity_delete_log"
-datestamp = "1365189312"
-
+datestamp = "1543857194"

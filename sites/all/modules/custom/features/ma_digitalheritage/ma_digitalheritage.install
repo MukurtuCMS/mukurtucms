@@ -1,0 +1,65 @@
+<?php
+
+/**
+ * Implements hook_update_N().
+ *
+ * For DH items, populate new Original Date field from old Date (now Date Description) field where possible.
+ */
+function ma_digitalheritage_update_7101() {
+
+  // 1. Increase the old date field field length so that it can become a description field.
+  _field_maxlength_fix('field_date', 255);
+
+  // 2. Revert Base Theme feature so that old date field length is at 255 in the feature def.
+  features_revert_module ('ma_base_theme');
+
+  // 3. Revert DH feature so that the Original Date field is added, and old date field is renamed to Date Description.
+  features_revert_module ('ma_digitalheritage');
+
+  // 4. Run the script to populate the new Original Date field with the old date (now Date Description) field.
+  include_once('one_time_updates/populate_original_date.php');
+
+}
+
+/**
+ * Implements hook_update_N().
+ *
+ * Populate the Mukurtu Mobile Community Records field.
+ */
+function ma_digitalheritage_update_7103() {
+
+  features_revert_module ('ma_digitalheritage');
+  include_once('one_time_updates/populate_mm_cr_field.php');
+
+}
+
+
+// Increase field length of an already-populated field.
+// Code from https://drupal.stackexchange.com/a/79832
+function _field_maxlength_fix($field_name, $maxlength = 255) {
+  _alter_field_table($field_name, $maxlength);
+  $data = _get_field_data($field_name);
+  $data = _fix_field_data($data, $maxlength);
+  _update_field_config($data, $field_name);
+}
+
+function _alter_field_table($field_name, $maxlength) {
+  db_query("ALTER TABLE field_data_".$field_name." CHANGE ".$field_name."_value ".$field_name."_value VARCHAR( ".$maxlength." ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL");
+  db_query("ALTER TABLE field_revision_".$field_name." CHANGE ".$field_name."_value ".$field_name."_value VARCHAR( ".$maxlength." ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL");
+}
+
+function _get_field_data($field_name) {
+  $qry = "SELECT data FROM field_config WHERE field_name = :field_name";
+  $result = db_query($qry, array(':field_name' => $field_name))->fetchObject();
+  return unserialize($result->data);
+}
+
+function _fix_field_data($data, $maxlength) {
+  $data['settings']['max_length'] = (string)$maxlength;
+  return serialize($data);
+}
+
+function _update_field_config($data, $field_name) {
+  $qry = "UPDATE field_config SET data = :data WHERE field_name = :field_name";
+  db_query($qry, array(':data' => $data, ':field_name' => $field_name));
+}

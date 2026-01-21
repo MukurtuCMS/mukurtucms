@@ -1,0 +1,49 @@
+div.mail-table {
+  width: 100%;
+  background: #fbfbfb;
+  border: 1px solid #E3E3E3;
+  border-radius: 4px;
+}
+
+h2.subject {
+  font-size: 20px;
+}
+
+.user-badge {
+  background-color: #f9f9f9;
+  border: 1px solid #CCC;
+  border-radius: 4px;
+  text-align: right;
+  padding: 5px 10px;
+  float: right;
+  margin: 5px;
+}
+
+.user-badge img {
+  vertical-align: bottom;
+}
+
+.user-badge a {
+  text-decoration: none;
+}
+
+.heading {
+  padding: 10px;
+  border-bottom: 1px solid #EEE;
+}
+
+.heading h3 {
+  margin: 0;
+}
+
+.footer {
+  padding: 10px;
+  border-top: 1px solid #EEE;
+}
+
+.body{
+  padding: 0 10px;
+  font-size: 14px;
+  line-height: 20px;
+  color: #333;
+}

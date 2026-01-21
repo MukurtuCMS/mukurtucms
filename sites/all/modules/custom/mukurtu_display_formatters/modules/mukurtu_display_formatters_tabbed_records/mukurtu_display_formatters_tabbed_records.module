@@ -1,0 +1,115 @@
+<?php
+/**
+* @file
+* Define Mukurtu tabbed record field formatter
+*
+*/
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function mukurtu_display_formatters_tabbed_records_field_formatter_info() {
+    return array(
+        'mukurtu_records_formatter' => array(
+            'label' => t('Mukurtu Tabbed Records'),
+            'field types' => array('entityreference'),
+            'settings' => array(
+              'view_mode' => 'full',
+            )
+        ),
+    );
+}
+
+/**
+* Implements hook_field_formatter_settings_form().
+*/
+function mukurtu_display_formatters_tabbed_records_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+    $display = $instance['display'][$view_mode];
+    $settings = $display['settings'];
+    $element = array();
+    if ($display['type'] == 'mukurtu_records_formatter') {
+      if (isset($field["settings"]["handler_settings"]["target_bundles"])) {
+        $entity_info = entity_get_info('node');
+        $view_mode_options = [];
+        foreach ($field["settings"]["handler_settings"]["target_bundles"] as $target_bundle) {
+          $view_modes = field_view_mode_settings('node', $target_bundle);
+          foreach ($view_modes as $view_mode => $view_mode_settings) {
+            if ($view_mode_settings['custom_settings']) {
+              $view_mode_options[$view_mode] = $entity_info["view modes"][$view_mode]["label"];
+            }
+          }
+        }
+        $view_mode_options = array_unique($view_mode_options);
+        $element['view_mode'] = [
+          '#type' => 'select',
+          '#title' => t('View Mode'),
+          '#options' => $view_mode_options,
+          '#default_value' => $settings['view_mode'],
+          '#description' => t('The view mode to show the tabbed nodes in.'),
+        ];
+      }
+    }
+    return $element;
+}
+
+/**
+* Implements hook_field_formatter_settings_summary().
+*/
+function mukurtu_display_formatters_tabbed_records_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $summary = t('Display referenced items in a tabbed interface.');
+  if (isset($view_mode)) {
+    $entity_info = entity_get_info('node');
+    $summary .= t(' View mode: @view_mode', array('@view_mode' => $entity_info["view modes"][$settings['view_mode']]['label']));
+  }
+
+    return $summary;
+}
+
+/**
+* Implements hook_field_formatter_view().
+*/
+function mukurtu_display_formatters_tabbed_records_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+    $element = array();
+    $settings = $display['settings'];
+
+    // Settings for the quicktabs
+    $tab_settings = array(
+        'ajax' => 0,
+        'default_tab' => 0,
+        'title' => 'Mukurtu Records Tabs',
+        'renderer' => 'quicktabs',
+        'style' => 'Excel',
+        'hide_empty_tabs' => 1,
+    );
+
+    // Strip out any records the user doesn't have view rights for.
+    // Also do any sorting here, before we generate the quicktabs.
+    $processed_nodes = array();
+    foreach ($items as $delta => $item) {
+        $node = node_load($item['target_id']);
+        if($node && node_access('view', $node)) {
+            $processed_nodes[] = $node;
+        }
+    }
+
+    // Create the quicktabs for the records
+    $record_tabs = array();
+    foreach($processed_nodes as $node) {
+            $record_tabs[] = array(
+                //                'type' => 'node',
+                //                'nid' => $node->nid,
+                //                'view_mode' => 'full',
+                // Need to pre-render the content here. Quicktabs was not pulling in layout CSS.
+                'contents' => node_view($node, $settings["view_mode"] ? $settings["view_mode"] : 'full'),
+                'title' => $node->title,
+                'hide_title' => 0,
+            );
+    }
+
+    // Build the quicktabs
+    $element[0] = quicktabs_build_quicktabs('mukurtu_records_quicktabs', $tab_settings, $record_tabs);
+
+    return $element;
+}

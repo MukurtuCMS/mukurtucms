@@ -1,6 +1,13 @@
 <?php
 
 class BootstrapIPAddressTestCase extends DrupalWebTestCase {
+  protected $oldserver;
+  protected $remote_ip;
+  protected $proxy_ip;
+  protected $proxy2_ip;
+  protected $forwarded_ip;
+  protected $cluster_ip;
+  protected $untrusted_ip;
 
   public static function getInfo() {
     return array(
@@ -68,6 +75,15 @@ class BootstrapIPAddressTestCase extends DrupalWebTestCase {
     $this->assertTrue(
       ip_address() == $this->forwarded_ip,
       'Proxy forwarding with trusted proxy got forwarded IP address.'
+    );
+
+    // Proxy forwarding on and proxy address trusted and visiting from proxy.
+    $_SERVER['REMOTE_ADDR'] = $this->proxy_ip;
+    $_SERVER['HTTP_X_FORWARDED_FOR'] = $this->proxy_ip;
+    drupal_static_reset('ip_address');
+    $this->assertTrue(
+      ip_address() == $this->proxy_ip,
+      'Visiting from trusted proxy got proxy IP address.'
     );
 
     // Multi-tier architecture with comma separated values in header.
@@ -152,7 +168,7 @@ class BootstrapPageCacheTestCase extends DrupalWebTestCase {
     $this->drupalLogin($user);
     $this->drupalGet('', array(), array('If-Modified-Since: ' . $last_modified, 'If-None-Match: ' . $etag));
     $this->assertResponse(200, 'Conditional request returned 200 OK for authenticated user.');
-    $this->assertFalse($this->drupalGetHeader('X-Drupal-Cache'), 'Absense of Page was not cached.');
+    $this->assertFalse($this->drupalGetHeader('X-Drupal-Cache'), 'Absence of Page was not cached.');
     $this->assertFalse($this->drupalGetHeader('ETag'), 'ETag HTTP headers are not present for logged in users.');
     $this->assertFalse($this->drupalGetHeader('Last-Modified'), 'Last-Modified HTTP headers are not present for logged in users.');
   }
@@ -178,6 +194,7 @@ class BootstrapPageCacheTestCase extends DrupalWebTestCase {
     $this->assertEqual($this->drupalGetHeader('Cache-Control'), 'public, max-age=0', 'Cache-Control header was sent.');
     $this->assertEqual($this->drupalGetHeader('Expires'), 'Sun, 19 Nov 1978 05:00:00 GMT', 'Expires header was sent.');
     $this->assertEqual($this->drupalGetHeader('Foo'), 'bar', 'Custom header was sent.');
+    $this->assertEqual($this->drupalGetHeader('X-Content-Type-Options'), 'nosniff', 'X-Content-Type-Options header was sent.');
 
     // Check replacing default headers.
     $this->drupalGet('system-test/set-header', array('query' => array('name' => 'Expires', 'value' => 'Fri, 19 Nov 2008 05:00:00 GMT')));
@@ -191,7 +208,7 @@ class BootstrapPageCacheTestCase extends DrupalWebTestCase {
     $this->drupalGet('system-test/set-header', array('query' => array('name' => 'Foo', 'value' => 'bar')));
     $this->assertFalse($this->drupalGetHeader('X-Drupal-Cache'), 'Caching was bypassed.');
     $this->assertTrue(strpos($this->drupalGetHeader('Vary'), 'Cookie') === FALSE, 'Vary: Cookie header was not sent.');
-    $this->assertEqual($this->drupalGetHeader('Cache-Control'), 'no-cache, must-revalidate, post-check=0, pre-check=0', 'Cache-Control header was sent.');
+    $this->assertEqual($this->drupalGetHeader('Cache-Control'), 'no-cache, must-revalidate', 'Cache-Control header was sent.');
     $this->assertEqual($this->drupalGetHeader('Expires'), 'Sun, 19 Nov 1978 05:00:00 GMT', 'Expires header was sent.');
     $this->assertEqual($this->drupalGetHeader('Foo'), 'bar', 'Custom header was sent.');
 
@@ -227,6 +244,9 @@ class BootstrapPageCacheTestCase extends DrupalWebTestCase {
     $this->assertTitle(t('Welcome to @site-name | @site-name', array('@site-name' => variable_get('site_name', 'Drupal'))), 'Site title matches.');
     $this->assertRaw('</html>', 'Page was not compressed.');
 
+    // Verify that an empty page doesn't throw an error when being decompressed.
+    $this->drupalGet('system-test/empty-page');
+
     // Disable compression mode.
     variable_set('page_compression', FALSE);
 
@@ -238,6 +258,27 @@ class BootstrapPageCacheTestCase extends DrupalWebTestCase {
     // Verify if cached page is still available for a client without compression support.
     $this->drupalGet('');
     $this->assertRaw('</html>', 'Page was delivered after compression mode is changed (compression support disabled).');
+  }
+
+  /**
+   * Test page cache headers.
+   */
+  function testPageCacheHeaders() {
+    variable_set('cache', 1);
+    // First request should store a response in the page cache.
+    $this->drupalGet('system-test/page-cache-headers');
+
+    // The test callback should remove the query string leaving the same path
+    // as the previous request, which we'll try to retrieve from cache_page.
+    $this->drupalGet('system-test/page-cache-headers', array('query' => array('return_headers' => 'TRUE')));
+
+    $headers = json_decode($this->drupalGetHeader('Page-Cache-Headers'), TRUE);
+    if (is_null($headers)) {
+      $this->fail('No headers were retrieved from the page cache.');
+    }
+    else {
+      $this->assertEqual($headers['X-Content-Type-Options'], 'nosniff', 'X-Content-Type-Options header retrieved from response in the page cache.');
+    }
   }
 }
 
@@ -379,11 +420,18 @@ class BootstrapGetFilenameTestCase extends DrupalUnitTestCase {
 
   public static function getInfo() {
     return array(
-      'name' => 'Get filename test',
-      'description' => 'Test that drupal_get_filename() works correctly when the file is not found in the database.',
+      'name' => 'Get filename test (without the system table)',
+      'description' => 'Test that drupal_get_filename() works correctly when the database is not available.',
       'group' => 'Bootstrap',
     );
   }
+
+  /**
+   * The last file-related error message triggered by the filename test.
+   *
+   * Used by BootstrapGetFilenameTestCase::testDrupalGetFilename().
+   */
+  protected $getFilenameTestTriggeredError;
 
   /**
    * Test that drupal_get_filename() works correctly when the file is not found in the database.
@@ -414,6 +462,203 @@ class BootstrapGetFilenameTestCase extends DrupalUnitTestCase {
     // automatically check there for 'script' files, just as it does for (e.g.)
     // 'module' files in modules.
     $this->assertIdentical(drupal_get_filename('script', 'test'), 'scripts/test.script', t('Retrieve test script location.'));
+
+    // When searching for a module that does not exist, drupal_get_filename()
+    // should return NULL and trigger an appropriate error message.
+    $this->getFilenameTestTriggeredError = NULL;
+    set_error_handler(array($this, 'fileNotFoundErrorHandler'));
+    $non_existing_module = $this->randomName();
+    $this->assertNull(drupal_get_filename('module', $non_existing_module), 'Searching for a module that does not exist returns NULL.');
+    $this->assertTrue(strpos($this->getFilenameTestTriggeredError, format_string('The following module is missing from the file system: %name', array('%name' => $non_existing_module))) === 0, 'Searching for an item that does not exist triggers the correct error.');
+    restore_error_handler();
+
+    // Check that the result is stored in the file system scan cache.
+    $file_scans = _drupal_file_scan_cache();
+    $this->assertIdentical($file_scans['module'][$non_existing_module], FALSE, 'Searching for a module that does not exist creates a record in the missing and moved files static variable.');
+
+    // Performing the search again in the same request still should not find
+    // the file, but the error message should not be repeated (therefore we do
+    // not override the error handler here).
+    $this->assertNull(drupal_get_filename('module', $non_existing_module), 'Searching for a module that does not exist returns NULL during the second search.');
+  }
+
+  /**
+   * Skips handling of "file not found" errors.
+   */
+  public function fileNotFoundErrorHandler($error_level, $message, $filename, $line) {
+    // Skip error handling if this is a "file not found" error.
+    if (strpos($message, 'is missing from the file system:') !== FALSE || strpos($message, 'has moved within the file system:') !== FALSE) {
+      $this->getFilenameTestTriggeredError = $message;
+      return;
+    }
+    _drupal_error_handler($error_level, $message, $filename, $line);
+  }
+}
+
+/**
+ * Test drupal_get_filename() in the context of a full Drupal installation.
+ */
+class BootstrapGetFilenameWebTestCase extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Get filename test (full installation)',
+      'description' => 'Test that drupal_get_filename() works correctly in the context of a full Drupal installation.',
+      'group' => 'Bootstrap',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('system_test');
+  }
+
+  /**
+   * The last file-related error message triggered by the filename test.
+   *
+   * Used by BootstrapGetFilenameWebTestCase::testDrupalGetFilename().
+   */
+  protected $getFilenameTestTriggeredError;
+
+  /**
+   * Test that drupal_get_filename() works correctly with a full Drupal site.
+   */
+  function testDrupalGetFilename() {
+    // Search for a module that exists in the file system and the {system}
+    // table and make sure that it is found.
+    $this->assertIdentical(drupal_get_filename('module', 'node'), 'modules/node/node.module', 'Module found at expected location.');
+
+    // Search for a module that does not exist in either the file system or the
+    // {system} table. Make sure that an appropriate error is triggered and
+    // that the module winds up in the static and persistent cache.
+    $this->getFilenameTestTriggeredError = NULL;
+    set_error_handler(array($this, 'fileNotFoundErrorHandler'));
+    $non_existing_module = $this->randomName();
+    $this->assertNull(drupal_get_filename('module', $non_existing_module), 'Searching for a module that does not exist returns NULL.');
+    $this->assertTrue(strpos($this->getFilenameTestTriggeredError, format_string('The following module is missing from the file system: %name', array('%name' => $non_existing_module))) === 0, 'Searching for a module that does not exist triggers the correct error.');
+    restore_error_handler();
+    $file_scans = _drupal_file_scan_cache();
+    $this->assertIdentical($file_scans['module'][$non_existing_module], FALSE, 'Searching for a module that does not exist creates a record in the missing and moved files static variable.');
+    drupal_file_scan_write_cache();
+    $cache = cache_get('_drupal_file_scan_cache', 'cache_bootstrap');
+    $this->assertIdentical($cache->data['module'][$non_existing_module], FALSE, 'Searching for a module that does not exist creates a record in the missing and moved files persistent cache.');
+
+    // Simulate moving a module to a location that does not match the location
+    // in the {system} table and perform similar tests as above.
+    db_update('system')
+      ->fields(array('filename' => 'modules/simpletest/tests/fake_location/module_test.module'))
+      ->condition('name', 'module_test')
+      ->condition('type', 'module')
+      ->execute();
+    $this->getFilenameTestTriggeredError = NULL;
+    set_error_handler(array($this, 'fileNotFoundErrorHandler'));
+    $this->assertIdentical(drupal_get_filename('module', 'module_test'), 'modules/simpletest/tests/module_test.module', 'Searching for a module that has moved finds the module at its new location.');
+    $this->assertTrue(strpos($this->getFilenameTestTriggeredError, format_string('The following module has moved within the file system: %name', array('%name' => 'module_test'))) === 0, 'Searching for a module that has moved triggers the correct error.');
+    restore_error_handler();
+    $file_scans = _drupal_file_scan_cache();
+    $this->assertIdentical($file_scans['module']['module_test'], 'modules/simpletest/tests/module_test.module', 'Searching for a module that has moved creates a record in the missing and moved files static variable.');
+    drupal_file_scan_write_cache();
+    $cache = cache_get('_drupal_file_scan_cache', 'cache_bootstrap');
+    $this->assertIdentical($cache->data['module']['module_test'], 'modules/simpletest/tests/module_test.module', 'Searching for a module that has moved creates a record in the missing and moved files persistent cache.');
+
+    // Simulate a module that exists in the {system} table but does not exist
+    // in the file system and perform similar tests as above.
+    $non_existing_module = $this->randomName();
+    db_update('system')
+      ->fields(array('name' => $non_existing_module))
+      ->condition('name', 'module_test')
+      ->condition('type', 'module')
+      ->execute();
+    $this->getFilenameTestTriggeredError = NULL;
+    set_error_handler(array($this, 'fileNotFoundErrorHandler'));
+    $this->assertNull(drupal_get_filename('module', $non_existing_module), 'Searching for a module that exists in the system table but not in the file system returns NULL.');
+    $this->assertTrue(strpos($this->getFilenameTestTriggeredError, format_string('The following module is missing from the file system: %name', array('%name' => $non_existing_module))) === 0, 'Searching for a module that exists in the system table but not in the file system triggers the correct error.');
+    restore_error_handler();
+    $file_scans = _drupal_file_scan_cache();
+    $this->assertIdentical($file_scans['module'][$non_existing_module], FALSE, 'Searching for a module that exists in the system table but not in the file system creates a record in the missing and moved files static variable.');
+    drupal_file_scan_write_cache();
+    $cache = cache_get('_drupal_file_scan_cache', 'cache_bootstrap');
+    $this->assertIdentical($cache->data['module'][$non_existing_module], FALSE, 'Searching for a module that exists in the system table but not in the file system creates a record in the missing and moved files persistent cache.');
+
+    // Simulate a module that exists in the file system but not in the {system}
+    // table and perform similar tests as above.
+    db_delete('system')
+      ->condition('name', 'common_test')
+      ->condition('type', 'module')
+      ->execute();
+    system_list_reset();
+    $this->getFilenameTestTriggeredError = NULL;
+    set_error_handler(array($this, 'fileNotFoundErrorHandler'));
+    $this->assertIdentical(drupal_get_filename('module', 'common_test'), 'modules/simpletest/tests/common_test.module', 'Searching for a module that does not exist in the system table finds the module at its actual location.');
+    $this->assertTrue(strpos($this->getFilenameTestTriggeredError, format_string('The following module has moved within the file system: %name', array('%name' => 'common_test'))) === 0, 'Searching for a module that does not exist in the system table triggers the correct error.');
+    restore_error_handler();
+    $file_scans = _drupal_file_scan_cache();
+    $this->assertIdentical($file_scans['module']['common_test'], 'modules/simpletest/tests/common_test.module', 'Searching for a module that does not exist in the system table creates a record in the missing and moved files static variable.');
+    drupal_file_scan_write_cache();
+    $cache = cache_get('_drupal_file_scan_cache', 'cache_bootstrap');
+    $this->assertIdentical($cache->data['module']['common_test'], 'modules/simpletest/tests/common_test.module', 'Searching for a module that does not exist in the system table creates a record in the missing and moved files persistent cache.');
+  }
+
+  /**
+   * Skips handling of "file not found" errors.
+   */
+  public function fileNotFoundErrorHandler($error_level, $message, $filename, $line) {
+    // Skip error handling if this is a "file not found" error.
+    if (strpos($message, 'is missing from the file system:') !== FALSE || strpos($message, 'has moved within the file system:') !== FALSE) {
+      $this->getFilenameTestTriggeredError = $message;
+      return;
+    }
+    _drupal_error_handler($error_level, $message, $filename, $line);
+  }
+
+  /**
+   * Test that watchdog messages about missing files are correctly recorded.
+   */
+  public function testWatchdog() {
+    // Search for a module that does not exist in either the file system or the
+    // {system} table. Make sure that an appropriate warning is recorded in the
+    // logs.
+    $non_existing_module = $this->randomName();
+    $query_parameters = array(
+      ':type' => 'php',
+      ':severity' => WATCHDOG_WARNING,
+    );
+    $this->assertEqual(db_query('SELECT COUNT(*) FROM {watchdog} WHERE type = :type AND severity = :severity', $query_parameters)->fetchField(), 0, 'No warning message appears in the logs before searching for a module that does not exist.');
+    // Trigger the drupal_get_filename() call. This must be done via a request
+    // to a separate URL since the watchdog() will happen in a shutdown
+    // function, and so that SimpleTest can be told to ignore (and not fail as
+    // a result of) the expected PHP warnings generated during this process.
+    variable_set('system_test_drupal_get_filename_test_module_name', $non_existing_module);
+    $this->drupalGet('system-test/drupal-get-filename');
+    $message_variables = db_query('SELECT variables FROM {watchdog} WHERE type = :type AND severity = :severity', $query_parameters)->fetchCol();
+    $this->assertEqual(count($message_variables), 1, 'A single warning message appears in the logs after searching for a module that does not exist.');
+    $variables = reset($message_variables);
+    $variables = unserialize($variables);
+    $this->assertTrue(isset($variables['!message']) && strpos($variables['!message'], format_string('The following module is missing from the file system: %name', array('%name' => $non_existing_module))) !== FALSE, 'The warning message that appears in the logs after searching for a module that does not exist contains the expected text.');
+  }
+
+  /**
+   * Test that drupal_get_filename() does not break recursive rebuilds.
+   */
+  public function testRecursiveRebuilds() {
+    // Ensure that the drupal_get_filename() call due to a missing module does
+    // not break the data returned by an attempted recursive rebuild. The code
+    // path which is tested is as follows:
+    // - Call drupal_get_schema().
+    // - Within a hook_schema() implementation, trigger a drupal_get_filename()
+    //   search for a nonexistent module.
+    // - In the watchdog() call that results from that, trigger
+    //   drupal_get_schema() again.
+    // Without some kind of recursion protection, this could cause the second
+    // drupal_get_schema() call to return incomplete results. This test ensures
+    // that does not happen.
+    $non_existing_module = $this->randomName();
+    variable_set('system_test_drupal_get_filename_test_module_name', $non_existing_module);
+    $this->drupalGet('system-test/drupal-get-filename-with-schema-rebuild');
+    $original_drupal_get_schema_tables = variable_get('system_test_drupal_get_filename_with_schema_rebuild_original_tables');
+    $final_drupal_get_schema_tables = variable_get('system_test_drupal_get_filename_with_schema_rebuild_final_tables');
+    $this->assertTrue(!empty($original_drupal_get_schema_tables));
+    $this->assertTrue(!empty($final_drupal_get_schema_tables));
+    $this->assertEqual($original_drupal_get_schema_tables, $final_drupal_get_schema_tables);
   }
 }
 
@@ -516,16 +761,12 @@ class BootstrapMiscTestCase extends DrupalUnitTestCase {
    * Tests that the drupal_check_memory_limit() function works as expected.
    */
   function testCheckMemoryLimit() {
-    $memory_limit = ini_get('memory_limit');
     // Test that a very reasonable amount of memory is available.
     $this->assertTrue(drupal_check_memory_limit('30MB'), '30MB of memory tested available.');
 
-    // Get the available memory and multiply it by two to make it unreasonably
-    // high.
-    $twice_avail_memory = ($memory_limit * 2) . 'MB';
-
+    // Test an unlimited memory limit.
     // The function should always return true if the memory limit is set to -1.
-    $this->assertTrue(drupal_check_memory_limit($twice_avail_memory, -1), 'drupal_check_memory_limit() returns TRUE when a limit of -1 (none) is supplied');
+    $this->assertTrue(drupal_check_memory_limit('9999999999YB', -1), 'drupal_check_memory_limit() returns TRUE when a limit of -1 (none) is supplied');
 
     // Test that even though we have 30MB of memory available - the function
     // returns FALSE when given an upper limit for how much memory can be used.
@@ -661,5 +902,123 @@ class BootstrapDestinationTestCase extends DrupalWebTestCase {
     variable_set('site_404', 'system-test/get-destination');
     $this->drupalGet('http://example.com', array('external' => FALSE));
     $this->assertIdentical('', $this->drupalGetContent(), 'External URL is not allowed on 404 pages.');
+  }
+}
+
+/**
+ * Tests DrupalCacheArray functionality.
+ */
+class BootstrapDrupalCacheArrayTestCase extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'DrupalCacheArray tests',
+      'description' => 'Test DrupalCacheArray functionality.',
+      'group' => 'Bootstrap',
+    );
+  }
+
+  /**
+   * Simulate unsafe deserialization of payload prepared by the phpggc project.
+   *
+   * @see https://github.com/ambionics/phpggc/pull/28
+   */
+  public function testGadgetChainDrupal7RCE1() {
+    // phpggc -s Drupal7/RCE1 phpinfo 2
+    $payload = 'O:11:"SchemaCache":4:{s:6:"%00*%00cid"%3Bs:14:"form_DrupalRCE"%3Bs:6:"%00*%00bin"%3Bs:10:"cache_form"%3Bs:16:"%00*%00keysToPersist"%3Ba:3:{s:8:"#form_id"%3Bb:1%3Bs:8:"#process"%3Bb:1%3Bs:9:"#attached"%3Bb:1%3B}s:10:"%00*%00storage"%3Ba:3:{s:8:"#form_id"%3Bs:9:"DrupalRCE"%3Bs:8:"#process"%3Ba:1:{i:0%3Bs:23:"drupal_process_attached"%3B}s:9:"#attached"%3Ba:1:{s:7:"phpinfo"%3Ba:1:{i:0%3Ba:1:{i:0%3Bs:1:"2"%3B}}}}}';
+    $object = unserialize(urldecode($payload));
+
+    // The object then needs to be destructed.
+    unset($object);
+
+    // If the exploit was successful, there should now be a row in cache_form.
+    $payload2 = db_query_range('SELECT data FROM {cache_form} WHERE cid LIKE :cid', 0, 1, array(':cid' => 'form_DrupalRCE'))->fetchField();
+    $this->assertFalse(is_string($payload2) && (strpos($payload2, 'phpinfo') !== FALSE), 'Second stage payload was not written to cache_form.');
+
+    // The final exploit is executed via the ajax system, but is not a
+    // sufficiently valid ajax form submission to use drupalPost for testing.
+    $headers = array(
+      'Content-Type: application/x-www-form-urlencoded',
+    );
+    $curl_options = array(
+      CURLOPT_URL => url('system/ajax', array('absolute' => TRUE)),
+      CURLOPT_POST => TRUE,
+      CURLOPT_POSTFIELDS => 'form_build_id=DrupalRCE',
+      CURLOPT_HTTPHEADER => $headers,
+    );
+    // The second stage payload causes several PHP warnings / notices if it is
+    // there in cache_form.
+    $content = $this->curlExec($curl_options);
+    $this->assertFalse((strpos($content, 'Rasmus Lerdorf') !== FALSE), 'Remote Code Execution was not successful.');
+
+    // Now opt-out of the cache_form protection.
+    variable_set('drupal_cache_array_persist_cache_form', TRUE);
+    $object = unserialize(urldecode($payload));
+
+    // The object then needs to be destructed.
+    unset($object);
+
+    // If the exploit was successful, there should now be a row in cache_form.
+    $payload2 = db_query_range('SELECT data FROM {cache_form} WHERE cid LIKE :cid', 0, 1, array(':cid' => 'form_DrupalRCE'))->fetchField();
+    $this->assertTrue(is_string($payload2) && (strpos($payload2, 'phpinfo') !== FALSE), 'DrupalCacheArray persisted data to cache_form.');
+  }
+}
+
+/**
+ * Test the trusted HTTP host configuration.
+ */
+class BootstrapTrustedHostsTestCase extends DrupalUnitTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Trusted HTTP host test',
+      'description' => 'Tests the trusted_host_patterns configuration.',
+      'group' => 'Bootstrap',
+    );
+  }
+
+  /**
+   * Tests hostname validation.
+   *
+   * @see drupal_check_trusted_hosts()
+   */
+  function testTrustedHosts() {
+    $trusted_host_patterns = array(
+      '^example\.com$',
+      '^.+\.example\.com$',
+      '^example\.org',
+      '^.+\.example\.org',
+    );
+
+    foreach ($this->providerTestTrustedHosts() as $data) {
+      $test = array_combine(array('host', 'message', 'expected'), $data);
+      $valid_host = drupal_check_trusted_hosts($test['host'], $trusted_host_patterns);
+      $this->assertEqual($test['expected'], $valid_host, $test['message']);
+    }
+  }
+
+  /**
+   * Provides test data for testTrustedHosts().
+   */
+  public function providerTestTrustedHosts() {
+    $data = array();
+
+    // Tests canonical URL.
+    $data[] = array('www.example.com', 'canonical URL is trusted', TRUE);
+
+    // Tests missing hostname for HTTP/1.0 compatability where the Host
+    // header is optional.
+    $data[] = array(NULL, 'empty Host is valid', TRUE);
+
+    // Tests the additional patterns from the settings.
+    $data[] = array('example.com', 'host from settings is trusted', TRUE);
+    $data[] = array('subdomain.example.com', 'host from settings is trusted', TRUE);
+    $data[] = array('www.example.org', 'host from settings is trusted', TRUE);
+    $data[] = array('example.org', 'host from settings is trusted', TRUE);
+
+    // Tests mismatch.
+    $data[] = array('www.blackhat.com', 'unspecified host is untrusted', FALSE);
+
+    return $data;
   }
 }

@@ -13,14 +13,11 @@ class ServicesAliasTests extends ServicesWebTestCase {
   protected $endpoint = NULL;
 
   /**
-   * Implementation of setUp().
+   * {@inheritdoc}
    */
-  public function setUp() {
-    parent::setUp(
-      'ctools',
-      'services',
-      'rest_server'
-    );
+  public function setUp(array $modules = array()) {
+    parent::setUp($modules);
+
     $edit = $this->populateEndpointFAPI() ;
     $endpoint = new stdClass;
     $endpoint->disabled = FALSE;
@@ -59,6 +56,11 @@ class ServicesAliasTests extends ServicesWebTestCase {
         'actions' => array(
           'login' => array(
             'enabled' => 1,
+            'settings' => array(
+              'services' => array(
+                'resource_api_version' => '1.1'
+              ),
+            ),
           ),
         ),
       ),
@@ -87,6 +89,9 @@ class ServicesAliasTests extends ServicesWebTestCase {
       'name' => 'Alias',
       'description' => 'Test the Aliases functionality.',
       'group' => 'Services',
+      // The libraries module is required by rest_service, which is used by
+      // ServicesEndpointTests.
+      'dependencies' => array('ctools', 'libraries'),
     );
   }
 
@@ -100,7 +105,7 @@ class ServicesAliasTests extends ServicesWebTestCase {
     $this->drupalLogout();
 
     // Try to login using alias.
-    $response = $this->servicesPost($this->endpoint->path . '/user-alias/login', array('username' => $account->name, 'password' => $account->pass_raw));
+    $response = $this->servicesPost($this->endpoint->path . '/user-alias/login', array('name' => $account->name, 'pass' => $account->pass_raw));
 
     $response_data = $response['body'];
 

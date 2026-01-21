@@ -1,0 +1,70 @@
+<?php
+/**
+ * @file
+ * Module file for Open Atrium Access Test.
+ */
+
+/**
+ * Implements hook_oa_access_permission().
+ */
+function oa_access_test_oa_access_permission() {
+  $permissions = array(
+    'access oa_access_test' => array(
+      'title' => t('Access Open Atrium Access Test'),
+      'description' => t('Gives you the ability to access Open Atrium Access Test'),
+    ),
+    'administer oa_access_test' => array(
+      'title' => t('Administer Open Atrium Access Test'),
+      'description' => 'This will be replaced!',
+    ),
+    'group permission for oa_access_test' => array(
+      'title' => t('A Group-only permission for Open Atrium Access Test'),
+      'description' => t('Used to test Group-only permissions'),
+      'type' => OA_ACCESS_GROUP_PERMISSION,
+    ),
+    'team permission for oa_access_test' => array(
+      'title' => t('A Team-only permission for Open Atrium Access Test'),
+      'description' => t('Used to test Team-only permissions'),
+      'type' => OA_ACCESS_TEAM_PERMISSION,
+    ),
+    'permission with all option for oa_access_test' => array(
+      'title' => t('A permission with an "All" option'),
+      'description' => t('Used to test the "All" option'),
+      'type' => OA_ACCESS_DEFAULT_PERMISSION | OA_ACCESS_ALLOW_OPTION_ALL,
+    ),
+    'access oa_access_test intersection' => array(
+      'title' => t('Access Open Atrium Access Test (Intersection)'),
+      'description' => t('Tests OA_ACCESS_COMBINE_INTERSECTION.'),
+      'type' => OA_ACCESS_DEFAULT_PERMISSION | OA_ACCESS_ALLOW_OPTION_ALL,
+      'combine' => OA_ACCESS_COMBINE_INTERSECTION,
+    ),
+    'access oa_access_test team override' => array(
+      'title' => t('Access Open Atrium Access Test (Team Override)'),
+      'description' => t('Tests OA_ACCESS_COMBINE_TEAM_OVERRIDE.'),
+      'type' => OA_ACCESS_DEFAULT_PERMISSION | OA_ACCESS_ALLOW_OPTION_ALL,
+      'combine' => OA_ACCESS_COMBINE_TEAM_OVERRIDE,
+    ),
+    'access oa_access_test group override' => array(
+      'title' => t('Access Open Atrium Access Test (Group Override)'),
+      'description' => t('Tests OA_ACCESS_COMBINE_GROUP_OVERRIDE.'),
+      'type' => OA_ACCESS_DEFAULT_PERMISSION | OA_ACCESS_ALLOW_OPTION_ALL,
+      'combine' => OA_ACCESS_COMBINE_GROUP_OVERRIDE,
+    ),
+  );
+  if (!variable_get('oa_access_test_remove_permission', FALSE)) {
+    $permissions['a permission for oa_access_test that is only conditionally available'] = array(
+      'title' => t('Some fickle permission'),
+      'description' => t('A permission for oa_access_test that is only conditionally available'),
+    );
+  }
+  return $permissions;
+}
+
+/**
+ * Implements hook_oa_access_permission_alter().
+ */
+function oa_access_test_oa_access_permission_alter(&$perm) {
+  if (isset($perm['administer oa_access_test'])) {
+    $perm['administer oa_access_test']['description'] = t('Gives you the ability to administer Open Atrium Access Test');
+  }
+}

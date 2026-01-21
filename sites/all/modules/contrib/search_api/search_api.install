@@ -191,6 +191,35 @@ function search_api_schema() {
     'primary key' => array('item_id', 'index_id'),
   );
 
+  $schema['search_api_item_string_id'] = array(
+    'description' => 'Stores the items which should be indexed for each index, and their status. Used only for items with string IDs.',
+    'fields' => array(
+      'item_id' => array(
+        'description' => "The item's ID.",
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+      ),
+      'index_id' => array(
+        'description' => 'The {search_api_index}.id this item belongs to.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'changed' => array(
+        'description' => 'Either a flag or a timestamp to indicate if or when the item was changed since it was last indexed.',
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+    ),
+    'indexes' => array(
+      'indexing' => array('index_id', 'changed'),
+    ),
+    'primary key' => array('item_id', 'index_id'),
+  );
+
   $schema['search_api_task'] = array(
     'description' => 'Stores pending tasks for servers.',
     'fields' => array(
@@ -233,6 +262,51 @@ function search_api_schema() {
   );
 
   return $schema;
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function search_api_requirements($phase) {
+  $requirements = array();
+
+  if ($phase == 'runtime') {
+    // Check whether at least one server has pending tasks.
+    if (search_api_server_tasks_count()) {
+      $items = array();
+
+      $conditions = array('enabled' => TRUE);
+      foreach (search_api_server_load_multiple(FALSE, $conditions) as $server) {
+        $count = search_api_server_tasks_count($server);
+        if ($count) {
+          $args = array(
+            '@name' => $server->name,
+          );
+          $text = format_plural($count, '@name has @count pending task.', '@name has @count pending tasks.', $args);
+          $items[] = l($text, "admin/config/search/search_api/server/{$server->machine_name}/execute-tasks");
+        }
+      }
+
+      if ($items) {
+        $text = t('There are pending tasks for the following servers:');
+        $text .= theme('item_list', array(
+          'type' => 'ul',
+          'items' => $items,
+        ));
+        if (count($items) > 1) {
+          $label = t('Execute pending tasks on all servers');
+          $text .= l($label, 'admin/config/search/search_api/execute-tasks');
+        }
+        $requirements['search_api_pending_tasks'] = array(
+          'title' => t('Search API'),
+          'value' => $text,
+          'severity' => REQUIREMENT_WARNING,
+        );
+      }
+    }
+  }
+
+  return $requirements;
 }
 
 /**
@@ -333,7 +407,7 @@ function search_api_install() {
     ),
   );
   search_api_index_insert($values);
-  drupal_set_message('The Search API module was installed. A new default node index was created.');
+  drupal_set_message(t('The Search API module was installed. A new default node index was created.'));
 }
 
 /**
@@ -1000,4 +1074,46 @@ function search_api_update_7117() {
       ->condition('id', $indexes)
       ->execute();
   }
+}
+
+/**
+ * Adds the {search_api_item_string_id} table for items with string IDs.
+ */
+function search_api_update_7118() {
+  // Some users have reported that the table already existed for them, for
+  // whatever reason. Therefore, just bail if the table already exists, assuming
+  // it already looks as expected.
+  if (db_table_exists('search_api_item_string_id')) {
+    return;
+  }
+
+  $table = array(
+    'description' => 'Stores the items which should be indexed for each index, and their status. Used only for items with string IDs.',
+    'fields' => array(
+      'item_id' => array(
+        'description' => "The item's ID.",
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+      ),
+      'index_id' => array(
+        'description' => 'The {search_api_index}.id this item belongs to.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'changed' => array(
+        'description' => 'Either a flag or a timestamp to indicate if or when the item was changed since it was last indexed.',
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+    ),
+    'indexes' => array(
+      'indexing' => array('index_id', 'changed'),
+    ),
+    'primary key' => array('item_id', 'index_id'),
+  );
+  db_create_table('search_api_item_string_id', $table);
 }

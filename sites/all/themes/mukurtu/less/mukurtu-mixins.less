@@ -1,0 +1,389 @@
+// Shadow accent bar between sections
+.section-shadow {
+    background: linear-gradient(#E6E6E6, #FFF);
+    background-repeat: no-repeat;
+    background-size: 100% 12px;
+}
+
+// "Light" font weight
+.font-light {
+    font-family: @font-family-sans-serif-light;
+    font-weight: 300;
+}
+
+.standard-padding {
+    padding: 10px 20px;
+}
+
+.flex-center {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    height: 100%;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+          align-items: center;
+    -webkit-box-pack: center;
+       -ms-flex-pack: center;
+    justify-content: center;
+}
+
+// Horizontal bar accenting element
+.title-accent-bar {
+    // Title accent bar
+    &::after {
+        content : "";
+        display: inline-block;
+        left: 0;
+        height: 1px;
+        width: 136px;
+        border-bottom: 6px solid @mukurtu-title-accent-bar-color;
+
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            top: -25px;
+        }
+    }
+}
+
+.section-accent-bar {
+    &::after {
+        content : "";
+        display: inline-block;
+        left: 0;
+        height: 5px;
+        width: 100px;
+        border-bottom: 5px solid @brand-secondary;
+
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            top: -25px;
+        }
+    }
+}
+
+// Links
+.mukurtu-standard-link {
+    color: @link-color;
+
+    &:hover,
+    &:focus {
+        color: @brand-secondary;
+        text-decoration: none;
+    }
+}
+
+// Fields
+.metadata-field-label {
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: @mukurtu-expanded-letter-spacing;
+    padding-bottom: 5px;
+}
+
+.metadata-primary-field-label {
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: @mukurtu-expanded-letter-spacing;
+    padding-bottom: 5px;
+
+    // Desktop
+    @media (min-width: @screen-md-min) {
+        font-size: 18px;
+    }
+}
+
+.metadata-field-padding {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.mukurtu-pane-label {
+    color: @mukurtu-panel-pane-text-color;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 20px 15px 20px 15px;
+    margin-bottom: 0px;
+    letter-spacing: @mukurtu-expanded-letter-spacing;
+    background: @mukurtu-default-container-bg-color;
+    text-transform: uppercase;
+}
+
+
+//// Primary color link container
+.primary-color-link-container {
+    background-color: @mukurtu-default-container-bg-color;
+
+    &:hover,
+    &:focus {
+        background-color: @mukurtu-default-container-bg-hover-color;
+    }
+
+    a {
+        color: @mukurtu-default-container-font-color;
+
+        &:hover,
+        &:focus {
+            text-decoration: none;
+        }
+    }
+}
+
+.default-background-container {
+    background-color: @navbar-default-bg;
+}
+
+//// Left side image/right side text
+@left-right-height: 100%;
+
+.left-right-image-title {
+    padding-bottom: 30px;
+
+    > div {
+        .primary-color-link-container;
+        position: static;
+    }
+
+    // Right side
+    .field-name-title {
+        width: 60%;
+        text-align: center;
+        height: @left-right-height;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-20%, -60%);
+        padding-left: 20px;
+        padding-right: 20px;
+
+        h3 {
+            margin: auto;
+            line-height: @left-right-height;
+            text-align: center;
+            height: 100%;
+            display: table;
+            margin-top: 0px;
+            margin-bottom: 0px;
+
+            a {
+                color: @mukurtu-left-right-title-color;
+                display: table-cell;
+                vertical-align: middle;
+                font-size: 14px;
+                font-weight: bold;
+                height: 100%;
+            }
+
+            // Tablet
+            @media (min-width: @screen-sm-min) {
+                a {
+                    font-size: 15px;
+                }
+            }
+
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                a {
+                    font-size: 16px;
+                }
+            }
+        }
+    }
+
+    // Left side
+    .field-name-field-community-image-thumbnail {
+        float:left;
+        width: 40%;
+        img {
+            height: @left-right-height;
+        }
+    }
+}
+
+.chevron-right {
+    background-image: url(@mukurtu-chevron-right-path);
+    background-repeat: no-repeat;
+    background-position: 95% 0%;
+    background-size: 12px;
+    min-height: 20px;
+    padding-right: 25px;
+}
+
+.chevron-right-middle {
+    .chevron-right;
+    background-position: 95% 50%;
+}
+
+.chevron-right-contrast {
+    .chevron-right;
+    background-image: url(@mukurtu-chevron-right-contrast-path);
+}
+
+.chevron-right-middle-contrast {
+    .chevron-right-middle;
+    background-image: url(@mukurtu-chevron-right-contrast-path);
+}
+
+.chevron-dropdown {
+    background-image: url(@mukurtu-chevron-dropdown-path);
+    background-repeat: no-repeat;
+    background-position: 95% 50%;
+}
+
+.arrow-right {
+    background: url(@mukurtu-arrow-right-path) no-repeat 0% 50%;
+    background-position: center right;
+}
+
+.arrow-down {
+    background: url(@mukurtu-arrow-down-path) no-repeat 0% 50%;
+}
+
+.nav-bottom-triangle {
+    &::after {
+        content : "";
+        display: inline-block;
+        position: absolute;
+        left: 0;
+        right: 0;
+        margin: auto;
+        top: 47px;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 11px 10px 0 10px;
+        border-color: @brand-primary transparent transparent transparent;
+        z-index: -1;
+    }
+}
+
+// Carousel Arrows
+.carousel-nav-right {
+    &::before {
+        content : "";
+        display: inline-block;
+        position: absolute;
+        right: 0;
+        top: 10px;
+        margin: auto;
+        border-style: solid;
+        border-width: 15px 0 15px 15px;
+        border-color: transparent transparent transparent @brand-secondary;
+        z-index: 2;
+    }
+}
+
+.carousel-nav-left {
+    &::before {
+        content : "";
+        display: inline-block;
+        position: absolute;
+        left: 0;
+        top: 10px;
+        margin: auto;
+        border-style: solid;
+        border-width: 15px 15px 15px 0;
+        border-color: transparent @brand-secondary transparent transparent;
+        z-index: 2;
+    }
+}
+
+// Item grid view
+// Take a search result view of an entity, hide all fields except title and media
+.item-grid-view {
+    .field {
+        display: none;
+    }
+
+    .field-name-title,
+    .field-name-field-media-asset,
+    .field-name-scald-thumbnail,
+    .field-name-featured-content-type {
+        display: block;
+
+        h2 {
+            font-size: 16px;
+            font-weight: bold;
+        }
+    }
+
+    .field-name-title {
+        h2 {
+            .chevron-right;
+        }
+
+        a {
+            .mukurtu-standard-link;
+        }
+    }
+
+    .field-name-field-media-asset {
+        padding-top: 10px;
+    }
+
+    .col-xs-4,
+    .col-xs-8 {
+        width: 100%;
+    }
+}
+
+// Thumbnail on top, standard link container with title link on bottom
+.thumbnail-on-link {
+    padding-bottom: 15px;
+
+    .views-field-name {
+        .primary-color-link-container;
+        .chevron-right-middle;
+        height: 135px;
+        width: 100%;
+        text-align: center;
+        display: inline-block;
+        position: relative;
+
+        .field-content {
+            display: inline-block;
+            vertical-align: middle;
+            line-height: 135px;
+
+            a {
+                font-size: 16px;
+                font-weight: bold;
+            }
+        }
+    }
+}
+
+// Setup grid sizing.
+// Mobile: 1 col
+// Tablet: 2 col
+// Desktop: 3 col
+// Extra large Desktop: 4 col
+.mukurtu-standard-grid-sizing {
+    width: 100% !important;
+    float: left;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+
+    // Tablet
+    @media (min-width: @screen-sm-min) {
+        width: 45% !important;
+    }
+
+    // Desktop
+    @media (min-width: @screen-md-min) {
+        width: 30% !important;
+    }
+
+    // Extra large Desktop
+    @media (min-width: 1600px) {
+        width: 20% !important;
+    }
+
+    &.views-row-first {
+        border-top: none !important;
+    }
+}

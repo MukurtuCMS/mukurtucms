@@ -1,0 +1,54 @@
+<?php
+
+/**
+ * @file
+ * Provide integration with Colors module for FullCalendar.
+ */
+
+/**
+ * Implements hook_preprocess_fullcalendar().
+ *
+ * Process FullCalendar Colors after the structure is built.
+ */
+function fullcalendar_colors_preprocess_fullcalendar(&$variables) {
+  // @todo Remove in 7.x-2.1.
+  if (!function_exists('colors_include_api')) {
+    return;
+  }
+
+  // @todo D8: Remove weight once http://drupal.org/node/1388546 is fixed.
+  $variables['element']['#attached']['css'][colors_create_css('fullcalendar_colors')] = array('weight' => 1);
+}
+
+/**
+ * Implements hook_colors_rebuild().
+ */
+function fullcalendar_colors_colors_rebuild() {
+  return TRUE;
+}
+
+/**
+ * Implements hook_colors_build_selector().
+ */
+function fullcalendar_colors_colors_build_selector($class) {
+  $selector = array(
+    ".$class",
+    ".$class .fc-event-skin",
+    ".$class .fc-event-time",
+    ".$class a",
+  );
+  return implode(', ', $selector);
+}
+
+/**
+ * Implements hook_fullcalendar_classes().
+ */
+function fullcalendar_colors_fullcalendar_classes($entity) {
+  // @todo Remove in 7.x-2.1.
+  if (!function_exists('colors_include_api')) {
+    return array();
+  }
+
+  colors_include_api();
+  return module_invoke_all('colors_classes', $entity);
+}

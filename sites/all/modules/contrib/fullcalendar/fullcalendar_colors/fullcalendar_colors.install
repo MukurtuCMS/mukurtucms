@@ -1,0 +1,178 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the FullCalendar Colors module.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function fullcalendar_colors_requirements($phase) {
+  $requirements = array();
+
+  if ($phase == 'runtime') {
+    $t = get_t();
+    if (!function_exists('colors_include_api')) {
+      $requirements['fullcalendar_colors_api'] = array(
+        'title' => $t('FullCalendar Colors API'),
+        'value' => $t('Out of date'),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => $t('You need to download the latest version of the !colors_module.', array('!colors_module' => l(t('Colors API module'), 'http://drupal.org/project/colors'))),
+      );
+    }
+    else {
+      $requirements['fullcalendar_colors_api'] = array(
+        'title' => $t('FullCalendar Colors API'),
+        'severity' => REQUIREMENT_OK,
+        'value' => $t('Up to date'),
+      );
+    }
+  }
+
+  return $requirements;
+}
+
+/**
+ * Upgrade FullCalendar Colors alpha6 to beta1 FullCalendar Colors API.
+ */
+function fullcalendar_colors_update_7200(&$sandbox) {
+  if (!function_exists('colors_include_api')) {
+    $t = get_t();
+    throw new DrupalUpdateException($t('You need to download the latest version of the !colors_module.', array('!colors_module' => l(t('Colors API module'), 'http://drupal.org/project/colors'))));
+  }
+
+  // Changed variable names.
+  variable_set('fullcalendar_colors_node_types_enabled', variable_get('fullcalendar_color_node_types_enabled', 0));
+  variable_del('fullcalendar_color_node_types_enabled');
+
+  if (module_exists('taxonomy')) {
+    $taxonomies = taxonomy_get_vocabularies();
+    foreach ($taxonomies as $vid => $vocab) {
+      variable_set('fullcalendar_colors_taxo_' . $vid . '_enabled', variable_get('fullcalendar_color_taxo_' . $vid . '_enabled', 0));
+      variable_del('fullcalendar_color_taxo_' . $vid . '_enabled');
+    }
+  }
+
+  variable_set('fullcalendar_colors_user_roles_enabled', variable_get('fullcalendar_color_user_roles_enabled', 0));
+  variable_del('fullcalendar_color_user_roles_enabled');
+
+  // Move the node type, taxonomy terms and user roles colors.
+  $items = array_map('unserialize',
+    db_select('variable', 'v')
+      ->fields('v', array('name', 'value'))
+      ->condition('name', db_like('fullcalendar_color_') . '%', 'LIKE')
+      ->execute()
+      ->fetchAllKeyed()
+  );
+
+  foreach ($items as $key => $item) {
+    $colors = array(
+      'background' => $item,
+      'border' => $item,
+      'text' => '#ffffff',
+    );
+    colors_set_colors(preg_replace('/_color_/', '_colors_', $key), $colors, 'fullcalendar_colors');
+    variable_del($item['name']);
+  }
+
+  // Add the default configuration.
+  $color_options = array(
+    'background' => '#3366cc',
+    'border' => '#3366cc',
+    'text' => '#ffffff',
+  );
+  colors_set_colors('fullcalendar_colors_default', $color_options, 'fullcalendar_colors');
+}
+
+/**
+ * Upgrade FullCalendar Colors beta1 to new Colors API.
+ */
+function fullcalendar_colors_update_7201(&$sandbox) {
+  if (!function_exists('colors_include_api')) {
+    $t = get_t();
+    throw new DrupalUpdateException($t('You need to download the latest version of the Colors API module: !colors_module.', array('!colors_module' => 'http://drupal.org/project/colors')));
+  }
+
+  // Get all default and module specific colors and update them.
+  foreach (colors_get_module_colors('fullcalendar_colors') as $name => $color) {
+    $key = substr($name, 20);
+    if ($key == 'default') {
+      $prefix = '';
+      $module = 'colors';
+      $suffix = '_default';
+    }
+    else {
+      $prefix = 'colors_';
+      $position = strrpos($key, '_');
+      $module = substr($key, 0, $position);
+      $suffix = substr($key, $position);
+      if ($module == 'taxo_term') {
+        $module = 'taxonomy_term';
+      }
+    }
+    $selector = $prefix . $module . $suffix;
+    colors_set_colors($selector, $color, $module);
+  }
+
+  // Delete the old values.
+  colors_delete_selectors('fullcalendar_colors');
+
+  // Retrieve and unserialize the variables.
+  $items = array_map('unserialize',
+    db_select('variable', 'v')
+      ->fields('v', array('name', 'value'))
+      ->condition('name', db_like('fullcalendar_colors_') . '%', 'LIKE')
+      ->execute()
+      ->fetchAllKeyed()
+  );
+
+  // Map old variable names to new ones.
+  $map = array(
+    'node' => 'node_type',
+    'node_types' => 'node_type',
+    'taxo' => 'taxonomy_term',
+    'taxonomy' => 'taxonomy_term',
+    'user' => 'user_role',
+    'user_roles' => 'user_role',
+    'process_order' => 'process_order',
+  );
+
+  // There are two sets of variables, enabled and weight.
+  $taxonomy = FALSE;
+  foreach ($items as $item => $value) {
+    $key = substr($item, 20);
+    // Weight variables.
+    if (strpos($key, 'weight_') === 0) {
+      $prefix = 'weight_';
+      $suffix = '';
+      $key = substr($key, 7);
+    }
+    // Enabled variables.
+    elseif (($position = strrpos($key, '_enabled')) && $position !== FALSE) {
+      $prefix = '';
+      $suffix = '_enabled';
+      $key = substr($key, 0, $position);
+      $position = strrpos($key, '_');
+      // Taxonomy is enabled per vocabulary.
+      if (substr($key, 0, $position) == 'taxo') {
+        $taxonomy = TRUE;
+        $suffix = substr($key, $position) . $suffix;
+        $key = substr($key, 0, $position);
+      }
+    }
+
+    // If this isn't in our map, skip it.
+    if (!isset($map[$key])) {
+      continue;
+    }
+
+    variable_del($item);
+    variable_set('colors_' . $prefix . $map[$key] . $suffix, $value);
+  }
+
+  // Set a master variable if any vocabulary is enabled.
+  if ($taxonomy) {
+    variable_set('colors_taxonomy_term_enabled', TRUE);
+  }
+}

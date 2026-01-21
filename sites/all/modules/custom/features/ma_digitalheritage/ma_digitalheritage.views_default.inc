@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_digitalheritage.views_default.inc
@@ -42,7 +43,23 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['sorts']['created']['table'] = 'node';
   $handler->display->display_options['sorts']['created']['field'] = 'created';
   $handler->display->display_options['sorts']['created']['order'] = 'DESC';
-  /* Filter criterion: Content: Published */
+  /* Contextual filter: Content: Nid */
+  $handler->display->display_options['arguments']['nid']['id'] = 'nid';
+  $handler->display->display_options['arguments']['nid']['table'] = 'node';
+  $handler->display->display_options['arguments']['nid']['field'] = 'nid';
+  $handler->display->display_options['arguments']['nid']['default_action'] = 'default';
+  $handler->display->display_options['arguments']['nid']['default_argument_type'] = 'node';
+  $handler->display->display_options['arguments']['nid']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['nid']['summary_options']['items_per_page'] = '25';
+  $handler->display->display_options['arguments']['nid']['specify_validation'] = TRUE;
+  $handler->display->display_options['arguments']['nid']['validate']['type'] = 'node';
+  $handler->display->display_options['arguments']['nid']['validate_options']['types'] = array(
+    'digital_heritage' => 'digital_heritage',
+  );
+  $handler->display->display_options['arguments']['nid']['validate']['fail'] = 'ignore';
+  $handler->display->display_options['arguments']['nid']['not'] = TRUE;
+  /* Filter criterion: Content: Published status */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
@@ -91,6 +108,7 @@ function ma_digitalheritage_views_default_views() {
     t('‹ previous'),
     t('next ›'),
     t('last »'),
+    t('All'),
     t('Entity Reference'),
   );
   $export['dh_nodes_available_to_dh'] = $view;
@@ -121,10 +139,10 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['style_plugin'] = 'default';
   $handler->display->display_options['row_plugin'] = 'fields';
   /* Relationship: Entity Reference: Referencing entity */
-  $handler->display->display_options['relationships']['reverse_field_related_dh_items_node']['id'] = 'reverse_field_related_dh_items_node';
-  $handler->display->display_options['relationships']['reverse_field_related_dh_items_node']['table'] = 'node';
-  $handler->display->display_options['relationships']['reverse_field_related_dh_items_node']['field'] = 'reverse_field_related_dh_items_node';
-  $handler->display->display_options['relationships']['reverse_field_related_dh_items_node']['required'] = TRUE;
+  $handler->display->display_options['relationships']['reverse_field_related_content_node']['id'] = 'reverse_field_related_content_node';
+  $handler->display->display_options['relationships']['reverse_field_related_content_node']['table'] = 'node';
+  $handler->display->display_options['relationships']['reverse_field_related_content_node']['field'] = 'reverse_field_related_content_node';
+  $handler->display->display_options['relationships']['reverse_field_related_content_node']['required'] = TRUE;
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
@@ -133,7 +151,7 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
-  /* Field: Content: Media Asset */
+  /* Field: Content: Media Assets */
   $handler->display->display_options['fields']['field_media_asset']['id'] = 'field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['table'] = 'field_data_field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['field'] = 'field_media_asset';
@@ -149,13 +167,13 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['arguments']['nid']['id'] = 'nid';
   $handler->display->display_options['arguments']['nid']['table'] = 'node';
   $handler->display->display_options['arguments']['nid']['field'] = 'nid';
-  $handler->display->display_options['arguments']['nid']['relationship'] = 'reverse_field_related_dh_items_node';
+  $handler->display->display_options['arguments']['nid']['relationship'] = 'reverse_field_related_content_node';
   $handler->display->display_options['arguments']['nid']['default_action'] = 'default';
   $handler->display->display_options['arguments']['nid']['default_argument_type'] = 'node';
   $handler->display->display_options['arguments']['nid']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['nid']['summary_options']['items_per_page'] = '25';
-  /* Filter criterion: Content: Published */
+  /* Filter criterion: Content: Published status */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
@@ -188,7 +206,7 @@ function ma_digitalheritage_views_default_views() {
     t('‹ previous'),
     t('next ›'),
     t('last »'),
-    t('Content referencing Content from field_related_dh_items'),
+    t('Content referencing Content from field_related_content'),
     t('All'),
     t('Block'),
   );
@@ -437,9 +455,16 @@ function ma_digitalheritage_views_default_views() {
 
   /* Display: Master */
   $handler = $view->new_display('default', 'Master', 'default');
-  $handler->display->display_options['title'] = 'Manage Digital Heritage';
+  $handler->display->display_options['title'] = 'Export Digital Heritage';
   $handler->display->display_options['use_more_always'] = FALSE;
-  $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['access']['type'] = 'php';
+  $handler->display->display_options['access']['php_access'] = '$admin = user_role_load_by_name(\'administrator\');
+$mukurtuadmin = user_role_load_by_name(\'Mukurtu Administrator\');
+
+if(user_has_role($admin->rid) || user_has_role($mukurtuadmin->rid)) {
+     return TRUE;
+}
+return FALSE;';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
@@ -464,9 +489,6 @@ function ma_digitalheritage_views_default_views() {
     'field_contributor' => 'field_contributor',
     'field_date' => 'field_date',
     'field_collection' => 'field_collection',
-    'field_book_parent' => 'field_book_parent',
-    'field_book_children' => 'field_book_children',
-    'field_community_record_parent' => 'field_community_record_parent',
   );
   $handler->display->display_options['style_options']['default'] = 'changed';
   $handler->display->display_options['style_options']['info'] = array(
@@ -485,41 +507,41 @@ function ma_digitalheritage_views_default_views() {
     'field_media_asset' => array(
       'align' => '',
       'separator' => '',
-      'empty_column' => 1,
+      'empty_column' => 0,
     ),
     'changed' => array(
       'sortable' => 1,
-      'default_sort_order' => 'asc',
+      'default_sort_order' => 'desc',
       'align' => '',
       'separator' => '',
       'empty_column' => 1,
     ),
     'field_summary' => array(
-      'sortable' => 1,
+      'sortable' => 0,
       'default_sort_order' => 'asc',
       'align' => '',
       'separator' => '',
-      'empty_column' => 1,
+      'empty_column' => 0,
     ),
     'field_community_ref' => array(
       'align' => '',
       'separator' => '',
-      'empty_column' => 1,
+      'empty_column' => 0,
     ),
     'field_category' => array(
       'align' => '',
       'separator' => '',
-      'empty_column' => 1,
+      'empty_column' => 0,
     ),
     'field_creator' => array(
       'align' => '',
       'separator' => '',
-      'empty_column' => 1,
+      'empty_column' => 0,
     ),
     'field_contributor' => array(
       'align' => '',
       'separator' => '',
-      'empty_column' => 1,
+      'empty_column' => 0,
     ),
     'field_date' => array(
       'sortable' => 1,
@@ -531,45 +553,35 @@ function ma_digitalheritage_views_default_views() {
     'field_collection' => array(
       'align' => '',
       'separator' => '',
-      'empty_column' => 1,
-    ),
-    'field_book_parent' => array(
-      'sortable' => 1,
-      'default_sort_order' => 'asc',
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 1,
-    ),
-    'field_book_children' => array(
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 1,
-    ),
-    'field_community_record_parent' => array(
-      'sortable' => 1,
-      'default_sort_order' => 'asc',
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 1,
+      'empty_column' => 0,
     ),
   );
   /* Field: Bulk operations: Content */
   $handler->display->display_options['fields']['views_bulk_operations']['id'] = 'views_bulk_operations';
-  $handler->display->display_options['fields']['views_bulk_operations']['table'] = 'node';
+  $handler->display->display_options['fields']['views_bulk_operations']['table'] = 'views_entity_node';
   $handler->display->display_options['fields']['views_bulk_operations']['field'] = 'views_bulk_operations';
   $handler->display->display_options['fields']['views_bulk_operations']['label'] = 'Select All';
   $handler->display->display_options['fields']['views_bulk_operations']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['display_type'] = '0';
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['enable_select_all_pages'] = 1;
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['row_clickable'] = 1;
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['force_single'] = 0;
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['entity_load_capacity'] = '10';
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_operations'] = array(
-    'action::ma_importexport_dh_export' => array(
+    'action::mukurtu_export_action' => array(
       'selected' => 1,
+      'postpone_processing' => 0,
       'skip_confirmation' => 0,
+      'skip_permission_check' => 0,
       'override_label' => 0,
       'label' => '',
-      'postpone_processing' => 0,
+    ),
+    'action::ma_importexport_dc_action_xml_export' => array(
+      'selected' => 1,
+      'skip_confirmation' => 0,
+      'skip_permission_check' => 0,
+      'override_label' => 0,
+      'label' => '',
     ),
   );
   /* Field: Content: Title */
@@ -579,7 +591,7 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
-  /* Field: Content: Media Asset */
+  /* Field: Content: Media Assets */
   $handler->display->display_options['fields']['field_media_asset']['id'] = 'field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['table'] = 'field_data_field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['field'] = 'field_media_asset';
@@ -614,16 +626,16 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['fields']['field_creator']['table'] = 'field_data_field_creator';
   $handler->display->display_options['fields']['field_creator']['field'] = 'field_creator';
   $handler->display->display_options['fields']['field_creator']['delta_offset'] = '0';
-  /* Field: Content: Contributor */
+  /* Field: Field: Contributor */
   $handler->display->display_options['fields']['field_contributor']['id'] = 'field_contributor';
   $handler->display->display_options['fields']['field_contributor']['table'] = 'field_data_field_contributor';
   $handler->display->display_options['fields']['field_contributor']['field'] = 'field_contributor';
   $handler->display->display_options['fields']['field_contributor']['delta_offset'] = '0';
-  /* Field: Content: Original Date */
+  /* Field: Content: Original Date Description */
   $handler->display->display_options['fields']['field_date']['id'] = 'field_date';
   $handler->display->display_options['fields']['field_date']['table'] = 'field_data_field_date';
   $handler->display->display_options['fields']['field_date']['field'] = 'field_date';
-  /* Field: Content: Collection */
+  /* Field: Content: Collections */
   $handler->display->display_options['fields']['field_collection']['id'] = 'field_collection';
   $handler->display->display_options['fields']['field_collection']['table'] = 'field_data_field_collection';
   $handler->display->display_options['fields']['field_collection']['field'] = 'field_collection';
@@ -631,12 +643,7 @@ function ma_digitalheritage_views_default_views() {
     'link' => 0,
   );
   $handler->display->display_options['fields']['field_collection']['delta_offset'] = '0';
-  /* Sort criterion: Content: Post date */
-  $handler->display->display_options['sorts']['created']['id'] = 'created';
-  $handler->display->display_options['sorts']['created']['table'] = 'node';
-  $handler->display->display_options['sorts']['created']['field'] = 'created';
-  $handler->display->display_options['sorts']['created']['order'] = 'DESC';
-  /* Filter criterion: Content: Published */
+  /* Filter criterion: Content: Published status */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
@@ -798,12 +805,120 @@ function ma_digitalheritage_views_default_views() {
     ),
   );
 
-  /* Display: Page */
-  $handler = $view->new_display('page', 'Page', 'page');
+  /* Display: Digital Heritage */
+  $handler = $view->new_display('page', 'Digital Heritage', 'page');
   $handler->display->display_options['path'] = 'manage/digital-heritage';
+
+  /* Display: Dictionary */
+  $handler = $view->new_display('page', 'Dictionary', 'page_1');
+  $handler->display->display_options['defaults']['title'] = FALSE;
+  $handler->display->display_options['title'] = 'Export Dictionary Words';
+  $handler->display->display_options['defaults']['fields'] = FALSE;
+  /* Field: Bulk operations: Content */
+  $handler->display->display_options['fields']['views_bulk_operations']['id'] = 'views_bulk_operations';
+  $handler->display->display_options['fields']['views_bulk_operations']['table'] = 'views_entity_node';
+  $handler->display->display_options['fields']['views_bulk_operations']['field'] = 'views_bulk_operations';
+  $handler->display->display_options['fields']['views_bulk_operations']['label'] = 'Select All';
+  $handler->display->display_options['fields']['views_bulk_operations']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['display_type'] = '0';
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['enable_select_all_pages'] = 1;
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['row_clickable'] = 1;
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['force_single'] = 0;
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['entity_load_capacity'] = '10';
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_operations'] = array(
+    'action::mukurtu_export_action' => array(
+      'selected' => 1,
+      'postpone_processing' => 0,
+      'skip_confirmation' => 0,
+      'skip_permission_check' => 0,
+      'override_label' => 0,
+      'label' => '',
+    ),
+  );
+  /* Field: Content: Title */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'node';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
+  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
+  /* Field: Content: Language */
+  $handler->display->display_options['fields']['field_dictionary_word_language']['id'] = 'field_dictionary_word_language';
+  $handler->display->display_options['fields']['field_dictionary_word_language']['table'] = 'field_data_field_dictionary_word_language';
+  $handler->display->display_options['fields']['field_dictionary_word_language']['field'] = 'field_dictionary_word_language';
+  /* Field: Field: Keywords */
+  $handler->display->display_options['fields']['field_tags']['id'] = 'field_tags';
+  $handler->display->display_options['fields']['field_tags']['table'] = 'field_data_field_tags';
+  $handler->display->display_options['fields']['field_tags']['field'] = 'field_tags';
+  $handler->display->display_options['fields']['field_tags']['delta_offset'] = '0';
+  /* Field: Content: Updated date */
+  $handler->display->display_options['fields']['changed']['id'] = 'changed';
+  $handler->display->display_options['fields']['changed']['table'] = 'node';
+  $handler->display->display_options['fields']['changed']['field'] = 'changed';
+  $handler->display->display_options['fields']['changed']['date_format'] = 'short';
+  $handler->display->display_options['fields']['changed']['second_date_format'] = 'exif';
+  /* Field: Content: Original Date Description */
+  $handler->display->display_options['fields']['field_date']['id'] = 'field_date';
+  $handler->display->display_options['fields']['field_date']['table'] = 'field_data_field_date';
+  $handler->display->display_options['fields']['field_date']['field'] = 'field_date';
+  $handler->display->display_options['defaults']['filter_groups'] = FALSE;
+  $handler->display->display_options['defaults']['filters'] = FALSE;
+  /* Filter criterion: Content: Published status */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = 1;
+  $handler->display->display_options['filters']['status']['group'] = 1;
+  $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
+  /* Filter criterion: Content: Type */
+  $handler->display->display_options['filters']['type']['id'] = 'type';
+  $handler->display->display_options['filters']['type']['table'] = 'node';
+  $handler->display->display_options['filters']['type']['field'] = 'type';
+  $handler->display->display_options['filters']['type']['value'] = array(
+    'dictionary_word' => 'dictionary_word',
+  );
+  /* Filter criterion: Content: Title */
+  $handler->display->display_options['filters']['title']['id'] = 'title';
+  $handler->display->display_options['filters']['title']['table'] = 'node';
+  $handler->display->display_options['filters']['title']['field'] = 'title';
+  $handler->display->display_options['filters']['title']['operator'] = 'contains';
+  $handler->display->display_options['filters']['title']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['title']['expose']['operator_id'] = 'title_op';
+  $handler->display->display_options['filters']['title']['expose']['label'] = 'Title';
+  $handler->display->display_options['filters']['title']['expose']['operator'] = 'title_op';
+  $handler->display->display_options['filters']['title']['expose']['identifier'] = 'title';
+  $handler->display->display_options['filters']['title']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    6 => 0,
+    3 => 0,
+    5 => 0,
+    4 => 0,
+  );
+  /* Filter criterion: Content: Language (field_dictionary_word_language) */
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['id'] = 'field_dictionary_word_language_tid';
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['table'] = 'field_data_field_dictionary_word_language';
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['field'] = 'field_dictionary_word_language_tid';
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['value'] = '';
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['expose']['operator_id'] = 'field_dictionary_word_language_tid_op';
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['expose']['label'] = 'Language';
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['expose']['operator'] = 'field_dictionary_word_language_tid_op';
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['expose']['identifier'] = 'field_dictionary_word_language_tid';
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    6 => 0,
+    3 => 0,
+    5 => 0,
+    4 => 0,
+  );
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['type'] = 'select';
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['vocabulary'] = 'language';
+  $handler->display->display_options['path'] = 'manage/dictionary-words';
   $translatables['export_digital_heritage'] = array(
     t('Master'),
-    t('Manage Digital Heritage'),
+    t('Export Digital Heritage'),
     t('more'),
     t('Apply'),
     t('Reset'),
@@ -820,21 +935,25 @@ function ma_digitalheritage_views_default_views() {
     t('Select All'),
     t('- Choose an operation -'),
     t('Title'),
-    t('Media Asset'),
+    t('Media Assets'),
     t('Updated date'),
     t('Summary'),
     t('Community'),
     t('Category'),
     t('Creator'),
     t('Contributor'),
-    t('Original Date'),
-    t('Collection'),
+    t('Original Date Description'),
+    t('Collections'),
     t('Category (field_category)'),
     t('Community Record Parent (field_community_record_parent)'),
     t('Is Community Record'),
     t('Book Parent (field_book_parent)'),
     t('Book Pages'),
-    t('Page'),
+    t('Digital Heritage'),
+    t('Dictionary'),
+    t('Export Dictionary Words'),
+    t('Language'),
+    t('Keywords'),
   );
   $export['export_digital_heritage'] = $view;
 

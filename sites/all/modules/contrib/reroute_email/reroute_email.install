@@ -1,0 +1,73 @@
+<?php
+
+/**
+ * @file
+ * Reroute Email module installation functions.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function reroute_email_requirements($phase) {
+  $requirements = array();
+
+  if ($phase === 'runtime' && variable_get(REROUTE_EMAIL_ENABLE, 0)) {
+    $settings = array(
+      '@path' => url('admin/config/development/reroute_email'),
+      '%addresses' => variable_get(REROUTE_EMAIL_ADDRESS, ''),
+    );
+
+    if (empty($settings['%addresses'])) {
+      $message = t('All outgoing emails (<a href="@path">configure whitelist</a>) would be aborted and recorded in the recent log entries (if enabled).', $settings);
+    }
+    else {
+      $message = t('All outgoing emails (<a href="@path">configure whitelist</a>) would be rerouted to: %addresses', $settings);
+    }
+
+    $requirements['reroute_email'] = array(
+      'title' => t('Reroute Email'),
+      'value' => $message,
+      'severity' => REQUIREMENT_WARNING,
+    );
+  }
+
+  return $requirements;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function reroute_email_uninstall() {
+  // Remove all the configuration variables added by the module.
+  db_delete('variable')
+    ->condition('name', 'reroute_email_%', 'LIKE')
+    ->execute();
+}
+
+/**
+ * Implements hook_update_N().
+ *
+ * Now we have a separate fields for `Rerouting email addresses` and
+ * `Whitelisted email addresses`. Previously all emails was rerouted
+ * to the first email from `Rerouting email addresses`.
+ */
+function reroute_email_update_7001() {
+  module_load_include('module', 'reroute_email');
+
+  // Do not update values if the user sets them manually already.
+  // `Whitelisted addresses` is a new variable, so it couldn't exist before.
+  if (NULL !== variable_get(REROUTE_EMAIL_WHITELIST)) {
+    return NULL;
+  }
+
+  // Update whitelisted email addresses value.
+  $addresses = variable_get(REROUTE_EMAIL_ADDRESS);
+  variable_set(REROUTE_EMAIL_WHITELIST, $addresses);
+
+  // Update rerouting email addresses value.
+  $addresses = reroute_email_split_string($addresses);
+  variable_set(REROUTE_EMAIL_ADDRESS, !empty($addresses[0]) ? $addresses[0] : '');
+
+  // Return a message to the user.
+  return t('Reroute email module updates completed successfully. Please visit configuration page to check.');
+}

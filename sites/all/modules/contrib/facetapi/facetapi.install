@@ -58,6 +58,13 @@ function facetapi_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
+      'hash' => array(
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '0',
+        'description' => 'Unique hash ID for facet.',
+      ),
       'settings' => array(
         'description' => 'Serialized storage of general settings.',
         'type' => 'blob',
@@ -221,4 +228,18 @@ function facetapi_update_7102() {
  */
 function facetapi_update_7103() {
   cache_clear_all('facetapi:delta_map', 'cache');
+}
+
+/**
+ * Add hash field to facetapi table.
+ */
+function facetapi_update_7104() {
+  $spec = array(
+    'type' => 'varchar',
+    'length' => 32,
+    'not null' => TRUE,
+    'default' => '0',
+    'description' => 'Unique hash ID for facet.',
+  );
+  db_add_field( 'facetapi', 'hash', $spec);
 }

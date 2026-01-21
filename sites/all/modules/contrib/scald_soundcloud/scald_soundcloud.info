@@ -1,0 +1,13 @@
+name = Scald: SoundCloud
+core = 7.x
+php = 5.x
+package = Scald
+description = Provider: Provides Audio atoms linked to SoundCloud tracks or sets
+dependencies[] = scald
+
+; Information added by Drupal.org packaging script on 2014-09-09
+version = "7.x-1.2"
+core = "7.x"
+project = "scald_soundcloud"
+datestamp = "1410278237"
+

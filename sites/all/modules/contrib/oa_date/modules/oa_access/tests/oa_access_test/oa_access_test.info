@@ -1,0 +1,12 @@
+name = Open Atrium Access Test
+description = A test module to help with the unit tests for Open Atrium Access.
+package = Open Atrium
+core = 7.x
+hidden = TRUE
+dependencies[] = oa_access
+
+; Information added by Drupal.org packaging script on 2018-10-18
+version = "7.x-2.91"
+core = "7.x"
+project = "oa_core"
+datestamp = "1539884795"

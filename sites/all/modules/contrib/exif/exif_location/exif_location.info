@@ -1,0 +1,13 @@
+name = EXIF Location
+description = "Sets a node location based on EXIF coordinates from an image."
+core = 7.x
+version = "7.x-1.x-dev"
+dependencies[] = exif
+dependencies[] = location
+dependencies[] = location_node
+
+; Information added by Drupal.org packaging script on 2022-04-06
+version = "7.x-1.10"
+core = "7.x"
+project = "exif"
+datestamp = "1649271394"

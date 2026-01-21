@@ -16,6 +16,7 @@
  * selection.
  *
  * @see entity_views_field_definition()
+ *
  * @ingroup views_field_handlers
  */
 class entity_views_handler_field_field extends views_handler_field_field {
@@ -59,7 +60,8 @@ class entity_views_handler_field_field extends views_handler_field_field {
   /**
    * Override so it doesn't do any harm (or, anything at all).
    */
-  public function post_execute(&$values) { }
+  public function post_execute(&$values) {
+  }
 
   /**
    * Load the entities for all rows that are about to be displayed.
@@ -97,9 +99,10 @@ class entity_views_handler_field_field extends views_handler_field_field {
   /**
    * Overridden to force displaying multiple values in a single row.
    */
-  function multiple_options_form(&$form, &$form_state) {
+  public function multiple_options_form(&$form, &$form_state) {
     parent::multiple_options_form($form, $form_state);
     $form['group_rows']['#default_value'] = TRUE;
     $form['group_rows']['#disabled'] = TRUE;
   }
+
 }

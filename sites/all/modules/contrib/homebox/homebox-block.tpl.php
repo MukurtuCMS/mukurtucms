@@ -10,12 +10,12 @@
   <div class="homebox-portlet-inner">
     <h3 class="portlet-header">
       <?php if ($block->closable): ?>
-        <a class="portlet-icon portlet-close"></a>
+        <a class="portlet-icon portlet-close" title="<?php print t('Close'); ?>"></a>
       <?php endif; ?>
-      <a class="portlet-icon portlet-maximize"></a>
-      <a class="portlet-icon portlet-minus"></a>
+      <a class="portlet-icon portlet-maximize" title="<?php print t('Maximize'); ?>"></a>
+      <a class="portlet-icon portlet-minus" title="<?php print t('Collapse'); ?>"></a>
       <?php if ($page->settings['color'] || isset($block->edit_form)): ?>
-        <a class="portlet-icon portlet-settings"></a>
+        <a class="portlet-icon portlet-settings" title="<?php print t('Settings'); ?>"></a>
       <?php endif; ?>
       <span class="portlet-title"><?php print $block->subject ?></span>
     </h3>

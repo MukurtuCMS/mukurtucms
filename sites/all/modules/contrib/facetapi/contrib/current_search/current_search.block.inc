@@ -226,7 +226,7 @@ function current_search_get_block_searcher($delta) {
  * @return
  *   The default searcher.
  *
- * @todo Figure out a beter default system.
+ * @todo Figure out a better default system.
  */
 function current_search_get_default_searcher() {
   $options = current_search_get_searcher_options();

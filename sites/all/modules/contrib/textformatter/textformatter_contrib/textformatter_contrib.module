@@ -15,6 +15,9 @@ function textformatter_contrib_textformatter_field_info() {
     $info['entityreference'] = array(
       'fields' => array('entityreference'),
       'callback' => 'textformatter_contrib_entityreference_field_create_list',
+      'settings' => array(
+        'entityreference_link' => TRUE,
+      ),
     );
   }
 
@@ -22,6 +25,9 @@ function textformatter_contrib_textformatter_field_info() {
     $info['node_reference'] = array(
       'fields' => array('node_reference'),
       'callback' => 'textformatter_contrib_node_reference_field_create_list',
+      'settings' => array(
+        'node_reference_link' => TRUE,
+      ),
     );
   }
 
@@ -29,6 +35,9 @@ function textformatter_contrib_textformatter_field_info() {
     $info['user_reference'] = array(
       'fields' => array('user_reference'),
       'callback' => 'textformatter_contrib_user_reference_field_create_list',
+      'settings' => array(
+        'user_reference_link' => TRUE,
+      ),
     );
   }
 
@@ -36,6 +45,19 @@ function textformatter_contrib_textformatter_field_info() {
     $info['link'] = array(
       'fields' => array('link_field'),
       'callback' => 'textformatter_contrib_link_field_create_list',
+      'settings' => array(
+        'link_field_display_type' => 'link_default',
+      ),
+    );
+  }
+
+  if (module_exists('field_collection')) {
+    $info['field_collection'] = array(
+      'fields' => array('field_collection'),
+      'callback' => 'textformatter_contrib_field_collection_field_create_list',
+      'settings' => array(
+        'field_collection_view_mode' => 'full',
+      ),
     );
   }
 
@@ -157,10 +179,24 @@ function textformatter_contrib_link_field_create_list($entity_type, $entity, $fi
   foreach ($items as $delta => $item) {
     $contrib_settings = $display['settings']['textformatter_contrib'];
 
-    $link_display = (isset($contrib_settings['link_field_display_type']) && !empty($contrib_settings['link_field_display_type']))
-      ? $contrib_settings['link_field_display_type'] : 'link_default';
+    $list_items[] = theme('link_formatter_' . $contrib_settings['link_field_display_type'], array('element' => $item, 'field' => $instance));
+  }
 
-    $list_items[] = theme('link_formatter_' . $link_display, array('element' => $item, 'field' => $instance));
+  return $list_items;
+}
+
+/**
+ * Field collection field listing callback.
+ */
+function textformatter_contrib_field_collection_field_create_list($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $contrib_settings = $display['settings']['textformatter_contrib'];
+  $list_items = array();
+
+  $view_mode = !empty($contrib_settings['field_collection_view_mode']) ? $contrib_settings['field_collection_view_mode'] : 'full';
+  foreach ($items as $delta => $item) {
+    if ($field_collection = field_collection_field_get_entity($item)) {
+      $list_items[$delta] = drupal_render($field_collection->view($view_mode));
+    }
   }
 
   return $list_items;
@@ -211,4 +247,21 @@ function textformatter_contrib_textformatter_field_formatter_settings_form_alter
       '#default_value' => isset($settings['textformatter_contrib']['link_field_display_type']) ? $settings['textformatter_contrib']['link_field_display_type'] : 'link_default',
     );
   }
+
+  if ($field['type'] == 'field_collection') {
+    $entity_type = entity_get_info('field_collection_item');
+    $options = array();
+    foreach ($entity_type['view modes'] as $mode => $info) {
+      $options[$mode] = $info['label'];
+    }
+
+    $form['textformatter_contrib']['field_collection_view_mode'] = array(
+      '#type' => 'select',
+      '#title' => t('View mode'),
+      '#options' => $options,
+      '#default_value' => isset($settings['textformatter_contrib']['field_collection_view_mode']) ? $settings['textformatter_contrib']['field_collection_view_mode'] : 'full',
+      '#description' => t('Select the view mode'),
+    );
+  }
+
 }

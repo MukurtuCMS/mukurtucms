@@ -1,0 +1,72 @@
+From eca79c3c0b57f5a8db722caab588e910898d26e4 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Thu, 27 Apr 2023 08:34:05 -0700
+Subject: [PATCH 2/2] Suppress deprecation warnings for PHP 8
+
+---
+ includes/CerFieldHandler.inc | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/includes/CerFieldHandler.inc b/includes/CerFieldHandler.inc
+index 8521e271..e990b9dd 100644
+--- a/includes/CerFieldHandler.inc
++++ b/includes/CerFieldHandler.inc
+@@ -240,6 +240,7 @@ class CerFieldHandler implements Countable, SeekableIterator {
+   /**
+    * Implements Countable::count().
+    */
++  #[\ReturnTypeWillChange]
+   public function count() {
+     if ($this->isMultiValue) {
+       return sizeof($this->value);
+@@ -252,6 +253,7 @@ class CerFieldHandler implements Countable, SeekableIterator {
+   /**
+    * Implements SeekableIterator::seek().
+    */
++  #[\ReturnTypeWillChange]
+   public function seek($position) {
+     $length = $this->count();
+ 
+@@ -270,6 +272,7 @@ class CerFieldHandler implements Countable, SeekableIterator {
+   /**
+    * Implements Iterator::current().
+    */
++  #[\ReturnTypeWillChange]
+   public function current() {
+     return ($this->isMultiValue ? $this->value[$this->delta] : $this->value);
+   }
+@@ -277,6 +280,7 @@ class CerFieldHandler implements Countable, SeekableIterator {
+   /**
+    * Implements Iterator::key().
+    */
++  #[\ReturnTypeWillChange]
+   public function key() {
+     return $this->current()->getIdentifier();
+   }
+@@ -284,6 +288,7 @@ class CerFieldHandler implements Countable, SeekableIterator {
+   /**
+    * Implements Iterator::next().
+    */
++  #[\ReturnTypeWillChange]
+   public function next() {
+     $this->delta++;
+   }
+@@ -291,6 +296,7 @@ class CerFieldHandler implements Countable, SeekableIterator {
+   /**
+    * Implements Iterator::rewind().
+    */
++  #[\ReturnTypeWillChange]
+   public function rewind() {
+     $this->delta = 0;
+   }
+@@ -298,6 +304,7 @@ class CerFieldHandler implements Countable, SeekableIterator {
+   /**
+    * Implements Iterator::valid().
+    */
++  #[\ReturnTypeWillChange]
+   public function valid() {
+     return ($this->delta < $this->count());
+   }
+-- 
+2.34.1
+

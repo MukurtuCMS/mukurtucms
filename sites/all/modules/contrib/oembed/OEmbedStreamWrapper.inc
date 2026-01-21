@@ -154,7 +154,7 @@ class OEmbedStreamWrapper implements DrupalStreamWrapperInterface {
    *   A string containing the path to the file to open.
    * @param string $mode
    *   The file mode ("r", "wb" etc.).
-   * @param bitmask $options
+   * @param int $options
    *   A bit mask of STREAM_USE_PATH and STREAM_REPORT_ERRORS.
    * @param string &$opened_url
    *   A string containing the path actually opened.
@@ -298,7 +298,7 @@ class OEmbedStreamWrapper implements DrupalStreamWrapperInterface {
    *
    * @param string $url
    *   A string containing the url to get information about.
-   * @param bitmask $flags
+   * @param int $flags
    *   A bit mask of STREAM_URL_STAT_LINK and STREAM_URL_STAT_QUIET.
    *
    * @return array

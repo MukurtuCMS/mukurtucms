@@ -69,7 +69,7 @@
             $secondaryActions.animate({height: "show", opacity: "show"}, 100);
             $dropbutton.addClass('open');
           }
-        }
+        };
         // Hide the secondary actions initially.
         $secondaryActions.hide();
 
@@ -90,5 +90,5 @@
         );
       });
     }
-  }
+  };
 })(jQuery);

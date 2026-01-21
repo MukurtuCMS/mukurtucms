@@ -1,0 +1,59 @@
+<?php
+
+/**
+ * Tests for Entity Delete Log.
+ */
+class EntityDeleteLogTest extends DrupalWebTestCase {
+
+  public function setUp() {
+    parent::setUp(array('node', 'entity_delete_log'));
+  }
+
+  public static function getInfo() {
+    // Note that getInfo() strings are not translated with t().
+    return array(
+      'name' => 'Entity delete log',
+      'description' => 'Ensure that Entity delete log functions properly.',
+      'group' => 'Entity delete log',
+    );
+  }
+
+  /**
+   * Test deleting a node.
+   */
+  function testNodeDeleteLog() {
+    global $user;
+    $author_user = $this->drupalCreateUser();
+    variable_set('entity_delete_log_entity_types', array('node' => 'node'));
+
+    $settings = array(
+      'type' => 'page',
+      'title' => 'Page to be deleted',
+      'body' => array(LANGUAGE_NONE => array(array('Content to be deleted'))),
+      'uid' => $author_user->uid,
+      'created' => strtotime('1986'),
+    );
+    $node = $this->drupalCreateNode($settings);
+
+    $delete_time = time();
+    node_delete($node->nid);
+
+    $deleted_nodes = db_select('entity_delete_log', 'e')
+      ->fields('e')
+      ->execute()
+      ->fetchAll();
+    $deleted_node = reset($deleted_nodes);
+    $deleted_data = unserialize($deleted_node->entity);
+
+    $this->assertEqual($node->title, $deleted_node->entity_title, t('Deleted title matches.'));
+    $this->assertEqual($node->type, $deleted_node->entity_bundle, t('Deleted entity type matches.'));
+    $this->assertEqual($user->uid, $deleted_node->uid, t('Deleter matches.'));
+    $this->assertEqual($author_user->uid, $deleted_node->author, t('Deleted entity author matches.'));
+    $this->assertEqual($node->created, $deleted_node->created, t('Creation date matches.'));
+    $this->assertTrue($deleted_node->deleted >= $delete_time, t('Deleted date matches.'));
+
+    // Test unserializing.
+    $this->assertEqual($node->body[LANGUAGE_NONE][0]['value'], $deleted_data->body[LANGUAGE_NONE][0]['value'], t('Deleted field data matches.'));
+  }
+
+}

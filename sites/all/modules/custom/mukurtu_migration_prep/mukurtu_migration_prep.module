@@ -1,0 +1,256 @@
+<?php
+
+define("MUKURTU_MIGRATION_REPORT_STATUS_NOT_RUN", 0);
+define("MUKURTU_MIGRATION_REPORT_STATUS_OK", 1);
+define("MUKURTU_MIGRATION_REPORT_STATUS_WARNING", 2);
+define("MUKURTU_MIGRATION_REPORT_STATUS_ERROR", 3);
+
+define("MUKURTU_MIGRATION_RESULT", 'result');
+define("MUKURTU_MIGRATION_CONTEXT", 'context');
+define("MUKURTU_MIGRATION_SUMMARY", 'summary');
+
+
+/**
+ * Implements hook_menu().
+ */
+function mukurtu_migration_prep_menu() {
+  $items = [];
+
+  $items['admin/reports/migration/summary'] = [
+    'title' => 'Pre-migration Summary Report',
+    'description' => '',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['mukurtu_migration_prep_summary_report_form'],
+    'access callback' => 'mukurtu_migration_prep_current_user_has_role',
+    'access arguments' => [['administrator', 'Mukurtu Administrator']],
+    'type' => MENU_NORMAL_ITEM,
+  ];
+
+  return $items;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function mukurtu_migration_prep_views_api() {
+  return [
+    'api' => '3.0',
+  ];
+}
+
+/**
+ * Implements hook_views_default_views().
+ */
+function mukurtu_migration_prep_views_default_views() {
+  $views = [];
+  $path = drupal_get_path('module', 'mukurtu_migration_prep') . '/views/*.inc';
+
+  foreach (glob($path) as $file) {
+    require_once $file;
+    $views[$view->name] = $view;
+    unset($view);
+  }
+
+  return $views;
+}
+
+function mukurtu_migration_prep_query_alter($query)
+{
+  if ($query->hasAllTags('views_content_with_missing_cultural_protocols')) {
+    $count_protocol_refs_subquery = "(SELECT count(*) from og_membership as `ogm` where node.nid = ogm.etid AND ogm.entity_type = 'node' AND ogm.field_name = 'og_group_ref' AND ogm.state = 1)";
+    $query->addExpression($count_protocol_refs_subquery, 'protocol_refs');
+    $query->havingCondition('protocol_refs', 0);
+  }
+}
+
+/**
+ * Access function for the form.
+ */
+function mukurtu_migration_prep_current_user_has_role($roles) {
+  if (user_is_logged_in()) {
+    global $user;
+
+    foreach ($roles as $role) {
+      if (in_array($role, $user->roles)) {
+        return TRUE;
+      }
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Form builder: Builds the migration summary report form.
+ */
+function mukurtu_migration_prep_summary_report_form($form, &$form_state) {
+  $header = [
+    'step' => t('Step'),
+    'description' => t('Description'),
+    'status' => t('Status'),
+  ];
+
+  $rows = [];
+  $rows[] = mukurtu_migration_prep_report_nodes_empty_protocols();
+  $rows[] = mukurtu_migration_prep_report_scald_atoms_empty_protocols();
+  $rows[] = mukurtu_migration_prep_report_unsupported_text_formats();
+  $rows[] = mukurtu_migration_prep_report_dictionary_words_with_additional_media();
+  $rows[] = mukurtu_migration_prep_report_dailymotion_atoms();
+  $rows[] = mukurtu_migration_prep_report_scald_authors();
+
+  $form['table'] = [
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+    '#empty' => '',
+    '#attributes' => ['class' => ['system-status-report']],
+  ];
+
+  $form['submit'] = [
+    '#type' => 'submit',
+    '#value' => t('Run Pre-migration Report'),
+  ];
+  drupal_flush_all_caches();
+  return $form;
+}
+
+function mukurtu_migration_prep_get_status_class($status) {
+  switch ($status) {
+    case MUKURTU_MIGRATION_REPORT_STATUS_OK:
+      return ['ok'];
+    case MUKURTU_MIGRATION_REPORT_STATUS_WARNING:
+      return ['warning'];
+    case MUKURTU_MIGRATION_REPORT_STATUS_ERROR:
+      return ['error'];
+    default:
+      return [];
+  }
+}
+
+/**
+ * Report for markdown/ds_code text formats.
+ */
+function mukurtu_migration_prep_report_unsupported_text_formats() {
+  $view = views_get_view('migration_nodes_with_unsupported_text_formats');
+  $view->execute();
+  $status = $view->total_rows <= 0 ? MUKURTU_MIGRATION_REPORT_STATUS_OK : MUKURTU_MIGRATION_REPORT_STATUS_ERROR;
+  $link = l(t('Details'), 'admin/reports/migration/summary/migration-nodes-with-unsupported-text-formats');
+  $summary = $status == MUKURTU_MIGRATION_REPORT_STATUS_OK ? t('No nodes with unsupported text formats') : t('@count node(s) with unsupported text formats: ', ['@count' => $view->total_rows]) . $link;
+
+  $row = [
+    'data' => [
+      t('Text Formats'),
+      t('Text formats "Markdown" and "Display Suite code" are not supported by default in Mukurtu CMS v4 and will not be migrated.'),
+      $summary,
+    ],
+    'class' => mukurtu_migration_prep_get_status_class($status),
+  ];
+
+  return $row;
+}
+
+/**
+ * Report for nodes with empty protocol fields.
+ */
+function mukurtu_migration_prep_report_nodes_empty_protocols() {
+  $view = views_get_view('content_with_missing_cultural_protocols');
+  $view->execute();
+  $status = $view->total_rows <= 0 ? MUKURTU_MIGRATION_REPORT_STATUS_OK : MUKURTU_MIGRATION_REPORT_STATUS_ERROR;
+  $link = l(t('Details'), 'admin/reports/migration/summary/content-with-missing-cultural-protocols');
+  $summary = $status == MUKURTU_MIGRATION_REPORT_STATUS_OK ? t('All content has cultural protocols') : t('@count items(s) with missing cultural protocols: ', ['@count' => $view->total_rows]) . $link;
+
+  $row = [
+    'data' => [
+      t('Content (nodes) with no assigned protocols'),
+      t('In Mukurtu CMS v4, cultural protocols are now required for all content types.'),
+      $summary,
+    ],
+    'class' => mukurtu_migration_prep_get_status_class($status),
+  ];
+  return $row;
+}
+
+/**
+ * Report for scald atoms with empty protocol fields.
+ */
+function mukurtu_migration_prep_report_scald_atoms_empty_protocols() {
+  $view = views_get_view('migration_scald_atoms_with_missing_cultural_protocols');
+  $view->execute();
+  $status = $view->total_rows <= 0 ? MUKURTU_MIGRATION_REPORT_STATUS_OK : MUKURTU_MIGRATION_REPORT_STATUS_ERROR;
+  $link = l(t('Details'), 'admin/reports/migration/summary/scald-atoms-with-missing-cultural-protocols');
+  $summary = $status == MUKURTU_MIGRATION_REPORT_STATUS_OK ? t('All Scald Atoms have cultural protocols') : t('@count atom(s) with missing cultural protocols: ', ['@count' => $view->total_rows]) . $link;
+
+  $row = [
+    'data' => [
+      t('Media (atoms) with no assigned protocols'),
+      t('In Mukurtu CMS v4, cultural protocols are now required for all media.'),
+      $summary,
+    ],
+    'class' => mukurtu_migration_prep_get_status_class($status),
+  ];
+  return $row;
+}
+
+/**
+ * Report for dictionary words with a non-empty additional media field.
+ */
+function mukurtu_migration_prep_report_dictionary_words_with_additional_media() {
+  $view = views_get_view('migration_dictionary_words_with_additional_media');
+  $view->execute();
+  $status = $view->total_rows <= 0 ? MUKURTU_MIGRATION_REPORT_STATUS_OK : MUKURTU_MIGRATION_REPORT_STATUS_WARNING;
+  $link = l(t('Details'), 'admin/reports/migration/migration-dictionary-words-with-additional-media');
+  $summary = $status == MUKURTU_MIGRATION_REPORT_STATUS_OK ? t('No dictionary words have additional media') : t('@count dictionary word(s) with additional media: ', ['@count' => $view->total_rows]) . $link;
+
+  $row = [
+    'data' => [
+      t('Dictionary words with additional media'),
+      t('In Mukurtu CMS v4, the dictionary word additional media field will not be migrated.'),
+      $summary,
+    ],
+    'class' => mukurtu_migration_prep_get_status_class($status),
+  ];
+  return $row;
+}
+
+/**
+ * Report for dailymotion atoms.
+ */
+function mukurtu_migration_prep_report_dailymotion_atoms() {
+  $view = views_get_view('migration_dailymotion_atoms');
+  $view->execute();
+  $status = $view->total_rows <= 0 ? MUKURTU_MIGRATION_REPORT_STATUS_OK : MUKURTU_MIGRATION_REPORT_STATUS_WARNING;
+  $link = l(t('Details'), 'admin/reports/migration/dailymotion-atoms');
+  $summary = $status == MUKURTU_MIGRATION_REPORT_STATUS_OK ? t('No Dailymotion atoms found') : t('@count Dailymotion atom(s): ', ['@count' => $view->total_rows]) . $link;
+
+  $row = [
+    'data' => [
+      t('Dailymotion Atoms'),
+      t('Support for Dailymotion has been dropped in Mukurtu CMS v4. Dailymotion atoms will not be migrated'),
+      $summary,
+    ],
+    'class' => mukurtu_migration_prep_get_status_class($status),
+  ];
+  return $row;
+}
+
+/**
+ * Report for scald authors.
+ */
+function mukurtu_migration_prep_report_scald_authors() {
+  $view = views_get_view('migration_scald_authors');
+  $view->execute();
+  $status = $view->total_rows <= 0 ? MUKURTU_MIGRATION_REPORT_STATUS_OK : MUKURTU_MIGRATION_REPORT_STATUS_WARNING;
+  $link = l(t('Details'), 'admin/reports/migration/migration-scald-authors');
+  $summary = $status == MUKURTU_MIGRATION_REPORT_STATUS_OK ? t('No Scald Authors terms found') : t('@count atom(s) use the Authors field: ', ['@count' => $view->total_rows]) . $link;
+
+  $row = [
+    'data' => [
+      t('Scald Authors Field'),
+      t('The Scald "Authors" (scald_authors) field will not be migrated to Mukurtu CMS v4'),
+      $summary,
+    ],
+    'class' => mukurtu_migration_prep_get_status_class($status),
+  ];
+  return $row;
+}
+

@@ -1,0 +1,32 @@
+diff --git a/modules/providers/scald_video/scald_video.module b/modules/providers/scald_video/scald_video.module
+index 6a5f86b..7e17c34 100644
+--- a/modules/providers/scald_video/scald_video.module
++++ b/modules/providers/scald_video/scald_video.module
+@@ -123,13 +123,24 @@ function scald_video_scald_prerender($atom, $context, $options, $mode) {
+   }
+
+   if ($mode == 'atom') {
++    //load context configuration to retrieve dimension data if present
++    $context_config = scald_context_config_load($context);
++    $video_width = (isset($atom->data['video_width']));
++    $video_height = (isset($atom->data['video_height']));
++    //allow context configuration to override video dimension variables
++    if(isset($context_config->data['width'])){
++      $video_width = $context_config->data['width'];
++    }
++    if(isset($context_config->data['height'])){
++      $video_height = $context_config->data['height'];
++    }
+     $atom->rendered->player = theme('scald_video_player',
+       array('vars' =>
+         array(
+           'atom'          => $atom,
+           'video_sources' => $video_sources,
+-          'video_width'   => check_plain($atom->data['video_width']),
+-          'video_height'  => check_plain($atom->data['video_height']),
++          'video_width'   => $video_width,
++          'video_height'  => $video_height,
+           'thumbnail'     => $atom->thumbnail_source,
+           'class'         => 'scald_video',
+           'context'       => $context,
+         ),

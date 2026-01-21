@@ -1,0 +1,25 @@
+From f7e5bc15a13aede9df7ac6fd6af7dc3f2413d02a Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Tue, 25 Apr 2023 16:55:31 -0700
+Subject: [PATCH] PHP 8 deprecation fix
+
+---
+ .../contrib/owlcarousel/modules/ui/owlcarousel_ui.admin.inc     | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/ui/owlcarousel_ui.admin.inc b/modules/ui/owlcarousel_ui.admin.inc
+index 00d2453b..ab420e13 100755
+--- a/modules/ui/owlcarousel_ui.admin.inc
++++ b/modules/ui/owlcarousel_ui.admin.inc
+@@ -513,7 +513,7 @@ function owlcarousel_create_instance_settings($instance, $variables) {
+ /** 
+  * Menu callback, delete Owl Carousel instance settings.
+  */
+-function owlcarousel_delete_instance_settings($id = NULL, $js) {
++function owlcarousel_delete_instance_settings($id = NULL, $js = NULL) {
+   $message = t('Settings group @id could not be found.', array('@id' => $id));
+ 
+   if ($id) {
+-- 
+2.34.1
+

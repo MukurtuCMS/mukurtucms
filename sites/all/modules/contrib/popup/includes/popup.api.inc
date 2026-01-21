@@ -239,7 +239,7 @@ function popup_element($title, $body, $attributes = array()){
     unset($attributes['ajax']);
   }
 
-  $popup_body = (count(trim($body)) || $attributes['empty-body'] == 'all')
+  $popup_body = (strlen(trim($body)) || $attributes['empty-body'] == 'all')
     ? theme(
         'popup-element-body' . $style_suffix,
         array(

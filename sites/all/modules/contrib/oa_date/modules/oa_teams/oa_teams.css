@@ -1,0 +1,43 @@
+.view-oa-team-list h3 {
+  font-size: 14px;
+  margin-left: -15px;
+  margin-right: -15px;
+  padding-left: 15px;
+  padding-top: 8px;
+  padding-bottom: 3px;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.view-oa-team-list h3 a {
+  color: #777;
+  text-transform: uppercase;
+  font-weight: normal;
+}
+
+.view-oa-team-list .user-badge {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  border-radius: 5px;
+  border: 1px solid #e0e0e0;
+  height: 26px;
+  vertical-align: middle;
+  padding: 2px 5px 2px 3px;
+  font-size: 12px;
+  background-color: #f5f6f7;
+}
+
+.view-oa-team-list .user-badge > div {
+  display: inline-block;
+}
+
+.view-oa-team-list .user-badge .username {
+  display: inline-block;
+  margin-top: 3px;
+}
+
+.view-oa-team-list .user-badge img {
+  width: 20px;
+  margin-right: 5px;
+}

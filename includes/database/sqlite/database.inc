@@ -107,9 +107,21 @@ class DatabaseConnection_sqlite extends DatabaseConnection {
     $this->sqliteCreateFunction('substring_index', array($this, 'sqlFunctionSubstringIndex'), 3);
     $this->sqliteCreateFunction('rand', array($this, 'sqlFunctionRand'));
 
+    // Enable the Write-Ahead Logging (WAL) option for SQLite if supported.
+    // @see https://www.drupal.org/node/2348137
+    // @see https://sqlite.org/wal.html
+    if (version_compare($version, '3.7') >= 0) {
+      $connection_options += array(
+        'init_commands' => array(),
+      );
+      $connection_options['init_commands'] += array(
+        'wal' => "PRAGMA journal_mode=WAL",
+      );
+    }
+
     // Execute sqlite init_commands.
     if (isset($connection_options['init_commands'])) {
-      $this->exec(implode('; ', $connection_options['init_commands']));
+      $this->connection->exec(implode('; ', $connection_options['init_commands']));
     }
   }
 
@@ -122,16 +134,19 @@ class DatabaseConnection_sqlite extends DatabaseConnection {
    */
   public function __destruct() {
     if ($this->tableDropped && !empty($this->attachedDatabases)) {
+      if (!is_array($this->attachedDatabases)) {
+        throw new UnexpectedValueException();
+      }
       foreach ($this->attachedDatabases as $prefix) {
         // Check if the database is now empty, ignore the internal SQLite tables.
         try {
           $count = $this->query('SELECT COUNT(*) FROM ' . $prefix . '.sqlite_master WHERE type = :type AND name NOT LIKE :pattern', array(':type' => 'table', ':pattern' => 'sqlite_%'))->fetchField();
 
           // We can prune the database file if it doesn't have any tables.
-          if ($count == 0) {
-            // Detach the database.
-            $this->query('DETACH DATABASE :schema', array(':schema' => $prefix));
-            // Destroy the database file.
+          if ($count == 0 && $this->connectionOptions['database'] != ':memory:') {
+            // Detaching the database fails at this point, but no other queries
+            // are executed after the connection is destructed so we can simply
+            // remove the database file.
             unlink($this->connectionOptions['database'] . '-' . $prefix);
           }
         }
@@ -141,6 +156,18 @@ class DatabaseConnection_sqlite extends DatabaseConnection {
         }
       }
     }
+  }
+
+  /**
+   * Gets all the attached databases.
+   *
+   * @return array
+   *   An array of attached database names.
+   *
+   * @see DatabaseConnection_sqlite::__construct().
+   */
+  public function getAttachedDatabases() {
+    return $this->attachedDatabases;
   }
 
   /**
@@ -235,7 +262,7 @@ class DatabaseConnection_sqlite extends DatabaseConnection {
    * expose this function to the world.
    */
   public function PDOPrepare($query, array $options = array()) {
-    return parent::prepare($query, $options);
+    return $this->connection->prepare($query, $options);
   }
 
   public function queryRange($query, $from, $count, array $args = array(), array $options = array()) {
@@ -326,7 +353,7 @@ class DatabaseConnection_sqlite extends DatabaseConnection {
       }
     }
     if ($this->supportsTransactions()) {
-      PDO::rollBack();
+      $this->connection->rollBack();
     }
   }
 
@@ -341,7 +368,7 @@ class DatabaseConnection_sqlite extends DatabaseConnection {
       throw new DatabaseTransactionNameNonUniqueException($name . " is already in use.");
     }
     if (!$this->inTransaction()) {
-      PDO::beginTransaction();
+      $this->connection->beginTransaction();
     }
     $this->transactionLayers[$name] = $name;
   }
@@ -366,9 +393,9 @@ class DatabaseConnection_sqlite extends DatabaseConnection {
         // If there was any rollback() we should roll back whole transaction.
         if ($this->willRollback) {
           $this->willRollback = FALSE;
-          PDO::rollBack();
+          $this->connection->rollBack();
         }
-        elseif (!PDO::commit()) {
+        elseif (!$this->connection->commit()) {
           throw new DatabaseTransactionCommitFailedException();
         }
       }
@@ -376,6 +403,14 @@ class DatabaseConnection_sqlite extends DatabaseConnection {
         break;
       }
     }
+  }
+
+  public function utf8mb4IsActive() {
+    return TRUE;
+  }
+
+  public function utf8mb4IsSupported() {
+    return TRUE;
   }
 
 }

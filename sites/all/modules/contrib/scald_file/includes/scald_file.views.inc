@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Adds filesize field to views
+ * Adds filesize field to views.
  */
 
 /**

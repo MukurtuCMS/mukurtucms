@@ -217,7 +217,7 @@ function _simpletest_batch_finished($success, $results, $operations, $elapsed) {
     $test_id = $operations[0][1][1];
 
     // Retrieve the last database prefix used for testing and the last test
-    // class that was run from. Use the information to read the lgo file
+    // class that was run from. Use the information to read the log file
     // in case any fatal errors caused the test to crash.
     list($last_prefix, $last_test_class) = simpletest_last_test_get($test_id);
     simpletest_log_read($test_id, $last_prefix, $last_test_class);
@@ -325,7 +325,7 @@ function simpletest_test_get_all() {
       $groups = $cache->data;
     }
     else {
-      // Select all clases in files ending with .test.
+      // Select all classes in files ending with .test.
       $classes = db_query("SELECT name FROM {registry} WHERE type = :type AND filename LIKE :name", array(':type' => 'class', ':name' => '%.test'))->fetchCol();
 
       // Also discover PSR-0 test classes, if the PHP version allows it.
@@ -374,7 +374,10 @@ function simpletest_test_get_all() {
           // If this test class requires a non-existing module, skip it.
           if (!empty($info['dependencies'])) {
             foreach ($info['dependencies'] as $module) {
-              if (!drupal_get_filename('module', $module)) {
+              // Pass FALSE as fourth argument so no error gets created for
+              // the missing file.
+              $found_module = drupal_get_filename('module', $module, NULL, FALSE);
+              if (!$found_module) {
                 continue 2;
               }
             }
@@ -489,7 +492,7 @@ function _simpletest_autoload_psr4_psr0($class) {
  * Implements hook_registry_files_alter().
  *
  * Add the test files for disabled modules so that we get a list containing
- * all the avialable tests.
+ * all the available tests.
  */
 function simpletest_registry_files_alter(&$files, $modules) {
   foreach ($modules as $module) {
@@ -560,7 +563,7 @@ function simpletest_clean_environment() {
  * Removed prefixed tables from the database that are left over from crashed tests.
  */
 function simpletest_clean_database() {
-  $tables = db_find_tables(Database::getConnection()->prefixTables('{simpletest}') . '%');
+  $tables = db_find_tables_d8(Database::getConnection()->prefixTables('{simpletest}') . '%');
   $schema = drupal_get_schema_unprocessed('simpletest');
   $count = 0;
   foreach (array_diff_key($tables, $schema) as $table) {
@@ -589,7 +592,8 @@ function simpletest_clean_temporary_directories() {
     $files = scandir('public://simpletest');
     foreach ($files as $file) {
       $path = 'public://simpletest/' . $file;
-      if (is_dir($path) && is_numeric($file)) {
+      // Ensure that cache directories are cleaned as well.
+      if (is_dir($path) && (is_numeric($file) || strpos($file, '1c') === 0)) {
         file_unmanaged_delete_recursive($path);
         $count++;
       }

@@ -1,0 +1,74 @@
+<?php
+
+/**
+ * @file
+ * A class for testing the plugin API.
+ */
+
+/**
+ * Test the plugin API.
+ */
+class BeanTestPlugins extends BeanSetup {
+
+  /**
+   * Define this test.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Bean Plugin',
+      'description' => 'Test the bean plugin API.',
+      'group' => 'Bean',
+    );
+  }
+
+  /**
+   * Test loading of the plugin.
+   */
+  function testBeanLoadPlugin() {
+    // Load the class.
+    $plugin_class = bean_load_plugin_class('test_bean');
+    $plugin_class_name = get_class($plugin_class);
+
+    // Plugin should be implement the BeanTypePluginInterface interface.
+    if (bean_check_plugin_class($plugin_class_name)) {
+      $this->pass(t('Bean type should use the BeanTypePluginInterface interface'));
+    }
+    else {
+      $this->fail(t('Bean type should use the BeanTypePluginInterface interface'));
+    }
+
+    // Verify that a bean plugin with an invalid class does not load.
+    $this->assertFalse(bean_load_plugin_class('test_no_bean'), t('Bean type should not load with an invalid class'));
+    $this->assertFalse(bean_load_plugin_class('test_wrong_class'), t('Bean type should not load with an invalid class'));
+  }
+
+  /**
+   * Verity that the correct links appear.
+   */
+  function testBeanTypeLinks() {
+    $this->drupalGet('block/add');
+    // Verify the block add pages exists.
+    $this->assertResponse(200, t('Block Add Page is accessible'));
+
+    // There should 2 plugins links.
+    $this->assertLinkByHref('block/add/test-bean', 0, t('A link to the bean add for each type should exist'));
+    $this->assertLinkByHref('block/add/test-bean-2', 0, t('A link to the bean add for each type should exist'));
+    $this->assertNoLinkByHref('block/add/test-no-bean', t('A link to an invalid bean type should not exist'));
+    $this->assertNoLinkByHref('block/add/test-wrong-class', t('A link to an invalid bean type should not exist'));
+  }
+
+  /**
+   * Test the bean form.
+   */
+  function testBeanTypeForm() {
+    foreach (bean_get_types() as $type) {
+      $this->drupalGet("block/add/{$type->buildUrl()}");
+
+      // Verify the core fields are there
+      $this->assertFieldById('edit-label', '', t('Label exists on bean add form.'));
+      $this->assertFieldById('edit-title', '', t('Title exists on bean add form.'));
+      $this->assertFieldById('edit-view-mode', '', t('View Mode exists on bean add form.'));
+    }
+  }
+
+}

@@ -1,0 +1,25 @@
+/* This css is loaded for Media Browser popups */
+/* It tweaks some of the theming from Panopoly for Bootstrap */
+
+.form-item.checkbox label,
+.form-item.radio label {
+  padding: 0 5px 0 20px;
+}
+
+.media-item .label-wrapper {
+  bottom: 0px;
+  position: absolute;
+}
+
+.media-item .label-wrapper label {
+  padding: 0;
+}
+
+.media-thumbnail {
+  height: 100px;
+  padding-bottom: 20px;
+}
+
+#media-browser-tabset .views-exposed-form .views-submit-button {
+  margin-top: 0;
+}

@@ -1,0 +1,114 @@
+.node-type-dictionary-word {
+    h1.page-header {
+        background: none;
+    }
+}
+
+.dictionary-word-entry-field {
+    padding-left: 25px;
+}
+
+.paragraphs-item-dictionary-word-bundle.view-mode-full {
+    // Tablet
+    @media (min-width: @screen-sm-min) {
+        .dictionary-word-entry-left-brick {
+            padding-right: 0px;
+        }
+
+        .dictionary-word-entry-right-brick {
+            padding-left: 0px;
+        }
+    }
+
+    .field {
+        padding-bottom: 20px;
+        font-family: @font-family-sans-serif-light;
+
+        .label-above {
+            background-color: @mukurtu-dictionary-word-label-background-color;
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: @mukurtu-expanded-letter-spacing;
+            padding: 5px 5px 5px 20px;
+            margin-bottom: 10px;
+        }
+
+        a {
+            .mukurtu-standard-link;
+        }
+    }
+
+    .field-name-field-alternate-spelling {
+        background-color: @brand-primary;
+        color: @mukurtu-dictionary-term-title-full-color;
+        margin-bottom: 30px;
+        padding: 5px 5px 5px 20px;
+
+        font-size: 30px;
+        // Desktop
+        @media (min-width: @screen-md-min) {
+            font-size: 44px;
+        }
+
+        // Triangle accent
+        &::after {
+            content : "";
+            display: inline-block;
+            position: absolute;
+            left: 40px;
+            top: 28px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 24px 0 24px 27px;
+            border-color: transparent transparent transparent @brand-primary;
+            z-index: -1;
+
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                top: 48px;
+            }
+        }
+    }
+
+    .field-name-field-translation {
+        .dictionary-word-entry-field;
+        font-weight: bold;
+        font-size: 17px;
+
+        // Desktop
+        @media (min-width: @screen-md-min) {
+            font-size: 22px;
+        }
+    }
+
+    .field-name-field-contributor {
+        padding-left: 10px;
+        .flex-center;
+    }
+
+    .sample-sentence {
+        padding-bottom: 10px;
+        font-weight: bold;
+        font-style: italic;
+        font-size: 17px;
+
+        // Desktop
+        @media (min-width: @screen-md-min) {
+            font-size: 18px;
+        }
+    }
+}
+
+
+.node-dictionary-word.view-mode-full {
+    // Left column and botttom only
+    .col-sm-8, .col-sm-12 {
+        .field {
+            .label-above {
+                .metadata-primary-field-label;
+            }
+        }
+    }
+}

@@ -1,0 +1,5 @@
+This module allows Mail Comment to act on messages sent by Message Notify.
+
+By default, this module will NOT work on any message types. You must specifically allow it to work on each message type. To do this, edit a message type, and check the box that allows replies by email.
+
+Note that this module assumes that messages for comments have a 'field_comment_ref' field, and messages for nodes have a 'field_node_ref' field.

@@ -1,0 +1,295 @@
+// Dictionary Browse
+.page-dictionary {
+    // No top level shadow divider
+    .page-header {
+        background: none;
+    }
+
+    .dictionary-facets {
+        .fullwidth;
+        background: @mukurtu-dictionary-facets-pane-background-color;
+    }
+
+    .dictionary-facets-region {
+        margin: auto;
+        float: none;
+
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            width: 83%;
+        }
+
+        .panel-pane {
+            padding: 10px 15px 10px 15px;
+        }
+
+        // Facet Dropdowns
+        .dropdown {
+            button {
+                .chevron-dropdown;
+                height: 60px;
+                width: 100%;
+                color: @text-color;
+                background-color: @mukurtu-navbar-collapse-bg;
+                border-color: @mukurtu-navbar-collapse-bg;
+                text-align: left;
+            }
+
+            &:hover,
+            &.open,
+            &.open:hover,
+            &.open:focus,
+            &.open > .dropdown-toggle.btn-primary:focus {
+                color: @text-color;
+                background-color: @mukurtu-navbar-collapse-bg;
+            }
+        }
+
+        .dropdown-menu {
+            width: 100%;
+            color: @text-color;
+            background-color: @mukurtu-navbar-collapse-bg;
+
+            ul {
+                padding-left: 10px;
+
+                li {
+                    list-style-type: none;
+
+                    a {
+                        .mukurtu-standard-link;
+
+                        &.facetapi-checkbox {
+                            padding-left: 5px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Exposed fiew form, text search
+    .pane-views-exp-dictionary-words-all {
+        // Hide title
+        .pane-title {
+            display: none;
+        }
+
+        // Hide label
+        #edit-search-api-views-fulltext-wrapper {
+            padding: 10px 15px 10px 15px;
+            clear: left;
+
+            label {
+                display: none;
+            }
+        }
+
+        .views-exposed-widget {
+            padding: 10px 15px 10px 15px;
+
+            .views-widget {
+                height: 60px;
+            }
+
+            // Submit/Reset buttons
+            input,
+            button,
+            .btn {
+                height: 60px;
+                width: 100%;
+                margin-top: 0px;
+            }
+
+            // Reset
+            &.views-reset-button {
+                .btn {
+                    color: @mukurtu-dictionary-facets-pane-contrast-color;
+                    line-height: 47px;
+                    font-weight: normal;
+                    font-size: 20px;
+                    text-transform: uppercase;
+                    letter-spacing: @mukurtu-expanded-letter-spacing;
+                    background-color: @mukurtu-dictionary-facets-pane-background-color;
+                    border-color: #fff;
+                }
+            }
+
+            .views-submit-button {
+                padding: 0px 12px 0px 8px;
+            }
+
+            // Search Text box
+            #edit-search-api-views-fulltext {
+                background-color: #fff;
+            }
+
+            // Search
+            #edit-submit-dictionary-words {
+                font-size: 20px;
+                background-color: @mukurtu-dictionary-facets-pane-contrast-color;
+                text-transform: uppercase;
+                font-weight: bold;
+            }
+        }
+
+    }
+
+    // A-Z glossary facet
+    .facet-glossary {
+        padding-top: 30px;
+        padding-bottom: 30px;
+        >a {
+            display: none;
+        }
+
+        .pane-content {
+            background: none;
+        }
+
+        .facetapi-search-api-glossary {
+            width: 100%;
+
+            // Tablet
+            @media (min-width: @screen-sm-min) {
+                display: table;
+            }
+
+            // Don't display glossary letters that aren't clickable, on small screens
+            .no-content {
+                display: none;
+
+                // Tablet
+                @media (min-width: @screen-sm-min) {
+                    display: table-cell;
+                }
+            }
+
+            .active {
+                font-weight: bold;
+                color: @text-color;
+            }
+
+            li {
+                display: inline;
+                // Tablet
+                @media (min-width: @screen-sm-min) {
+                    display: table-cell;
+                    width: 1%;
+                }
+
+                a {
+                    .mukurtu-standard-link;
+                    font-weight: bold;
+                    font-size: 17px;
+                }
+            }
+        }
+    }
+}
+
+.view-dictionary-words {
+    width: 100%;
+
+    .views-row-odd {
+        clear: left;
+    }
+}
+
+.node-dictionary-word.view-mode-full {
+    .field-name-field-additional-media {
+        .label-above {
+            background-color: @mukurtu-dictionary-word-label-background-color;
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: @mukurtu-expanded-letter-spacing;
+            padding: 5px 5px 5px 20px;
+            margin-bottom: 10px;
+        }
+
+        a {
+            .mukurtu-standard-link;
+        }
+    }
+}
+
+.node-dictionary-word.view-mode-dictionary_word_summary {
+    .field-name-field-word-entry {
+        div.paragraphs-item-dictionary-word-bundle {
+            // Hide additional entries
+            display: none;
+            margin-bottom: @grid-gutter-width;
+            background-color: @mukurtu-navbar-collapse-bg;
+            padding-bottom: 30px;
+
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                height: 290px;
+            }
+
+            .field {
+                padding-left: 10px;
+                padding-top: 10px;
+
+                // Tablet
+                @media (min-width: @screen-sm-min) {
+                    padding-left: 30px;
+                }
+            }
+
+            .field-name-field-alternate-spelling {
+                .primary-color-link-container;
+                .chevron-right-middle-contrast;
+                background-size: 18px;
+                height: 68px;
+                padding: 0px 0px 0px 10px;
+
+                a {
+                    .font-light;
+                    display: inherit;
+                    font-size: 26px;
+                    color: @mukurtu-dictionary-term-title-color;
+                    padding-left: 20px;
+                    line-height: 68px;
+                }
+            }
+
+            .field-name-field-translation {
+                font-weight: bold;
+                font-size: 20px;
+            }
+
+            .field-name-field-dictionary-word-recording {
+                .field-label {
+                    .font-light;
+                    font-size: 17px;
+                }
+
+                .field-item {
+                    padding-right: 30px;
+                    .group-left {
+                        width: 80%;
+                    }
+                }
+            }
+        }
+
+        // Show first entry
+        div:first-of-type {
+            display: block;
+        }
+    }
+}
+
+.node-dictionary-word.view-mode-featured_content {
+    .field-name-featured-content-type {
+        padding-top: 60px;
+    }
+
+    .field-name-field-word-entry {
+        .row {
+            margin: auto;
+        }
+    }
+}

@@ -32,11 +32,14 @@ function theme_module_filter_system_modules_tabs($variables) {
   }
 
   $header = array(
-    t('Enabled'),
-    t('Name'),
-    t('Version'),
-    t('Description')
+    array('data' => '', 'class' => array('checkbox')),
+    array('data' => t('Name'), 'class' => array('name')),
+    array('data' => t('Description'), 'class' => array('description')),
+    array('data' => t('Links'), 'class' => array('links')),
   );
+  if (variable_get('module_filter_version_column', 0)) {
+    array_splice($header, 2, 0, array(array('data' => t('Version'), 'class' => array('version'))));
+  }
   $package_ids = array('all');
   $enabled['all'] = array();
 
@@ -79,6 +82,11 @@ function theme_module_filter_system_modules_tabs($variables) {
       }
 
       $row = array();
+
+      $version = !empty($module['version']['#markup']);
+      $requires = !empty($module['#requires']);
+      $required_by = !empty($module['#required_by']);
+
       $toggle_enable = '';
       if (isset($module['enable']['#type']) && $module['enable']['#type'] == 'checkbox') {
         unset($module['enable']['#title']);
@@ -89,26 +97,39 @@ function theme_module_filter_system_modules_tabs($variables) {
         $toggle_enable = '<div class="js-hide toggle-enable ' . $class . '"><div>&nbsp;</div></div>';
       }
       $row[] = array('class' => array('checkbox'), 'data' => $toggle_enable . drupal_render($module['enable']));
+
       $label = '<label';
       if (isset($module['enable']['#id'])) {
         $label .= ' for="' . $module['enable']['#id'] . '"';
       }
-      $row[] = array('class' => array('name'), 'data' => $label . '><strong>' . drupal_render($module['name']) . '</strong><br><span class="module-machine-name">(' . $key . ')</span></label>');
-      $row[] = array('class' => array('version'), 'data' => drupal_render($module['version']));
-      // Add the description, along with any modules it requires and any
-      // operation links.
-      $description = drupal_render($module['description']);
-      if ($module['#requires']) {
-        $description .= '<div class="admin-requirements">' . t('Requires: !module-list', array('!module-list' => implode(', ', $module['#requires']))) . '</div>';
+      $row[] = array('class' => array('name'), 'data' => $label . '><strong>' . drupal_render($module['name']) . '</strong> <span class="module-machine-name">(' . $key . ')</span></label>');
+
+      if (variable_get('module_filter_version_column', 0) && $version) {
+        $row[] = array('class' => array('version'), 'data' => drupal_render($module['version']));
       }
-      if ($module['#required_by']) {
-        $description .= '<div class="admin-requirements">' . t('Required by: !module-list', array('!module-list' => implode(', ', $module['#required_by']))) . '</div>';
+
+      // Add the description, along with any modules it requires.
+      if (empty($module['description']['#markup'])) {
+        $module['description']['#markup'] = '<em>' . t('No description available.') . '</em>';
       }
+      $description = '<span class="details"><span class="text">' . drupal_render($module['description']) . '</span></span>';
+      if ($requires || $required_by || (!variable_get('module_filter_version_column', 0) && $version)) {
+        $description .= '<div class="requirements">';
+        if (!variable_get('module_filter_version_column', 0) && $version) {
+          $description .= '<div class="admin-requirements">' . t('Version: !module-version', array('!module-version' => drupal_render($module['version']))) . '</div>';
+        }
+        if ($requires) {
+          $description .= '<div class="admin-requirements">' . t('Requires: !module-list', array('!module-list' => implode(', ', $module['#requires']))) . '</div>';
+        }
+        if ($required_by) {
+          $description .= '<div class="admin-requirements">' . t('Required by: !module-list', array('!module-list' => implode(', ', $module['#required_by']))) . '</div>';
+        }
+        $description .= '</div>';
+      }
+      $row[] = array('data' => '<div class="inner expand" role="button">' . $description . '</div>', 'class' => array('description'));
+
       $operations = (module_exists('ctools')) ? theme('module_filter_operations', array('links' => $module['links'], 'dropbutton' => TRUE)) : theme('module_filter_operations', array('links' => $module['links']));
-      if (!empty($operations)) {
-        $description .= $operations;
-      }
-      $row[] = array('data' => $description, 'class' => array('description'));
+      $row[] = array('data' => '<div class="links">' . $operations . '</div>', 'class' => array('links'));
 
       $class = array(module_filter_get_id($package) . '-tab', 'module', $stripe);
       if (isset($recent_modules[$key])) {
@@ -125,21 +146,20 @@ function theme_module_filter_system_modules_tabs($variables) {
     $form['modules'][$package]['#printed'] = TRUE;
   }
 
-  if (variable_get('module_filter_count_enabled', 1)) {
-    $enabled_counts = array();
-    foreach ($enabled as $package_id => $value) {
-      $enabled_counts[$package_id] = array(
-        'enabled' => count(array_filter($value)),
-        'total' => count($value),
-      );
-    }
-    drupal_add_js(array(
-      'moduleFilter' => array(
-        'packageIDs' => $package_ids,
-        'enabledCounts' => $enabled_counts,
-      )
-    ), 'setting');
+  //Get packages and count number of modules
+  $enabled_counts = array();
+  foreach ($enabled as $package_id => $value) {
+    $enabled_counts[$package_id] = array(
+      'enabled' => count(array_filter($value)),
+      'total' => count($value),
+    );
   }
+  drupal_add_js(array(
+    'moduleFilter' => array(
+      'packageIDs' => $package_ids,
+      'enabledCounts' => $enabled_counts,
+    )
+  ), 'setting');
 
   // Add first and last class to rows.
   $rows[0]['class'][] = 'first';
@@ -154,25 +174,34 @@ function theme_module_filter_system_modules_tabs($variables) {
   return $output;
 }
 
+/**
+ * Theme function for module filter operations.
+ * @param $variables
+ * @return
+ *   HTML for admin status operations.
+ */
 function theme_module_filter_operations(&$vars) {
   $links = &$vars['links'];
   $dropbutton = $vars['dropbutton'];
 
   $operations = array();
-  foreach (array('configure', 'permissions', 'help') as $key) {
+  foreach (element_children($links) as $key) {
     if ($dropbutton) {
       hide($links[$key]);
       if (!empty($links[$key]['#href'])) {
-        $operations[] = array(
+        $operations[$key] = array(
           'title' => $links[$key]['#title'],
           'href' => $links[$key]['#href'],
         );
+        if (isset($links[$key]['#options'])) {
+          $operations[$key] += $links[$key]['#options'];
+        }
       }
     }
     else {
       $data = drupal_render($links[$key]);
       if (!empty($data)) {
-        $operations[] = array('data' => $data);
+        $operations[$key] = array('data' => $data);
       }
     }
   }

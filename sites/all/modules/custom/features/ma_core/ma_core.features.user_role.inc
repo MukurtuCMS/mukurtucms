@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_core.features.user_role.inc

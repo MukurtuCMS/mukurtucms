@@ -70,7 +70,7 @@ function og_field_widget_form(&$form, &$form_state, $field, $instance, $langcode
   }
 
   $target_type = $field['settings']['target_type'];
-  $user_gids = og_get_entity_groups();
+  $user_gids = og_get_entity_groups('user', NULL, array(OG_STATE_ACTIVE, OG_STATE_PENDING));
   $user_gids = !empty($user_gids[$target_type]) ? $user_gids[$target_type] : array();
 
   // Get the "Other group" group IDs.
@@ -344,6 +344,10 @@ function og_complex_widget_after_build($form, &$form_state) {
     unset($form[$field_name][LANGUAGE_NONE]['#theme']);
     unset($form[$field_name][LANGUAGE_NONE]['add_more']);
     unset($form[$field_name][LANGUAGE_NONE][0]['_weight']);
+
+    if ($form[$field_name][LANGUAGE_NONE]['#required']) {
+      $form[$field_name][LANGUAGE_NONE]['#title'] .= ' ' . theme('form_required_marker', array());
+    }
 
     if (!empty($form[$field_name][LANGUAGE_NONE][0]['admin'])) {
       // Wrap both elements with a fieldset.

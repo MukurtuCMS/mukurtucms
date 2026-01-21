@@ -8,7 +8,7 @@
 // TODO: fix being embedded in a host with revisions.
 
 /**
- * Field collection item view page.
+ * Field Collection item view page.
  */
 function field_collection_item_page_view($field_collection_item) {
   // @todo: Set breadcrumb including the host.
@@ -30,7 +30,8 @@ function field_collection_item_form($form, &$form_state, $field_collection_item)
   // @todo: Fix core and remove the hack.
   $form['field_name'] = array('#type' => 'value', '#value' => $field_collection_item->field_name);
 
-  field_attach_form('field_collection_item', $field_collection_item, $form, $form_state);
+  $langcode = entity_language('field_collection_item', $field_collection_item);
+  field_attach_form('field_collection_item', $field_collection_item, $form, $form_state, $langcode);
 
   $form['actions'] = array('#type' => 'actions', '#weight' => 50);
   $form['actions']['submit'] = array(
@@ -85,7 +86,7 @@ function field_collection_item_delete_confirm($form, &$form_state, $field_collec
  */
 function field_collection_item_delete_confirm_submit($form, &$form_state) {
   $field_collection_item = $form_state['field_collection_item'];
-  $field_collection_item->deleteRevision();
+  entity_delete('field_collection_item', $field_collection_item->item_id);
   drupal_set_message(t('%label has been deleted.', array('%label' => drupal_ucfirst($field_collection_item->label()))));
   $form_state['redirect'] = '<front>';
 }
@@ -114,10 +115,10 @@ function field_collection_item_add($field_name, $entity_type, $entity_id, $revis
 
   // Check field cardinality.
   $field = field_info_field($field_name);
-  $langcode = LANGUAGE_NONE;
+  $langcode = !empty($field['translatable']) ? entity_language($entity_type, $entity) : LANGUAGE_NONE;
+
   if (!($field['cardinality'] == FIELD_CARDINALITY_UNLIMITED || !isset($entity->{$field_name}[$langcode]) || count($entity->{$field_name}[$langcode]) < $field['cardinality'])) {
-    drupal_set_message(t('Too many items.'), 'error');
-    return '';
+    return MENU_ACCESS_DENIED;
   }
 
   $field_collection_item = entity_create('field_collection_item', array('field_name' => $field_name));
@@ -125,14 +126,14 @@ function field_collection_item_add($field_name, $entity_type, $entity_id, $revis
   // as during the form-workflow we have multiple field collection item entity
   // instances, which we don't want link all with the host.
   // That way the link is going to be created when the item is saved.
-  $field_collection_item->setHostEntity($entity_type, $entity, LANGUAGE_NONE, FALSE);
+  $field_collection_item->setHostEntity($entity_type, $entity, $langcode, FALSE);
 
   $label = $field_collection_item->translatedInstanceLabel();
-  $title = ($field['cardinality'] == 1) ? $label : t('Add new !instance_label', array('!instance_label' => $label));
+  $title = $field['cardinality'] == 1 ? $label : t('Add new !instance_label', array('!instance_label' => $label));
   drupal_set_title($title);
 
   // Make sure the current user has access to create a field collection item.
-  if (!field_collection_item_access('create', $field_collection_item)) {
+  if (!entity_access('create', 'field_collection_item', $field_collection_item)) {
     return MENU_ACCESS_DENIED;
   }
   return drupal_get_form('field_collection_item_form', $field_collection_item);

@@ -11,7 +11,15 @@ entity CRUD controller, which helps simplifying the creation of new entity types
 This is an API module. You only need to enable it if a module depends on it or
 you are interested in using it for development.
 
-This README is for interested developers. If you are not interested in
+Advanced usage:
+---------------
+You can optimize cache clearing performance by setting the variable
+'entity_rebuild_on_flush' to FALSE. This skips rebuilding of feature
+components and exported entities during cache flushing. Instead, it is triggered
+by the features module only; e.g., when features are reverted.
+
+
+The README below is for interested developers. If you are not interested in
 developing, you may stop reading now.
 
 --------------------------------------------------------------------------------
@@ -76,7 +84,7 @@ developing, you may stop reading now.
     To see how to provide a separate class have a look at the "EntityClass" from
     the "entity_test.module".
 
-  * Implement hook_entity_info() for your entity. At least specifiy the
+  * Implement hook_entity_info() for your entity. At least specify the
     controller class (EntityAPIController, EntityAPIControllerExportable or your
     own), your db table and your entity's keys.
     Again just look at "entity_test.module"'s hook_entity_info() for guidance.

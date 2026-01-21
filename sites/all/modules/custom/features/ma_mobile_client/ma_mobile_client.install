@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function ma_mobile_client_install() {
+  ma_mobile_client_set_default_types();
+}
+
+/**
+ * Update the default Mukurtu Mobile content types.
+ */
+function ma_mobile_client_update_7102() {
+  ma_mobile_client_set_default_types();
+}

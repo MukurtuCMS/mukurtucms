@@ -8,19 +8,39 @@
 define('LINK_EXTERNAL', 'external');
 define('LINK_INTERNAL', 'internal');
 define('LINK_FRONT', 'front');
+define('LINK_FRAGMENT', 'fragment');
+define('LINK_QUERY', 'query');
 define('LINK_EMAIL', 'email');
+define('LINK_TEL', 'tel');
 define('LINK_NEWS', 'news');
-define('LINK_DOMAINS', 'aero|arpa|asia|biz|com|cat|coop|edu|gov|info|int|jobs|mil|museum|name|nato|net|org|pro|travel|mobi|local');
-
+define('LINK_FILE', 'file');
 define('LINK_TARGET_DEFAULT', 'default');
 define('LINK_TARGET_NEW_WINDOW', '_blank');
 define('LINK_TARGET_TOP', '_top');
 define('LINK_TARGET_USER', 'user');
+define('LINK_HTTP_PROTOCOL', 'http');
+define('LINK_HTTPS_PROTOCOL', 'https');
 
 /**
  * Maximum URLs length - needs to match value in link.install.
  */
 define('LINK_URL_MAX_LENGTH', 2048);
+
+/**
+ * Implements hook_help().
+ */
+function link_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#link':
+      $output = '<p><strong>' . t('About') . '</strong></p>';
+      $output .= '<p>' . t('The link provides a standard custom content field for links. Links can be easily added to any content types and profiles and include advanced validating and different ways of storing internal or external links and URLs. It also supports additional link text title, site wide tokens for titles and title attributes, target attributes, css class attribution, static repeating values, input conversion, and many more.') . '</p>';
+      $output .= '<p><strong>' . t('Requirements / Dependencies') . '</strong></p>';
+      $output .= '<p>' . 'Fields API is provided already by core [no dependencies].' . '</p>';
+      $output .= '<p><strong>Configuration</strong></p>';
+      $output .= '<p>' . 'Configuration is only slightly more complicated than a text field. Link text titles for URLs can be made required, set as instead of URL, optional (default), or left out entirely. If no link text title is provided, the trimmed version of the complete URL will be displayed. The target attribute should be set to "_blank", "top", or left out completely (checkboxes provide info). The rel=nofollow attribute prevents the link from being followed by certain search engines.' . '</p>';
+      return $output;
+  }
+}
 
 /**
  * Implements hook_field_info().
@@ -35,7 +55,7 @@ function link_field_info() {
         'url' => 0,
         'title' => 'optional',
         'title_value' => '',
-        'title_maxlength' => 128, //patch #1307788 from nmc
+        'title_maxlength' => 128,
         'enable_tokens' => 1,
         'display' => array(
           'url_cutoff' => 80,
@@ -46,12 +66,15 @@ function link_field_info() {
         'url' => 0,
         'title' => 'optional',
         'title_value' => '',
-        'title_maxlength' => 128, // patch #1307788 from nmc
+        'title_label_use_field_label' => FALSE,
+        'title_maxlength' => 128,
         'enable_tokens' => 1,
+        'convert_aliases' => 0,
         'display' => array(
           'url_cutoff' => 80,
         ),
         'validate_url' => 1,
+        'absolute_url' => 1,
       ),
       'default_widget' => 'link_field',
       'default_formatter' => 'link_default',
@@ -69,7 +92,14 @@ function link_field_instance_settings_form($field, $instance) {
   $form = array(
     '#element_validate' => array('link_field_settings_form_validate'),
   );
-  
+
+  $form['absolute_url'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Absolute URL'),
+    '#default_value' => isset($instance['settings']['absolute_url']) && ($instance['settings']['absolute_url'] !== '') ? $instance['settings']['absolute_url'] : TRUE,
+    '#description' => t('If checked, the URL will always render as an absolute URL.'),
+  );
+
   $form['validate_url'] = array(
     '#type' => 'checkbox',
     '#title' => t('Validate URL'),
@@ -89,6 +119,7 @@ function link_field_instance_settings_form($field, $instance) {
     'optional' => t('Optional Title'),
     'required' => t('Required Title'),
     'value' => t('Static Title'),
+    'select' => t('Selected Title'),
     'none' => t('No Title'),
   );
 
@@ -97,53 +128,74 @@ function link_field_instance_settings_form($field, $instance) {
     '#title' => t('Link Title'),
     '#default_value' => isset($instance['settings']['title']) ? $instance['settings']['title'] : 'optional',
     '#options' => $title_options,
-    '#description' => t('If the link title is optional or required, a field will be displayed to the end user. If the link title is static, the link will always use the same title. If <a href="http://drupal.org/project/token">token module</a> is installed, the static title value may use any other node field as its value. Static and token-based titles may include most inline XHTML tags such as <em>strong</em>, <em>em</em>, <em>img</em>, <em>span</em>, etc.'),
+    '#description' => t('If the link title is optional or required, a field will be displayed to the end user. If the link title is static, the link will always use the same title. If <a href="http://drupal.org/project/token">token module</a> is installed, the static title value may use any other entity field as its value. Static and token-based titles may include most inline XHTML tags such as <em>strong</em>, <em>em</em>, <em>img</em>, <em>span</em>, etc.'),
   );
 
   $form['title_value'] = array(
     '#type' => 'textfield',
-    '#title' => t('Static title'),
+    '#title' => t('Static or default title'),
     '#default_value' => isset($instance['settings']['title_value']) ? $instance['settings']['title_value'] : '',
-    '#description' => t('This title will always be used if &ldquo;Static Title&rdquo; is selected above.'),
+    '#description' => t('This title will 1) always be used if "Static Title" is selected above, or 2) used if "Optional title" is selected above and no title is entered when creating content.'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="instance[settings][title]"]' => array('value' => 'value'),
+      ),
+    ),
   );
 
-  $form['title_maxlength'] = array( // patch #1307788 from nmc
+  $form['title_allowed_values'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Title allowed values'),
+    '#default_value' => isset($instance['settings']['title_allowed_values']) ? $instance['settings']['title_allowed_values'] : '',
+    '#description' => t('When using "Selected Title", you can allow users to select the title from a limited set of values (eg. Home, Office, Other). Enter here all possible values that title can take, one value per line.'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="instance[settings][title]"]' => array('value' => 'select'),
+      ),
+    ),
+  );
+
+  $form['title_label_use_field_label'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use field label as the label for the title field'),
+    '#default_value' => isset($instance['settings']['title_label_use_field_label']) ? $instance['settings']['title_label_use_field_label'] : FALSE,
+    '#description' => t('If this is checked the field label will be hidden.'),
+  );
+
+  $form['title_maxlength'] = array(
     '#type' => 'textfield',
     '#title' => t('Max length of title field'),
     '#default_value' => isset($instance['settings']['title_maxlength']) ? $instance['settings']['title_maxlength'] : '128',
     '#description' => t('Set a maximum length on the title field (applies only if Link Title is optional or required).  The maximum limit is 255 characters.'),
     '#maxlength' => 3,
     '#size' => 3,
-    );
+  );
 
   if (module_exists('token')) {
-    // Add token module replacements fields
-    $form['tokens'] = array(
-      '#type' => 'fieldset',
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
-      '#title' => t('Placeholder tokens'),
-      '#description' => t("The following placeholder tokens can be used in both paths and titles. When used in a path or title, they will be replaced with the appropriate values."),
-    );
-    $token_type = array(
-      'theme' => 'token_tree',
-      'token_types' => array($instance['entity_type']),
-      'global_types' => TRUE,
-      'click_insert' => TRUE,
-      'recursion_limit' => 2,
-    );
-    $form['tokens']['help'] = array(
-      '#type' => 'markup',
-      '#markup' => theme('token_tree', $token_type),
-    );
-
+    // Add token module replacements fields.
     $form['enable_tokens'] = array(
       '#type' => 'checkbox',
       '#title' => t('Allow user-entered tokens'),
       '#default_value' => isset($instance['settings']['enable_tokens']) ? $instance['settings']['enable_tokens'] : 1,
-      '#description' => t('Checking will allow users to enter tokens in URLs and Titles on the node edit form. This does not affect the field settings on this page.'),
+      '#description' => t('Checking will allow users to enter tokens in URLs and Titles on the entity edit form. This does not affect the field settings on this page.'),
+    );
+
+    $entity_info = entity_get_info($instance['entity_type']);
+    $form['tokens_help'] = array(
+      '#theme' => 'token_tree',
+      '#token_types' => array($entity_info['token type']),
+      '#global_types' => TRUE,
+      '#click_insert' => TRUE,
+      '#dialog' => TRUE,
     );
   }
+
+  $form['convert_aliases'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Convert local aliases'),
+    '#default_value' => isset($instance['settings']['convert_aliases']) ? $instance['settings']['convert_aliases'] : '',
+    '#description' => t('If checked, a path alias is converted to the internal system path, the same way as when saving menu links.'),
+  );
 
   $form['display'] = array(
     '#tree' => TRUE,
@@ -154,18 +206,21 @@ function link_field_instance_settings_form($field, $instance) {
     '#default_value' => isset($instance['settings']['display']['url_cutoff']) ? $instance['settings']['display']['url_cutoff'] : '80',
     '#description' => t('If the user does not include a title for this link, the URL will be used as the title. When should the link title be trimmed and finished with an elipsis (&hellip;)? Leave blank for no limit.'),
     '#maxlength' => 3,
-   '#size' => 3,
+    '#size' => 3,
   );
 
+  // Target options. E.g. New window = target="_blank".
   $target_options = array(
     LINK_TARGET_DEFAULT => t('Default (no target attribute)'),
     LINK_TARGET_TOP => t('Open link in window root'),
     LINK_TARGET_NEW_WINDOW => t('Open link in new window'),
     LINK_TARGET_USER => t('Allow the user to choose'),
   );
+
   $form['attributes'] = array(
     '#tree' => TRUE,
   );
+
   $form['attributes']['target'] = array(
     '#type' => 'radios',
     '#title' => t('Link Target'),
@@ -175,16 +230,33 @@ function link_field_instance_settings_form($field, $instance) {
   $form['attributes']['rel'] = array(
     '#type' => 'textfield',
     '#title' => t('Rel Attribute'),
-    '#description' => t('When output, this link will have this rel attribute. The most common usage is <a href="http://en.wikipedia.org/wiki/Nofollow">rel=&quot;nofollow&quot;</a> which prevents some search engines from spidering entered links.'),
+    '#description' => t('When output, this link will have this rel attribute. The most common usage is <a href="http://en.wikipedia.org/wiki/Nofollow" target="blank">rel=&quot;nofollow&quot;</a> which prevents some search engines from spidering entered links.'),
     '#default_value' => empty($instance['settings']['attributes']['rel']) ? '' : $instance['settings']['attributes']['rel'],
     '#field_prefix' => 'rel = "',
     '#field_suffix' => '"',
     '#size' => 20,
   );
+  $rel_remove_options = array(
+    'default' => t('Keep rel as set up above (untouched/default)'),
+    'rel_remove_external' => t('Remove rel if given link is external'),
+    'rel_remove_internal' => t('Remove rel if given link is internal'),
+  );
+  $form['rel_remove'] = array(
+    '#type' => 'radios',
+    '#title' => t('Remove rel attribute automatically'),
+    '#default_value' => !isset($instance['settings']['rel_remove']) ? 'default' : $instance['settings']['rel_remove'],
+    '#description' => t('Turn on/off if rel attribute should be removed automatically, if user given link is internal/external'),
+    '#options' => $rel_remove_options,
+  );
+  $form['attributes']['configurable_class'] = array(
+    '#title' => t("Allow the user to enter a custom link class per link"),
+    '#type' => 'checkbox',
+    '#default_value' => empty($instance['settings']['attributes']['configurable_class']) ? '' : $instance['settings']['attributes']['configurable_class'],
+  );
   $form['attributes']['class'] = array(
     '#type' => 'textfield',
     '#title' => t('Additional CSS Class'),
-    '#description' => t('When output, this link will have this class attribute. Multiple classes should be separated by spaces.'),
+    '#description' => t('When output, this link will have this class attribute. Multiple classes should be separated by spaces. Only alphanumeric characters and hyphens are allowed'),
     '#default_value' => empty($instance['settings']['attributes']['class']) ? '' : $instance['settings']['attributes']['class'],
   );
   $form['attributes']['configurable_title'] = array(
@@ -195,7 +267,7 @@ function link_field_instance_settings_form($field, $instance) {
   $form['attributes']['title'] = array(
     '#title' => t("Default link 'title' Attribute"),
     '#type' => 'textfield',
-    '#description' => t('When output, links will use this "title" attribute if the user does not provide one and when different from the link text. Read <a href="http://www.w3.org/TR/WCAG10-HTML-TECHS/#links">WCAG 1.0 Guidelines</a> for links comformances. Tokens values will be evaluated.'),
+    '#description' => t('When output, links will use this "title" attribute if the user does not provide one and when different from the link text. Read <a href="http://www.w3.org/TR/WCAG10-HTML-TECHS/#links" target="blank">WCAG 1.0 Guidelines</a> for links comformances. Tokens values will be evaluated.'),
     '#default_value' => empty($instance['settings']['attributes']['title']) ? '' : $instance['settings']['attributes']['title'],
     '#field_prefix' => 'title = "',
     '#field_suffix' => '"',
@@ -205,29 +277,34 @@ function link_field_instance_settings_form($field, $instance) {
 }
 
 /**
- * Validate the field settings form.
+ * Form validate.
+ *
+ * #element_validate handler for link_field_instance_settings_form().
  */
 function link_field_settings_form_validate($element, &$form_state, $complete_form) {
-  if ($form_state['values']['instance']['settings']['title'] === 'value'
-      && empty($form_state['values']['instance']['settings']['title_value'])) {
-    form_set_error('title_value', t('A default title must be provided if the title is a static value.'));
+  if ($form_state['values']['instance']['settings']['title'] === 'value' && empty($form_state['values']['instance']['settings']['title_value'])) {
+    form_set_error('instance][settings][title_value', t('A default title must be provided if the title is a static value.'));
   }
-  if (!empty($form_state['values']['instance']['settings']['display']['url_cutoff'])  // patch #1307788 from nmc
-      && !is_numeric($form_state['values']['instance']['settings']['display']['url_cutoff'])) {
+  if ($form_state['values']['instance']['settings']['title'] === 'select'
+    && empty($form_state['values']['instance']['settings']['title_allowed_values'])) {
+    form_set_error('instance][settings][title_allowed_values', t('You must enter one or more allowed values for link Title, the title is a selected value.'));
+  }
+  if (!empty($form_state['values']['instance']['settings']['display']['url_cutoff']) && !is_numeric($form_state['values']['instance']['settings']['display']['url_cutoff'])) {
     form_set_error('display', t('URL Display Cutoff value must be numeric.'));
   }
-  if (empty($form_state['values']['instance']['settings']['title_maxlength'])) {     // patch #1307788 from nmc
+  if (empty($form_state['values']['instance']['settings']['title_maxlength'])) {
     form_set_value($element['title_maxlength'], '128', $form_state);
-  } elseif (!is_numeric($form_state['values']['instance']['settings']['title_maxlength'])) {
+  }
+  elseif (!is_numeric($form_state['values']['instance']['settings']['title_maxlength'])) {
     form_set_error('title_maxlength', t('The max length of the link title must be numeric.'));
-  } elseif ($form_state['values']['instance']['settings']['title_maxlength'] > 255) {
+  }
+  elseif ($form_state['values']['instance']['settings']['title_maxlength'] > 255) {
     form_set_error('title_maxlength', t('The max length of the link title cannot be greater than 255 characters.'));
   }
-
 }
 
 /**
- * Implement hook_field_is_empty().
+ * Implements hook_field_is_empty().
  */
 function link_field_is_empty($item, $field) {
   return empty($item['title']) && empty($item['url']);
@@ -240,6 +317,8 @@ function link_field_load($entity_type, $entities, $field, $instances, $langcode,
   foreach ($entities as $id => $entity) {
     foreach ($items[$id] as $delta => $item) {
       $items[$id][$delta]['attributes'] = _link_load($field, $item, $instances[$id]);
+      $items[$id][$delta]['original_title'] = isset($item['title']) ? $item['title'] : NULL;
+      $items[$id][$delta]['original_url'] = $item['url'];
     }
   }
 }
@@ -251,21 +330,56 @@ function link_field_validate($entity_type, $entity, $field, $instance, $langcode
   $optional_field_found = FALSE;
   if ($instance['settings']['validate_url'] !== 0 || is_null($instance['settings']['validate_url']) || !isset($instance['settings']['validate_url'])) {
     foreach ($items as $delta => $value) {
-      _link_validate($items[$delta], $delta, $field, $entity, $instance, $optional_field_found);
+      _link_validate($items[$delta], $delta, $field, $entity, $instance, $langcode, $optional_field_found, $errors);
+    }
+  }
+
+  foreach ($items as $delta => $value) {
+    if (isset($value['attributes']) && is_string($value['attributes'])) {
+      $errors[$field['field_name']][$langcode][$delta][] = array(
+        'error' => 'link_required',
+        'message' => t('String values are not acceptable for attributes.'),
+        'error_element' => array('url' => TRUE, 'title' => FALSE),
+      );
     }
   }
 
   if ($instance['settings']['url'] === 'optional' && $instance['settings']['title'] === 'optional' && $instance['required'] && !$optional_field_found) {
-    form_set_error($field['field_name'] .'][0][title', t('At least one title or URL must be entered.'));
+    $errors[$field['field_name']][$langcode][0][] = array(
+      'error' => 'link_required',
+      'message' => t('At least one title or URL must be entered.'),
+      'error_element' => array('url' => FALSE, 'title' => TRUE),
+    );
+  }
+
+  // Specific logic for when using the 'select' option on the title field.
+  if ($instance['settings']['title'] == 'select') {
+    // The title is required.
+    if (!empty($item['title']) && !empty($item['url'])) {
+      $errors[$field['field_name']][$langcode][$delta][] = array(
+        'error' => 'link_required',
+        'message' => t('The title field is required when a URL is provided.'),
+        'error_element' => array('url' => FALSE, 'title' => TRUE),
+      );
+    }
   }
 }
 
 /**
- * Implements hook_field_presave().
+ * Implements hook_field_insert().
  */
-function link_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
+function link_field_insert($entity_type, $entity, $field, $instance, $langcode, &$items) {
   foreach ($items as $delta => $value) {
-    _link_process($items[$delta], $delta, $field, $entity);
+    _link_process($items[$delta], $delta, $field, $entity, $instance);
+  }
+}
+
+/**
+ * Implements hook_field_update().
+ */
+function link_field_update($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  foreach ($items as $delta => $value) {
+    _link_process($items[$delta], $delta, $field, $entity, $instance);
   }
 }
 
@@ -305,16 +419,28 @@ function link_field_widget_form(&$form, &$form_state, $field, $instance, $langco
 }
 
 /**
+ * Implements hook_field_widget_error().
+ */
+function link_field_widget_error($element, $error, $form, &$form_state) {
+  if (!empty($error['error_element']['title'])) {
+    form_error($element['title'], $error['message']);
+  }
+  elseif (!empty($error['error_element']['url'])) {
+    form_error($element['url'], $error['message']);
+  }
+}
+
+/**
  * Unpacks the item attributes for use.
  */
 function _link_load($field, $item, $instance) {
-  /*return $item['attributes'] = isset($item['attributes']) ?
-                                unserialize($item['attributes']) :
-                                $instance['settings']['attributes'];*/
   if (isset($item['attributes'])) {
-    return unserialize($item['attributes']);
+    if (!is_array($item['attributes'])) {
+      $item['attributes'] = unserialize($item['attributes']);
+    }
+    return $item['attributes'];
   }
-  else if (isset($instance['settings']['attributes'])) {
+  elseif (isset($instance['settings']['attributes'])) {
     return $instance['settings']['attributes'];
   }
   else {
@@ -324,12 +450,91 @@ function _link_load($field, $item, $instance) {
 
 /**
  * Prepares the item attributes and url for storage.
+ *
+ * @param array $item
+ *   Link field values.
+ * @param array $delta
+ *   The sequence number for current values.
+ * @param array $field
+ *   The field structure array.
+ * @param object $entity
+ *   Entity object.
+ * @param array $instance
+ *   The instance structure for $field on $entity's bundle.
+ *
+ * @codingStandardsIgnoreStart
  */
-function _link_process(&$item, $delta = 0, $field, $entity) {
+function _link_process(&$item, $delta, $field, $entity, $instance) {
+  // @codingStandardsIgnoreEnd
   // Trim whitespace from URL.
-  $item['url'] = trim($item['url']);
+  if (!empty($item['url'])) {
+    $item['url'] = trim($item['url']);
+  }
 
-  // if no attributes are set then make sure $item['attributes'] is an empty array - this lets $field['attributes'] override it.
+  // Optionally convert aliases to the system path.
+  if (!empty($instance['settings']['convert_aliases'])) {
+    global $base_url;
+
+    // Check if either the site's absolute URL or the relative base URL are at
+    // the start of the URL, if so remove them.
+    $base_paths = array(
+      $base_url . base_path(),
+      base_path(),
+    );
+
+    // Work out the correct base_path to use based on the HTTPS settings.
+    if (isset($GLOBALS['base_secure_url'])) {
+      $base_paths[] = $GLOBALS['base_secure_url'] . base_path();
+    }
+    if (isset($GLOBALS['base_insecure_url'])) {
+      $base_paths[] = $GLOBALS['base_insecure_url'] . base_path();
+    }
+
+    // Add any additional paths.
+    if ($extra_paths = variable_get('link_base_urls', array())) {
+      // Create versions with and without the base path.
+      foreach ($extra_paths as $extra_path) {
+        $base_paths[] = $extra_path;
+        $base_paths[] = $extra_path . base_path();
+      }
+    }
+
+    $paths_to_test = array(
+      $item['url'],
+    );
+
+    foreach ($base_paths as $path) {
+      // Verify the path is at the beginning of the URL string.
+      if (strpos($item['url'], $path) === 0) {
+        $strlen = drupal_strlen($path);
+        $paths_to_test[] = drupal_substr($item['url'], $strlen);
+      }
+    }
+
+    // Check each of the paths to see if one of them is a system path.
+    foreach (array_unique($paths_to_test) as $path) {
+      $language = NULL;
+
+      // If we have locale enabled attempt to remove the language prefix first.
+      if (module_exists('locale')) {
+        require_once DRUPAL_ROOT . '/includes/language.inc';
+        list($language, $path) = language_url_split_prefix($path, language_list());
+      }
+
+      // Attempt to get a system path.
+      $normal_path = drupal_get_normal_path($path, $language);
+
+      // If we get back a different path it means Drupal found a system path we
+      // can use.
+      if ($normal_path != $path) {
+        $item['url'] = $normal_path;
+        break;
+      }
+    }
+  }
+
+  // If no attributes are set then make sure $item['attributes'] is an empty
+  // array, so $field['attributes'] can override it.
   if (empty($item['attributes'])) {
     $item['attributes'] = array();
   }
@@ -340,9 +545,9 @@ function _link_process(&$item, $delta = 0, $field, $entity) {
   }
 
   // Don't save an invalid default value (e.g. 'http://').
-  if ((isset($field['widget']['default_value'][$delta]['url']) && $item['url'] == $field['widget']['default_value'][$delta]['url'])
-      && is_object($node)) {
-    if (!link_validate_url($item['url'])) {
+  if ((isset($field['widget']['default_value'][$delta]['url']) && $item['url'] == $field['widget']['default_value'][$delta]['url']) && is_object($entity)) {
+    $langcode = !empty($entity) ? field_language($instance['entity_type'], $entity, $instance['field_name']) : LANGUAGE_NONE;
+    if (!link_validate_url($item['url'], $langcode)) {
       unset($item['url']);
     }
   }
@@ -351,128 +556,252 @@ function _link_process(&$item, $delta = 0, $field, $entity) {
 /**
  * Validates that the link field has been entered properly.
  */
-function _link_validate(&$item, $delta, $field, $node, $instance, &$optional_field_found) {
-  if ($item['url']
-      && !(isset($instance['default_value'][$delta]['url'])
-      && $item['url'] === $instance['default_value'][$delta]['url']
-      && !$instance['required'])) {
+function _link_validate(&$item, $delta, $field, $entity, $instance, $langcode, &$optional_field_found, &$errors) {
+  if ($item['url'] && !(isset($instance['default_value'][$delta]['url']) && $item['url'] === $instance['default_value'][$delta]['url'] && !$instance['required'])) {
     // Validate the link.
-    if (link_validate_url(trim($item['url'])) == FALSE) {
-      form_set_error($field['field_name'] .']['. $delta .'][url', t('Not a valid URL.'));
+    if (!link_validate_url(trim($item['url']), $langcode)) {
+      $errors[$field['field_name']][$langcode][$delta][] = array(
+        'error' => 'link_required',
+        'message' => t('The value %value provided for %field is not a valid URL.', array(
+          '%value' => trim($item['url']),
+          '%field' => $instance['label'],
+        )),
+        'error_element' => array('url' => TRUE, 'title' => FALSE),
+      );
     }
     // Require a title for the link if necessary.
     if ($instance['settings']['title'] == 'required' && strlen(trim($item['title'])) == 0) {
-      form_set_error($field['field_name'] .']['. $delta .'][title', t('Titles are required for all links.'));
+      $errors[$field['field_name']][$langcode][$delta][] = array(
+        'error' => 'link_required',
+        'message' => t('Titles are required for all links.'),
+        'error_element' => array('url' => FALSE, 'title' => TRUE),
+      );
     }
   }
   // Require a link if we have a title.
-  if ($instance['settings']['url'] !== 'optional'
-      && strlen(isset($item['title']) ? $item['title'] : NULL) > 0
-      && strlen(trim($item['url'])) == 0) {
-    form_set_error($field['field_name'] .']['. $delta .'][url', t('You cannot enter a title without a link url.'));
+  if ($instance['settings']['url'] !== 'optional' && strlen(isset($item['title']) ? $item['title'] : '') > 0 && strlen(trim($item['url'])) == 0) {
+    $errors[$field['field_name']][$langcode][$delta][] = array(
+      'error' => 'link_required',
+      'message' => t('You cannot enter a title without a link url.'),
+      'error_element' => array('url' => TRUE, 'title' => FALSE),
+    );
   }
-  // In a totally bizzaro case, where URLs and titles are optional but the field is required, ensure there is at least one link.
-  if ($instance['settings']['url'] === 'optional'
-      && $instance['settings']['title'] === 'optional'
-      && (strlen(trim($item['url'])) !== 0 || strlen(trim($item['title'])) !== 0)) {
+  // In a totally bizzaro case, where URLs and titles are optional but the field
+  // is required, ensure there is at least one link.
+  if ($instance['settings']['url'] === 'optional' && $instance['settings']['title'] === 'optional'
+    && (strlen(trim($item['url'])) !== 0 || strlen(trim($item['title'])) !== 0)) {
     $optional_field_found = TRUE;
   }
-  // Require entire field
-  if ($instance['settings']['url'] === 'optional'
-    && $instance['settings']['title'] === 'optional'
-    && $instance['required'] == 1
-    && !$optional_field_found
-    && isset($instance['id'])) {
-    form_set_error($instance['field_name'] .'][0][title',
-                   t('At least one title or URL must be entered.'));
+  // Require entire field.
+  if ($instance['settings']['url'] === 'optional' && $instance['settings']['title'] === 'optional' && $instance['required'] == 1 && !$optional_field_found && isset($instance['id'])) {
+    $errors[$field['field_name']][$langcode][$delta][] = array(
+      'error' => 'link_required',
+      'message' => t('At least one title or URL must be entered.'),
+      'error_element' => array('url' => FALSE, 'title' => TRUE),
+    );
+  }
+
+  // Specific logic for when using the 'select' option on the title field.
+  if ($instance['settings']['title'] == 'select') {
+    // The title is required.
+    if (!empty($item['title']) && !empty($item['url'])) {
+      $errors[$field['field_name']][$langcode][$delta][] = array(
+        'error' => 'link_required',
+        'message' => t('The title field is required when a URL is provided.'),
+        'error_element' => array('url' => FALSE, 'title' => TRUE),
+      );
+    }
   }
 }
 
 /**
- * Cleanup user-entered values for a link field according to field settings.
+ * Clean up user-entered values for a link field according to field settings.
  *
- * @param $item
+ * Note: this cannot be properly unit tested as it checks for certain entity
+ * values.
+ *
+ * @todo Rewrite so that the logic can be unit tested.
+ *
+ * @param array $item
  *   A single link item, usually containing url, title, and attributes.
- * @param $delta
+ * @param int $delta
  *   The delta value if this field is one of multiple fields.
- * @param $field
+ * @param array $field
  *   The CCK field definition.
- * @param $node
- *   The node containing this link.
+ * @param object $entity
+ *   The entity containing this link.
+ *
+ * @codingStandardsIgnoreStart
  */
-function _link_sanitize(&$item, $delta, &$field, $instance, &$node) {
+function _link_sanitize(&$item, $delta, &$field, $instance, &$entity) {
+  // @codingStandardsIgnoreEnd
+  // As this function can be called multiple times and the item is changed by
+  // reference we need to ensure that there's always the original data to
+  // process otherwise processed data are processed again which might leads to
+  // unexpected results.
+  if (isset($item['_link_sanitized'])) {
+    return;
+  }
+
+  // Store a flag to check in case of a second call.
+  $item['_link_sanitized'] = TRUE;
+
   // Don't try to process empty links.
   if (empty($item['url']) && empty($item['title'])) {
     return;
   }
-
-  // Replace URL tokens.
-  if (isset($instance['settings']['enable_tokens']) && $instance['settings']['enable_tokens']) {
-    global $user;
-    // Load the node if necessary for nodes in views.
-    $token_node = isset($node->nid) ? node_load($node->nid) : $node;
-    $item['url'] = token_replace($item['url'], array('node' => $token_node));
+  if (empty($item['html'])) {
+    $item['html'] = FALSE;
   }
 
-  $type = link_validate_url($item['url']);
-  // If we can't determine the type of url, and we've been told not to validate it,
-  // then we assume it's a LINK_EXTERNAL type for later processing. #357604
+  // Replace URL tokens.
+  $entity_type = $instance['entity_type'];
+  $entity_info = entity_get_info($entity_type);
+  $property_id = $entity_info['entity keys']['id'];
+  if (isset($entity_info['token type'])) {
+    $entity_token_type = $entity_info['token type'];
+  }
+  elseif ($entity_type == 'taxonomy_term' || $entity_type == 'taxonomy_vocabulary') {
+    $entity_token_type = str_replace('taxonomy_', '', $entity_type);
+  }
+  else {
+    $entity_token_type = $entity_type;
+  }
+  if (isset($instance['settings']['enable_tokens']) && $instance['settings']['enable_tokens']) {
+    $text_tokens = token_scan($item['url']);
+    if (!empty($text_tokens)) {
+      // Load the entity if necessary for entities in views.
+      if (isset($entity->{$property_id})) {
+        $entity_loaded = entity_load($entity_type, array($entity->{$property_id}));
+        $entity_loaded = array_pop($entity_loaded);
+      }
+      else {
+        $entity_loaded = $entity;
+      }
+      $item['url'] = token_replace($item['url'], array($entity_token_type => $entity_loaded));
+    }
+  }
+
+  $type = link_url_type($item['url']);
+  // If the type of the URL cannot be determined and URL validation is disabled,
+  // then assume LINK_EXTERNAL for later processing.
   if ($type == FALSE && $instance['settings']['validate_url'] === 0) {
     $type = LINK_EXTERNAL;
   }
-  $url = link_cleanup_url($item['url']);
-
-  // Separate out the anchor if any.
-  if (strpos($url, '#') !== FALSE) {
-    $item['fragment'] = substr($url, strpos($url, '#') + 1);
-    $url = substr($url, 0, strpos($url, '#'));
+  elseif ($type == LINK_FRAGMENT || $type == LINK_QUERY) {
+    // Treat fragment or query-only links as external.
+    if (!empty($instance['settings']['absolute_url'])) {
+      $item['url'] = $_GET['q'] . $item['url'];
+    }
+    else {
+      $item['external'] = TRUE;
+    }
   }
-  // Separate out the query string if any.
-  if (strpos($url, '?') !== FALSE) {
-    $query = substr($url, strpos($url, '?') + 1);
-    parse_str($query, $query_array);
-    $item['query'] = $query_array;
-    $url = substr($url, 0, strpos($url, '?'));
-  }
+  $url = link_cleanup_url($item['url'], variable_get('link_default_protocol', LINK_HTTP_PROTOCOL));
+  $url_parts = _link_parse_url($url);
 
-  $item['url'] = check_plain($url);
+  if (!empty($url_parts['url'])) {
+    $item = array(
+      'url' => $url_parts['url'],
+      'query' => isset($url_parts['query']) ? $url_parts['query'] : NULL,
+      'fragment' => isset($url_parts['fragment']) ? $url_parts['fragment'] : NULL,
+      'absolute' => !empty($instance['settings']['absolute_url']),
+      'html' => TRUE,
+    ) + $item;
+  }
 
   // Create a shortened URL for display.
-  $display_url = $type == LINK_EMAIL ?
-                  str_replace('mailto:', '', $url) :
-                  url($url, array('query' => isset($item['query']) ?
-                                              $item['query'] :
-                                              NULL,
-                                  'fragment' => isset($item['fragment']) ?
-                                                $item['fragment'] :
-                                                NULL,
-                                  'absolute' => TRUE));
+  if ($type == LINK_EMAIL) {
+    $display_url = str_replace('mailto:', '', $url);
+  }
+  elseif ($type === LINK_EXTERNAL) {
+    $display_url = url($url_parts['url'],
+      array(
+        'query' => isset($url_parts['query']) ? $url_parts['query'] : NULL,
+        'fragment' => isset($url_parts['fragment']) ? $url_parts['fragment'] : NULL,
+        'absolute' => TRUE,
+      )
+    );
+  }
+  elseif ($type == LINK_TEL) {
+    $display_url = str_replace('tel:', '', $url);
+  }
+  else {
+    $display_url = url($url_parts['url'],
+      array(
+        'query' => isset($url_parts['query']) ? $url_parts['query'] : NULL,
+        'fragment' => isset($url_parts['fragment']) ? $url_parts['fragment'] : NULL,
+        'absolute' => !empty($instance['settings']['absolute_url']),
+      )
+    );
+  }
   if ($instance['settings']['display']['url_cutoff'] && strlen($display_url) > $instance['settings']['display']['url_cutoff']) {
-    $display_url = substr($display_url, 0, $instance['settings']['display']['url_cutoff']) ."...";
+    $display_url = substr($display_url, 0, $instance['settings']['display']['url_cutoff']) . "…";
   }
   $item['display_url'] = $display_url;
 
   // Use the title defined at the instance level.
   if ($instance['settings']['title'] == 'value' && strlen(trim($instance['settings']['title_value']))) {
     $title = $instance['settings']['title_value'];
+    if (function_exists('i18n_string_translate')) {
+      $i18n_string_name = "field:{$instance['field_name']}:{$instance['bundle']}:title_value";
+      $title = i18n_string_translate($i18n_string_name, $title);
+    }
   }
   // Use the title defined by the user at the widget level.
-  else if (isset($item['title'])) {
+  elseif (isset($item['title']) && drupal_strlen(trim($item['title']))) {
     $title = $item['title'];
+  }
+  // Use the static title if a user-defined title is optional and a static title
+  // has been defined.
+  elseif ($instance['settings']['title'] == 'optional' && drupal_strlen(trim($instance['settings']['title_value']))) {
+    $title = $instance['settings']['title_value'];
   }
   else {
     $title = '';
   }
 
-  // Replace tokens.
-  if ($title && ($instance['settings']['title'] == 'value' || $instance['settings']['enable_tokens'])) {
-    // Load the node if necessary for nodes in views.
-    $token_node = isset($node->nid) ? node_load($node->nid) : $node;
-    $title = filter_xss(token_replace($title, array('node' => $token_node)),
-                        array('b', 'br', 'code', 'em', 'i', 'img', 'span', 'strong', 'sub', 'sup', 'tt', 'u'));
-    $item['html'] = TRUE;
+  // Replace title tokens.
+  if ($title !== '' && $instance['settings']['enable_tokens']) {
+    $text_tokens = token_scan($title);
+    if (!empty($text_tokens)) {
+      // Load the entity if necessary for entities in views.
+      if (isset($entity->{$property_id})) {
+        $entity_loaded = entity_load($entity_type, array($entity->{$property_id}));
+        $entity_loaded = array_pop($entity_loaded);
+      }
+      else {
+        $entity_loaded = $entity;
+      }
+      $title = token_replace($title, array($entity_token_type => $entity_loaded));
+    }
   }
-  $item['title'] = empty($title) ? $item['display_url'] : $title;
+  if ($title !== '') {
+    // if title may potentially use tokens, assume that they may contain HTML
+    if ($instance['settings']['title'] == 'value' || $instance['settings']['enable_tokens']) {
+      $item['html'] = TRUE;
+    }
+    if (!empty($item['html'])) {
+      $title = filter_xss($title, array(
+        'b',
+        'br',
+        'code',
+        'em',
+        'i',
+        'img',
+        'span',
+        'strong',
+        'sub',
+        'sup',
+        'tt',
+        'u',
+      ));
+    }
+    $item['title'] = $title;
+  }
+  else {
+    $item['title'] = $item['display_url'];
+  }
 
   if (!isset($item['attributes'])) {
     $item['attributes'] = array();
@@ -480,11 +809,11 @@ function _link_sanitize(&$item, $delta, &$field, $instance, &$node) {
 
   // Unserialize attributtes array if it has not been unserialized yet.
   if (!is_array($item['attributes'])) {
-    $item['attributes'] = (array)unserialize($item['attributes']);
+    $item['attributes'] = (array) unserialize($item['attributes']);
   }
 
   // Add default attributes.
-  if (!is_array($instance['settings']['attributes'])){
+  if (!is_array($instance['settings']['attributes'])) {
     $instance['settings']['attributes'] = _link_default_attributes();
   }
   else {
@@ -499,24 +828,62 @@ function _link_sanitize(&$item, $delta, &$field, $instance, &$node) {
   if ($instance['settings']['attributes']['target'] != LINK_TARGET_USER) {
     $item['attributes']['target'] = $instance['settings']['attributes']['target'];
   }
+  elseif ($item['attributes']['target'] == LINK_TARGET_USER) {
+    $item['attributes']['target'] = LINK_TARGET_DEFAULT;
+  }
 
   // Remove the target attribute if the default (no target) is selected.
-  if (empty($item['attributes']) || $item['attributes']['target'] == LINK_TARGET_DEFAULT) {
+  if (empty($item['attributes']) || (isset($item['attributes']['target']) && $item['attributes']['target'] == LINK_TARGET_DEFAULT)) {
     unset($item['attributes']['target']);
   }
 
-  // Remove the rel=nofollow for internal links.
-  if ($type != LINK_EXTERNAL && strpos($item['attributes']['rel'], 'nofollow') !== FALSE) {
-    $item['attributes']['rel'] = str_replace('nofollow', '', $item['attributes']);
+  // Remove rel attribute for internal or external links if selected.
+  if (isset($item['attributes']['rel']) && isset($instance['settings']['rel_remove']) && $instance['settings']['rel_remove'] != 'default') {
+    if (($instance['settings']['rel_remove'] != 'rel_remove_internal' && $type != LINK_INTERNAL) ||
+      ($instance['settings']['rel_remove'] != 'rel_remove_external' && $type != LINK_EXTERNAL)) {
+      unset($item['attributes']['rel']);
+    }
   }
 
   // Handle "title" link attribute.
   if (!empty($item['attributes']['title']) && module_exists('token')) {
-    // Load the node (necessary for nodes in views).
-    $token_node = isset($node->nid) ? node_load($node->nid) : $node;
-    $item['attributes']['title'] = filter_xss(token_replace($item['attributes']['title'], array('node' => $token_node)),
-                        array('b', 'br', 'code', 'em', 'i', 'img', 'span', 'strong', 'sub', 'sup', 'tt', 'u'));
+    $text_tokens = token_scan($item['attributes']['title']);
+    if (!empty($text_tokens)) {
+      // Load the entity (necessary for entities in views).
+      if (isset($entity->{$property_id})) {
+        $entity_loaded = entity_load($entity_type, array($entity->{$property_id}));
+        $entity_loaded = array_pop($entity_loaded);
+      }
+      else {
+        $entity_loaded = $entity;
+      }
+      $item['attributes']['title'] = token_replace($item['attributes']['title'], array($entity_token_type => $entity_loaded), array('clear' => TRUE));
+    }
+    $item['attributes']['title'] = filter_xss($item['attributes']['title'], array(
+      'b',
+      'br',
+      'code',
+      'em',
+      'i',
+      'img',
+      'span',
+      'strong',
+      'sub',
+      'sup',
+      'tt',
+      'u',
+    ));
   }
+  // Handle attribute classes.
+  if (!empty($item['attributes']['class'])) {
+    $classes = explode(' ', $item['attributes']['class']);
+    foreach ($classes as &$class) {
+      $class = drupal_clean_css_identifier($class);
+    }
+    $item['attributes']['class'] = implode(' ', $classes);
+  }
+  unset($item['attributes']['configurable_class']);
+
   // Remove title attribute if it's equal to link text.
   if (isset($item['attributes']['title']) && $item['attributes']['title'] == $item['title']) {
     unset($item['attributes']['title']);
@@ -525,16 +892,81 @@ function _link_sanitize(&$item, $delta, &$field, $instance, &$node) {
 
   // Remove empty attributes.
   $item['attributes'] = array_filter($item['attributes']);
+}
 
-  // Sets title to trimmed url if one exists
-  // @TODO: Do we need this?  It seems not.
-  /*if(!empty($item['display_url']) && empty($item['title'])) {
-    $item['title'] = $item['display_url'];
+/**
+ * Because parse_url doesn't work with relative urls.
+ *
+ * @param string $url
+ *   URL to parse.
+ *
+ * @return array
+ *   Array of url pieces - only 'url', 'query', and 'fragment'.
+ */
+function _link_parse_url($url) {
+  $url_parts = array();
+  // Separate out the anchor, if any.
+  if (strpos($url, '#') !== FALSE) {
+    $url_parts['fragment'] = substr($url, strpos($url, '#') + 1);
+    $url = substr($url, 0, strpos($url, '#'));
   }
-  elseif(!isset($item['title'])) {
-    $item['title'] = $item['url'];
-  }*/
+  // Separate out the query string, if any.
+  if (strpos($url, '?') !== FALSE) {
+    $query = substr($url, strpos($url, '?') + 1);
+    $url_parts['query'] = _link_parse_str($query);
+    $url = substr($url, 0, strpos($url, '?'));
+  }
+  $url_parts['url'] = $url;
+  return $url_parts;
+}
 
+/**
+ * Replaces the PHP parse_str() function.
+ *
+ * Because parse_str replaces the following characters in query parameters name
+ * in order to maintain compatibility with deprecated register_globals
+ * directive:
+ *
+ *   - chr(32) ( ) (space)
+ *   - chr(46) (.) (dot)
+ *   - chr(91) ([) (open square bracket)
+ *   - chr(128) - chr(159) (various)
+ *
+ * @param string $query
+ *   Query to parse.
+ *
+ * @return array
+ *   Array of query parameters.
+ *
+ * @see http://php.net/manual/en/language.variables.external.php#81080
+ */
+function _link_parse_str($query) {
+  $query_array = array();
+
+  $pairs = explode('&', $query);
+  foreach ($pairs as $pair) {
+    $name_value = explode('=', $pair, 2);
+    $name = urldecode($name_value[0]);
+    $value = isset($name_value[1]) ? urldecode($name_value[1]) : NULL;
+    $query_array[$name] = $value;
+  }
+
+  return $query_array;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function link_menu() {
+  $items['admin/config/content/link'] = array(
+    'title' => 'Link settings',
+    'description' => 'Settings for the link module.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('link_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'link.admin.inc',
+  );
+  return $items;
 }
 
 /**
@@ -542,29 +974,42 @@ function _link_sanitize(&$item, $delta, &$field, $instance, &$node) {
  */
 function link_theme() {
   return array(
-    /*'link_field_settings' => array(
-      'variables' => array('element' => NULL),
-    ),*/
     'link_formatter_link_default' => array(
-      'variables' => array('element' => NULL),
+      'variables' => array('element' => NULL, 'field' => NULL),
     ),
     'link_formatter_link_plain' => array(
+      'variables' => array('element' => NULL, 'field' => NULL),
+    ),
+    'link_formatter_link_host' => array(
       'variables' => array('element' => NULL),
+    ),
+    'link_formatter_link_absolute' => array(
+      'variables' => array('element' => NULL, 'field' => NULL),
+    ),
+    'link_formatter_link_domain' => array(
+      'variables' => array(
+        'element' => NULL,
+        'display' => NULL,
+        'field' => NULL,
+      ),
+    ),
+    'link_formatter_link_no_protocol' => array(
+      'variables' => array('element' => NULL, 'field' => NULL),
     ),
     'link_formatter_link_title_plain' => array(
-      'variables' => array('element' => NULL),
+      'variables' => array('element' => NULL, 'field' => NULL),
     ),
     'link_formatter_link_url' => array(
-      'variables' => array('element' => NULL),
+      'variables' => array('element' => NULL, 'field' => NULL),
     ),
     'link_formatter_link_short' => array(
-      'variables' => array('element' => NULL),
+      'variables' => array('element' => NULL, 'field' => NULL),
     ),
     'link_formatter_link_label' => array(
-      'variables' => array('element' => NULL),
+      'variables' => array('element' => NULL, 'field' => NULL),
     ),
     'link_formatter_link_separate' => array(
-      'variables' => array('element' => NULL),
+      'variables' => array('element' => NULL, 'field' => NULL),
     ),
     'link_field' => array(
       'render element' => 'element',
@@ -573,32 +1018,35 @@ function link_theme() {
 }
 
 /**
- * FAPI theme for an individual text elements.
+ * Formats a link field widget.
  */
 function theme_link_field($vars) {
-  drupal_add_css(drupal_get_path('module', 'link') .'/link.css');
-
+  drupal_add_css(drupal_get_path('module', 'link') . '/css/link.css');
   $element = $vars['element'];
   // Prefix single value link fields with the name of the field.
   if (empty($element['#field']['multiple'])) {
     if (isset($element['url']) && !isset($element['title'])) {
-      unset($element['url']['#title']);
+      $element['url']['#title_display'] = 'invisible';
     }
   }
 
   $output = '';
   $output .= '<div class="link-field-subrow clearfix">';
   if (isset($element['title'])) {
-    $output .= '<div class="link-field-title link-field-column">'. drupal_render($element['title']) .'</div>';
+    $output .= '<div class="link-field-title link-field-column">' . drupal_render($element['title']) . '</div>';
   }
-  $output .= '<div class="link-field-url'. (isset($element['title']) ? ' link-field-column' : '') .'">'. drupal_render($element['url']) .'</div>';
+  $output .= '<div class="link-field-url' . (isset($element['title']) ? ' link-field-column' : '') . '">' . drupal_render($element['url']) . '</div>';
   $output .= '</div>';
   if (!empty($element['attributes']['target'])) {
-    $output .= '<div class="link-attributes">'. drupal_render($element['attributes']['target']) .'</div>';
+    $output .= '<div class="link-attributes">' . drupal_render($element['attributes']['target']) . '</div>';
   }
   if (!empty($element['attributes']['title'])) {
-    $output .= '<div class="link-attributes">'. drupal_render($element['attributes']['title']) .'</div>';
+    $output .= '<div class="link-attributes">' . drupal_render($element['attributes']['title']) . '</div>';
   }
+  if (!empty($element['attributes']['class'])) {
+    $output .= '<div class="link-attributes">' . drupal_render($element['attributes']['class']) . '</div>';
+  }
+  $output .= drupal_render_children($element);
   return $output;
 }
 
@@ -607,7 +1055,7 @@ function theme_link_field($vars) {
  */
 function link_element_info() {
   $elements = array();
-  $elements['link_field'] =  array(
+  $elements['link_field'] = array(
     '#input' => TRUE,
     '#process' => array('link_field_process'),
     '#theme' => 'link_field',
@@ -616,6 +1064,9 @@ function link_element_info() {
   return $elements;
 }
 
+/**
+ * Returns the default attributes and their values.
+ */
 function _link_default_attributes() {
   return array(
     'target' => LINK_TARGET_DEFAULT,
@@ -625,15 +1076,29 @@ function _link_default_attributes() {
 }
 
 /**
- * Process the link type element before displaying the field.
+ * Processes the link type element before displaying the field.
  *
  * Build the form element. When creating a form using FAPI #process,
  * note that $element['#value'] is already set.
  *
- * The $fields array is in $complete_form['#field_info'][$element['#field_name']].
+ * The $fields array is in
+ * $complete_form['#field_info'][$element['#field_name']].
  */
 function link_field_process($element, $form_state, $complete_form) {
   $instance = field_widget_instance($element, $form_state);
+  if (!$instance) {
+    // The element comes from a custom form, we have to manually create the
+    // $instance settings.
+    $instance['settings'] = array(
+      'title_maxlength' => isset($element['#title_maxlength']) ? $element['#title_maxlength'] : 128,
+      'title' => isset($element['#title_mode']) ? $element['#title_mode'] : 'optional',
+      'title_label_use_field_label' => isset($element['#title_label_use_field_label']) ? $element['#title_label_use_field_label'] : FALSE,
+      'url' => isset($element['#url']) ? $element['#url'] : 'optional',
+    );
+    if (isset($element['#attributes'])) {
+      $instance['settings']['attributes'] = $element['#attributes'];
+    }
+  }
   $settings = $instance['settings'];
   $element['url'] = array(
     '#type' => 'textfield',
@@ -642,14 +1107,42 @@ function link_field_process($element, $form_state, $complete_form) {
     '#required' => ($element['#delta'] == 0 && $settings['url'] !== 'optional') ? $element['#required'] : FALSE,
     '#default_value' => isset($element['#value']['url']) ? $element['#value']['url'] : NULL,
   );
-  if ($settings['title'] !== 'none' && $settings['title'] !== 'value') {
+  if (in_array($settings['title'], array('optional', 'required'))) {
+    // Figure out the label of the title field.
+    if (!empty($settings['title_label_use_field_label'])) {
+      // Use the element label as the title field label.
+      $title_label = $element['#title'];
+      // Hide the field label because there is no need for the duplicate labels.
+      $element['#title_display'] = 'invisible';
+    }
+    else {
+      $title_label = t('Title');
+    }
+
+    // Default value.
+    $title_maxlength = 128;
+    if (!empty($settings['title_maxlength'])) {
+      $title_maxlength = $settings['title_maxlength'];
+    }
+
     $element['title'] = array(
       '#type' => 'textfield',
-      '#maxlength' => $settings['title_maxlength'],  // patch #1307788 from nmc
-      '#title' => t('Title'),
-      '#description' => t('The link title is limited to '.$settings['title_maxlength'].' characters maximum.'), // patch #1307788 from nmc
-      '#required' => ($settings['title'] == 'required' && (($element['#delta'] == 0 && $element['#required']) || !empty($element['#value']['url']))) ? TRUE : FALSE, // davereids patch from jan 2011
+      '#maxlength' => $title_maxlength,
+      '#title' => $title_label,
+      '#description' => t('The link title is limited to @maxlength characters maximum.', array('@maxlength' => $title_maxlength)),
+      '#required' => ($settings['title'] == 'required' && (($element['#delta'] == 0 && $element['#required']) || !empty($element['#value']['url']))) ? TRUE : FALSE,
       '#default_value' => isset($element['#value']['title']) ? $element['#value']['title'] : NULL,
+    );
+  }
+  elseif ($settings['title'] == 'select') {
+    $options = drupal_map_assoc(array_filter(explode("\n", str_replace("\r", "\n", trim($settings['title_allowed_values'])))));
+    $element['title'] = array(
+      '#type' => 'select',
+      '#title' => t('Title'),
+      '#description' => t('Select the a title for this link.'),
+      '#default_value' => isset($element['#value']['title']) ? $element['#value']['title'] : NULL,
+      '#options' => $options,
+      '#empty_value' => '',
     );
   }
 
@@ -677,16 +1170,30 @@ function link_field_process($element, $form_state, $complete_form) {
       '#field_suffix' => '"',
     );
   }
+  if (!empty($settings['attributes']['configurable_class']) && $settings['attributes']['configurable_class'] == 1) {
+    $element['attributes']['class'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Custom link class'),
+      '#default_value' => isset($attributes['class']) ? $attributes['class'] : '',
+      '#field_prefix' => 'class = "',
+      '#field_suffix' => '"',
+    );
+  }
 
-  // To prevent an extra required indicator, disable the required flag on the
-  // base element since all the sub-fields are already required if desired.
-  $element['#required'] = FALSE; // davereids patch from jan 2011
+  // If the title field is available or there are field accepts multiple values
+  // then allow the individual field items display the required asterisk if
+  // needed.
+  if (isset($element['title']) || isset($element['_weight'])) {
+    // To prevent an extra required indicator, disable the required flag on the
+    // base element since all the sub-fields are already required if desired.
+    $element['#required'] = FALSE;
+  }
 
   return $element;
 }
 
 /**
- * Implementation of hook_field_formatter_info().
+ * Implements hook_field_formatter_info().
  */
 function link_field_formatter_info() {
   return array(
@@ -694,9 +1201,17 @@ function link_field_formatter_info() {
       'label' => t('Title, as link (default)'),
       'field types' => array('link_field'),
       'multiple values' => FIELD_BEHAVIOR_DEFAULT,
+      'settings' => array(
+        'custom_title' => '',
+      ),
     ),
     'link_title_plain' => array(
       'label' => t('Title, as plain text'),
+      'field types' => array('link_field'),
+      'multiple values' => FIELD_BEHAVIOR_DEFAULT,
+    ),
+    'link_host' => array(
+      'label' => t('Host, as plain text'),
       'field types' => array('link_field'),
       'multiple values' => FIELD_BEHAVIOR_DEFAULT,
     ),
@@ -707,6 +1222,24 @@ function link_field_formatter_info() {
     ),
     'link_plain' => array(
       'label' => t('URL, as plain text'),
+      'field types' => array('link_field'),
+      'multiple values' => FIELD_BEHAVIOR_DEFAULT,
+    ),
+    'link_absolute' => array(
+      'label' => t('URL, absolute'),
+      'field types' => array('link_field'),
+      'multiple values' => FIELD_BEHAVIOR_DEFAULT,
+    ),
+    'link_domain' => array(
+      'label' => t('Domain, as link'),
+      'field types' => array('link_field'),
+      'multiple values' => FIELD_BEHAVIOR_DEFAULT,
+      'settings' => array(
+        'strip_www' => FALSE,
+      ),
+    ),
+    'link_no_protocol' => array(
+      'label' => t('URL with the protocol removed'),
       'field types' => array('link_field'),
       'multiple values' => FIELD_BEHAVIOR_DEFAULT,
     ),
@@ -729,133 +1262,290 @@ function link_field_formatter_info() {
 }
 
 /**
+ * Implements hook_field_formatter_settings_form().
+ */
+function link_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $element = array();
+  if ($display['type'] == 'link_domain') {
+    $element['strip_www'] = array(
+      '#title' => t('Strip www. from domain'),
+      '#type' => 'checkbox',
+      '#default_value' => $settings['strip_www'],
+    );
+  }
+  if ($display['type'] == 'link_default') {
+    $element['custom_title'] = array(
+      '#title' => t('Override title'),
+      '#description' => t('Optionally override the title for the link(s).'),
+      '#type' => 'textfield',
+      '#default_value' => $settings['custom_title'],
+    );
+  }
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function link_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+
+  if ($display['type'] == 'link_domain') {
+    if ($display['settings']['strip_www']) {
+      return t('Strip www. from domain');
+    }
+    else {
+      return t('Leave www. in domain');
+    }
+  }
+  if ($display['type'] == 'link_default') {
+    if ($display['settings']['custom_title']) {
+      return t('Title: %title', array('%title' => $display['settings']['custom_title']));
+    }
+  }
+  return '';
+}
+
+/**
  * Implements hook_field_formatter_view().
  */
 function link_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $elements = array();
   foreach ($items as $delta => $item) {
+    if (!empty($display['settings']['custom_title'])) {
+      $item['title'] = $display['settings']['custom_title'];
+    }
     $elements[$delta] = array(
-      '#markup' => theme('link_formatter_'. $display['type'], array('element' => $item, 'field' => $instance)),
+      '#theme' => 'link_formatter_' . $display['type'],
+      '#element' => $item,
+      '#field' => $instance,
+      '#display' => array(
+        'settings' => $display['settings'],
+      ),
     );
   }
   return $elements;
 }
 
 /**
- * Theme function for 'default' text field formatter.
+ * Formats a link.
  */
 function theme_link_formatter_link_default($vars) {
   $link_options = $vars['element'];
-  unset($link_options['element']['title']);
-  unset($link_options['element']['url']);
-  
-  // Issue #1199806 by ss81: Fixes fatal error when the link URl is equal to page URL
+  unset($link_options['title']);
+  unset($link_options['url']);
+
   if (isset($link_options['attributes']['class'])) {
     $link_options['attributes']['class'] = array($link_options['attributes']['class']);
   }
-  
   // Display a normal link if both title and URL are available.
   if (!empty($vars['element']['title']) && !empty($vars['element']['url'])) {
-    return l($vars['element']['title'], $vars['element']['url'], $link_options);
+    return l($vars['element']['title'], rawurldecode($vars['element']['url']), $link_options);
   }
   // If only a title, display the title.
   elseif (!empty($vars['element']['title'])) {
-    return check_plain($vars['element']['title']);
+    return !empty($link_options['html']) ? $vars['element']['title'] : check_plain($vars['element']['title']);
   }
   elseif (!empty($vars['element']['url'])) {
-    return l($vars['element']['title'], $vars['element']['url'], $link_options);
+    return l($vars['element']['title'], rawurldecode($vars['element']['url']), $link_options);
   }
 }
 
 /**
- * Theme function for 'plain' text field formatter.
+ * Formats a link (or its title) as plain text.
  */
 function theme_link_formatter_link_plain($vars) {
   $link_options = $vars['element'];
-  unset($link_options['element']['title']);
-  unset($link_options['element']['url']);
-  return empty($vars['element']['url']) ?
-    check_plain($vars['element']['title']) :
-    url($vars['element']['url'], $link_options);
+  if (isset($link_options['title'])) {
+    unset($link_options['title']);
+  }
+  else {
+    $vars['element']['title'] = '';
+  }
+  unset($link_options['url']);
+  return empty($vars['element']['url']) ? check_plain($vars['element']['title']) : url($vars['element']['url'], $link_options);
 }
 
 /**
- * Theme function for 'title_plain' text field formatter.
+ * Theme function for 'host' text field formatter.
+ */
+function theme_link_formatter_link_host($vars) {
+  $host = @parse_url($vars['element']['url']);
+  return isset($host['host']) ? check_plain($host['host']) : '';
+}
+
+/**
+ * Formats a link as an absolute URL.
+ */
+function theme_link_formatter_link_absolute($vars) {
+  // If no URL value is present there's no point in continuing.
+  if (empty($vars['element']['url'])) {
+    return '';
+  }
+
+  // Hardcode the 'absolute' argument.
+  $vars['element']['absolute'] = TRUE;
+  return url($vars['element']['url'], $vars['element']);
+}
+
+/**
+ * Formats a link using the URL's domain for it's link text.
+ */
+function theme_link_formatter_link_domain($vars) {
+  // If no URL value is present there's no point in continuing.
+  if (empty($vars['element']['url'])) {
+    return '';
+  }
+
+  $link_options = $vars['element'];
+  unset($link_options['title']);
+  unset($link_options['url']);
+  $domain = parse_url($vars['element']['display_url'], PHP_URL_HOST);
+  if (!empty($vars['display']['settings']['strip_www'])) {
+    $domain = str_replace('www.', '', $domain);
+  }
+  return l($domain, $vars['element']['url'], $link_options);
+}
+
+/**
+ * Formats a link without the http:// or https://.
+ */
+function theme_link_formatter_link_no_protocol($vars) {
+  // If no URL value is present there's no point in continuing.
+  if (empty($vars['element']['url'])) {
+    return '';
+  }
+
+  $link_options = $vars['element'];
+  unset($link_options['title']);
+  unset($link_options['url']);
+  // We drop any scheme of the url.
+  $scheme = parse_url($vars['element']['url']);
+  $search = '/' . preg_quote($scheme['scheme'] . '://', '/') . '/';
+  $replace = '';
+  $display_url = preg_replace($search, $replace, $vars['element']['url'], 1);
+
+  return l($display_url, $vars['element']['url'], $link_options);
+}
+
+/**
+ * Formats a link's title as plain text.
  */
 function theme_link_formatter_link_title_plain($vars) {
-  return empty($vars['element']['title']) ? '' : check_plain($vars['element']['title']);
+  // If no title value is present there's no point in continuing.
+  if (empty($vars['element']['title'])) {
+    return '';
+  }
+
+  return check_plain(decode_entities($vars['element']['title']));
 }
 
 /**
- * Theme function for 'url' text field formatter.
+ * Formats a link using an alternate display URL for its link text.
  */
 function theme_link_formatter_link_url($vars) {
+  // If no URL value is present there's no point in continuing.
+  if (empty($vars['element']['url'])) {
+    return '';
+  }
+
   $link_options = $vars['element'];
-  unset($link_options['element']['title']);
-  unset($link_options['element']['url']);
-  return $vars['element']['url'] ? l($vars['element']['display_url'], $vars['element']['url'], $link_options) : '';
+  if (isset($link_options['attributes']['class'])) {
+    $link_options['attributes']['class'] = array($link_options['attributes']['class']);
+  }
+  unset($link_options['title']);
+  unset($link_options['url']);
+
+  if (!isset($vars['element']['display_url'])) {
+    // Display suite sometimes does not set 'display_url'.
+    $vars['element']['display_url'] = $vars['element']['url'];
+  }
+
+  return l($vars['element']['display_url'], $vars['element']['url'], $link_options);
 }
 
 /**
- * Theme function for 'short' text field formatter.
+ * Formats a link using "Link" as the link text.
  */
 function theme_link_formatter_link_short($vars) {
+  // If no URL value is present there's no point in continuing.
+  if (empty($vars['element']['url'])) {
+    return '';
+  }
+
   $link_options = $vars['element'];
-  unset($link_options['element']['title']);
-  unset($link_options['element']['url']);
-  return $vars['element']['url'] ? l(t('Link'), $vars['element']['url'], $link_options) : '';
+  unset($link_options['title']);
+  unset($link_options['url']);
+  return l(t('Link'), $vars['element']['url'], $link_options);
 }
 
 /**
- * Theme function for 'label' text field formatter.
+ * Formats a link using the field's label as link text.
  */
 function theme_link_formatter_link_label($vars) {
+  // If no URL value is present there's no point in continuing.
+  if (empty($vars['element']['url'])) {
+    return '';
+  }
+
   $link_options = $vars['element'];
-  unset($link_options['element']['title']);
-  unset($link_options['element']['url']);
-  return $vars['element']['url'] ? l($vars['field']['label'], $vars['element']['url'], $link_options) : '';
+  unset($link_options['title']);
+  unset($link_options['url']);
+  $label = $vars['field']['label'];
+  if (function_exists('i18n_string_translate')) {
+    $i18n_string_name = "field:{$vars['field']['field_name']}:{$vars['field']['bundle']}:label";
+    $label = i18n_string_translate($i18n_string_name, $label);
+  }
+  return l($label, $vars['element']['url'], $link_options);
 }
 
 /**
- * Theme function for 'separate' text field formatter.
+ * Formats a link as separate title and URL elements.
  */
-
 function theme_link_formatter_link_separate($vars) {
-  $class = empty($vars['element']['attributes']['class']) ? '' : ' '. $vars['element']['attributes']['class'];
+  $class = empty($vars['element']['attributes']['class']) ? '' : ' ' . $vars['element']['attributes']['class'];
   unset($vars['element']['attributes']['class']);
   $link_options = $vars['element'];
-  unset($link_options['element']['title']);
-  unset($link_options['element']['url']);
+  unset($link_options['title']);
+  unset($link_options['url']);
   $title = empty($vars['element']['title']) ? '' : check_plain($vars['element']['title']);
-  
-  /** 
-   * @TODO static html markup looks not very elegant to me (who takes it off?)
-   * needs smarter output solution and an optional title/url seperator (digidog) 
-   */
+
+  // @todo Static html markup looks not very elegant, needs smarter output
+  // solution and an optional title/URL seperator.
+  $url_parts = _link_parse_url($vars['element']['url']);
   $output = '';
-  $output .= '<div class="link-item '. $class .'">';
+  $output .= '<div class="link-item ' . $class . '">';
   if (!empty($title)) {
-    $output .= '<div class="link-title">'. $title .'</div>';
+    $output .= '<div class="link-title">' . $title . '</div>';
   }
-  $output .= '<div class="link-url">'. l($vars['element']['url'], $vars['element']['url'], $link_options) .'</div>';
+  $output .= '<div class="link-url">' . l($url_parts['url'], $vars['element']['url'], $link_options) . '</div>';
   $output .= '</div>';
   return $output;
 }
 
-
+/**
+ * Implements hook_token_list().
+ */
 function link_token_list($type = 'all') {
+  // @todo hook_token_list() no longer exists, this should be rewritten as
+  // hook_token_info().
   if ($type === 'field' || $type === 'all') {
     $tokens = array();
-
     $tokens['link']['url'] = t("Link URL");
     $tokens['link']['title'] = t("Link title");
     $tokens['link']['view'] = t("Formatted html link");
-
     return $tokens;
   }
 }
 
+/**
+ * Implements hook_token_values().
+ */
 function link_token_values($type, $object = NULL) {
+  // @todo hook_token_values() no longer exists, this should be rewritten as
+  // hook_tokens().
   if ($type === 'field') {
     $item = $object[0];
 
@@ -873,29 +1563,41 @@ function link_token_values($type, $object = NULL) {
 function link_views_api() {
   return array(
     'api' => 2,
-    'path' => drupal_get_path('module', 'link') .'/views',
+    'path' => drupal_get_path('module', 'link') . '/views',
   );
 }
 
 /**
  * Forms a valid URL if possible from an entered address.
- * Trims whitespace and automatically adds an http:// to addresses without a protocol specified
+ *
+ * Trims whitespace and automatically adds an http:// to addresses without a
+ * protocol specified.
  *
  * @param string $url
- * @param string $protocol The protocol to be prepended to the url if one is not specified
+ *   The url entered by the user.
+ * @param string $protocol
+ *   The protocol to be prepended to the url if one is not specified.
  */
-function link_cleanup_url($url, $protocol = "http") {
+function link_cleanup_url($url, $protocol = 'http') {
+  try {
+    link_ensure_valid_default_protocol();
+  }
+  catch (Exception $e) {
+    watchdog('link', $e->getMessage(), array(), WATCHDOG_ERROR);
+  }
   $url = trim($url);
-  $type = link_validate_url($url);
+  $type = link_url_type($url);
 
   if ($type === LINK_EXTERNAL) {
     // Check if there is no protocol specified.
     $protocol_match = preg_match("/^([a-z0-9][a-z0-9\.\-_]*:\/\/)/i", $url);
     if (empty($protocol_match)) {
-      // But should there be? Add an automatic http:// if it starts with a domain name.
-      $domain_match = preg_match('/^(([a-z0-9]([a-z0-9\-_]*\.)+)('. LINK_DOMAINS .'|[a-z]{2}))/i', $url);
+      // But should there be? Add an automatic http:// if it starts with a
+      // domain name.
+      $link_domains = _link_domains();
+      $domain_match = preg_match('/^(([a-z0-9]([a-z0-9\-_]*\.)+)(' . $link_domains . '|[a-z]{2}))/i', $url);
       if (!empty($domain_match)) {
-        $url = $protocol ."://". $url;
+        $url = $protocol . "://" . $url;
       }
     }
   }
@@ -904,105 +1606,240 @@ function link_cleanup_url($url, $protocol = "http") {
 }
 
 /**
- * A lenient verification for URLs. Accepts all URLs following RFC 1738 standard
- * for URL formation and all email addresses following the RFC 2368 standard for
- * mailto address formation.
+ * Validate that the protocol is either HTTP or HTTPS.
+ *
+ * @throws Exception
+ */
+function link_ensure_valid_default_protocol() {
+  $protocol = variable_get('link_default_protocol', LINK_HTTP_PROTOCOL);
+  if ($protocol !== LINK_HTTP_PROTOCOL && $protocol !== LINK_HTTPS_PROTOCOL) {
+    variable_set('link_default_protocol', LINK_HTTP_PROTOCOL);
+    throw new Exception(t('Protocol was set to !protocol but must be !HTTP or !HTTPS. Set to default HTTP.', array(
+      '!protocol' => $protocol,
+      '!HTTP' => LINK_HTTP_PROTOCOL,
+      '!HTTPS' => LINK_HTTPS_PROTOCOL,
+    )));
+  }
+}
+
+/**
+ * Validates a URL.
  *
  * @param string $text
- * @return mixed Returns boolean FALSE if the URL is not valid. On success, returns an object with
- * the following attributes: protocol, hostname, ip, and port.
+ *   Url to be validated.
+ * @param string $langcode
+ *   An optional language code to look up the path in.
+ *
+ * @return bool
+ *   True if a valid link, FALSE otherwise.
  */
-function link_validate_url($text) {
-  $LINK_ICHARS_DOMAIN = (string) html_entity_decode(implode("", array( // @TODO completing letters ...
-    "&#x00E6;", // æ
-    "&#x00C6;", // Æ
+function link_validate_url($text, $langcode = NULL) {
+  $text = _link_clean_relative($text);
+  $text = link_cleanup_url($text);
+  $type = link_url_type($text);
+
+  if ($type == LINK_EXTERNAL) {
+    $scheme = parse_url($text, PHP_URL_SCHEME);
+    if ($scheme && !in_array(strtolower($scheme), array('http', 'https', 'ftp', 'feed'))) {
+      // valid_url() cannot validate this scheme (which can be anything, if
+      // filter_allowed_protocols was changed). The exact syntax is likely
+      // unknown, so skip the next block and accept anything.
+      $type = $scheme;
+    }
+  }
+
+  if ($type && ($type == LINK_INTERNAL || $type == LINK_EXTERNAL)) {
+    $flag = valid_url($text, $type == LINK_EXTERNAL);
+    if (!$flag) {
+      $normal_path = drupal_get_normal_path($text, $langcode);
+      $parsed_link = parse_url($normal_path, PHP_URL_PATH);
+      if ($normal_path != $parsed_link) {
+        $normal_path = $parsed_link;
+      }
+      $flag = drupal_valid_path($normal_path);
+    }
+    if (!$flag) {
+      $flag = file_exists($normal_path);
+    }
+    if (!$flag) {
+      $uri = file_build_uri($normal_path);
+      $flag = file_exists($uri);
+    }
+  }
+  else {
+    $flag = (bool) $type;
+  }
+
+  return $flag;
+}
+
+/**
+ * Cleaner of relatives urls.
+ *
+ * @param string $url
+ *   The url to clean up the relative protocol.
+ */
+function _link_clean_relative($url) {
+  $check = substr($url, 0, 2);
+  if (isset($_SERVER['HTTPS']) &&
+    ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) ||
+    isset($_SERVER['HTTP_X_FORWARDED_PROTO']) &&
+    $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') {
+    $protocol = 'https://';
+  }
+  else {
+    $protocol = 'http://';
+  }
+
+  if ($check == '//') {
+    $url = str_replace('//', $protocol, $url);
+  }
+
+  return $url;
+}
+
+/**
+ * Type check a URL.
+ *
+ * Accepts all URLs following RFC 1738 standard for URL formation and all e-mail
+ * addresses following the RFC 2368 standard for mailto address formation.
+ *
+ * @param string $text
+ *   Url to be checked.
+ *
+ * @return mixed
+ *   Returns boolean FALSE if the URL is not valid. On success, returns one of
+ *   the LINK_(linktype) constants.
+ */
+function link_url_type($text) {
+  // @todo Complete letters.
+  // @codingStandardsIgnoreStart
+  $link_ichars_domain = (string) html_entity_decode(implode("", array(
+    "&#x00BF;", // ¿
     "&#x00C0;", // À
-    "&#x00E0;", // à
     "&#x00C1;", // Á
-    "&#x00E1;", // á
     "&#x00C2;", // Â
-    "&#x00E2;", // â
-    "&#x00E5;", // å
-    "&#x00C5;", // Å
-    "&#x00E4;", // ä
+    "&#x00C3;", // Ã
     "&#x00C4;", // Ä
+    "&#x00C5;", // Å
+    "&#x00C6;", // Æ
     "&#x00C7;", // Ç
-    "&#x00E7;", // ç
-    "&#x00D0;", // Ð
-    "&#x00F0;", // ð
     "&#x00C8;", // È
-    "&#x00E8;", // è
     "&#x00C9;", // É
-    "&#x00E9;", // é
     "&#x00CA;", // Ê
-    "&#x00EA;", // ê
     "&#x00CB;", // Ë
-    "&#x00EB;", // ë
+    "&#x00CC;", // Ì
+    "&#x00CD;", // Í
     "&#x00CE;", // Î
-    "&#x00EE;", // î
     "&#x00CF;", // Ï
-    "&#x00EF;", // ï
-    "&#x00F8;", // ø
-    "&#x00D8;", // Ø
-    "&#x00F6;", // ö
-    "&#x00D6;", // Ö
+    "&#x00D0;", // Ð
+    "&#x00D1;", // Ñ
+    "&#x00D2;", // Ò
+    "&#x00D3;", // Ó
     "&#x00D4;", // Ô
+    "&#x00D5;", // Õ
+    "&#x00D6;", // Ö
+    // ×
+    "&#x00D8;", // Ø
+    "&#x00D9;", // Ù
+    "&#x00DA;", // Ú
+    "&#x00DB;", // Û
+    "&#x00DC;", // Ü
+    "&#x00DD;", // Ý
+    "&#x00DE;", // Þ
+    // ß (see LINK_ICHARS)
+    "&#x00E0;", // à
+    "&#x00E1;", // á
+    "&#x00E2;", // â
+    "&#x00E3;", // ã
+    "&#x00E4;", // ä
+    "&#x00E5;", // å
+    "&#x00E6;", // æ
+    "&#x00E7;", // ç
+    "&#x00E8;", // è
+    "&#x00E9;", // é
+    "&#x00EA;", // ê
+    "&#x00EB;", // ë
+    "&#x00EC;", // ì
+    "&#x00ED;", // í
+    "&#x00EE;", // î
+    "&#x00EF;", // ï
+    "&#x00F0;", // ð
+    "&#x00F1;", // ñ
+    "&#x00F2;", // ò
+    "&#x00F3;", // ó
     "&#x00F4;", // ô
-    "&#x00D5;",	// Õ
-    "&#x00F5;",	// õ
+    "&#x00F5;", // õ
+    "&#x00F6;", // ö
+    // ÷
+    "&#x00F8;", // ø
+    "&#x00F9;", // ù
+    "&#x00FA;", // ú
+    "&#x00FB;", // û
+    "&#x00FC;", // ü
+    "&#x00FD;", // ý
+    "&#x00FE;", // þ
+    "&#x00FF;", // ÿ
     "&#x0152;", // Œ
     "&#x0153;", // œ
-    "&#x00FC;", // ü
-    "&#x00DC;", // Ü
-    "&#x00D9;", // Ù
-    "&#x00F9;", // ù
-    "&#x00DB;", // Û
-    "&#x00FB;", // û
     "&#x0178;", // Ÿ
-    "&#x00FF;", // ÿ 
-    "&#x00D1;", // Ñ
-    "&#x00F1;", // ñ
-    "&#x00FE;", // þ
-    "&#x00DE;", // Þ
-    "&#x00FD;", // ý
-    "&#x00DD;", // Ý
-    "&#x00BF;", // ¿
   )), ENT_QUOTES, 'UTF-8');
+  // @codingStandardsIgnoreEnd
 
-  $LINK_ICHARS = $LINK_ICHARS_DOMAIN . (string) html_entity_decode(implode("", array(
-    "&#x00DF;", // ß
+  $link_ichars = $link_ichars_domain . (string) html_entity_decode(implode("", array(
+    // ß.
+    "&#x00DF;",
   )), ENT_QUOTES, 'UTF-8');
-  $allowed_protocols = variable_get('filter_allowed_protocols', array('http', 'https', 'ftp', 'news', 'nntp', 'telnet', 'mailto', 'irc', 'ssh', 'sftp', 'webcal'));
+  $allowed_protocols = variable_get('filter_allowed_protocols', array(
+    'http',
+    'https',
+    'ftp',
+    'file',
+    'news',
+    'nntp',
+    'telnet',
+    'mailto',
+    'irc',
+    'ssh',
+    'sftp',
+    'webcal',
+    'tel',
+  ));
+  $link_domains = _link_domains();
 
-  // Starting a parenthesis group with (?: means that it is grouped, but is not captured
-  $protocol = '((?:'. implode("|", $allowed_protocols) .'):\/\/)';
-  $authentication = "(?:(?:(?:[\w\.\-\+!$&'\(\)*\+,;=" . $LINK_ICHARS . "]|%[0-9a-f]{2})+(?::(?:[\w". $LINK_ICHARS ."\.\-\+%!$&'\(\)*\+,;=]|%[0-9a-f]{2})*)?)?@)";
-  $domain = '(?:(?:[a-z0-9' . $LINK_ICHARS_DOMAIN . ']([a-z0-9'. $LINK_ICHARS_DOMAIN . '\-_\[\]])*)(\.(([a-z0-9' . $LINK_ICHARS_DOMAIN . '\-_\[\]])+\.)*('. LINK_DOMAINS .'|[a-z]{2}))?)';
+  // Starting a parenthesis group with (?: means that it is grouped, but is not
+  // captured.
+  $protocol = '((?:' . implode("|", $allowed_protocols) . '):\/\/)';
+  $authentication = "(?:(?:(?:[\w\.\-\+!$&'\(\)*\+,;=" . $link_ichars . "]|%[0-9a-f]{2})+(?::(?:[\w" . $link_ichars . "\.\-\+%!$&'\(\)*\+,;=]|%[0-9a-f]{2})*)?)?@)";
+  $domain = '(?:(?:[a-zA-Z0-9' . $link_ichars_domain . ']([a-zA-Z0-9' . $link_ichars_domain . '\-_\[\]])*)(\.(([a-zA-Z0-9' . $link_ichars_domain . '\-_\[\]])+\.)*(' . $link_domains . '|[a-z]{2}))?)';
   $ipv4 = '(?:[0-9]{1,3}(\.[0-9]{1,3}){3})';
   $ipv6 = '(?:[0-9a-fA-F]{1,4}(\:[0-9a-fA-F]{1,4}){7})';
   $port = '(?::([0-9]{1,5}))';
-
   // Pattern specific to external links.
-  $external_pattern = '/^'. $protocol .'?'. $authentication .'?('. $domain .'|'. $ipv4 .'|'. $ipv6 .' |localhost)'. $port .'?';
+  $external_pattern = '/^' . $protocol . '?' . $authentication . '?(' . $domain . '|' . $ipv4 . '|' . $ipv6 . ' |localhost)' . $port . '?';
 
   // Pattern specific to internal links.
-  $internal_pattern = "/^(?:[a-z0-9". $LINK_ICHARS ."_\-+\[\]]+)";
-  $internal_pattern_file = "/^(?:[a-z0-9". $LINK_ICHARS ."_\-+\[\]\.]+)$/i";
+  $internal_pattern = "/^(?:[a-z0-9" . $link_ichars . "_\-+\[\] ]+)";
+  $internal_pattern_file = "/^(?:[a-z0-9" . $link_ichars . "_\-+\[\]\. \/\(\)][a-z0-9" . $link_ichars . "_\-+\[\]\. \(\)][a-z0-9" . $link_ichars . "_\-+\[\]\. \/\(\)]+)$/i";
 
-  $directories = "(?:\/[a-z0-9". $LINK_ICHARS ."_\-\.~+%=&,$'#!():;*@\[\]]*)*";
+  $directories = "(?:\/[a-z0-9" . $link_ichars . "_\-\.~+%=&,$'#!():;*@\[\]]*)*";
   // Yes, four backslashes == a single backslash.
-  $query = "(?:\/?\?([?a-z0-9". $LINK_ICHARS ."+_|\-\.~\/\\\\%=&,$'():;*@\[\]{} ]*))";
-  $anchor = "(?:#[a-z0-9". $LINK_ICHARS ."_\-\.~+%=&,$'():;*@\[\]\/\?]*)";
+  $query = "(?:\/?\?([?a-zA-Z0-9" . $link_ichars . "+_|\-\.~\/\\\\%=&,$'!():;*@\[\]{} ]*))";
+  $anchor = "(?:#[a-zA-Z0-9" . $link_ichars . "_\-\.~+%=&,$'():;*@\[\]\/\?!]*)";
 
   // The rest of the path for a standard URL.
-  $end = $directories .'?'. $query .'?'. $anchor .'?'.'$/i';
+  // @codingStandardsIgnoreLine
+  $end = $directories . '?' . $query . '?' . $anchor . '?' . '$/i';
 
-  $message_id = '[^@].*@'. $domain;
+  $message_id = '[^@].*@' . $domain;
   $newsgroup_name = '(?:[0-9a-z+-]*\.)*[0-9a-z+-]*';
-  $news_pattern = '/^news:('. $newsgroup_name .'|'. $message_id .')$/i';
+  $news_pattern = '/^news:(' . $newsgroup_name . '|' . $message_id . ')$/i';
 
-  $user = '[a-zA-Z0-9'. $LINK_ICHARS .'_\-\.\+\^!#\$%&*+\/\=\?\`\|\{\}~\'\[\]]+';
-  $email_pattern = '/^mailto:'. $user .'@'.'(?:'. $domain .'|'. $ipv4 .'|'. $ipv6 .'|localhost)'. $query .'?$/';
+  $user = '[a-zA-Z0-9' . $link_ichars . '_\-\.\+\^!#\$%&*+\/\=\?\`\|\{\}~\'\[\]]+';
+  $email_pattern = '/^mailto:' . $user . '@' . '(?:' . $domain . '|' . $ipv4 . '|' . $ipv6 . '|localhost)' . $query . '?$/';
+  $tel_pattern = '/^tel:(?:\+[1-9]\d{1,14}|\d{2,15})$/';
+
+  $file_pattern = "/^(?:file:\/\/)" . "(?:\/?[a-z0-9" . $link_ichars . "_\-\.\\\~+%=&,$'#!():;*@\[\]]*)*" . '$/i';
 
   if (strpos($text, '<front>') === 0) {
     return LINK_FRONT;
@@ -1010,10 +1847,35 @@ function link_validate_url($text) {
   if (in_array('mailto', $allowed_protocols) && preg_match($email_pattern, $text)) {
     return LINK_EMAIL;
   }
+  if (strpos($text, '#') === 0) {
+    return LINK_FRAGMENT;
+  }
+  if (strpos($text, '?') === 0) {
+    return LINK_QUERY;
+  }
+  if (in_array('tel', $allowed_protocols) && strpos($text, 'tel:') === 0) {
+    if (preg_match($tel_pattern, $text)) {
+      // Based on our tel pattern this is a 'valid' phone number so return tel
+      // type.
+      return LINK_TEL;
+    }
+    else {
+      // Based on our tel pattern this is using the tel protocol, but is not a
+      // 'valid' phone number. If we don't return false here $text will match
+      // LINK_EXTERNAL which is incorrect.
+      return FALSE;
+    }
+  }
   if (in_array('news', $allowed_protocols) && preg_match($news_pattern, $text)) {
     return LINK_NEWS;
   }
+  if (in_array('file', $allowed_protocols) && preg_match($file_pattern, $text, $as)) {
+    return LINK_FILE;
+  }
   if (preg_match($internal_pattern . $end, $text)) {
+    return LINK_INTERNAL;
+  }
+  if (drupal_valid_path($text) && url_is_external($text) == FALSE) {
     return LINK_INTERNAL;
   }
   if (preg_match($external_pattern . $end, $text)) {
@@ -1027,12 +1889,37 @@ function link_validate_url($text) {
 }
 
 /**
+ * Returns the list of allowed domains.
+ *
+ * If the variable link_allowed_domains is set, restrict allowed domains to the
+ * strings in that array. If the variable link_allowed_domains is not set, allow
+ * all domains between 2 and 63 characters in length.
+ * See https://tools.ietf.org/html/rfc1034.
+ */
+function _link_domains() {
+  $link_allowed_domains = variable_get('link_allowed_domains', array());
+  return empty($link_allowed_domains) ? '[a-z][a-z0-9-]{1,62}' : implode('|', $link_allowed_domains);
+}
+
+/**
  * Implements hook_migrate_field_alter().
  */
 function link_content_migrate_field_alter(&$field_value, $instance_value) {
   if ($field_value['type'] == 'link') {
-    // need to change the type:
+    // Adjust the field type.
     $field_value['type'] = 'link_field';
+    // Remove settings that are now on the instance.
+    foreach (array(
+      'attributes',
+      'display',
+      'url',
+      'title',
+      'title_value',
+      'enable_tokens',
+      'validate_url',
+    ) as $setting) {
+      unset($field_value['settings'][$setting]);
+    }
   }
 }
 
@@ -1042,9 +1929,39 @@ function link_content_migrate_field_alter(&$field_value, $instance_value) {
  * Widget type also changed to link_field.
  */
 function link_content_migrate_instance_alter(&$instance_value, $field_value) {
-  if ($instance_value['widget']['module'] == 'link'
-      && $instance_value['widget']['type'] == 'link') {
-    $instance_value['widget']['type'] = 'link_field';
+  if ($field_value['type'] == 'link') {
+    // Grab settings that were previously on the field.
+    foreach (array(
+      'attributes',
+      'display',
+      'url',
+      'title',
+      'title_value',
+      'enable_tokens',
+      'validate_url',
+    ) as $setting) {
+      if (isset($field_value['settings'][$setting])) {
+        $instance_value['settings'][$setting] = $field_value['settings'][$setting];
+      }
+    }
+    // Adjust widget type.
+    if ($instance_value['widget']['type'] == 'link') {
+      $instance_value['widget']['type'] = 'link_field';
+    }
+    // Adjust formatter types.
+    foreach ($instance_value['display'] as $context => $settings) {
+      if (in_array($settings['type'], array(
+        'default',
+        'title_plain',
+        'url',
+        'plain',
+        'short',
+        'label',
+        'separate',
+      ))) {
+        $instance_value['display'][$context]['type'] = 'link_' . $settings['type'];
+      }
+    }
   }
 }
 
@@ -1057,7 +1974,8 @@ function link_field_settings_form() {
 
 /**
  * Additional callback to adapt the property info of link fields.
- * @see entity_metadata_field_entity_property_info().
+ *
+ * @see entity_metadata_field_entity_property_info()
  */
 function link_field_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
   $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$field['field_name']];
@@ -1067,15 +1985,14 @@ function link_field_property_info_callback(&$info, $entity_type, $field, $instan
   $property['setter callback'] = 'entity_metadata_field_verbatim_set';
 
   // Auto-create the field item as soon as a property is set.
- $property['auto creation'] = 'link_field_item_create';
+  $property['auto creation'] = 'link_field_item_create';
 
   $property['property info'] = link_field_item_property_info();
-  $property['property info']['url']['required'] = !$instance['settings']['url'];
-  $property['property info']['title']['required'] = ($instance['settings']['title'] == 'required');
+  $property['property info']['url']['required'] = $instance['required'] && !$instance['settings']['url'];
+  $property['property info']['title']['required'] = $instance['required'] && ($instance['settings']['title'] == 'required');
   if ($instance['settings']['title'] == 'none') {
     unset($property['property info']['title']);
   }
-
   unset($property['query callback']);
 }
 
@@ -1085,7 +2002,7 @@ function link_field_property_info_callback(&$info, $entity_type, $field, $instan
  * @see link_field_property_info_callback()
  */
 function link_field_item_create() {
-  return array('title' => NULL, 'url' => NULL);
+  return array('title' => NULL, 'url' => NULL, 'display_url' => NULL);
 }
 
 /**
@@ -1098,9 +2015,61 @@ function link_field_item_property_info() {
     'setter callback' => 'entity_property_verbatim_set',
   );
   $properties['url'] = array(
-    'type' => 'uri',
+    'type' => 'text',
     'label' => t('The URL of the link.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'getter callback' => 'link_url_property_get',
+  );
+  $properties['attributes'] = array(
+    'type' => 'struct',
+    'label' => t('The attributes of the link.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'getter callback' => 'link_attribute_property_get',
+  );
+  $properties['display_url'] = array(
+    'type' => 'uri',
+    'label' => t('The full URL of the link.'),
     'setter callback' => 'entity_property_verbatim_set',
   );
   return $properties;
+}
+
+/**
+ * Callback for getting the URL property.
+ *
+ * @see entity_metadata_entity_get_properties()
+ */
+function link_url_property_get($data, array $options, $name, $type, $info) {
+  $url = entity_property_verbatim_get($data, $options, $name, $type, $info);
+
+  return url($url, $data + $options);
+}
+
+/**
+ * Entity property info getter callback for link attributes.
+ */
+function link_attribute_property_get($data, array $options, $name, $type, $info) {
+  return isset($data[$name]) ? array_filter($data[$name]) : array();
+}
+
+/**
+ * Implements hook_field_update_instance().
+ */
+function link_field_update_instance($instance, $prior_instance) {
+  if (function_exists('i18n_string_update') && isset($instance['widget']) && $instance['widget']['type'] == 'link_field' && $prior_instance['settings']['title_value'] != $instance['settings']['title_value']) {
+    $i18n_string_name = "field:{$instance['field_name']}:{$instance['bundle']}:title_value";
+    i18n_string_update($i18n_string_name, $instance['settings']['title_value']);
+  }
+}
+
+/**
+ * Implements hook_i18n_string_list_TEXTGROUP_alter().
+ */
+function link_i18n_string_list_field_alter(&$strings, $type = NULL, $object = NULL) {
+  if ($type != 'field_instance' || !is_array($object) || !isset($object['widget']['type'])) {
+    return;
+  }
+  if ($object['widget']['type'] == 'link_field' && isset($object['settings']['title_value'])) {
+    $strings['field'][$object['field_name']][$object['bundle']]['title_value']['string'] = $object['settings']['title_value'];
+  }
 }

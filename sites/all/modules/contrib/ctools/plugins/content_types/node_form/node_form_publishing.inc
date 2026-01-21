@@ -23,7 +23,7 @@ function ctools_node_form_publishing_content_type_render($subtype, $conf, $panel
   $block = new stdClass();
 
   $block->title = t('Publishing options');
-  $block->module = t('node_form');
+  $block->module = 'node_form';
   $block->delta = 'publishing-options';
 
   if (isset($context->form)) {
@@ -49,6 +49,6 @@ function ctools_node_form_publishing_content_type_admin_title($subtype, $conf, $
 }
 
 function ctools_node_form_publishing_content_type_edit_form($form, &$form_state) {
-  // provide a blank form so we have a place to have context setting.
+  // Provide a blank form so we have a place to have context setting.
   return $form;
 }

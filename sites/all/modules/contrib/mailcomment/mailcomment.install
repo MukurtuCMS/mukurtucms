@@ -1,0 +1,80 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the Mailhandler module.
+ */
+
+/**
+ * Implements hook_requirements().
+ *
+ * Check that either notifications or message_notify exist
+ */
+function mailcomment_requirements($phase) {
+  // Ensure translations don't break at install time
+  $t = get_t();
+  $requirements = array();
+  switch ($phase) {
+    case 'runtime':
+      $notification_exists   = module_exists('mailcomment_notifications');
+      $message_notify_exists = module_exists('mailcomment_message_notify');
+      $value = 'No Mail Comment submodule is enabled.';
+      if ($notification_exists || $message_notify_exists) {
+        $value = 'Mail Comment submodule enabled';
+      }
+
+      $requirements['mailcomment_runtime_dependency'] = array(
+        'title'       => $t('Mail Comment'),
+        'description' => $t("Mail Comment requires that either the Notifications or Message notify submodules be enabled in order to function properly.", array()),
+        'value'       => $value,
+        'severity'    => ($notification_exists || $message_notify_exists) ? REQUIREMENT_OK : REQUIREMENT_ERROR,
+      );
+      break;
+  }
+  return $requirements;
+}
+
+/**
+ * Set the new mailcomment_mailboxes variable with the mailcomment_mailbox variable by default.
+ */
+function mailcomment_update_6001() {
+  $mailbox = variable_get('mailcomment_mailbox', '');
+  variable_set('mailcomment_mailboxes', array($mailbox));
+  return t('Set the mailcomment_mailboxes variable.');
+}
+
+/**
+ * Add filtering modes: To mimic old behavior, use basic filtering when mailcomment_reply_text was set by user.
+ */
+function mailcomment_update_6201() {
+  if (variable_get('mailcomment_reply_text', t('((( Reply ABOVE this LINE to POST a COMMENT )))'))) {
+    variable_set('mailcomment_import_filter_mode', MAILCOMMENT_FILTER_BASIC);
+    $query = 'Set mailcomment_import_filter_mode variable to use basic filtering.';
+  }
+  else {
+    variable_set('mailcomment_import_filter_mode', MAILCOMMENT_FILTER_NONE);
+    $query = 'Set mailcomment_import_filter_mode variable to use no filtering.';
+  }
+  return t($query);
+}
+
+/**
+ * Add filtering modes: To mimic old behavior, use basic filtering when mailcomment_reply_text was set by user.
+ */
+function mailcomment_update_7201() {
+  if (variable_get('mailcomment_reply_text', t('((( Reply ABOVE this LINE to POST a COMMENT )))'))) {
+    variable_set('mailcomment_import_filter_mode', MAILCOMMENT_FILTER_BASIC);
+    $query = 'Set mailcomment_import_filter_mode variable to use basic filtering.';
+  }
+  else {
+    variable_set('mailcomment_import_filter_mode', MAILCOMMENT_FILTER_NONE);
+    $query = 'Set mailcomment_import_filter_mode variable to use no filtering.';
+  }
+  return t($query);
+}
+
+/**
+ * Enable mailcomment_notifications.
+ */
+function mailcomment_update_7202() {
+  module_enable(array('mailcomment_notifications'));
+}

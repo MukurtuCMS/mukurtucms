@@ -11,9 +11,11 @@ class ServicesRESTServerTests extends DrupalUnitTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => t('RESTServer unit tests'),
-      'description' => t('Test separate methods of class.'),
-      'group' => t('Services'),
+      'name' => 'RESTServer unit tests',
+      'description' => 'Test separate methods of class.',
+      'group' => 'Services',
+      // The REST service module requires the libraries module.
+      'dependencies' => array('ctools', 'libraries'),
     );
   }
 

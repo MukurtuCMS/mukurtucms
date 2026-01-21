@@ -1,0 +1,1944 @@
+<?php
+
+/**
+ * @file
+ * Code for the Mukurtu Mobile Client feature.
+ */
+
+include_once 'ma_mobile_client.features.inc';
+
+/**
+ * Implements hook_menu().
+ */
+function ma_mobile_client_menu() {
+  $items = [];
+
+  $items['mukurtu-mobile'] = [
+    'title' => 'Configure Mukurtu Mobile',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ma_mobile_client_admin_config'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+  ];
+
+  $items['node/%node/mobile-sync-toggle/%'] = [
+    'page callback' => 'ma_mobile_client_toggle_sync_node',
+    'page arguments' => array(1, 3),
+    'access callback' => 'user_is_logged_in',
+    'type' => MENU_CALLBACK,
+    'delivery callback' => 'ajax_deliver',
+  ];
+
+  $items['mobile/login/%/%/%'] = array(
+    'title' => 'Mobile browser login',
+    'page callback' => 'ma_mobile_client_browser_login',
+    'page arguments' => array(2, 3, 4),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Mukurtu Mobile admin config form.
+ * Linked from Dashboard.
+ */
+function ma_mobile_client_admin_config($form, $form_state) {
+
+  $form['mukurtu_mobile_enabled'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Enable access to the site via the Mukurtu Mobile app.'), // TODO: link to the app here.
+    '#default_value' => variable_get ('mukurtu_mobile_enabled', 0),
+  ];
+
+  $logo_options = [
+    'logo'=> '<img src="' . theme_get_setting('favicon') . '" height="26"> (site logo)',
+    'favicon' => '<img src="' . theme_get_setting('logo') . '" height="26"> (site favicon)',
+  ];
+  $form['mm_logo'] = [
+    '#type' => 'radios',
+    '#title' => t('Logo to use in the Mukurtu Mobile app'),
+    '#default_value' => variable_get ('mm_logo', 'logo'),
+    '#options' => $logo_options,
+  ];
+
+  ////
+  // Viewable content types table
+  ////
+
+  $ordered_types = variable_get('mm_viewable_types', []);
+  uasort($ordered_types, 'drupal_sort_weight');
+  $node_types = node_type_get_names();
+
+  // If a node type has been added since var mm_viewable_types was last set
+  // (meaning it wasn't saved to the mm_viewable_types var in this form nor in a hook_update or hook_install when the type was created)
+  // then we need to ensure it gets added to this form, but at the bottom.
+  foreach ($node_types as $type => $type_name) {
+    if (!array_key_exists($type, $ordered_types)) {
+      if (!isset($highest_weight)) {
+        $highest_weight = end($ordered_types)['weight'] ? end($ordered_types)['weight'] : 0;
+      }
+      $highest_weight += 10;
+      $ordered_types[$type] = [
+        'viewable' => 0,
+        'weight' => $highest_weight,
+      ];
+    }
+  }
+
+  $form['viewable'] = [
+    '#type' => 'fieldset',
+    '#title' => t('Viewable Content Types'),
+    'help_text' => [
+      '#markup' => 'Check the content types which can be viewed within the Mukurtu Mobile app.<br/>Content types in <span class="linethrough">strikethrough</span> either need a Mukurtu Mobile view mode, or have paragraph fields which need a Mukurtu Mobile view mode, before they will work.<br/>Use the arrows to drag the content types into the order that they will display in the <i>View Content</i> page in the app.',
+    ],
+    'mm_viewable_types' => [
+      '#tree' => TRUE,
+      '#theme' => 'mm_viewable_types_table',
+    ],
+  ];
+
+  foreach ($ordered_types as $node_type => $node_type_properties) {
+
+    // Determine if a content type has a Mukurtu Mobile view mode.
+    $view_modes = field_view_mode_settings('node', $node_type);
+    $available = isset($view_modes["mukurtu_mobile"]) ? TRUE : FALSE;
+    $fields = field_info_instances('node', $node_type);
+    if ($available) {
+      // Also need to make sure any of its Paragraph fields have a Mukurtu Mobile view mode as well.
+      foreach ($fields as $field) {
+        if (isset($field["display"]["mukurtu_mobile"]["module"]) && $field["display"]["mukurtu_mobile"]["module"] == 'paragraphs') {
+          $allowed_bundles = $field["settings"]["allowed_bundles"];
+          $select_bundles = [];
+          foreach ($allowed_bundles as $allowed_bundle_key => $allowed_bundle_value) {
+            if ($allowed_bundle_key === $allowed_bundle_value) {
+              $select_bundles[] = $allowed_bundle_value;
+            }
+          }
+          if (count($select_bundles) > 1) {
+            drupal_set_message($field['field_name'] . ' has more than 1 selected bundle. ma_mobile_client_admin_config() needs to be updated for this.', 'error');
+          }
+          $paragraph_view_modes = field_view_mode_settings('paragraphs_item', $select_bundles[0]);
+          if (is_null($paragraph_view_modes["mukurtu_mobile"])) {
+            $available = FALSE;
+            break;
+          }
+        }
+      }
+    }
+
+    $form['viewable']['mm_viewable_types'][$node_type] = [
+      'viewable' => [
+        '#type' => 'checkbox',
+        '#default_value' => $node_type_properties['viewable'],
+        '#available' => $available, // Items that are not available will get a linethrough during render.
+      ],
+      'label' => [
+        '#type' => 'item',
+        '#markup' => $node_types[$node_type],
+      ],
+      'weight' => [
+        '#type' => 'textfield',
+        '#default_value' => $node_type_properties['weight'],
+        '#size' => 3,
+        '#attributes' => ['class' => ['item-row-weight']],
+      ],
+    ];
+  }
+
+  ////
+  // Creatable content types table
+  ////
+
+  $ordered_types = variable_get('mm_creatable_types', []);
+  uasort($ordered_types, 'drupal_sort_weight');
+  $node_types = node_type_get_names();
+
+  // If a node type has been added since var mm_creatable_types was last set
+  // (meaning it wasn't saved to the mm_creatable_types var in this form nor in a hook_update or hook_install when the type was created)
+  // then we need to ensure it gets added to this form, but at the bottom.
+  foreach ($node_types as $type => $type_name) {
+    if (!array_key_exists($type, $ordered_types)) {
+      if (!isset($highest_weight)) {
+        $highest_weight = end($ordered_types)['weight'] ? end($ordered_types)['weight'] : 0;
+      }
+      $highest_weight += 10;
+      $ordered_types[$type] = [
+        'creatable' => 0,
+        'weight' => $highest_weight,
+      ];
+    }
+  }
+
+  $form['creatable'] = [
+    '#type' => 'fieldset',
+    '#title' => t('Creatable Content Types'),
+    'help_text' => [
+      '#markup' => 'Check the content types which can be created within the Mukurtu Mobile app.<br/>Use the arrows to drag the content types into the order that they will display in the <i>Create Content</i> page in the app.',
+    ],
+    'mm_creatable_types' => [
+      '#tree' => TRUE,
+      '#theme' => 'mm_creatable_types_table',
+    ],
+  ];
+
+  foreach ($ordered_types as $node_type => $node_type_properties) {
+    $form['creatable']['mm_creatable_types'][$node_type] = [
+      'creatable' => [
+        '#type' => 'checkbox',
+        '#default_value' => $node_type_properties['creatable'],
+      ],
+      'label' => [
+        '#type' => 'item',
+        '#markup' => $node_types[$node_type],
+      ],
+      'weight' => [
+        '#type' => 'textfield',
+        '#default_value' => $node_type_properties['weight'],
+        '#size' => 3,
+        '#attributes' => ['class' => ['item-row-weight']],
+      ],
+    ];
+  }
+
+  return system_settings_form($form);
+}
+
+/**
+ * Implements hook_theme().
+ */
+function ma_mobile_client_theme($existing, $type, $theme, $path) {
+  $themes = array(
+    'mm_viewable_types_table' => array(
+      'render element' => 'element'
+    ),
+    'mm_creatable_types_table' => array(
+      'render element' => 'element'
+    ),
+  );
+  return $themes;
+}
+
+/**
+ * Make the node types table rows draggable; the resulting order is used when listing the content types in the app.
+ */
+function theme_mm_viewable_types_table($vars) {
+  $element = $vars['element'];
+  drupal_add_tabledrag('mm_viewable_types_table', 'order', 'sibling', 'item-row-weight');
+
+  $header = array(
+    'viewable' => t('Viewable'),
+    'label' => t('Content Type'),
+    'weight' => t('Weight'),
+  );
+
+  $rows = array();
+  foreach (element_children($element) as $key) {
+    $row = array();
+    $row['data'] = array();
+    foreach ($header as $fieldname => $title) {
+      $row['data'][] = drupal_render($element[$key][$fieldname]);
+      $classes = ['draggable'];
+      if (!$element[$key]["viewable"]["#available"]) {
+        $classes[] = 'linethrough';
+      }
+      $row['class'] = $classes;
+    }
+    $rows[] = $row;
+  }
+
+  return theme('table', array(
+    'header' => $header,
+    'rows' => $rows,
+    'attributes' => array('id' => 'mm_viewable_types_table'),
+  ));
+}
+
+/**
+ * Make the node types table rows draggable; the resulting order is used when listing the content types in the app.
+ */
+function theme_mm_creatable_types_table($vars) {
+  $element = $vars['element'];
+  drupal_add_tabledrag('mm_creatable_types_table', 'order', 'sibling', 'item-row-weight');
+
+  $header = array(
+    'creatable' => t('Creatable'),
+    'label' => t('Content Type'),
+    'weight' => t('Weight'),
+  );
+
+  $rows = array();
+  foreach (element_children($element) as $key) {
+    $row = array();
+    $row['data'] = array();
+    foreach ($header as $fieldname => $title) {
+      $row['data'][] = drupal_render($element[$key][$fieldname]);
+      $row['class'] = array('draggable');
+    }
+    $rows[] = $row;
+  }
+
+  return theme('table', array(
+    'header' => $header,
+    'rows' => $rows,
+    'attributes' => array('id' => 'mm_creatable_types_table'),
+  ));
+}
+
+
+/**
+ * Add or Remove a node from a user's mukurtu mobile synced nodes list (via ajax link)
+ */
+function ma_mobile_client_toggle_sync_node($node, $color) {
+
+  // This would only happen via someone intentionally trying to hack in (hitting the toggle URL).
+  // Important because otherwise a node they can't access will sync to their phone.
+  if (!node_access('view', $node)) {
+    return;
+  }
+
+  // Save to the user the new list of synced nodes.
+  global $user;
+  $uw = entity_metadata_wrapper('user', $user);
+  $synced_nodes = $uw->field_mm_sync->raw();
+  if (($key = array_search($node->nid, $synced_nodes)) !== FALSE) {
+    unset($synced_nodes[$key]);
+  }
+  else {
+    $synced_nodes[] =  $node->nid;
+  }
+  $uw->field_mm_sync->set($synced_nodes);
+  $uw->save();
+
+  // Update the mobile sync icon link (image and tooltip) for this node via ajax.
+  return array(
+    '#type' => 'ajax',
+    '#commands' => [ajax_command_replace('.mobile-sync-' . $node->nid, ma_mobile_client_generate_toggle_link($node, $color))],
+  );
+
+}
+
+
+/**
+ * Generate the link to sync/unsync a node for a user.
+ */
+function ma_mobile_client_generate_toggle_link($node, $color = '') {
+  if (user_is_logged_in()) {
+
+    // If viewing another user's profile page, do not render the sync icons for any of the items in the blocks.
+    // (would be very confusing because the sync would happen for viewing user, though the nodes displayed are for the viewed user)
+    if (arg(0) == 'user' && !ma_mobile_client_viewing_own_profile()) {
+      return;
+    }
+
+    if (!$node->type) {
+      $node->type = $node->node_type; // when called by the My Mukurtu Mobile Content view (as opposed to the DS field)
+    }
+    global $user;
+    $uw = entity_metadata_wrapper('user', $user);
+    $synced_nodes = $uw->field_mm_sync->raw();
+    if (in_array($node->nid, $synced_nodes)) {
+      $icon = "synced";
+      $link_text = 'Remove this ' . node_type_get_name($node->type) . ' from your Mukurtu Mobile synced content.';
+    }
+    else {
+      $icon = "unsynced";
+      $link_text = 'Add this ' . node_type_get_name($node->type) . ' to your Mukurtu Mobile synced content.';
+    }
+    if (!$color) {
+      switch (theme_get_setting('mukurtu_theme_color_scheme', 'mukurtu')) {
+        case 'red-bone':
+          $color = 'red';
+          break;
+        default:
+          $color = 'blue';
+      }
+    }
+    $classes = [
+      'use-ajax',
+      'mobile-sync-icon',
+      'mobile-sync-' . $node->nid,
+    ];
+
+    global $base_path;
+    $theme_path = drupal_get_path('theme', 'mukurtu');
+    return l('<img src="' . $base_path . $theme_path . '/images/icons/mobile-' . $icon . '-' . $color . '.png">', 'node/' . $node->nid . '/mobile-sync-toggle/' . $color, ['html' => TRUE, 'attributes' => ['class' => $classes, 'title' => $link_text]]);
+  }
+
+}
+
+/**
+ * Callback to a log a user into the mobile browser using the link obtained by the app from the one-time-login endpoint.
+ * This is based on user_pass_reset().
+ */
+function ma_mobile_client_browser_login($uid, $timestamp, $hashed_pass) {
+  global $user;
+  if ($user->uid) {
+    //    drupal_set_message(t('User is already logged in.'), 'error');
+    drupal_goto();
+  }
+  else {
+    $timeout = 60;
+    $current = REQUEST_TIME;
+    $users = user_load_multiple(array($uid), array('status' => '1'));
+    if ($timestamp <= $current && $account = reset($users)) {
+      if ($current - $timestamp > $timeout) {
+        drupal_set_message(t('Login link expires after ' . $timeout . 'seconds.'), 'error');
+        drupal_goto('');
+      }
+      elseif ($account->uid && $timestamp >= $account->login && $timestamp <= $current && $hashed_pass == user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid)) {
+        $user = $account;
+        user_login_finalize();
+        drupal_goto('');
+      }
+      else {
+        drupal_set_message(t('Login link already used or invalid.'), 'error');
+        drupal_goto('');
+      }
+    }
+    else {
+      drupal_access_denied();
+      drupal_exit();
+    }
+  }
+}
+
+
+/**
+ * Check if viewing own profile page.
+ *
+ * Used as the view perm for My Mukurtu Mobile Content, and also in ma_mobile_client_generate_toggle_link()
+ * to hide the sync icon on the nodes in the other blocks (Community, Protocols) when not viewing own profile.
+ */
+function ma_mobile_client_viewing_own_profile() {
+  global $user;
+  if ($user->uid == arg(1)) {
+    return TRUE;
+  }
+}
+
+
+/**
+ * Implements of hook_services_resources().
+ */
+function ma_mobile_client_services_resources() {
+  $api = [
+
+    'one_time_login' => [
+      'operations' => [
+        'retrieve' => [
+          'help' => 'Retrieve a one-time-login URL for the currently authed user, to use to auth the user in the mobile browser',
+          'callback' => '_ma_mobile_client_get_one_time_login',
+          'access callback' => 'user_is_logged_in',
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+          ],
+        ],
+      ],
+    ],
+
+    'site_info' => [
+      'operations' => [
+        'retrieve' => [
+          'help' => 'Retrieve basic site info to use in the Mukurtu Mobile app',
+          'callback' => '_ma_mobile_client_get_site_info',
+          'access callback' => 'user_is_logged_in',
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+          ],
+        ],
+      ],
+    ],
+
+    'synced_entities' => [
+      'operations' => [
+        'retrieve' => [
+          'help' => "Retrieve a structured array of a user's list of synced entities",
+          'callback' => '_ma_mobile_client_get_user_synced_entities',
+          'access callback' => 'user_is_logged_in',
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+          ],
+        ],
+        'create' => [
+          'help' => "Submit an array of NIDs to add to a user's list of synced entities (for when the node was created in the app)",
+          'callback' => '_ma_mobile_client_submit_user_synced_entities',
+          'access callback' => 'user_is_logged_in',
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+            [
+              'name' => 'nodes',
+              'optional' => FALSE,
+              'source' => 'data',
+              'description' => 'Array of NIDs to add as synced',
+              'type' => 'array',
+            ],
+          ],
+        ],
+      ],
+    ],
+
+    'creatable_types' => [
+      'operations' => [
+        'retrieve' => [
+          'help' => "Retrieve a list of content types for which nodes of that type can be created from the Mukurtu Mobile app",
+          'callback' => '_ma_mobile_client_get_creatable_types',
+          'access callback' => 'user_is_logged_in',
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+          ],
+        ],
+      ],
+    ],
+
+    'node_form_fields' => [
+      'operations' => [
+        'retrieve' => [
+          'help' => "Retrieves the fields and their properties, and fieldgroups, of the passed content type for the current user, to be used by the app in constructing the form in React.",
+          'callback' => '_ma_mobile_client_get_node_form_fields',
+          'access callback' => 'user_is_logged_in',
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+            [
+              'name' => 'type',
+              'type' => 'string',
+              'description' => 'Content type',
+              'source' => ['path' => '1'],
+              'optional' => FALSE,
+            ],
+
+          ],
+        ],
+      ],
+    ],
+
+    'viewable_types' => [
+      'operations' => [
+        'retrieve' => [
+          'help' => "Retrieve a list of content types for which nodes of that type can be viewed from the Mukurtu Mobile app",
+          'callback' => '_ma_mobile_client_get_viewable_types',
+          'access callback' => 'user_is_logged_in',
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+          ],
+        ],
+      ],
+    ],
+
+    'node_view_fields' => [
+      'operations' => [
+        'retrieve' => [
+          'help' => "Retrieves the fields and their properties, and fieldgroups, to be used by the app in constructing the node view in React.",
+          'callback' => '_ma_mobile_client_get_node_view_fields',
+          'access callback' => 'user_is_logged_in',
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+            [
+              'name' => 'type',
+              'type' => 'string',
+              'description' => 'Content type',
+              'source' => ['path' => '1'],
+              'optional' => FALSE,
+            ],
+
+          ],
+        ],
+      ],
+    ],
+
+    'list_view_fields' => [
+      'operations' => [
+        'retrieve' => [
+          'help' => "Retrieves the fields and their properties to be used by the app in constructing the list view in React.",
+          'callback' => '_ma_mobile_client_get_list_view_fields',
+          'access callback' => 'user_is_logged_in',
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+            [
+              'name' => 'type',
+              'type' => 'string',
+              'description' => 'Content type',
+              'source' => ['path' => '1'],
+              'optional' => FALSE,
+            ],
+
+          ],
+        ],
+      ],
+    ],
+
+    'paragraph' => [
+      'operations' => [
+        'retrieve' => [
+          'help' => 'Retrieves a paragraph',
+          'callback' => '_ma_mobile_client_retrieve_paragraph',
+          'access callback' => 'user_is_logged_in',
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+            [
+              'name' => 'pid',
+              'type' => 'string',
+              'description' => 'Paragraph ID',
+              'source' => ['path' => '1'],
+              'optional' => FALSE,
+            ],
+          ],
+        ],
+      ],
+    ],
+
+    'scald' => [
+      'operations' => [
+
+        'create' => [
+          'help' => 'Creates a scald atom',
+          'callback' => '_ma_mobile_client_create_atom',
+          'access callback' => 'user_access',
+          'access arguments' => ['create atom of any type'],
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+            [
+              'name' => 'id',
+              'type' => 'string',
+              'description' => 'ID (File ID, Youtube ID, Video ID)',
+              'source' => ['param' => 'id'],
+              'optional' => FALSE,
+            ],
+            [
+              'name' => 'external',
+              'type' => 'string',
+              'description' => '"Youtube" or "Vimeo"',
+              'source' => ['param' => 'external'],
+              'optional' => TRUE,
+            ],
+            [
+              'name' => 'title',
+              'type' => 'string',
+              'description' => 'title',
+              'source' => ['param' => 'title'],
+              'optional' => TRUE,
+            ],
+            [
+              'name' => 'author',
+              'type' => 'string',
+              'description' => 'author',
+              'source' => ['param' => 'author'],
+              'optional' => TRUE,
+            ],
+            [
+              'name' => 'category',
+              'type' => 'string',
+              'description' => 'category',
+              'source' => ['param' => 'category'],
+              'optional' => TRUE,
+            ],
+          ],
+        ],
+
+        'retrieve' => [
+          'help' => 'Retrieves a scald atom',
+          'callback' => '_ma_mobile_client_retrieve_atom',
+          'access callback' => 'user_is_logged_in',
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+            [
+              'name' => 'sid',
+              'type' => 'string',
+              'description' => 'Scald Atom ID',
+              'source' => ['path' => '1'],
+              'optional' => FALSE,
+            ],
+          ],
+        ],
+      ],
+    ],
+
+    'groups' => [
+      'operations' => [
+        'index' => [
+          'help' => 'Retrieve all groups that current user can post content to',
+          'callback' => '_ma_mobile_client_user_groups',
+          'access callback' => 'user_access',
+          'access arguments' => ['edit own digital_heritage content'],
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+          ],
+        ],
+      ],
+    ],
+
+  ];
+
+  return $api;
+}
+
+
+/**
+ * Provide a one-time-login link.
+ */
+function _ma_mobile_client_get_one_time_login($fn) {
+  global $user;
+  $timestamp = REQUEST_TIME;
+  return url("mobile/login/$user->uid/$timestamp/" . user_pass_rehash($user->pass, $timestamp, $user->login, $user->uid), array('absolute' => TRUE));
+}
+
+/**
+ * Return the logo.
+ */
+function _ma_mobile_client_get_site_info($fn) {
+  $mm_enabled = variable_get ('mukurtu_mobile_enabled', 0);
+  $logo = file_get_contents(theme_get_setting(variable_get ('mm_logo', 'logo')));
+  $site_name = variable_get('site_name', 'Mukurtu');
+  return [
+    'mukurtu_mobile_enabled' => $mm_enabled,
+    'site_name' => $site_name,
+    'logo' => base64_encode($logo),
+  ];
+}
+
+
+/**
+ * Retrieve a NID list of a user's synced nodes, w/ last updated time, so that we don't try to sync unchanged nodes.
+ */
+function _ma_mobile_client_get_user_synced_entities ($fn) {
+  global $user;
+  $uw = entity_metadata_wrapper('user', $user);
+  $synced_nodes = $uw->field_mm_sync->value();
+  $all_synced_entities = [];
+  $viewable_types = _ma_mobile_client_get_viewable_types();
+
+  foreach ($synced_nodes as $synced_node) {
+
+    if (!array_key_exists($synced_node->type, $viewable_types)) {
+      continue; // Just in case user hacked to the form submission to get an invalid node as one to sync, or if an admin changed the valid vieawwable types subsequent to it being added.
+    }
+
+    // Add the node.
+    if (node_access('view', $synced_node)) { // Check to make sure the user can view the node. This might not be the case if the CP on the node was changed after the user had set it to be synced.
+      $all_synced_entities['nodes'][$synced_node->type][$synced_node->nid] = [
+        'last_updated' => $synced_node->changed,
+        'editable' => node_access('update', $synced_node) ? TRUE: FALSE,
+        'skip_in_browse_view' => !empty($synced_node->field_community_record_parent[LANGUAGE_NONE]) ? TRUE: FALSE,
+      ];
+    }
+
+    // For all the refs, add those entities to be synced as well.
+    $all_synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_node, $all_synced_entities);
+  }
+
+  return $all_synced_entities;
+}
+
+
+/**
+ * For all the entity refs, node refs, term refs, atom refs in the node, add those entities to be synced as well.
+ * We are going one-level deep*, so entity ref'ed nodes get synced, but entity ref'ed nodes of entity ref'ed nodes do not get synced.
+ * Entity-ref'ed nodes are *not* marked by this as synced when viewing that node individually (ie. the phone icon remains unstarred),
+ * or else their own entity refs would then get synced; this is just so that when viewing the parent node,
+ * the user can see its immediate children in the ref fields.
+ *
+ * * except for entity refs that are in $go_one_level_deeper. For these, the children get their own entity refs synced too.
+ */
+function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_synced_entities, $synced_entity_type = 'node', $non_node_refs_only = FALSE) {
+
+  // Build list of fields to loop through
+  $ref_types = ['taxonomy_term_reference', 'atom_reference', 'field_collection', 'paragraphs'];
+  if (!$non_node_refs_only) {
+    $ref_types = array_merge($ref_types, ['node_reference', 'entityreference']);
+  }
+  $ref_fields = field_read_fields(['type' => $ref_types]);
+
+  foreach ($ref_fields as $ref_field => $ref_field_properties) {
+
+    // Define entity reference term fields (where a view is used to populate the values in the form) as tax term references, for the purpose of this function.
+    $entity_reference_term_fields = [
+      'field_mukurtu_terms'
+    ];
+    if (in_array($ref_field, $entity_reference_term_fields)) {
+      $ref_field_properties['type'] = 'taxonomy_term_reference';
+    }
+
+
+    /////
+    // Get $ref_field_values
+    $ref_field_values = [];
+
+    // Unfortunately, no metadata wrapper methods for atoms, so need to load manually.
+    if ($synced_entity_type == 'atom') {
+      if (isset($synced_entity->{$ref_field}) && isset($synced_entity->{$ref_field})) {
+        foreach ($synced_entity->{$ref_field}[LANGUAGE_NONE] as $ref_field_value) {
+          if (isset($ref_field_value['tid'])) {
+            $ref_field_values[] = taxonomy_term_load($ref_field_value['tid']);
+          }
+          elseif (isset($ref_field_value['target_id'])) {
+            $ref_field_values[] = node_load($ref_field_value['target_id']);
+          }
+          else {
+            // Currently, term refs and entity refs are the only kind of refs in atoms, but if there are others in the future, we'll need to add handling for them here.
+            drupal_set_message ("Error in _ma_mobile_client_add_ref_fields_to_sync_nodes() (atoms). Contact developer.", 'error');
+          }
+        }
+      }
+    }
+    else {
+      $sew = entity_metadata_wrapper($synced_entity_type, $synced_entity);
+      if (isset($sew->{$ref_field})) {
+        $ref_field_values = $sew->{$ref_field}->value();
+        if (is_object(($ref_field_values))) {
+          $ref_field_values = [$ref_field_values]; // convert single value term ref fields (single value entity ref fields too?) from single object to single value array with object as first value
+        }
+      }
+    }
+
+    if (isset($ref_field_values)) {
+
+//    dpm ($ref_field_values, $ref_field_properties["type"] . ': ' . $ref_field . ' count: ' . count($ref_field_values) );
+      foreach ($ref_field_values as $reffed_entity) {
+        switch ($ref_field_properties["type"]) {
+
+          // Term references
+          case 'taxonomy_term_reference':
+            $all_synced_entities['terms'][$reffed_entity->tid] = [
+              'last_updated' => $reffed_entity->changed,
+              'term_name' => $reffed_entity->name
+            ];
+            break;
+
+          // Atom references
+          case 'atom_reference':
+            if (scald_atom_access('view', $reffed_entity)) { // Check to make sure the user can view the reffed node.
+              $all_synced_entities['atoms'][$reffed_entity->sid] = [
+                'last_updated' => $reffed_entity->changed,
+                'editable' => scald_atom_access('edit', $reffed_entity) ? TRUE : FALSE,
+              ];
+              $all_synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_entity, $all_synced_entities, 'atom');
+            }
+            break;
+
+          // Field_collections
+          case 'field_collection':
+            $all_synced_entities['field_collections'][$reffed_entity->item_id] = [
+              'last_updated' => 0, // reffed_entity->changed, // TODO: if these get unwieildy on the sync, will need to add this property to FC entities.
+            ];
+            $all_synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_entity, $all_synced_entities, 'field_collection_item');
+            break;
+
+          // Paragraphs
+          case 'paragraphs':
+            $all_synced_entities['paragraphs'][$reffed_entity->item_id] = [
+              'last_updated' => 0, // reffed_entity->changed, // TODO: if these get unwieildy on the sync, will need to add this property to paragraph entities.
+            ];
+            $all_synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_entity, $all_synced_entities, 'paragraphs_item');
+            break;
+
+          // Entity / node references.
+          default:
+          if (node_access('view', $reffed_entity)) { // Check to make sure the user can view the reffed node.
+            if ($ref_field_properties["settings"]["target_type"] != 'user') { // skip when the referring field is field_dhan_notified_users, or any other entity ref fields to users
+              $go_deeper_for_this_entity = (isset($all_synced_entities['nodes'][$reffed_entity->type]) AND !array_key_exists($reffed_entity->nid, $all_synced_entities['nodes'][$reffed_entity->type]));
+              $all_synced_entities['nodes'][$reffed_entity->type][$reffed_entity->nid] = [
+                'last_updated' => $reffed_entity->changed,
+                'editable' => node_access('update', $reffed_entity) ? TRUE: FALSE,
+                'skip_in_browse_view' => !empty($reffed_entity->field_community_record_parent[LANGUAGE_NONE]) ? TRUE: FALSE,
+              ];
+              // Go deeper for certain entity refs.
+              $go_one_level_deeper = ['field_unit_lessons'];
+              if (in_array($ref_field, $go_one_level_deeper)) {
+                $all_synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_entity, $all_synced_entities);
+              }
+              // Otherwise still need to get the entity's refs other than other nodes (if it hasn't already been done for this node)
+              elseif ($go_deeper_for_this_entity) {
+                $all_synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_entity, $all_synced_entities, 'node', TRUE);
+              }
+            }
+          }
+          break;
+
+        }
+      }
+    }
+  }
+  return $all_synced_entities;
+}
+
+
+/**
+ * Submit an array of NIDs to add to a user's list of synced entities (for when the node was created in the app)
+ */
+function _ma_mobile_client_submit_user_synced_entities ($fn, $nids) {
+  $nids = _services_arg_value($nids, 'entities');
+  $confirmed_nids = [];
+  foreach ($nids as $nid) {
+    if (is_int($nid) && node_load($nid)) {
+      $confirmed_nids[] = $nid;
+    }
+  }
+  global $user;
+  $uw = entity_metadata_wrapper('user', $user);
+  $synced_nids = $uw->field_mm_sync->raw();
+  $new_nids = array_diff ($confirmed_nids, $synced_nids);
+  if (isset($new_nids) AND count($new_nids)) {
+    $all_nids = array_merge($synced_nids, $new_nids);
+    $uw->field_mm_sync->set($all_nids);
+    $uw->save();
+    return "The following NIDs were added to be synced: " . implode(', ', $new_nids);
+  }
+  else {
+    return "No new NIDs were added to be synced.";
+  }
+}
+
+
+/**
+ * Retrieve a list of content types that are creatable by the app.
+ */
+function _ma_mobile_client_get_creatable_types ($fn = NULL) {
+  $ordered_types = variable_get('mm_creatable_types', []);
+  uasort($ordered_types, 'drupal_sort_weight');
+  $node_types = node_type_get_types();
+  $creatable_types = [];
+  foreach ($ordered_types as $node_type => $node_type_properties) {
+    if ($node_type_properties['creatable']) {
+      $creatable_types[$node_type] = [
+        'label' => $node_types[$node_type]->name,
+        'description' => $node_types[$node_type]->description
+      ];
+    }
+  }
+  return $creatable_types;
+}
+
+
+/**
+ * Retrieve a list of content types that are viewable by the app.
+ * Also some other properties (list view filters, whether type can be added to a Personal Collection)
+ */
+function _ma_mobile_client_get_viewable_types ($fn = NULL) {
+  $ordered_types = variable_get('mm_viewable_types', []);
+  uasort($ordered_types, 'drupal_sort_weight');
+  $node_types = node_type_get_types();
+  $viewable_types = [];
+  $view_filters = [
+//    'all' => same as digital_heritage
+    'digital_heritage' => [
+      'field_community_ref' => 'Community',
+      'field_collection' => 'Collections',
+      'field_category' => 'Category',
+      'field_media_asset:type' => 'Media Type',
+      'field_tags' => 'Keywords',
+    ],
+    'dictionary_word' => [
+      'field_dictionary_word_language' => 'Language',
+      'field_tags' => 'Keywords',
+      'field_word_entry:field_part_of_speech' => 'Word Entry',
+      'field_word_list' => 'Word List',
+    ],
+  ];
+  foreach ($ordered_types as $node_type => $node_type_properties) {
+    if ($node_type_properties['viewable']) {
+      $viewable_types[$node_type] = [
+        'label' => $node_types[$node_type]->name,
+        'description' => $node_types[$node_type]->description
+      ];
+      if (isset ($view_filters[$node_type])) {
+        $viewable_types[$node_type]['list view filters'] = $view_filters[$node_type];
+      }
+      // Personal Collection-able?
+      $ds_layout = ds_get_layout('node', $node_type, 'full', TRUE);
+      $viewable_types[$node_type]['valid type for personal collection'] = isset($ds_layout["settings"]["fields"]["mukurtu_icon_actions"]) ? 1 : 0;
+    }
+  }
+  return $viewable_types;
+}
+
+
+/**
+ * Retrieves the fields and their properties, and fieldgroups, of the passed content type for the current user, to be used by the app in constructing the form in React.
+ */
+function _ma_mobile_client_get_node_form_fields ($fn, $bundle, $fc = FALSE) {
+
+  // Build node form
+  if (!$fc) {
+    if (!node_type_get_type($bundle)) {
+      return 'Content type ' . $bundle . ' does not exist';
+    }
+    if (!key_exists($bundle, _ma_mobile_client_get_creatable_types())) {
+      return 'Content type ' . $bundle . ' exists, but is not a valid app-creatable type.';
+    }
+
+    // Get the node form for this user and this content type.
+    module_load_include('inc', 'node', 'node.pages');
+    global $user;
+    $node = new stdClass;
+    $node->uid = $user->uid;
+    $node->type = $bundle;
+    $node->language = LANGUAGE_NONE;
+    $form = drupal_get_form($bundle . '_node_form', $node);
+  }
+
+  // Build field collection form which gets embedded into the node form.
+  else {
+    $field_collection_item = entity_create('field_collection_item', array('field_name' => $bundle));
+    $form_state = [];
+    $form = [];
+    field_attach_form('field_collection_item', $field_collection_item, $form, $form_state, LANGUAGE_NONE);
+  }
+
+  // Build $fields_and_fieldgroups out of the node form fields (skipping the ones we don't want), body, title, and the field groups.
+  $fields_and_fieldgroups = [];
+  $special_fields = [
+    'title',
+    'body',
+    '#groups',
+    '#group_children',
+    'group_access',
+    'group_register',
+    'og_roles_permissions',
+    'og_group_ref',
+  ];
+  foreach ($form as $key => $value) {
+    if ((in_array($key, $special_fields) OR substr($key, 0, 6) == 'field_')) {
+
+      $field_info = field_info_field($key);
+
+      // For field collection fields, call this own function to add the FC's subfields within the FC field.
+      // For paragraphs, this is not necessary -- the form API builds the paragraph subfields already. For FC we have to manually add them.
+      if ($field_info["module"] == 'field_collection') {
+        $fc_subfields = _ma_mobile_client_get_node_form_fields(NULL, $key, TRUE);
+        $value['field_collection_subfields'] = $fc_subfields;
+      }
+
+      // Non-FC fields.
+      else {
+
+        // Custom handling per field.
+        switch ($key) {
+
+          case "og_group_ref":
+            $options = [];
+            $communities = _ajax_get_community_dropdown_options([], FALSE);
+            foreach ($communities as $community_nid => $community_name) {
+              if ($community_nid) {
+                $options [$community_name] = _ajax_get_protocol_by_community_dropdown_options($community_nid, [], FALSE);
+              }
+            }
+            $value[LANGUAGE_NONE]["#options"] = $options;
+            $value[LANGUAGE_NONE]["#required"] = ma_cultural_protocol_node_type_must_have_cp($bundle);
+            $value[LANGUAGE_NONE]['#title'] = "Communities and Protocols"; //tw26327856
+            $value[LANGUAGE_NONE]['#description'] = "Communities represent groups of contributors. Communities can be large or small. Contributions could be media assets, complete Digital Heritage Items, knowledge, metadata, or other contributions. Cultural Protocols are how Communities provide users specific types of access to Digital heritage Items. Each Cultural Protocol is created by and managed within a Community. Digital Heritage Items must belong to at least one Community and one Cultural Protocol within that Community."; //tw26327856
+            break;
+
+        }
+      }
+
+      // Specify skip fields for the app to handle.
+      $skip_fields = [
+        'field_book_children',
+        'field_pre_actions',
+        'oggroup_fieldset',
+        'field_community_record_children',
+        'field_book_parent',
+      ];
+      foreach ($skip_fields as $skip_field) {
+        if (isset($fields_and_fieldgroups[$skip_field])) {
+          $fields_and_fieldgroups[$skip_field]['#skip_on_mobile'] = TRUE;
+        }
+      }
+
+      // Set the field.
+      $fields_and_fieldgroups[$key] = $value;
+
+    }
+  }
+
+  // Return the form.
+  return $fields_and_fieldgroups;
+
+}
+
+/**
+ * Implements hook_node_prepare().
+ *
+ * When hitting the node-form-fields endpoint for the person paragraphs form definition,
+ * we need to create one instance of the field.
+ *
+ * Theoretically these should be open already because the paragraph parent fields are set to open, but for some reason that is not working.
+ * This is already being done for field_word_entry in ma_dictionary_node_prepare(), so this function is for any remaining
+ * paragraph fields.
+ *
+ * TODO: abstract this function so that it works with all paragraph fields automatically, including future ones. Otherwise they need to be manually added here.
+ */
+function ma_mobile_client_node_prepare($node) {
+  if($node->type == 'person') {
+    if (arg(1) == 'node-form-fields') {
+      if (empty($node->field_related_people)) {
+        $paragraph = new ParagraphsItemEntity(array('field_name' => 'field_related_people', 'bundle' => 'person_relationship_bundle'));
+        $paragraph->is_new = TRUE;
+        $paragraph->setHostEntity('node', $node);
+      }
+      if (empty($node->field_sections)) {
+        $paragraph = new ParagraphsItemEntity(array('field_name' => 'field_sections', 'bundle' => 'text_section'));
+        $paragraph->is_new = TRUE;
+        $paragraph->setHostEntity('node', $node);
+      }
+    }
+  }
+}
+
+
+/**
+ * Retrieves the fields and their properties, and fieldgroups, to be used by the app in constructing the node view in React.
+ *
+ * Works for:
+ *  - fields at top-level and within fieldgroups
+ *  - paragraphs at top-level and within fieldgroups
+ *  - field collections at top-level (tested) and within fieldgroups (not tested)
+ *  - rendered entity fields at top-level (tested) and within fieldgroups (not yet tested) and within field collections (not tested)
+ *  - scald fields (and its metadata fields)_ at the top-level (tested) and within fieldgroups (not tested)
+ *
+ * Does not work for (currently not needed):
+ *  - fieldgroups within fieldgroups
+ *  - fieldgroups within paragraphs
+ *  - fieldgroups within field collections
+ */
+function _ma_mobile_client_get_node_view_fields ($fn, $content_type, $skip_type_validation = FALSE) {
+
+  if (!$skip_type_validation) {
+    if (!node_type_get_type($content_type)) {
+      return 'Content type ' . $content_type . ' does not exist';
+    }
+    if (!key_exists($content_type, _ma_mobile_client_get_viewable_types())) {
+      return 'Content type ' . $content_type . ' exists, but is not a valid app-viewable type.';
+    }
+  }
+
+  $structured_view = [];
+
+  // Add fieldgroups to the structured view.
+  $field_groups = field_group_info_groups('node', $content_type, 'mukurtu_mobile');
+  $all_field_group_fields = [];
+  foreach ($field_groups as $field_group => $field_group_properties) {
+    $structured_view[$field_group] = ['type' => 'fieldgroup', 'label' => $field_group_properties->label, 'weight' => $field_group_properties->weight];
+    if (isset($field_group_properties->children)) {
+      foreach ($field_group_properties->children as $child) {
+        $all_field_group_fields[$child] = $field_group;
+      }
+    }
+  }
+
+  /////////////////////////////////////
+  // Add fields to the structured view.
+  /////////////////////////////////////
+
+  $field_info = field_info_instances('node', $content_type);
+
+  // Special adding of custom DS fields (these do not get picked up by field_info_instances().
+  // So far just using this for the extracted_??_from_relationships fields.
+  $ds_fields = ds_get_field_settings('node', $content_type, 'mukurtu_mobile');
+  foreach ($ds_fields as $ds_field => $ds_field_properties) {
+    if (substr($ds_field, 0, 10) == 'extracted_') {
+      $ct_abb_type_map = [
+        'dh' => 'digital_heritage',
+        'dw' => 'dictionary_word',
+        'wl' => 'word_list'
+      ];
+      $formatted_properties = [
+        'type' => 'field',
+        'label' => $ds_field_properties["formatter_settings"]["ft"]["lb"],
+        'weight' => $ds_field_properties['weight'],
+        'custom_ds_field' => TRUE,
+        'extracted_type' => $ct_abb_type_map[substr($ds_field, 10, 2)], // this would be ommitted if we add non extracted custom DS fields.
+      ];
+      $field_info[$ds_field] = $formatted_properties;
+    }
+  }
+
+  foreach ($field_info as $field => $field_properties) {
+
+    if ($field_properties['custom_ds_field']) {
+      $field_array = $field_properties;
+    }
+    else {
+      $field_array = _ma_mobile_client_build_field_arrays_from_field_properties($field_properties);
+
+      if (!$field_array) {
+        continue;
+      }
+
+      switch ($field_array["view_mode_properties"]["type"]) {
+
+        // For rendered entity fields (eg. Lesson nodes with Unit Plan),
+        // self-call this function to build fields for the referenced type, and append them as fields to the rendered entity field.
+        case 'entityreference_entity_view':
+
+          $target_bundles = $field_array["base_field_properties"]["settings"]["handler_settings"]["target_bundles"];
+          if (count($target_bundles) > 1) {
+            return "Error: need to add handling for multiple target bundles for rendered entity field " . $field;
+          }
+          $field_array['fields'] = _ma_mobile_client_get_node_view_fields('retrieve', reset($target_bundles), TRUE);
+          break;
+
+        // For paragraphs, loop through its bundle fields and add them as fields within the paragraph.
+        case 'paragraphs_view':
+          $allowed_bundles = $field_properties["settings"]["allowed_bundles"];
+          $select_bundles = [];
+          foreach ($allowed_bundles as $allowed_bundle_key => $allowed_bundle_value) {
+            if ($allowed_bundle_key === $allowed_bundle_value) {
+              $select_bundles[] = $allowed_bundle_value;
+            }
+          }
+          if (count($select_bundles) > 1) {
+            return 'Error: ' . $field . ' has more than 1 selected bundle. _ma_mobile_client_get_node_view_fields() needs to be updated for this.';
+          }
+          $paragraph_fields = field_info_instances('paragraphs_item', $select_bundles[0]);
+          foreach ($paragraph_fields as $paragraph_field => $paragraph_field_properties) {
+            $paragraph_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($paragraph_field_properties);
+            if (!$paragraph_field_array) {
+              continue;
+            }
+            $field_array['fields'][$paragraph_field] = $paragraph_field_array;
+          }
+          break;
+
+        // For field collections, loop through its fields and add them as fields on the field collection field.
+        case 'field_collection_view':
+          $fc_fields = field_info_instances('field_collection_item', $field);
+          foreach ($fc_fields as $fc_field => $fc_field_properties) {
+            $fc_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($fc_field_properties);
+            if (!$fc_field_array) {
+              continue;
+            }
+            $field_array['fields'][$fc_field] = $fc_field_array;
+          }
+          break;
+
+        default:
+          // Don't do anything with these for now.
+          break;
+
+      }
+
+      // For scald fields, add its metadata fields, keyed by scald type.
+      if ($field_array["view_mode_properties"]["module"] == 'atom_reference') {
+        $referencable_types = $field_array["other_properties"]["settings"]["referencable_types"];
+        $referenced_types = [];
+        foreach ($referencable_types as $referencable_type_key => $referencable_type_value) {
+          if ($referencable_type_key === $referencable_type_value) {
+            $referenced_types[] = $referencable_type_value;
+          }
+        }
+        if (count($referenced_types) == 0) {
+          $referenced_types = array_keys($referencable_types); // If none are selected in the field formatter, it actually means all are options.
+        }
+        foreach ($referenced_types as $referenced_type) {
+          $referenced_type_field_groups = field_group_info_groups('scald_atom', $referenced_type, $field_array["view_mode_properties"]["type"]);
+          if (!$scald_metadata_fields = $referenced_type_field_groups["group_scald_atom_metadata"]->children) {
+            return 'Error: the content type has a scald field with a scald view mode that needs a "Metadata" fieldgroup.';
+          }
+          $atom_fields_per_type = field_info_instances('scald_atom', $referenced_type);
+          foreach ($atom_fields_per_type as $atom_field => $atom_field_properties) {
+            if (in_array($atom_field, $scald_metadata_fields)) {
+              $atom_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($atom_field_properties, $field_array["view_mode_properties"]["type"], 'scald_atom');
+              if (!$atom_field_array) {
+                continue;
+              }
+              $field_array['atom_metadata_fields'][$referenced_type][$atom_field] = $atom_field_array;
+            }
+          }
+        }
+      }
+    }
+
+    // Fields within fieldgroups get added here.
+    if (array_key_exists($field, $all_field_group_fields)) {
+      $structured_view[$all_field_group_fields[$field]]['fields'][$field] = $field_array;
+    }
+    // Fields not within fieldgroups get added here.
+    else {
+      $structured_view[$field] = $field_array;
+    }
+  }
+
+  // Sort the fields and fieldgroups, and the fields within fieldgroups, according to their weight.
+  uasort($structured_view, 'drupal_sort_weight');
+  foreach ($structured_view as $name => $properties) {
+    if (isset($properties['fields'])) {
+      uasort ($structured_view[$name]['fields'], 'drupal_sort_weight');
+    }
+    else {
+      if (isset($properties['atom_metadata_fields'])) {
+        foreach ($properties['atom_metadata_fields'] as $referenced_type => $referenced_type_fields) {
+          uasort($structured_view[$name]['atom_metadata_fields'][$referenced_type], 'drupal_sort_weight');
+        }
+      }
+    }
+  }
+
+  // Return the structured view.
+  return $structured_view;
+}
+
+
+
+/**
+ * Retrieves the fields and their properties, and fieldgroups, to be used by the app in constructing the list view of a node in React.
+ */
+function _ma_mobile_client_get_list_view_fields ($fn, $content_type, $skip_type_validation = FALSE) {
+
+  if (!$skip_type_validation) {
+    if (!node_type_get_type($content_type)) {
+      return t('Content type @content_type does not exist', ['@content_type' => $content_type]);
+    }
+    // TODO: do we want this to be defined server side or client side? For now client-side.
+//    if (!key_exists($content_type, _ma_mobile_client_get_viewable_types())) {
+//      return 'Content type ' . $content_type . ' exists, but is not a valid app-viewable type.';
+//    }
+  }
+
+  $structured_view = [];
+
+  // Add fields to the structured view.
+
+  $field_info = field_info_instances('node', $content_type);
+
+  // Not using this as at least dictionary does not have a List View Fields fieldgroup.
+  //  $field_groups = field_group_info_groups('node', $content_type, 'search_result');
+  //  if (!$valid_list_view_fields = $field_groups["group_list_view_fields"]->children) {
+  //    return 'Error: the content type needs a "List View Fields" fieldgroup.';
+  //  }
+  // array_unshift($valid_list_view_fields, 'field_media_asset');
+
+
+  foreach ($field_info as $field => $field_properties) {
+    $field_array = _ma_mobile_client_build_field_arrays_from_field_properties($field_properties, 'search_result');
+    if (!$field_array) {
+      continue;
+    }
+
+    switch ($field_array["view_mode_properties"]["type"]) {
+
+      // For rendered entity fields (eg. Lesson nodes with Unit Plan),
+      // self-call this function to build fields for the referenced type, and append them as fields to the rendered entity field.
+      case 'entityreference_entity_view':
+
+        // TODO: If we do have any instances of this, test this and make work. May just work as is.
+        return "Error: rendered entity within a list view content type not yet set up in _ma_mobile_client_get_list_view_fields(). Field: " . $field;
+
+        $target_bundles = $field_array["base_field_properties"]["settings"]["handler_settings"]["target_bundles"];
+        if (count($target_bundles) > 1) {
+          return "Error: need to add handling for multiple target bundles for rendered entity field " . $field;
+        }
+        $field_array['fields'] = _ma_mobile_client_get_list_view_fields('retrieve', reset($target_bundles), TRUE);
+        break;
+
+      // For paragraphs, loop through its bundle fields and add them as fields within the paragraph.
+      case 'paragraphs_view':
+        $allowed_bundles = $field_properties["settings"]["allowed_bundles"];
+        $select_bundles = [];
+        foreach ($allowed_bundles as $allowed_bundle_key => $allowed_bundle_value) {
+          if ($allowed_bundle_key === $allowed_bundle_value) {
+            $select_bundles[] = $allowed_bundle_value;
+          }
+        }
+        if (count($select_bundles) > 1) {
+          return 'Error: ' . $field . ' has more than 1 selected bundle. _ma_mobile_client_get_list_view_fields() needs to be updated for this.';
+        }
+        $paragraph_fields = field_info_instances('paragraphs_item', $select_bundles[0]);
+        foreach ($paragraph_fields as $paragraph_field => $paragraph_field_properties) {
+          $paragraph_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($paragraph_field_properties, $field_array["view_mode_properties"]["settings"]["view_mode"]);
+          if (!$paragraph_field_array) {
+            continue;
+          }
+          $field_array['fields'][$paragraph_field] = $paragraph_field_array;
+        }
+        break;
+
+      // For field collections, loop through its fields and add them as fields on the field collection field.
+      case 'field_collection_view':
+        $fc_fields = field_info_instances('field_collection_item', $field);
+        foreach ($fc_fields as $fc_field => $fc_field_properties) {
+          $fc_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($fc_field_properties, $field_array["view_mode_properties"]["settings"]["view_mode"]);
+          if (!$fc_field_array) {
+            continue;
+          }
+          $field_array['fields'][$fc_field] = $fc_field_array;
+        }
+        break;
+
+    }
+
+
+//    if (in_array($field, $valid_list_view_fields)) {
+    $structured_view[$field] = $field_array;
+//    }
+
+  }
+
+  // Sort the fields according to their weight.
+  uasort($structured_view, 'drupal_sort_weight');
+  foreach ($structured_view as $name => $properties) {
+    if (isset($properties['fields'])) {
+      uasort ($structured_view[$name]['fields'], 'drupal_sort_weight');
+    }
+  }
+
+  // Return the structured view.
+  return $structured_view;
+}
+
+
+/**
+ * Called from _ma_mobile_client_get_node_view_fields() and _ma_mobile_client_get_list_view_fields().
+ * Broken out into a separate function because it can be called within a nested loop.
+ */
+function _ma_mobile_client_build_field_arrays_from_field_properties($field_properties, $view_mode = 'mukurtu_mobile', $entity_type = 'node' ) {
+  if (!$view_mode_properties = $field_properties['display'][$view_mode]) {
+    return;
+  }
+  if ($field_properties["display"][$view_mode]["type"] == 'hidden') {
+    return;
+  }
+  unset ($field_properties['display']);
+  $ds_layout = ds_get_layout($entity_type, $field_properties["bundle"], $view_mode, FALSE);
+  if (isset($ds_layout["settings"]["limit"][$field_properties["field_name"]])) {
+    $view_mode_properties['limit'] = $ds_layout["settings"]["limit"][$field_properties["field_name"]];
+  }
+  return[
+    'type' => 'field',
+    'label' => $field_properties['label'],
+    'weight' => $view_mode_properties['weight'],
+    'view_mode_properties' => $view_mode_properties,
+    'other_properties' => $field_properties,
+    'base_field_properties' => field_info_field($field_properties["field_name"]),
+  ];
+}
+
+
+/**
+ * Retrieve a paragraph.
+ */
+function _ma_mobile_client_retrieve_paragraph($fn, $pid) {
+  $paragraph = entity_load('paragraphs_item', array($pid));
+  if (!$paragraph) {
+    return t('There is no paragraph with the ID of @pid.', ['@pid' => $pid]);
+  }
+  return $paragraph;
+}
+
+
+/**
+ * Create a scald atom.
+ */
+function _ma_mobile_client_create_atom ($fn, $fid, $external, $title, $author, $category) {
+
+  $resave_atom = 0;
+
+  if ($external) {
+    switch ($external) {
+
+      case 'youtube':
+      case 'vimeo':
+
+        // The following code is taken from scald_youtube_scald_add_form_fill / scald_vimeo_scald_add_form_fill with two changes: 1. the merging of the two. 2. dropping of the tags and author taxonomy fills (produce entity errors in this context)
+
+        if ($external == 'vimeo') {
+          $identifier = scald_vimeo_parse_id($fid, TRUE);
+          if ($identifier == FALSE) {
+            return services_error('invalid Vimeo ID', 406);
+          };
+          if ($sid = scald_vimeo_already_imported($identifier)) {
+            return array(
+              'status' => 'atom exists',
+              'sid' => $sid,
+            );
+          }
+          $infos = scald_vimeo_video($identifier);
+        }
+
+        elseif ($external == 'youtube') {
+          $identifier = scald_youtube_parse_id($fid, TRUE);
+          if ($identifier == FALSE) {
+            return services_error('invalid Youtube ID', 406);
+          };
+          if ($sid = scald_youtube_already_imported($identifier)) {
+            return array(
+              'status' => 'atom exists',
+              'sid' => $sid,
+            );
+          }
+          $infos = scald_youtube_video($identifier['id']);
+        }
+
+        // Atom does not exist, needs to be created.
+        $atom = new ScaldAtom('video', 'scald_' . $external);
+
+        $atom->base_id = $fid;
+        if (!isset($atom->data)) {
+          $atom->data = array();
+        }
+        if (isset($identifier['list'])) {
+          $atom->data['list'] = $identifier['list'];
+        }
+        // If the client set a title, use that, otherwise, grab it from the youtube / vimeo property
+        // Usually is best here to leave title unset because the video services have good titles
+        if (!$title) {
+          $atom->title = $infos->title;
+        }
+
+        // Save video width and height.
+        $atom->data['video_width'] = $infos->width;
+        $atom->data['video_height'] = $infos->height;
+
+        // Download a copy of the video thumbnail. This makes it possible
+        // to do interesting manipulation with image styles presets.
+        $thumb = drupal_http_request($infos->thumbnail['src']);
+        if ($thumb->code == 200 && $directory = ScaldAtomController::getThumbnailPath('video')) {
+          $dest = $directory . '/youtube-' . $infos->id . '.jpg';
+          $file = file_save_data($thumb->data, $dest);
+
+          if ($file) {
+            // Set the file status to temporary.
+            $query = db_update('file_managed')
+              ->condition('fid', $file->fid)
+              ->fields(array('status' => 0))
+              ->execute();
+            $langcode = field_language('scald_atom', $atom, 'scald_thumbnail');
+            $atom->scald_thumbnail[$langcode][0] = (array) $file;
+          }
+        }
+
+        if ($sid = scald_atom_save($atom)) {
+        }
+        else {
+          return services_error('unable to save external atom', 406);
+        }
+
+        break;
+
+      default:
+        return services_error('invalid external service', 406);
+
+    }
+  }
+
+  // Regular file upload
+  else {
+    $fid = intval($fid);
+    if (!$file = file_load($fid)) {
+      return services_error('id does not match a file ID', 406);
+    }
+
+    // If the client set a title, use that, otherwise, use the filename.
+    // Usually best here to set the title by the client
+    if (!$title) {
+      $title = $file->filename;
+    }
+
+    $type = _scald_feeds_get_provider_by_mime_type($file->filemime);
+    $provider = 'scald_' . $type;
+
+    // Search for a previously imported matching scald atom and use that if found (slight adaptation from scald_feeds_fetch_matching_atom)
+
+    // Check for matching atom title and atom type
+    $scald_query = array('title' => $title, 'type' => $type);
+    $sids = scald_search($scald_query, FALSE);
+    if ($sids != FALSE && (count($sids) > 0)) {
+      foreach ($sids as $sid) {
+
+        $atom = scald_atom_load($sid);
+        switch ($type) {
+          case 'file':
+            scald_file_scald_fetch($atom, 'atom');
+            break;
+          case 'image':
+            scald_image_scald_fetch($atom, 'atom');
+            break;
+          case 'audio':
+            scald_audio_scald_fetch($atom, 'atom');
+            break;
+          case 'video':
+            scald_video_scald_fetch($atom, 'atom');
+            break;
+        }
+
+        // Check for matching filesize and md5
+        if (filesize($atom->file_source) == filesize($file->uri) &&
+          md5_file($atom->file_source) == md5_file($file->uri)) {
+          return array(
+            'status' => 'atom exists',
+            'sid' => $sid,
+          );
+          break;
+        }
+      }
+    }
+
+    // Atom does not exist already, needs to be created
+    $atom = new ScaldAtom($type, $provider);
+    $atom->base_id = $fid;
+    $atom->title = $title;
+    $sid = scald_atom_save($atom);
+    if (!$sid) {
+      return services_error('unable to create atom', 406);
+    }
+    else {
+
+      switch ($type) {
+
+        case 'video':
+          $atom->file_source = $file->uri;
+          $atom->data['video_file'] = $file->uri;
+          $atom->data['video_id'] = $file->fid;
+          scald_atom_save($atom);
+          break;
+
+        case 'audio':
+          $atom->data['audio_file'] = $file->uri;
+          $atom->data['audio_id'] = $file->fid;
+          $atom->file_source = $file->uri;
+          scald_atom_save($atom);
+          break;
+
+        case 'image':
+
+        // Populate metadata from exif/xmp/iptc fields
+        $resave_atom = 1;
+
+          // Thumbnail
+          $atom->scald_thumbnail[LANGUAGE_NONE][] = (array) $file;
+          scald_atom_save($atom);
+
+          // Reload the atom as a wrapper
+          $atom_wrapper = entity_metadata_wrapper('scald_atom', $sid);
+
+          // Identifier
+          $atom_wrapper->field_scald_identifier = $title;
+
+          // Direct metadata population
+          $field_assocs = array(
+            'field_media_description' => 'field_scald_description',
+            'field_iptc_headline' => 'field_scald_headline',
+            'field_iptc_copyright' => 'field_licence_std_cc',
+            'field_xmp_rights' => 'field_rights',
+            'field_iptc_sublocation' => 'field_scald_location',
+            'field_xmp_creator' => 'field_scald_creator',
+          );
+
+          foreach ($field_assocs as $exif_field => $scald_field) {
+            if (isset($file->{$exif_field}[LANGUAGE_NONE][0]['value'])) {
+              $atom_wrapper->$scald_field = $file->{$exif_field}[LANGUAGE_NONE][0]['value'];
+            }
+          }
+
+          /// Non-direct metadata population
+
+          // Created date
+          if (isset($file->field_exif_datetime[LANGUAGE_NONE][0]['value'])) {
+            $atom_wrapper->field_scald_created->set(strtotime($file->field_exif_datetime[LANGUAGE_NONE][0]['value']));
+          }
+
+          // Geolocation
+          if (isset($file->field_gps_latitude[LANGUAGE_NONE][0]['value']) && isset($file->field_gps_longitude[LANGUAGE_NONE][0]['value'])) {
+            $atom_wrapper->field_scald_geo_location->set(array(
+              'lat' => $file->field_gps_latitude[LANGUAGE_NONE][0]['value'],
+              'lon' => $file->field_gps_longitude[LANGUAGE_NONE][0]['value']
+            ));
+          }
+
+          // Keywords (Scald tags)
+          // TODO: exif is currently only extracting the first keyword. Make it extract multiple keywords.
+          if (isset($file->field_iptc_keywords[LANGUAGE_NONE][0]['value'])) {
+            $keyword = $file->field_iptc_keywords[LANGUAGE_NONE][0]['value'];
+            $term = ma_core_get_create_tax_term($keyword, 'scald_tags');
+            $atom_wrapper->scald_tags = array($term->tid);
+
+          }
+
+          break;
+
+      }
+    }
+  }
+
+  if ($sid) {
+
+    // POST-passed metadata fields
+    // TODO: make these fields accept multiple values. Will probably need to pass via json-encoded content as opposed to URL parameters
+    $atom_wrapper = entity_metadata_wrapper('scald_atom', $sid);
+    if ($author) {
+      $term = ma_core_get_create_tax_term ($author, 'scald_authors');
+      $atom_wrapper->scald_authors->set(array($term->tid));
+      $resave_atom = 1;
+    }
+    if ($category) {
+      $term = ma_core_get_create_tax_term($category, 'category');
+      // Cannot set this field with an entity wrapper, so setting directly on the atom instead
+      $atom = scald_atom_load($sid);
+      $atom->field_category[LANGUAGE_NONE][0]['tid'] = $term->tid;
+      scald_atom_save($atom);
+    }
+    if ($resave_atom) {
+      $atom_wrapper->save();
+    }
+
+    // Return the SID
+    return array (
+      'status' => 'atom created',
+      'sid' => $sid,
+    );
+  }
+}
+
+
+/**
+ * Retrieve a scald atom.
+ */
+function _ma_mobile_client_retrieve_atom ($fn, $sid) {
+
+  $atom = scald_atom_load($sid);
+
+  if (!$atom) {
+    return t('There is no atom with the scald ID of @sid.', ['@sid' => $sid]);
+  }
+
+  if (ma_scald_scald_atom_access($sid, 'view') === false) {
+    return t('You do not have permission to view the atom with the scald ID of @sid.', ['@sid' => $sid]);
+  }
+
+  // URL to retrieve atom thumbnail.
+  $atom->thumbnail_url = file_create_url($atom->thumbnail_source);
+
+  // URL to retrieve atom main media.
+  switch ($atom->provider) {
+    case 'scald_youtube':
+      $atom->file_url = 'www.youtube.com/watch?v=' . $atom->base_id;
+      break;
+    case 'scald_vimeo':
+      $atom->file_url = 'https://vimeo.com/' . $atom->base_id;
+      break;
+    case 'scald_dailymotion':
+      $atom->file_url = 'https://dailymotion.com/video/' . $atom->base_id;
+      break;
+    case 'scald_soundcloud':
+      $atom->file_url = $atom->data["permalink_url"];
+      break;
+    default:
+      if (!$uri = $atom->file_source) {
+        $file = file_load ($atom->base_id);
+        $uri = $file->uri;
+      }
+      $atom->file_url = file_create_url($uri);
+      break;
+  }
+
+  return $atom;
+}
+
+
+/**
+ * Return the communities and protocols the current user has posting access to
+ */
+function _ma_mobile_client_user_groups ($fn) {
+  $groups_list = array();
+
+  $groups = og_get_groups_by_user(null, 'node');
+  foreach ($groups as $group) {
+    $og_node = node_load($group);
+    if ($og_node->type == 'community') {
+      $groups_list[] = array (
+        'nid' => $og_node->nid,
+        'title' => $og_node->title,
+        'type' => 'community',
+      );
+      $cultural_protocols = ma_cultural_protocol_get_cps_user_can_post_to($og_node->nid);
+      foreach ($cultural_protocols as $group_nid => $group_title) {
+        $groups_list[] = array(
+          'nid' => $group_nid,
+          'title' => $group_title,
+          'type' => 'cultural_protocol',
+        );
+      }
+    }
+  }
+
+  return $groups_list;
+}
+
+
+/**
+ * Called from hook_update and hook_install to set to the default Mukurtu Mobile types
+ */
+function ma_mobile_client_set_default_types() {
+
+  $ordered_viewable_types = ['digital_heritage', 'dictionary_word', 'word_list', 'unit_plan', 'community', 'cultural_protocol_group', 'person', 'personal_collection', 'collection'];
+  $default_viewable_types = [];
+  $weight = 0;
+  foreach ($ordered_viewable_types as $ordered_viewable_type) {
+    $weight += 10;
+    $default_viewable_types[$ordered_viewable_type] = [
+      'viewable' => 1,
+      'weight' => $weight,
+    ];
+  }
+  variable_set('mm_viewable_types', $default_viewable_types);
+
+  $ordered_creatable_types = ['digital_heritage', 'dictionary_word', 'word_list', 'community', 'cultural_protocol_group', 'person', 'personal_collection', 'lesson'];
+  $default_creatable_types = [];
+  $weight = 0;
+  foreach ($ordered_creatable_types as $ordered_creatable_type) {
+    $weight += 10;
+    $default_creatable_types[$ordered_creatable_type] = [
+      'creatable' => 1,
+      'weight' => $weight,
+    ];
+  }
+  variable_set('mm_creatable_types', $default_creatable_types);
+
+}
+
+
+/**
+ * Implements hook_node_presave().
+ *
+ * Services does not work with multival paragraphs (even with the multival patch),
+ * so we set paragraphs in the JSON with a custom key "paragraphs" and this presave hook
+ * takes care of creating the paragraphs and attaching it to the parent node.
+ */
+function ma_mobile_client_node_presave($node) {
+  if (isset($node->paragraphs)) {
+    $_SESSION['paragraph validation errors'] = [];
+    $fields = field_info_instances('node', $node->type);
+    foreach ($node->paragraphs as $parent_field_name => $parent_instances) {
+      if (!$field_info = field_info_field($parent_field_name)) {
+        // TODO: add error message
+        continue;
+      }
+      // TODO: this will only work if there is only one allowed bundle for the field.
+      // Once we have a field that can target multiple bundles, this will need to change.
+      $allowed_bundles = $fields[$parent_field_name]["settings"]["allowed_bundles"];
+      foreach ($allowed_bundles as $allowed_bundle) {
+        if (is_string($allowed_bundle)) {
+          $paragraph_bundle = $allowed_bundle;
+        }
+      }
+
+      // Build the required fields for a paragraph.
+      $paragraph_fields =  field_info_instances('paragraphs_item', $paragraph_bundle);
+      $required_paragraph_fields = [];
+      foreach ($paragraph_fields as $paragraph_field_name => $paragraph_field_properties) {
+        if ($paragraph_field_properties['required']) {
+          $required_paragraph_fields[$paragraph_field_name] = $paragraph_field_properties;
+        }
+      }
+      foreach ($parent_instances[LANGUAGE_NONE] as $parent_instance_index => $parent_instance) {
+        $paragraph = new ParagraphsItemEntity([
+          'field_name' => $parent_field_name,
+          'bundle' => $paragraph_bundle,
+        ]);
+        $paragraph->is_new = TRUE;
+        $paragraph->setHostEntity('node', $node, LANGUAGE_NONE, FALSE);
+        foreach ($parent_instance as $paragraph_field => $paragraph_field_values) {
+          $paragraph->{$paragraph_field} = $paragraph_field_values;
+        }
+        // Validate against the required paragraph fields before saving.
+        foreach ($required_paragraph_fields as $required_paragraph_field_name => $required_paragraph_field_properties) {
+          if (!$paragraph->{$required_paragraph_field_name}) {
+            $_SESSION['paragraph validation errors'][$required_paragraph_field_name] = $required_paragraph_field_properties['label'] . ' in ' . $parent_field_name . ' paragraph field is required.' ;
+          }
+        }
+        if (count($_SESSION['paragraph validation errors']) == 0) {
+          if ($paragraph->save(TRUE)) {
+            $node->{$parent_field_name}[LANGUAGE_NONE][$parent_instance_index] = [
+              'value' => $paragraph->item_id,
+              'revision_id' => $paragraph->revision_id
+            ];
+          }
+          else {
+            // TODO: add error message
+          }
+        }
+      }
+    }
+    unset ($node->paragraphs);
+  }
+}
+

@@ -1,0 +1,43 @@
+.metadata-sidebar {
+    .metadata-wrapper {
+        border-top: 5px solid @brand-secondary;
+        border-radius: 0px;
+        background-color: @mukurtu-navbar-collapse-bg;
+
+        // Desktop
+        @media (min-width: @screen-md-min) {
+            margin-left: @grid-gutter-width;
+        }
+    }
+
+    .field {
+        .metadata-field-padding;
+
+        .field-label,
+        .label-above {
+            .metadata-field-label;
+        }
+
+        a {
+            .mukurtu-standard-link;
+        }
+    }
+
+    // Field dividers
+    .field::after {
+        content : "";
+        display: inline-block;
+        left: 0;
+        bottom: 0;
+        height: 1px;
+        width: 100%;
+        border-bottom: 1px solid rgba(70, 70, 70, 0.25);
+    }
+
+
+    .field-name-field-licence-trad {
+        .popup-element {
+            width: 50%;
+        }
+    }
+}

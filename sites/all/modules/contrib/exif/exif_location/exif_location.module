@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * @file Sets Location module coordinates from GPS EXIF image data
+ */
+
+/**
+ * Implements hook_node_presave().
+ */
+function exif_location_node_presave($node) {
+  // first check if exif lat and long fields exist
+  if (is_array($node->field_gps_gpslatitude) && is_array($node->field_gps_gpslongitude)) {
+    $itemslat = field_get_items('node', $node, 'field_gps_gpslatitude');
+    $itemslong = field_get_items('node', $node, 'field_gps_gpslongitude');
+    
+    // then check if exif coordinates exist
+    if (empty($itemslat) || empty($itemslong)) {
+    return;
+    }
+    
+    $lat = field_view_value('node', $node, 'field_gps_gpslatitude', $itemslat[0]);
+    $lng = field_view_value('node', $node, 'field_gps_gpslongitude', $itemslong[0]);
+    
+    // then check if location coordinates are empty
+    if (empty($node->location['latitude']) && empty($node->location['longitude'])) {
+      $node->locations = array(
+        array(
+        'locpick' => array(
+          'user_latitude' => $lat['#markup'],
+          'user_longitude' => $lng['#markup']
+        )),
+      );
+      drupal_set_message('Node location coordinates have been set from EXIF data', 'status');
+    }
+  }  
+}
+
+
+/**
+ * Implementation of hook_form_alter
+ * @param array $form
+ * @param array $form_state
+ * @param array $form_id
+ */
+function exif_location_form_alter(&$form, $form_state, $form_id) {
+  /* Comment out the return below to enable this */
+  return;
+  /* Remove the location element from the node form */
+  if (isset($form['#node']) && $form['#node']->type == 'image' && $form_id == $form['#node']->type . '_node_form') {
+    $form['locations']['#access'] = FALSE;
+  }
+}

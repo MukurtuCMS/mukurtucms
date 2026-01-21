@@ -71,6 +71,7 @@ function ma_media_strongarm() {
       'media_original' => '0',
       'full_content' => '2',
       'component_media_item' => '2',
+      'collab_doc_attachments' => 0,
     ),
     'video' => array(
       'media_preview' => '0',
@@ -81,6 +82,7 @@ function ma_media_strongarm() {
       'media_link' => '0',
       'full_content' => '2',
       'component_media_item' => '2',
+      'collab_doc_attachments' => 0,
     ),
     'image' => array(
       'media_small' => '1',
@@ -91,6 +93,7 @@ function ma_media_strongarm() {
       'media_large' => '0',
       'full_content' => '2',
       'component_media_item' => '2',
+      'collab_doc_attachments' => 0,
     ),
     'default' => array(
       'media_preview' => '2',
@@ -115,6 +118,9 @@ function ma_media_strongarm() {
       'media_preview' => '0',
       'media_large' => '2',
       'media_original' => '0',
+    ),
+    'document' => array(
+      'collab_doc_attachments' => 0,
     ),
   );
   $export['file_entity_link_settings'] = $strongarm;
@@ -188,6 +194,13 @@ function ma_media_strongarm() {
   $strongarm->name = 'oembedembedly_default';
   $strongarm->value = '1';
   $export['oembedembedly_default'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_taxonomy_term_media_folders_pattern';
+  $strongarm->value = '';
+  $export['pathauto_taxonomy_term_media_folders_pattern'] = $strongarm;
 
   return $export;
 }

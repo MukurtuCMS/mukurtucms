@@ -5,18 +5,41 @@
  */
 
 class scald_views_handler_filter_actions extends views_handler_filter {
-  /**
-   * Overrides operator_form.
-   *
-   * Hardcode our bitwise AND, and tells Views that this filter doesn't
-   * expose an operator.
-   */
-  public function operator_form(&$form, &$form_state) {
-    $this->no_operator = TRUE;
-    $form['operator'] = array(
-      '#type' => 'value',
-      '#value' => '&',
+  public function option_definition() {
+    $options = parent::option_definition();
+
+    $options['operator']['default'] = '&';
+    $options['value']['default'] = array();
+
+    return $options;
+  }
+
+  public function operators() {
+    $operators = array(
+      '&' => array(
+        'title' => t('Is all of'),
+        'short' => t('is'),
+      ),
+      'in' => array(
+        'title' => t('Is one of'),
+        'short' => t('in'),
+      ),
+      'not in' => array(
+        'title' => t('Is not one of'),
+        'short' => t('not in'),
+      ),
     );
+
+    return $operators;
+  }
+
+  function operator_options($which = 'title') {
+    $options = array();
+    foreach ($this->operators() as $id => $info) {
+      $options[$id] = $info[$which];
+    }
+
+    return $options;
   }
 
   /**
@@ -49,19 +72,35 @@ class scald_views_handler_filter_actions extends views_handler_filter {
    * Change the operator before querying.
    */
   public function query() {
-    if (is_array($this->options['value'])) {
-      $this->value = 0;
+    if (is_array($this->value)) {
+      $values = drupal_map_assoc($this->value);
+      $bitmask = 0;
       $actions = scald_actions();
       foreach ($actions as $name => $action) {
-        if (!empty($this->options['value'][$name])) {
-          $this->value |= $action['bitmask'];
+        if (!empty($values[$name])) {
+          $bitmask |= $action['bitmask'];
         }
       }
     }
     else {
-      $this->value = $this->options['value'];
+      $bitmask = $this->value;
     }
-    $this->operator = ' & ' . $this->value . ' = ';
+
+    switch ($this->operator) {
+      case '&':
+        $this->operator = ' & ' . $bitmask . ' = ';
+        $this->value = $bitmask;
+        break;
+      case 'in':
+        $this->operator = ' & ' . $bitmask . ' >';
+        $this->value = 0;
+        break;
+      case 'not in':
+        $this->operator = ' & ' . $bitmask . ' = ';
+        $this->value = 0;
+        break;
+    }
+
     parent::query();
   }
 

@@ -1,0 +1,62 @@
+<?php
+
+/**
+ * @file
+ * Tests the public interface of the oa_core_section_is_public function.
+ */
+
+class oa_core_section_is_publicUnitTest extends oa_coreBaseUnitTest {
+  static function getInfo() {
+    return array(
+      'name' => 'oa_core_section_is_public function Tests',
+      'description' => 'Test the public interface of the oa_core_section_is_public function',
+      'group' => 'OA',
+    );
+  }
+  public function testoa_core_section_is_public_success() {
+
+    $node = (object) array(
+      'field_oa_group_ref' => array(LANGUAGE_NONE => array()),
+      'field_oa_team_ref' => array(LANGUAGE_NONE => array()),
+      'field_oa_user_ref' => array(LANGUAGE_NONE => array()),
+    );
+    $this->assertEqual(
+      oa_core_section_is_public($node),
+      TRUE,
+      'If Node does not have any visibilty settings should return TRUE'
+    );
+  }
+  public function testoa_core_section_is_public_fail() {
+
+    $node = (object) array(
+      'field_oa_group_ref' => array(LANGUAGE_NONE => array('something')),
+      'field_oa_team_ref' => array(LANGUAGE_NONE => array()),
+      'field_oa_user_ref' => array(LANGUAGE_NONE => array()),
+    );
+    $this->assertEqual(
+      oa_core_section_is_public($node),
+      FALSE,
+      'If Node does has a group visibilty setting then it is not public'
+    );
+    $node = (object) array(
+      'field_oa_group_ref' => array(LANGUAGE_NONE => array()),
+      'field_oa_team_ref' => array(LANGUAGE_NONE => array("something")),
+      'field_oa_user_ref' => array(LANGUAGE_NONE => array()),
+    );
+    $this->assertEqual(
+      oa_core_section_is_public($node),
+     FALSE ,
+      'If Node does has a team visibilty setting then it is not public'
+    );
+    $node = (object) array(
+      'field_oa_group_ref' => array(LANGUAGE_NONE => array()),
+      'field_oa_team_ref' => array(LANGUAGE_NONE => array()),
+      'field_oa_user_ref' => array(LANGUAGE_NONE => array("something")),
+    );
+    $this->assertEqual(
+      oa_core_section_is_public($node),
+     FALSE ,
+      'If Node does has a user visibilty setting then it is not public'
+    );
+  }
+}

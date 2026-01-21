@@ -1,0 +1,179 @@
+<?php
+
+/**
+ * @file
+ * Processes various FullCalendar configuration extenders.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function fullcalendar_options_menu() {
+  $items = array();
+
+  $items['admin/config/user-interface/fullcalendar/options'] = array(
+    'title' => 'Options',
+    'description' => 'Enable or disable extra FullCalendar options.',
+    'file' => 'fullcalendar_options.admin.inc',
+    'file path' => drupal_get_path('module', 'fullcalendar_options') . '/includes',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('fullcalendar_options_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_fullcalendar_api().
+ */
+function fullcalendar_options_fullcalendar_api() {
+  return array(
+    'api' => fullcalendar_api_version(),
+    'path' => drupal_get_path('module', 'fullcalendar_options') . '/includes',
+  );
+}
+
+/**
+ * Provide basic form element for each option.
+ *
+ * This is a helper function so that it can be reused in the admin settings.
+ *
+ * @see fullcalendar_options_admin_settings()
+ */
+function _fullcalendar_options_list($show_all = FALSE) {
+  $form = array();
+
+  $form['firstHour'] = array(
+    '#type' => 'textfield',
+    '#title' => t('First hour'),
+    '#description' => t('Determines the first hour that will be visible in the scroll pane.'),
+    '#size' => 2,
+    '#maxlength' => 2,
+    '#default_value' => 6,
+    '#data_type' => 'int',
+  );
+  $form['minTime'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Minimum time'),
+    '#description' => t('Determines the first hour/time that will be displayed, even when the scrollbars have been scrolled all the way up.'),
+    '#size' => 2,
+    '#maxlength' => 2,
+    '#default_value' => 0,
+    '#data_type' => 'int',
+  );
+  $form['maxTime'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Maximum time'),
+    '#description' => t('Determines the last hour/time (exclusively) that will be displayed, even when the scrollbars have been scrolled all the way down.'),
+    '#size' => 2,
+    '#maxlength' => 2,
+    '#default_value' => 24,
+    '#data_type' => 'int',
+  );
+  $form['slotMinutes'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Slot minutes'),
+    '#description' => t('The frequency for displaying time slots, in minutes.'),
+    '#size' => 2,
+    '#maxlength' => 2,
+    '#default_value' => 30,
+    '#data_type' => 'int',
+  );
+  $form['defaultEventMinutes'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Default event minutes'),
+    '#description' => t('Determines the length (in minutes) an event appears to be when it has an unspecified end date.'),
+    '#size' => 4,
+    '#maxlength' => 4,
+    '#default_value' => 120,
+    '#data_type' => 'int',
+  );
+  $form['allDaySlot'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('All day slot'),
+    '#description' => t('Determines if the "all-day" slot is displayed at the top of the calendar.'),
+    '#default_value' => TRUE,
+    '#data_type' => 'bool',
+  );
+  $form['weekends'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Weekends'),
+    '#description' => t('Whether to include Saturday/Sunday columns in any of the calendar views.'),
+    '#default_value' => TRUE,
+    '#data_type' => 'bool',
+  );
+  $form['lazyFetching'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Lazy fetching'),
+    '#description' => t('Determines when event fetching should occur.'),
+    '#default_value' => TRUE,
+    '#data_type' => 'bool',
+  );
+  $form['disableDragging'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Disable dragging'),
+    '#description' => t('Disables all event dragging, even when events are editable.'),
+    '#default_value' => FALSE,
+    '#data_type' => 'bool',
+  );
+  $form['disableResizing'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Disable resizing'),
+    '#description' => t('Disables all event resizing, even when events are editable.'),
+    '#default_value' => FALSE,
+    '#data_type' => 'bool',
+  );
+  $form['dragRevertDuration'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Drag revert duration'),
+    '#description' => t('Time (in ms) it takes for an event to revert to its original position after an unsuccessful drag.'),
+    '#size' => 6,
+    '#maxlength' => 6,
+    '#default_value' => 500,
+    '#data_type' => 'int',
+  );
+  $form['dayClick'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Day click'),
+    '#description' => t('Switch the display when a day is clicked'),
+    '#default_value' => FALSE,
+    '#data_type' => 'bool',
+  );
+
+  // By default, restrict the form to options allowed by the admin settings.
+  if (!$show_all) {
+    $form = array_intersect_key($form, array_filter(variable_get('fullcalendar_options', array())));
+
+    if (isset($form['dayClick'])) {
+      // Add in dependency form elements.
+      $form['dayClickView'] = array(
+        '#type' => 'select',
+        '#title' => t('Display'),
+        '#description' => t('The display to switch to when a day is clicked.'),
+        '#default_value' => 'agendaWeek',
+        '#options' => array(
+          'month' => 'Month',
+          'agendaWeek' => 'Week (Agenda)',
+          'basicWeek' => 'Week (Basic)',
+          'agendaDay' => 'Day (Agenda)',
+          'basicDay' => 'Day (Basic)',
+        ),
+        '#dependency' => array('edit-style-options-fullcalendar-options-dayclick' => array(1)),
+      );
+    }
+  }
+
+  return $form;
+}
+
+/**
+ * Add Colorbox integration.
+ */
+if (module_exists('colorbox') && !function_exists('colorbox_fullcalendar_api')) {
+  function colorbox_fullcalendar_api() {
+    return fullcalendar_options_fullcalendar_api();
+  }
+}

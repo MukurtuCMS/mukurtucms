@@ -1,0 +1,1335 @@
+<?php
+
+/*
+ * Implements hook_menu().
+ */
+function mukurtu_taxonomy_records_menu() {
+    $items = array();
+
+    $items['taxonomy/term/%taxonomy_term/add-record'] = array(
+        'title' => t('Add Record'),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('mukurtu_taxonomy_records_add_record_form', 2),
+        'access callback' => 'mukurtu_taxonomy_records_add_record_form_access',
+        'access arguments' => array(2),
+        'type' => MENU_LOCAL_TASK,
+        'weight' => 100,
+    );
+
+    $items['taxonomy/term/%taxonomy_term/remove-record/%node'] = array(
+        'title' => t('Remove Record'),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('mukurtu_taxonomy_records_remove_record_form', 2, 4),
+        'access callback' => 'mukurtu_taxonomy_records_remove_record_form_access',
+        'access arguments' => array(2,4),
+        'type' => MENU_LOCAL_TASK,
+        'weight' => 100,
+    );
+    /*
+    $items['node/%node/manage-record'] = array(
+        'title' => t('Manage Record'),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('mukurtu_taxonomy_records_manage_record_form', 1),
+        'access callback' => 'mukurtu_taxonomy_records_manage_record_form_access',
+        'access arguments' => array(1),
+        'type' => MENU_LOCAL_TASK,
+        'weight' => 100,
+    );
+    */
+    $items['dashboard/mukurtu-records'] = array(
+        'title' => t('Mukurtu Records Configuration'),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('mukurtu_taxonomy_records_config_form'),
+        'access callback' => 'mukurtu_taxonomy_records_config_form_access',
+        'access arguments' => array(),
+        'type' => MENU_LOCAL_TASK,
+        'weight' => 100,
+    );
+
+    return $items;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function mukurtu_taxonomy_records_block_info() {
+    $blocks['mukurtu_records'] = array(
+        'info' => t('Mukurtu Taxonomy Records'),
+    );
+    return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function mukurtu_taxonomy_records_block_view($delta = '') {
+    $block = array();
+
+    switch ($delta) {
+    case 'mukurtu_records':
+        $block['subject'] = t('Mukurtu Taxonomy Records');
+        $block['content'] = mukurtu_taxonomy_records_block();
+        break;
+    }
+    return $block;
+}
+
+/**
+ * Builds the taxonomy record dashboard block
+ */
+function mukurtu_taxonomy_records_block() {
+    $items = array();
+
+    if(drupal_valid_path('dashboard/mukurtu-records')) {
+        $items[] = array(
+            'title' => t('Mukurtu Taxonomy Record Sitewide Settings'),
+            'href' => 'dashboard/mukurtu-records',
+            'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+            'description' => t('Enable/Disable Mukurtu Taxonomy Records per Taxonomy'),
+        );
+    }
+
+    // Create links for each type of record
+    $record_list = mukurtu_taxonomy_records_entity_list();
+    foreach($record_list as $type => $bundles) {
+        foreach($bundles as $bundle => $bundle_label) {
+            $add_path = "$type/add/$bundle";
+            if(drupal_valid_path($add_path)) {
+                $items[] = array(
+                    'title' => t('Create @bundle', array('@bundle' => $bundle_label)),
+                    'href' => $add_path,
+                    'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+                    'description' => t('Create a new @bundle record.', array('@bundle' => $bundle_label)),
+                );
+            }
+        }
+    }
+
+    $content = array ('content' => $items);
+    $markup = theme('admin_block_content', $content);
+
+    $block = array(
+        '#markup' => $markup,
+    );
+    return $block;
+}
+
+/*
+function mukurtu_taxonomy_records_manage_record_form($form, $form_state, $node) {
+    $suggested_terms = mukurtu_taxonomy_records_suggested_record_terms($node);
+    $vocabs = taxonomy_get_vocabularies();
+    $options = array();
+    $default_value = array();
+
+    // Add JS
+    drupal_add_js(drupal_get_path('module', 'mukurtu_taxonomy_records') .'/js/mukurtu_records.js', 'file');
+
+    // Get terms record is attached to
+    $emw_record = entity_metadata_wrapper('node', $node);
+    $mukurtu_term_refs = array();
+    foreach($emw_record->field_mukurtu_terms->value() as $index => $term_ref) {
+        $mukurtu_term_refs[] = $term_ref->tid;
+    }
+
+    // List all suggested terms
+    foreach($suggested_terms as $suggested_term) {
+        $term = taxonomy_term_load($suggested_term->tid);
+        if($term && mukurtu_taxonomy_records_are_records_enabled($term)) {
+            $vocab = taxonomy_vocabulary_load($term->vid);
+            $vocab_name = isset($vocab->name) ? $vocab->name : $term->vocabulary_machine_name;
+            $options[$term->tid] = $term->name . " ({$vocab_name})";
+
+            // If the record is already attached to the term, the checkbox should be checked
+            if(in_array($term->tid, $mukurtu_term_refs)) {
+                $default_value[] = $term->tid;
+            }
+        }
+    }
+
+    $form['mukurtu_record']['instructions'] = array(
+        '#markup' => '<p>'. t('Attach this record to one or more taxonomy terms. This record will be shown in place of the default page for attached taxonomy terms.') . '</p>',
+    );
+    $form['mukurtu_record']['terms'] = array(
+        '#type' => 'checkboxes',
+        '#options' => $options,
+        '#title' => t('Suggested Terms'),
+        '#default_value' => $default_value
+    );
+
+    // Get list of all vocabs that are enabled
+    $vocabs = taxonomy_get_vocabularies();
+    $enabled_vocabs = array();
+    foreach($vocabs as $vocab) {
+        if(mukurtu_taxonomy_records_are_records_enabled_for_vocabulary($vocab)) {
+            $enabled_vocabs[] = $vocab;
+        }
+    }
+
+    // Build the options for the select control
+    // It consists of all taxonomy terms enabled for records
+    $options = array();
+    foreach($enabled_vocabs as $enabled_vocab) {
+        $query = new EntityFieldQuery();
+        $query->entityCondition('entity_type', 'taxonomy_term')
+            ->propertyCondition('vid', $enabled_vocab->vid)
+            ->propertyOrderBy('name', 'ASC');
+
+        $result = $query->execute();
+        if(isset($result['taxonomy_term'])) {
+            foreach($result['taxonomy_term'] as $term_ref) {
+                $term = taxonomy_term_load($term_ref->tid);
+                if($term) {
+                    $options[$term->tid] = $term->name . " ({$enabled_vocab->name})";
+                }
+            }
+        }
+    }
+
+    // Build select control where user can select from all available terms
+    $form['mukurtu_record']['terms_all'] = array(
+        '#title' => t('Choose from all available terms'),
+        '#type' => 'select',
+        '#multiple' => TRUE,
+        '#options' => $options,
+        '#default_value' => $mukurtu_term_refs,
+    );
+
+    $form['submit_button'] = array(
+        '#type' => 'submit',
+        '#value' => t('Save configuration'),
+    );
+    return $form;
+}
+*/
+/**
+ * Submit handler for a Mukurtu Record's 'Manage Record' form
+ */
+/*
+function mukurtu_taxonomy_records_manage_record_form_submit($form, &$form_state) {
+    if(!isset($form_state['build_info']['args'][0])) {
+        return;
+    }
+    $record = $form_state['build_info']['args'][0];
+
+    // Get terms record is attached to
+    $emw_record = entity_metadata_wrapper('node', $record);
+    $mukurtu_term_refs = array();
+    foreach($emw_record->field_mukurtu_terms->value() as $index => $term_ref) {
+        $mukurtu_term_refs[] = $term_ref->tid;
+    }
+
+    // Loop through all submitted term values
+    if(isset($form_state['input']['terms_all'])) {
+        foreach($form_state['input']['terms_all'] as $index => $tid) {
+            // If the term isn't already attached, add it
+            if(!in_array($tid, $mukurtu_term_refs)) {
+                $term = taxonomy_term_load($tid);
+                if($term) {
+                    mukurtu_taxonomy_records_add_record_to_term($term, $record->nid);
+                }
+            } else {
+                // The term is already attached. Remove it from our list. After looping through all form input,
+                // anything left in this list are "removed" terms.
+                $old_index = array_search($tid, $mukurtu_term_refs);
+                if($old_index !== FALSE) {
+                    unset($mukurtu_term_refs[$old_index]);
+                }
+            }
+        }
+    }
+
+    // Delete the references to all the removed terms
+    foreach($mukurtu_term_refs as $removed_tid) {
+        $removed_term = taxonomy_term_load($removed_tid);
+        if($removed_term) {
+            mukurtu_taxonomy_records_remove_record_from_term($removed_term, $record->nid);
+        }
+    }
+
+    drupal_set_message(t('Configuration saved'));
+}
+
+function mukurtu_taxonomy_records_manage_record_form_access($node) {
+    // Show only if the node is a record
+    if(mukurtu_taxonomy_records_is_record($node)) {
+        return node_access("update", $node);
+    }
+    return FALSE;
+}
+*/
+
+/**
+ * Implements hook_suggested_record_terms().
+ *
+ * Return the list of suggested taxonomy terms based on the given record form
+ */
+function mukurtu_taxonomy_records_suggested_record_terms($form, $form_state) {
+    // Default behavior is a simple record title/taxonomy term name comparison
+    // First use any form input for title
+    $title = isset($form_state['input']['title']) ? $form_state['input']['title'] : '';
+
+    // If no input, check for existing value (e.g., editing an existing node)
+    if($title == '') {
+        if(isset($form['title']['#default_value'])) {
+            $title = $form['title']['#default_value'];
+        }
+    }
+
+    // We want to return nothing if we can't find specific results
+    if($title != '') {
+        $query = new EntityFieldQuery();
+        $query->entityCondition('entity_type', 'taxonomy_term')
+            ->propertyCondition('name', "%$title%", 'LIKE')
+            ->range(0, 20);
+
+        $result = $query->execute();
+        if(isset($result['taxonomy_term'])) {
+            return $result['taxonomy_term'];
+        }
+    }
+
+    return array();
+}
+
+/**
+ * Build form for adding a record from a taxonomy term
+ */
+function mukurtu_taxonomy_records_add_record_form($form, $form_state, $term) {
+    // Check if the taxonomy is enabled for records
+    $vocab = taxonomy_vocabulary_load($term->vid);
+    if(!mukurtu_taxonomy_records_are_records_enabled($term)) {
+        $form['records_not_enabled'] = array(
+            '#markup' => t("Records are not enabled for the \"@vocab\" taxonomy.",
+                           array('@vocab' => $vocab->name)),
+        );
+        return $form;
+    }
+
+    $form['add_new_record_instructions'] = array(
+        //        '#markup' => t("Select the type of record for the \"@term\" term in the \"@vocab\" taxonomy:",
+        //                       array('@term' => $term->name, '@vocab' => $vocab->name)),
+        '#markup' => t("Select the type of record:"),
+    );
+
+    // For all the valid record types, makes links for the types the user has access to
+    $record_list = mukurtu_taxonomy_records_entity_list();
+
+    $new_record_links = array();
+    foreach($record_list as $type => $bundles) {
+        foreach($bundles as $bundle => $bundle_label) {
+            $add_path = "$type/add/$bundle/attach-record/{$term->tid}";
+            if(drupal_valid_path($add_path)) {
+                $new_record_links[] = l($bundle_label, $add_path);
+            }
+        }
+    }
+    $form['add_new_record'] = array(
+        '#theme' => 'item_list',
+        '#items' => $new_record_links,
+    );
+    /*
+    // Existing Records
+    $form['add_existing_record_instructions'] = array(
+        '#markup' => t("Add an existing record for the \"@term\" term in the \"@vocab\" taxonomy:",
+                       array('@term' => $term->name, '@vocab' => $vocab->name)),
+    );
+
+    $header = array(
+        'title' => array('data' => t('Title'), 'field' => 'n.title'),
+        'thumbnail' => array('data' => t('Thumbnail')),
+        'type' => array('data' => t('Type'), 'field' => 'n.type'),
+        'author' => t('Author'),
+        'status' => array('data' => t('Status'), 'field' => 'n.status'),
+        'changed' => array('data' => t('Updated'), 'field' => 'n.changed', 'sort' => 'desc')
+    );
+
+    $options = array();
+
+    // Get all available records
+    $query = new EntityFieldQuery;
+    $available_records = $query->entityCondition('entity_type', 'node')
+                       ->entityCondition('bundle', $record_list['node'], 'IN')
+                       ->execute();
+
+    $record_nids = array();
+    if(isset($available_records['node'])) {
+        $record_nids = $available_records['node'];
+    }
+
+    // Get the list of terms that are already attached
+    $emw_term = entity_metadata_wrapper('taxonomy_term', $term);
+    $mukurtu_record_refs = array();
+    foreach($emw_term->field_mukurtu_records->value() as $index => $record_ref) {
+        $mukurtu_record_refs[] = $record_ref->nid;
+    }
+
+    foreach($record_nids as $nid => $value) {
+        // Don't present already attached terms
+        if(in_array($nid, $mukurtu_record_refs)) {
+            continue;
+        }
+
+        $node = node_load($nid);
+        $atom = scald_atom_load($node->field_media_asset[LANGUAGE_NONE][0]['sid']);
+
+        $options[$node->nid] = array(
+            'thumbnail' => scald_render($atom, 'sdl_library_item'),
+            'title' => array(
+                'data' => array(
+                    '#type' => 'link',
+                    '#title' => $node->title,
+                    '#href' => 'node/' . $node->nid,
+                ),
+            ),
+            'type' => check_plain(node_type_get_name($node)),
+            'author' => theme('username', array('account' => $node)),
+            'status' => $node->status ? t('published') : t('not published'),
+            'changed' => format_date($node->changed, 'short'),
+        );
+    }
+
+    $form['nodes'] = array(
+      '#type' => 'tableselect',
+      '#header' => $header,
+      '#options' => $options,
+      '#empty' => t('No records available.'),
+    );
+    $form['submit_button'] = array(
+        '#type' => 'submit',
+        '#value' => t('Add Selected'),
+    );
+    */
+
+    return $form;
+}
+
+/*
+function mukurtu_taxonomy_records_add_record_form_submit($form, &$form_state) {
+    if(!isset($form_state['build_info']['args'][0])) {
+        return;
+    }
+
+    $term = $form_state['build_info']['args'][0];
+
+    // Add selected records
+    $added = 0;
+    if(isset($form_state['input']['nodes'])) {
+        foreach($form_state['input']['nodes'] as $nid_to_add => $value) {
+            if($value) {
+                mukurtu_taxonomy_records_add_record_to_term($term, $nid_to_add);
+                $added += 1;
+            }
+        }
+    }
+
+    if($added > 0) {
+        drupal_set_message(t('Added the selected records'));
+    }
+}
+*/
+
+/**
+ *  Builds the form to configure which taxonomy vocabularies are enabled
+ *  to use taxonomy records.
+ */
+function mukurtu_taxonomy_records_config_form($form, $form_state) {
+    $vocabs = taxonomy_get_vocabularies();
+    $options = array();
+    $default_value = array();
+    foreach($vocabs as $vocab) {
+        $options[$vocab->vid] = $vocab->name;
+        if(mukurtu_taxonomy_records_are_records_enabled_for_vocabulary($vocab)) {
+            $default_value[] = $vocab->vid;
+        }
+    }
+
+    $form['mukurtu_records']['enable_vocabs'] = array(
+        '#type' => 'checkboxes',
+        '#options' => $options,
+        '#title' => t('Vocabularies Enabled for Mukurtu Records'),
+        '#default_value' => $default_value
+    );
+
+    $form['submit_button'] = array(
+        '#type' => 'submit',
+        '#value' => t('Save configuration'),
+    );
+
+    return $form;
+}
+
+/**
+ *  Submit handler for the taxonomy record config form
+ */
+function mukurtu_taxonomy_records_config_form_submit($form, &$form_state) {
+    foreach($form_state['values']['enable_vocabs'] as $index => $vid) {
+        $vocab = taxonomy_vocabulary_load($index);
+        if($vid && $vocab) {
+                mukurtu_taxonomy_records_enable_records_for_vocabulary($vocab);
+        } else {
+            mukurtu_taxonomy_records_disable_records_for_vocabulary($vocab);
+        }
+    }
+    drupal_set_message(t('Configuration saved'));
+}
+
+/**
+ *  Access callback for the taxonomy record config form
+ */
+function mukurtu_taxonomy_records_config_form_access() {
+    return user_access('administer taxonomy');
+}
+
+/**
+ *  Enables taxonomy records for a given taxonomy vocabulary.
+ *  $vocab needs to be the loaded vocabulary, not the vid.
+ */
+function mukurtu_taxonomy_records_enable_records_for_vocabulary($vocab) {
+    // Check if vocab has the Mukurtu Records field
+    $instances = field_info_instances('taxonomy_term', $vocab->machine_name);
+    if(!isset($instances['field_mukurtu_records'])) {
+        // If it doesn't, add the Mukurtu Records field to vocabulary
+        $field_instance = array(
+            'field_name' => 'field_mukurtu_records',
+            'entity_type' => 'taxonomy_term',
+            'label' => 'Records',
+            'bundle' => $vocab->machine_name,
+            'required' => FALSE,
+            'display' => array(
+                'default' => array(
+                    'label' => 'hidden',
+                    'module' => 'mukurtu_display_formatters',
+                    'settings' => array(),
+                    'type' => 'mukurtu_records_formatter',
+                    'weight' => 0,
+                ),
+            ),
+            'widget' => array(
+                'active' => 1,
+                'module' => 'options',
+                'settings' => array(
+                    'apply_chosen' => 0,
+                ),
+                'type' => 'options_select',
+            ),
+        );
+        field_create_instance($field_instance);
+    }
+
+    // Enable CER for vocabulary <-> All record types
+    mukurtu_taxonomy_records_enable_all_cer($vocab);
+}
+
+/**
+ *  Helper function to enable CER between the given taxonomy vocabulary and all record types
+ *  $vocab needs to be the loaded vocabulary, not the vid.
+ */
+function mukurtu_taxonomy_records_enable_all_cer($vocab) {
+    foreach(mukurtu_taxonomy_records_entity_list() as $type_label => $type) {
+        foreach($type as $bundle_label => $bundle) {
+            mukurtu_taxonomy_records_enable_cer('taxonomy_term', $vocab->machine_name, $type_label, $bundle_label);
+        }
+    }
+}
+
+/**
+ *  Disables taxonomy records for a given taxonomy vocabulary.
+ *  $vocab needs to be the loaded vocabulary, not the vid.
+ */
+function mukurtu_taxonomy_records_disable_records_for_vocabulary($vocab) {
+    if(mukurtu_taxonomy_records_are_records_enabled_for_vocabulary($vocab)) {
+        foreach(mukurtu_taxonomy_records_entity_list() as $type_label => $type) {
+            foreach($type as $bundle_label => $bundle) {
+                mukurtu_taxonomy_records_disable_cer('taxonomy_term', $vocab->machine_name, $type_label, $bundle_label);
+            }
+        }
+    }
+}
+
+/**
+ *  Helper function to disable a specific CER
+ */
+function mukurtu_taxonomy_records_disable_cer($left_type, $left_bundle, $right_type, $right_bundle) {
+    // All arguments are required non-null
+    if(!$left_bundle || !$left_type || !$right_bundle || !$right_type) {
+        return;
+    }
+    $left_field = 'field_mukurtu_records';
+    if($left_type != 'taxonomy_term') {
+        $left_field = 'field_mukurtu_terms';
+    }
+
+    $right_field = 'field_mukurtu_records';
+    if($right_type != 'taxonomy_term') {
+        $right_field = 'field_mukurtu_terms';
+    }
+
+    $left = "$left_type:$left_bundle:$left_field";
+    $right = "$right_type:$right_bundle:$right_field";
+    $identifier = "$left*$right";
+
+    // Find the CER
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'cer')
+        ->propertyCondition('identifier', $identifier)
+        ->addMetaData('account', user_load(1));
+    $result = $query->execute();
+
+    // Delete the CER
+    if(isset($result['cer'])) {
+        foreach($result['cer'] as $cer) {
+            entity_delete('cer', $cer->pid);
+        }
+    }
+}
+
+/**
+ *  Helper function to enable a specific CER
+ */
+function mukurtu_taxonomy_records_enable_cer($left_type, $left_bundle, $right_type, $right_bundle) {
+    // All arguments are required non-null
+    if(!$left_bundle || !$left_type || !$right_bundle || !$right_type) {
+        return;
+    }
+
+    $left_field = 'field_mukurtu_records';
+    if($left_type != 'taxonomy_term') {
+        $left_field = 'field_mukurtu_terms';
+    }
+
+    $right_field = 'field_mukurtu_records';
+    if($right_type != 'taxonomy_term') {
+        $right_field = 'field_mukurtu_terms';
+    }
+
+    $left = "$left_type:$left_bundle:$left_field";
+    $right = "$right_type:$right_bundle:$right_field";
+    $identifier = "$left*$right";
+
+    if(!mukurtu_taxonomy_records_cer_exists($identifier)) {
+        $cer = entity_create('cer', array('identifier' => $identifier));
+        $cer_emw = entity_metadata_wrapper('cer', $cer);
+        $cer_emw->cer_bidirectional = TRUE;
+        $cer_emw->cer_enabled = TRUE;
+        $cer_emw->cer_weight = 0;
+        $cer_emw->cer_left = $left;
+        $cer_emw->cer_right = $right;
+        $cer_emw->save();
+    }
+}
+
+/**
+ *  Helper function to check if a specific CER already exists
+ */
+function mukurtu_taxonomy_records_cer_exists($identifier) {
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'cer')
+        ->propertyCondition('identifier', $identifier)
+        ->addMetaData('account', user_load(1));
+
+    $result = $query->execute();
+
+    if(isset($result['cer']) && count($result['cer']) > 0) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+
+/**
+ * Access control for the add record (from taxonomy term) form
+ */
+function mukurtu_taxonomy_records_add_record_form_access($term) {
+    // If the term is records enabled
+    if(mukurtu_taxonomy_records_are_records_enabled($term)) {
+        // Allow anybody who can edit a taxonomy to add records to terms in that vocabulary
+        return user_access("edit terms in {$term->vid}") || user_access('administer taxonomy');
+    }
+    return FALSE;
+}
+
+/**
+ * Form used to confirm remove a record from a taxonomy term. Triggered from record's contextual menu.
+ */
+function mukurtu_taxonomy_records_remove_record_form($form, $form_state, $term, $record) {
+    $question = t("Remove the record \"@record\" from term \"@term\"?", array('@record' => $record->title, '@term' => $term->name, '@vocab' => $term->vocabulary_machine_name));
+
+    $description = t("Are you sure you want to detach the record \"@record\" currently attached to the \"@term\" term in the \"@vocab\" taxonomy? This will not delete the record.", array('@record' => $record->title, '@term' => $term->name, '@vocab' => $term->vocabulary_machine_name));
+    return confirm_form($form, $question, drupal_get_destination(), $description);
+}
+
+/**
+ * Access control for the remove record form
+ */
+function mukurtu_taxonomy_records_remove_record_form_access($term, $record) {
+    // To reach the form to remove a record, a user must:
+    // 1. Term must be records enabled
+    // 2. Have permission to edit the record
+    // 3. Have permission to edit the taxonomy
+    if(mukurtu_taxonomy_records_are_records_enabled($term) && node_access('update', $record)) {
+        return user_access("edit terms in {$term->vid}") || user_access('administer taxonomy');
+    }
+    return FALSE;
+}
+
+
+/**
+ * Submit handler for the remove record form
+ */
+function mukurtu_taxonomy_records_remove_record_form_submit($form, $form_state) {
+    if(isset($form_state['build_info']['args'][0])) {
+        $term = $form_state['build_info']['args'][0];
+    }
+
+    if(isset($form_state['build_info']['args'][1])) {
+        $record = $form_state['build_info']['args'][1];
+    }
+
+    if($term && $record) {
+        mukurtu_taxonomy_records_remove_record_from_term($term, $record->nid);
+    }
+}
+
+// Remove the reference to record_id from the term. CER will take care of the record to term reference.
+function mukurtu_taxonomy_records_remove_record_from_term($term, $record_id) {
+    $emw_term = entity_metadata_wrapper('taxonomy_term', $term);
+    $mukurtu_record_refs = array();
+    foreach($emw_term->field_mukurtu_records->value() as $index => $record_ref) {
+        $mukurtu_record_refs[] = $record_ref->nid;
+    }
+
+    $key = array_search($record_id, $mukurtu_record_refs);
+    if($key !== FALSE) {
+        unset($mukurtu_record_refs[$key]);
+        $emw_term->field_mukurtu_records->set($mukurtu_record_refs);
+        $emw_term->save();
+    }
+}
+
+// Add the reference to record_id from the term. CER will take care of the record to term reference.
+function mukurtu_taxonomy_records_add_record_to_term($term, $record_id) {
+    // Make sure CER is enabled
+    mukurtu_taxonomy_records_enable_all_cer($vocab);
+
+    // Add the reference
+    $emw_term = entity_metadata_wrapper('taxonomy_term', $term);
+    $mukurtu_record_refs = array();
+    foreach($emw_term->field_mukurtu_records->value() as $index => $record_ref) {
+        $mukurtu_record_refs[] = $record_ref->nid;
+    }
+
+    if(!in_array($record_id, $mukurtu_record_refs)) {
+        $mukurtu_record_refs[] = $record_id;
+        $emw_term->field_mukurtu_records->set($mukurtu_record_refs);
+        $emw_term->save();
+    }
+}
+
+function mukurtu_taxonomy_records_menu_alter(&$items) {
+    $items['taxonomy/term/%taxonomy_term']['page callback'] = 'mukurtu_taxonomy_records_taxonomy_term_page';
+    unset($items['taxonomy/term/%taxonomy_term']['file']);
+}
+
+// Here we are overriding the default display of taxonomy pages
+function mukurtu_taxonomy_records_taxonomy_term_page($term) {
+    $hide_records = FALSE;
+    // Terms might still have records data after records are disabled. Don't display them if not enabled.
+    if(!mukurtu_taxonomy_records_are_records_enabled($term) || empty($term->field_mukurtu_records)) {
+        if(isset($term->field_mukurtu_records)) {
+            unset($term->field_mukurtu_records);
+        }
+        $hide_records = TRUE;
+    }
+
+    module_load_include('inc', 'taxonomy', 'taxonomy.pages');
+    $build = taxonomy_term_page($term);
+
+    // Don't display the record label in the case where records are enabled, but the term doesn't have any
+    if($hide_records && isset($build['term_heading']['term']['field_mukurtu_records'])) {
+        unset($build['term_heading']['term']['field_mukurtu_records']);
+    }
+
+    if(isset($term->field_mukurtu_records) && !empty($term->field_mukurtu_records[LANGUAGE_NONE])){
+        if(isset($build['nodes'])) {
+            unset($build['nodes']);
+        }
+        if(isset($build['pager'])) {
+            unset($build['pager']);
+        }
+    }
+    return $build;
+}
+
+/*
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function mukurtu_taxonomy_records_form_node_form_alter(&$form, &$form_state, $form_id) {
+    if(isset($form_state['node']) && mukurtu_taxonomy_records_is_record($form_state['node'])) {
+        // Check if we are attaching this record to a taxonomy term
+        $action = arg(3);
+        $tid = arg(4);
+        if(isset($action) && isset($tid)) {
+            if($action == 'attach-record') {
+                // Set the default value for the custom widget form elements, so that the passed taxonomy term appears
+                // checked/selected in the "Record Management" tab. Ideally we'd check that they are using our custom
+                // widget first.
+                if(isset($form['field_mukurtu_terms'][LANGUAGE_NONE]['mukurtu_record']['terms'])
+                   && isset($form['field_mukurtu_terms'][LANGUAGE_NONE]['mukurtu_record']['terms']['#options'][$tid])) {
+                    $form['field_mukurtu_terms'][LANGUAGE_NONE]['mukurtu_record']['terms']['#default_value'][$tid] = $tid;
+                }
+                if(isset($form['field_mukurtu_terms'][LANGUAGE_NONE]['mukurtu_record']['terms_all'])) {
+                    $form['field_mukurtu_terms'][LANGUAGE_NONE]['mukurtu_record']['terms_all']['#default_value'][] = $tid;
+                }
+
+                if(isset($form['field_mukurtu_terms'][LANGUAGE_NONE]['#default_value'])) {
+                    // Make sure CER is enabled
+                    mukurtu_taxonomy_records_enable_all_cer($vocab);
+
+                    // Put the reference in the form
+                    $added = FALSE;
+                    foreach($form['field_mukurtu_terms'][LANGUAGE_NONE]['#default_value'] as $selected_term) {
+                        if($selected_term == $tid) {
+                            $added = TRUE;
+                        }
+                    }
+                    if(!$added) {
+                        $form['field_mukurtu_terms'][LANGUAGE_NONE]['#default_value'][] = $tid;
+                    }
+                }
+            }
+        }
+
+        // Hide node/media aggregate fields when editing. Those are set programmatically.
+        $form['field_node_aggregate']['#access'] = FALSE;
+        $form['field_media_aggregate']['#access'] = FALSE;
+
+        // Setup ajax callback. The default suggestions only use the title. Modules implementing
+        // hook_suggested_record_terms should alter the form and add the callback to other form elements
+        // they want to include
+        $form['title']['#ajax'] = array(
+            'callback' => 'mukurtu_taxonomy_records_suggested_terms_ajax',
+            'wrapper' => 'suggested-terms-wrapper',
+        );
+    }
+}
+
+function mukurtu_taxonomy_records_suggested_terms_ajax($form, $form_state) {
+    return $form['field_mukurtu_terms'];
+}
+
+function mukurtu_taxonomy_records_form_taxonomy_form_term_alter(&$form, &$form_state, $form_id) {
+    // Hide record field from term form when editing. We want users to use the 'add record' interface.
+    if(isset($form['field_mukurtu_records'])) {
+        $form['field_mukurtu_records']['#access'] = FALSE;
+    }
+}
+
+/*
+ * Implements hook_entity_update().
+ */
+function mukurtu_taxonomy_records_entity_update($entity, $type) {
+  if ($type == 'node') {
+    $taxonomy_fields = field_read_fields(array('type' => 'taxonomy_term_reference'));
+    $emw_node = entity_metadata_wrapper('node', $entity);
+    $emw_node_original = entity_metadata_wrapper('node', $entity->original);
+    foreach ($taxonomy_fields as $taxonomy_field) {
+      if (!empty($entity->{$taxonomy_field['field_name']})) {
+        $new = array();
+        $old = array();
+
+        // Simple case, single value.
+        if ($taxonomy_field['cardinality'] == "1") {
+          $new_term = $emw_node->{$taxonomy_field['field_name']}->value();
+          if (isset($new_term->tid)) {
+            $new[] = $new_term->tid;
+          }
+
+          if (!empty($entity->original->{$taxonomy_field['field_name']})) {
+            $old_term = $emw_node_original->{$taxonomy_field['field_name']}->value();
+            if (isset($old_term->tid)) {
+              $old[] = $old_term->tid;
+            }
+          }
+        } else {
+          // Cardinality allows multiple term refs, need to loop through.
+          // Get the new taxonomy refs.
+          foreach ($emw_node->{$taxonomy_field['field_name']}->getIterator() as $index => $term_wrapper) {
+            $term_wrapper_value = $term_wrapper->value();
+            if (isset($term_wrapper_value->tid)) {
+              $new[] = $term_wrapper_value->tid;
+            }
+          }
+
+          // Get the old taxonomy refs.
+          if (!empty($entity->original->{$taxonomy_field['field_name']})) {
+            foreach ($emw_node_original->{$taxonomy_field['field_name']}->getIterator() as $index => $term_wrapper) {
+              $term_wrapper_value = $term_wrapper->value();
+              if (isset($term_wrapper_value->tid)) {
+                $old[] = $term_wrapper_value->tid;
+              }
+            }
+          }
+        }
+
+        $new_old_diff = array_merge(array_diff($new, $old), array_diff($old, $new));
+
+        // Update the record cache of all the terms that have been changed.
+        foreach ($new_old_diff as $diff_tid) {
+          $diff_term = taxonomy_term_load($diff_tid);
+          if ($diff_term) {
+            mukurtu_taxonomy_records_update_records_cache($diff_term);
+          }
+        }
+      }
+    }
+  }
+}
+
+
+/**
+ * Updates the aggregate fields for attached records
+ */
+function mukurtu_taxonomy_records_update_records_cache($term) {
+    // Get all the attached records
+    $emw_term = entity_metadata_wrapper('taxonomy_term', $term);
+    $mukurtu_record_refs = array();
+    if(!empty($emw_term->field_mukurtu_records)) {
+        foreach($emw_term->field_mukurtu_records->value() as $index => $record_ref) {
+            // Update the record's aggregate fields
+            $emw_record = entity_metadata_wrapper('node', $record_ref);
+            $emw_record->field_node_aggregate->set(mukurtu_taxonomy_records_get_aggregate($record_ref));
+            $emw_record->save();
+        }
+    }
+}
+
+/*
+ * Implements hook_entity_presave().
+ */
+function mukurtu_taxonomy_records_entity_presave($entity, $type) {
+    if($type == 'node') {
+        if(mukurtu_taxonomy_records_is_record($entity)) {
+            $emw_node = entity_metadata_wrapper('node', $entity);
+            $emw_node->field_node_aggregate->set(mukurtu_taxonomy_records_get_aggregate($entity));
+        }
+    }
+}
+
+/*function mukurtu_taxonomy_records_entity_view($entity, $type, $view_mode, $langcode) {
+    if($view_mode == 'taxonomy_record_teaser') {
+        dpm($entity);
+    }
+    }*/
+
+function mukurtu_taxonomy_records_get_aggregate($entity) {
+    $aggregate = array();
+    if(mukurtu_taxonomy_records_is_record($entity)) {
+        $node_refs = array();
+        foreach($entity->field_mukurtu_terms[LANGUAGE_NONE] as $term_ref) {
+            $node_refs = array_merge(taxonomy_select_nodes($term_ref['target_id'], FALSE), $node_refs);
+        }
+
+        $node_refs = array_unique($node_refs);
+        $self = array_search($entity->nid, $node_refs);
+        if($self) {
+            unset($node_refs[$self]);
+        }
+
+        foreach($node_refs as $nid) {
+            // Don't aggregate other records
+            $node = node_load($nid);
+            if(!mukurtu_taxonomy_records_is_record($node)) {
+                $aggregate[] = $nid;
+            }
+        }
+    }
+    return $aggregate;
+}
+
+// Returns if Mukurtu Taxonomy Records are enabled for a specific vocabulary
+function mukurtu_taxonomy_records_are_records_enabled_for_vocabulary($vocab) {
+    if(!isset($vocab->machine_name)) {
+        return FALSE;
+    }
+    // To be enabled, the vocabulary needs:
+    // 1. The 'field_mukurtu_records' field
+    $instances = field_info_instances('taxonomy_term', $vocab->machine_name);
+    if(isset($instances['field_mukurtu_records'])) {
+
+        // 2. An enabled CER between the vocab and some other entity type
+        // Find the CER, check both left/right
+        foreach(array('cer_left', 'cer_right') as $cer_field) {
+            $query = new EntityFieldQuery();
+            $query->entityCondition('entity_type', 'cer')
+                ->fieldCondition($cer_field, 'path', "taxonomy_term:{$vocab->machine_name}:field_mukurtu_records", '=')
+                ->fieldCondition('cer_enabled', 'value', TRUE)
+                ->addMetaData('account', user_load(1));
+
+            $result = $query->execute();
+            if(isset($result['cer']) && count($result['cer']) > 0) {
+                return TRUE;
+            }
+        }
+    }
+
+    return FALSE;
+}
+
+// Returns if Mukurtu Taxonomy Records are enabled for a specific term
+function mukurtu_taxonomy_records_are_records_enabled($term) {
+    if(isset($term->vid)) {
+        $vocab = taxonomy_vocabulary_load($term->vid);
+        return mukurtu_taxonomy_records_are_records_enabled_for_vocabulary($vocab);
+    }
+    return FALSE;
+}
+
+// Returns a list of entity types that have records enabled
+function mukurtu_taxonomy_records_entity_list() {
+    $entity_records = array();
+
+    $entity_info = entity_get_info();
+
+    // Currently only supporting scald_atom and node
+    $supported_types = array('scald_atom', 'node');
+
+    // Check each supported type for the 'field_mukurtu_terms' field
+    foreach($supported_types as $type) {
+        foreach($entity_info[$type]['bundles'] as $bundle => $bundle_info) {
+            $instance = field_info_instance($type, 'field_mukurtu_terms', $bundle);
+            if($instance) {
+                $entity_records[$type][$bundle] = $bundle_info['label'];
+            }
+        }
+    }
+
+    return $entity_records;
+}
+
+function mukurtu_taxonomy_records_is_record($entity, $entity_type = 'node') {
+    if(!isset($entity->type)) {
+        return FALSE;
+    }
+
+    $supported_list = mukurtu_taxonomy_records_entity_list();
+    if(isset($supported_list[$entity_type])) {
+        foreach($supported_list[$entity_type] as $bundle => $bundle_label) {
+            if($entity->type == $bundle) {
+                return TRUE;
+            }
+        }
+    }
+    if(isset($entity->field_mukurtu_terms)) {
+        //        return TRUE;
+    }
+    return FALSE;
+}
+
+/**
+ * Implements hook_contextual_links_view_alter().
+ */
+function mukurtu_taxonomy_records_contextual_links_view_alter(&$element, $items) {
+    if(isset($element['#element']['#node']) && mukurtu_taxonomy_records_is_record($element['#element']['#node']) && $element['#element']['#view_mode'] == 'full') {
+        $term = menu_get_object('taxonomy_term', 2);
+        if($term) {
+            if(node_access('update', $element['#element']['#node'])) {
+                // Add detach button'
+                $tid = $term->tid;
+                $element['#links']['mukurtu-records'] = array(
+                    'title' => t("Remove this record"),
+                    'href' => url("/taxonomy/term/$tid/remove-record/" . $element['#element']['#node']->nid,
+                                  array('absolute' => TRUE,'query' => drupal_get_destination()))
+                );
+            }
+        }
+    }
+}
+
+
+function mukurtu_taxonomy_records_get_content_by_vocabulary($nid, $vocab_name) {
+    $filter_list = array();
+    $record_node = node_load($nid);
+    if($record_node) {
+        if(module_exists('mukurtu_taxonomy_records') && mukurtu_taxonomy_records_is_record($record_node)) {
+            if(isset($vocab_name) && $vocab_name != 'all') {
+                // Filtering by this vocabulary
+                $vocab = taxonomy_vocabulary_machine_name_load($vocab_name);
+
+                if($vocab) {
+                    $record_wrapper = entity_metadata_wrapper('node', $record_node);
+                    foreach($record_wrapper->field_mukurtu_terms->getIterator() as $delta => $term_wrapper) {
+                        if($term_wrapper->vocabulary->value()->vid == $vocab->vid) {
+                            $filter_list = array_merge(taxonomy_select_nodes($term_wrapper->tid->value(), FALSE), $filter_list);
+                        }
+                    }
+                    $filter_list = array_unique($filter_list);
+                }
+            }
+        }
+    }
+
+    return $filter_list;
+}
+
+function mukurtu_taxonomy_records_get_vocabulary_list($nid) {
+    $vocab_list = array();
+    $record_node = node_load($nid);
+    if($record_node) {
+        if(module_exists('mukurtu_taxonomy_records') && mukurtu_taxonomy_records_is_record($record_node)) {
+            $record_wrapper = entity_metadata_wrapper('node', $record_node);
+            foreach($record_wrapper->field_mukurtu_terms->getIterator() as $delta => $term_wrapper) {
+                // Don't duplicate vocabs in the list
+                if(!in_array($term_wrapper->vocabulary->value(), $vocab_list)) {
+                    $vocab_list[] = $term_wrapper->vocabulary->value();
+                }
+            }
+        }
+    }
+    return $vocab_list;
+}
+
+/**
+* Implements hook_views_api().
+*/
+function mukurtu_taxonomy_records_views_api() {
+    return array(
+        'api' => 3.0,
+        'path' => drupal_get_path('module', 'mukurtu_taxonomy_records')
+    );
+}
+
+/**
+ * Implements hook_views_default_views().
+ */
+function mukurtu_taxonomy_records_views_default_views() {
+    $view = new view();
+    $view->name = 'mukurtu_record_allowed_taxonomy_terms';
+    $view->description = '';
+    $view->tag = 'default';
+    $view->base_table = 'taxonomy_term_data';
+    $view->human_name = 'Mukurtu Record Allowed Taxonomy Terms';
+    $view->core = 7;
+    $view->api_version = '3.0';
+    $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+    /* Display: Master */
+    $handler = $view->new_display('default', 'Master', 'default');
+    $handler->display->display_options['title'] = 'Mukurtu Record Allowed Taxonomy Terms';
+    $handler->display->display_options['use_more_always'] = FALSE;
+    $handler->display->display_options['access']['type'] = 'perm';
+    $handler->display->display_options['cache']['type'] = 'none';
+    $handler->display->display_options['query']['type'] = 'views_query';
+    $handler->display->display_options['exposed_form']['type'] = 'basic';
+    $handler->display->display_options['pager']['type'] = 'none';
+    $handler->display->display_options['style_plugin'] = 'default';
+    $handler->display->display_options['row_plugin'] = 'fields';
+    /* Field: Taxonomy term: Name */
+    $handler->display->display_options['fields']['name']['id'] = 'name';
+    $handler->display->display_options['fields']['name']['table'] = 'taxonomy_term_data';
+    $handler->display->display_options['fields']['name']['field'] = 'name';
+    $handler->display->display_options['fields']['name']['label'] = '';
+    $handler->display->display_options['fields']['name']['alter']['word_boundary'] = FALSE;
+    $handler->display->display_options['fields']['name']['alter']['ellipsis'] = FALSE;
+    $handler->display->display_options['fields']['name']['link_to_taxonomy'] = TRUE;
+    /* Field: Taxonomy term: Term ID */
+    $handler->display->display_options['fields']['tid']['id'] = 'tid';
+    $handler->display->display_options['fields']['tid']['table'] = 'taxonomy_term_data';
+    $handler->display->display_options['fields']['tid']['field'] = 'tid';
+    $handler->display->display_options['fields']['tid']['separator'] = '';
+    /* Field: Taxonomy vocabulary: Name */
+    $handler->display->display_options['fields']['name_1']['id'] = 'name_1';
+    $handler->display->display_options['fields']['name_1']['table'] = 'taxonomy_vocabulary';
+    $handler->display->display_options['fields']['name_1']['field'] = 'name';
+    /* Field: Taxonomy vocabulary: Vocabulary ID */
+    $handler->display->display_options['fields']['vid']['id'] = 'vid';
+    $handler->display->display_options['fields']['vid']['table'] = 'taxonomy_vocabulary';
+    $handler->display->display_options['fields']['vid']['field'] = 'vid';
+    $handler->display->display_options['fields']['vid']['element_label_colon'] = FALSE;
+
+    /* Display: Entity Reference */
+    $handler = $view->new_display('entityreference', 'Entity Reference', 'entityreference_1');
+    $handler->display->display_options['defaults']['title'] = FALSE;
+    $handler->display->display_options['pager']['type'] = 'some';
+    $handler->display->display_options['defaults']['style_plugin'] = FALSE;
+    $handler->display->display_options['style_plugin'] = 'entityreference_style';
+    $handler->display->display_options['style_options']['grouping'] = array(
+        0 => array(
+            'field' => 'name',
+            'rendered' => 1,
+            'rendered_strip' => 0,
+        ),
+    );
+    $handler->display->display_options['style_options']['search_fields'] = array(
+        'name' => 'name',
+    );
+    $handler->display->display_options['defaults']['style_options'] = FALSE;
+    $handler->display->display_options['defaults']['row_plugin'] = FALSE;
+    $handler->display->display_options['row_plugin'] = 'entityreference_fields';
+    $handler->display->display_options['defaults']['row_options'] = FALSE;
+    $translatables['mukurtu_record_allowed_taxonomy_terms'] = array(
+        t('Master'),
+        t('Mukurtu Record Allowed Taxonomy Terms'),
+        t('more'),
+        t('Apply'),
+        t('Reset'),
+        t('Sort by'),
+        t('Asc'),
+        t('Desc'),
+        t('Term ID'),
+        t('.'),
+        t('Name'),
+        t('Vocabulary ID'),
+        t(','),
+        t('Entity Reference'),
+    );
+
+    $views[$view->name] = $view;
+    return $views;
+}
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function mukurtu_taxonomy_records_field_widget_info() {
+    return array(
+        'mukurtu_record_term_connection_widget' => array(
+            'label' => t('Mukurtu Records Term Selector'),
+            'field types' => array('entityreference'),
+            'behaviors' => array(
+                'multiple values' => FIELD_BEHAVIOR_CUSTOM,
+                'default value' => FIELD_BEHAVIOR_CUSTOM,
+            ),
+        ),
+    );
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function mukurtu_taxonomy_records_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+    $node = $element['#entity'];
+
+    // Get module specific suggestions, these should be better than our default
+    $suggested_terms = module_invoke_all('suggested_record_terms', $form, $form_state);
+
+    $vocabs = taxonomy_get_vocabularies();
+    $options = array();
+    $default_value = array();
+
+    // Add JS
+    drupal_add_js(drupal_get_path('module', 'mukurtu_taxonomy_records') .'/js/mukurtu_records.js', 'file');
+
+    // Get terms record is attached to
+    $emw_record = entity_metadata_wrapper('node', $node);
+    $mukurtu_term_refs = array();
+    foreach($emw_record->field_mukurtu_terms->value() as $index => $term_ref) {
+        $mukurtu_term_refs[] = $term_ref->tid;
+    }
+
+    // List all suggested terms
+    foreach($suggested_terms as $suggested_term) {
+        $term = taxonomy_term_load($suggested_term->tid);
+        if($term && mukurtu_taxonomy_records_are_records_enabled($term)) {
+            $vocab = taxonomy_vocabulary_load($term->vid);
+            $vocab_name = isset($vocab->name) ? $vocab->name : $term->vocabulary_machine_name;
+            $options[$term->tid] = $term->name . " ({$vocab_name})";
+
+            // If the record is already attached to the term, the checkbox should be checked
+            if(in_array($term->tid, $mukurtu_term_refs)) {
+                $default_value[] = $term->tid;
+            }
+        }
+    }
+
+    $element['mukurtu_record']['instructions'] = array(
+        '#markup' => '<p>'. t('Attach this record to one or more taxonomy terms. This record will be shown in place of the default page for attached taxonomy terms.') . '</p>',
+    );
+
+    if(!empty($options)) {
+        $element['mukurtu_record']['terms'] = array(
+            '#type' => 'checkboxes',
+            '#options' => $options,
+            '#title' => t('Suggested Terms'),
+            '#default_value' => $default_value,
+        );
+    }
+
+    // Add ajax wrapper for suggested terms
+    $element['mukurtu_record']['#prefix'] = '<div id="suggested-terms-wrapper">';
+    $element['mukurtu_record']['#suffix'] = '</div>';
+
+    // Get list of all vocabs that are enabled
+    $vocabs = taxonomy_get_vocabularies();
+    $enabled_vocabs = array();
+    foreach($vocabs as $vocab) {
+        if(mukurtu_taxonomy_records_are_records_enabled_for_vocabulary($vocab)) {
+            $enabled_vocabs[] = $vocab;
+        }
+    }
+
+    // Build the options for the select control
+    // It consists of all taxonomy terms enabled for records
+    $options = array();
+    foreach($enabled_vocabs as $enabled_vocab) {
+        $query = new EntityFieldQuery();
+        $query->entityCondition('entity_type', 'taxonomy_term')
+            ->propertyCondition('vid', $enabled_vocab->vid)
+            ->propertyOrderBy('name', 'ASC');
+
+        $result = $query->execute();
+        if(isset($result['taxonomy_term'])) {
+            foreach($result['taxonomy_term'] as $term_ref) {
+                $term = taxonomy_term_load($term_ref->tid);
+                if($term) {
+                    $options[$term->tid] = $term->name . " ({$enabled_vocab->name})";
+                }
+            }
+        }
+    }
+
+    // Build select control where user can select from all available terms
+    $element['mukurtu_record']['terms_all'] = array(
+        '#title' => t('Choose from all available terms'),
+        '#type' => 'select',
+        '#multiple' => TRUE,
+        '#options' => $options,
+        '#default_value' => $mukurtu_term_refs,
+        '#element_validate' => array('_mukurtu_taxonomy_records_widget_validate'),
+        '#select2' => [],
+    );
+
+    //    $element['mukurtu_record']['#submit'][] = '_mukurtu_taxonomy_records_widget_submit';
+
+    return $element;
+}
+
+function _mukurtu_taxonomy_records_widget_validate($element, &$form_state, $form) {
+    // TODO: This has got to be the WRONG way to do this...
+    // Convert our custom form input into the expected Drupal format so that the field API can save the values
+    if (!empty($form_state['input']['field_mukurtu_terms'][LANGUAGE_NONE]['mukurtu_record']['terms_all'])) {
+        foreach ($form_state['input']['field_mukurtu_terms'][LANGUAGE_NONE]['mukurtu_record']['terms_all'] as $index => $tid) {
+            $form_state['input']['field_mukurtu_terms'][LANGUAGE_NONE][$index]['target_id'] = $tid;
+            $form_state['values']['field_mukurtu_terms'][LANGUAGE_NONE][$index]['target_id'] = $tid;
+        }
+    }
+}
+
+/**
+ * Callback for Mukurtu Record implementors of hook_feeds_processor_targets_alter
+ */
+function mukurtu_taxonomy_records_set_target($source, $entity, $target, $value, $mapping)
+{
+    $new_target = str_replace(':guid_or_tid', '', $target);
+
+    foreach($value as $id) {
+        if($id) {
+            // Check if ID is a valid GUID.  If so, we use that.
+            $tid = ma_importexport_feeds_lookup_term_by_guid($id);
+            if(!$tid) {
+                // Otherwise we assume ID is a NID
+                $tid = $id;
+            }
+            $entity->{$new_target}[$entity->language][]['target_id'] = $tid;
+        }
+    }
+}

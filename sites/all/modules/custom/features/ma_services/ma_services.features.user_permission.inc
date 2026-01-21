@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_services.features.user_permission.inc
@@ -35,6 +36,7 @@ function ma_services_user_default_permissions() {
     'name' => 'get any binary files',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'services',
@@ -46,6 +48,7 @@ function ma_services_user_default_permissions() {
     'roles' => array(
       'Curator' => 'Curator',
       'administrator' => 'administrator',
+      'authenticated user' => 'authenticated user',
     ),
     'module' => 'services',
   );

@@ -74,6 +74,16 @@ class Updater {
    */
   public $source;
 
+  /**
+   * @var string $name The name of the project.
+   */
+  protected $name;
+
+  /**
+   * @var string $title The title of the project.
+   */
+  protected $title;
+
   public function __construct($source) {
     $this->source = $source;
     $this->name = self::getProjectName($source);
@@ -235,9 +245,6 @@ class Updater {
       // Make sure the installation parent directory exists and is writable.
       $this->prepareInstallDirectory($filetransfer, $args['install_dir']);
 
-      // Note: If the project is installed in sites/all, it will not be
-      // deleted. It will be installed in sites/default as that will override
-      // the sites/all reference and not break other sites which are using it.
       if (is_dir($args['install_dir'] . '/' . $this->name)) {
         // Remove the existing installed file.
         $filetransfer->removeDirectory($args['install_dir'] . '/' . $this->name);

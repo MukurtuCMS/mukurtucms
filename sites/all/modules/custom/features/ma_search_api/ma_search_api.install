@@ -1,0 +1,54 @@
+<?php
+
+/**
+ * Implements hook_update().
+ */
+
+/**
+ * Fix an issue with Search API tables not being created.
+ */
+function ma_search_api_update_7100() {
+    // Disable Search API then revert the ma_search_api feature
+    if(module_exists('search_api')) {
+        $result = search_api_server_disable('search_api_db_server');
+        if($result) {
+            $feature = features_get_features('ma_search_api');
+            if(isset($feature->info)) {
+                $components = array_keys($feature->info['features']);
+                features_revert(array('ma_search_api' => $components));
+            }
+        }
+    }
+}
+
+/**
+ * Verify database tables for timestamp search indexing exist.
+ */
+function ma_search_api_update_7101() {
+  if (!module_exists('search_api')) {
+    return;
+  }
+
+  $indexes = entity_load('search_api_index', array('default_node_index'));
+  $index = current($indexes);
+
+  if (isset($index->options['fields']['field_original_date:timestamp'])) {
+    // Disable timestamp index. On some sites, the table for timestamp
+    // wasn't created on update, and search_api can't index.
+    unset($index->options['fields']['field_original_date:timestamp']);
+    entity_save('search_api_index', $index);
+
+    // Disable search index.
+    search_api_server_disable('search_api_db_server');
+
+    // Revert the feature to pickup database schema update and enable index.
+    // This will also add the timestamp field back in.
+    features_revert_module('ma_search_api');
+
+    // Mark for re-indexing.
+    $index->reindex();
+
+    // Run Search cron to re-index.
+    search_api_cron();
+  }
+}

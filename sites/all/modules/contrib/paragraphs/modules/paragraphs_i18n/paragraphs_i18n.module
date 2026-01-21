@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * @file
+ * Holds function for paragraph field prepare translation.
+ */
+
+/**
+ * Implements hook_field_prepare_translation().
+ *
+ * @see field_attach_prepare_translation()
+ */
+function paragraphs_i18n_field_prepare_translation($entity_type, $entity, $field, $instance, $langcode, &$items, $source_entity, $source_langcode) {
+  list($id, ,) = entity_extract_ids($entity_type, $entity);
+
+  if (empty($id)) {
+    $news_items = array();
+    foreach ($items as &$item) {
+      if ($current_entity = paragraphs_field_get_entity($item)) {
+        $current_entity = replicate_clone_entity('paragraphs_item', $current_entity);
+        $current_entity->setHostEntity($entity_type, $source_entity, $langcode, FALSE);
+        $current_entity->save(TRUE);
+        $news_items[] = array(
+          'value' => $current_entity->item_id,
+          'revision_id' => $current_entity->revision_id,
+        );
+      }
+    }
+    $items = $news_items;
+  }
+}

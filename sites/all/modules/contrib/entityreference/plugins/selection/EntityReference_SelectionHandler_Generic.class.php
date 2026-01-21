@@ -167,10 +167,22 @@ class EntityReference_SelectionHandler_Generic implements EntityReference_Select
     $results = $query->execute();
 
     if (!empty($results[$entity_type])) {
-      $entities = entity_load($entity_type, array_keys($results[$entity_type]));
-      foreach ($entities as $entity_id => $entity) {
-        list(,, $bundle) = entity_extract_ids($entity_type, $entity);
-        $options[$bundle][$entity_id] = check_plain($this->getLabel($entity));
+      // Mukurtu Patch. For larger sites (10,000+ nodes), loading every node just to grab the title is
+      // prohibitively slow. At this point, the entity reference selection view has already been filtered
+      // for access, so for nodes we'll grab the titles via a db_query. This limits a lot of the
+      // configurability of entity reference fields, but most Mukurtu users aren't looking to change
+      // those fields and would rather have the speed increase.
+      if ($entity_type == 'node' && variable_get('mukurtu_entity_reference_quick_node_title_lookup', TRUE)) {
+        $titles = db_query("SELECT nid, title FROM {node} WHERE nid IN (:nids)", array(':nids' => array_keys($results[$entity_type])))->fetchAllKeyed(0, 1);
+        foreach ($titles as $nid => $title) {
+          $options[$results[$entity_type][$nid]->type][$nid] = check_plain($title);
+        }
+      } else {
+        $entities = entity_load($entity_type, array_keys($results[$entity_type]));
+        foreach ($entities as $entity_id => $entity) {
+          list(,, $bundle) = entity_extract_ids($entity_type, $entity);
+          $options[$bundle][$entity_id] = check_plain($this->getLabel($entity));
+        }
       }
     }
 
@@ -208,7 +220,11 @@ class EntityReference_SelectionHandler_Generic implements EntityReference_Select
    * Implements EntityReferenceHandler::validateAutocompleteInput().
    */
   public function validateAutocompleteInput($input, &$element, &$form_state, $form) {
-      $entities = $this->getReferencableEntities($input, '=', 6);
+      $bundled_entities = $this->getReferencableEntities($input, '=', 6);
+      $entities = array();
+      foreach($bundled_entities as $entities_list) {
+        $entities += $entities_list;
+      }
       if (empty($entities)) {
         // Error if there are no entities available for a required field.
         form_error($element, t('There are no entities matching "%value"', array('%value' => $input)));
@@ -305,7 +321,7 @@ class EntityReference_SelectionHandler_Generic implements EntityReference_Select
    */
   public function getLabel($entity) {
     $target_type = $this->field['settings']['target_type'];
-    return entity_access('view', $target_type, $entity) ? entity_label($target_type, $entity) : t('- Restricted access -');
+    return entity_access('view', $target_type, $entity) ? entity_label($target_type, $entity) : t(ENTITYREFERENCE_DENIED);
   }
 
   /**
@@ -339,9 +355,11 @@ class EntityReference_SelectionHandler_Generic implements EntityReference_Select
     // Join the known base-table.
     $target_type = $this->field['settings']['target_type'];
     $entity_info = entity_get_info($target_type);
+    $target_type_base_table = $entity_info['base table'];
     $id = $entity_info['entity keys']['id'];
+
     // Return the alias of the table.
-    return $query->innerJoin($target_type, NULL, "%alias.$id = $alias.entity_id");
+    return $query->innerJoin($target_type_base_table, NULL, "%alias.$id = $alias.entity_id");
   }
 }
 
@@ -543,7 +561,7 @@ class EntityReference_SelectionHandler_Generic_taxonomy_term extends EntityRefer
       if ($vocabulary = taxonomy_vocabulary_machine_name_load($bundle)) {
         if ($terms = taxonomy_get_tree($vocabulary->vid, 0, NULL, TRUE)) {
           foreach ($terms as $term) {
-            $options[$vocabulary->machine_name][$term->tid] = str_repeat('-', $term->depth) . check_plain($term->name);
+            $options[$vocabulary->machine_name][$term->tid] = str_repeat('-', $term->depth) . check_plain(entity_label('taxonomy_term', $term));
           }
         }
       }

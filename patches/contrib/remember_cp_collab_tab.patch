@@ -1,0 +1,54 @@
+diff --git a/js/quicktabs.js b/js/quicktabs.js
+index fa90ec0..7eef5af 100644
+--- a/js/quicktabs.js
++++ b/js/quicktabs.js
+@@ -16,6 +16,49 @@ Drupal.behaviors.quicktabs = {
+   }
+ }
+
++// Enable tab memory.
++// Relies on the jQuery Cookie plugin.
++// @see http://plugins.jquery.com/cookie
++Drupal.behaviors.quicktabsTabMemory = {
++  attach: function(context, settings) {
++    // The .each() is in case there is more than one quicktab on a page.
++    $('.quicktabs-wrapper', context).each(function () {
++
++      var $this = $(this);
++      var wrapperID = $this.attr('id');
++      if (wrapperID.substr(0, 23) == 'quicktabs-protocol-tabs') {
++
++        var $activeTabLink = $('.quicktabs-tabs li.active a', context);
++        var activeTabLinkID = $activeTabLink.attr('id');
++
++        // Use a unique cookie namespace for each set of Quicktabs, which
++        // should allow for more than one set on a page.
++        var cookieName = 'Drupal-quicktabs-active-tab-id-' + wrapperID;
++        // Default cookie options.
++        var cookieOptions = {path: '/'};
++
++        // Click the tab ID if a cookie exists otherwise set a cookie for
++        // the default active tab.
++        var $cookieValue = $.cookie(cookieName);
++        if ($cookieValue) {
++          $('#' + $cookieValue).click();
++        }
++        else {
++          $.cookie(cookieName, activeTabLinkID, cookieOptions);
++        }
++
++        // Set the click handler for all tabs, this updates the cookie on every
++        // tab click.
++        $this.find('ul.quicktabs-tabs a').click(function quicktabsCookieClickHandler() {
++          $activeTabLink = $this.find('.quicktabs-tabs li.active a', context);
++          activeTabLinkID = $activeTabLink.attr('id');
++          $.cookie(cookieName, activeTabLinkID, cookieOptions);
++        });
++      }
++    });
++  }
++};
++
+ // Setting up the inital behaviours
+ Drupal.quicktabs.prepare = function(el) {
+   // el.id format: "quicktabs-$name"

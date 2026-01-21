@@ -83,7 +83,7 @@ class FeedsFileProcessor extends FeedsProcessor {
    * @throws FeedsValidationException $e
    *   If validation fails.
    */
-  protected function entityValidate($entity) {
+  protected function entityValidate($entity, $source = NULL) {
 
   }
 

@@ -1,0 +1,9 @@
+name: mukurtu-cms
+recipe: drupal7
+config:
+  php: '7.4'
+  via: apache:2.4
+  database: mariadb
+  drush: ^8
+  xdebug: true
+  webroot: .

@@ -1,0 +1,25 @@
+From fc98e4d56de367646e84d0b90083a75869b41ad5 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Wed, 26 Apr 2023 08:27:54 -0700
+Subject: [PATCH] Function signature change for PHP 8
+
+---
+ .../modules/contrib/services/resources/taxonomy_resource.inc    | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/resources/taxonomy_resource.inc b/resources/taxonomy_resource.inc
+index cab9c402..51810933 100644
+--- a/resources/taxonomy_resource.inc
++++ b/resources/taxonomy_resource.inc
+@@ -561,7 +561,7 @@ function taxonomy_service_get_by_machine_name($machine_name) {
+  * @return
+  *   An array of node objects.
+  */
+-function taxonomy_service_select_nodes($tid = '', $pager, $limit,  $order) {
++function taxonomy_service_select_nodes($tid, $pager, $limit,  $order) {
+   $result = taxonomy_select_nodes($tid, (bool)$pager, $limit, $order);
+   foreach ($result as $nid) {
+     $node = node_load($nid);
+-- 
+2.34.1
+

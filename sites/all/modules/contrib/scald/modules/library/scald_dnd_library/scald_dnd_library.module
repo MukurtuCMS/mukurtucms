@@ -52,7 +52,7 @@ function scald_dnd_library_dnd_libraries_info() {
   else {
     $views = views_get_all_views();
     foreach ($views as $view) {
-      // disabled views get nothing.
+      // Disabled views get nothing.
       if (!empty($view->disabled)) {
         continue;
       }
@@ -87,11 +87,13 @@ function scald_dnd_library_add_item(&$library, $sid) {
     'meta' => array(
       'title' => $atom->title,
       'type' => $atom->type,
+      'data' => !empty($atom->data) ? $atom->data : array(),
       'legend' => '',
     ),
     'sas' =>  '[scald=' . $atom->sid . ':' . $context .']',
     'editor' => scald_render($atom, $context),
     'preview' => scald_render($atom, 'sdl_preview'),
+    'actions' => array_keys(scald_atom_actions_available($atom)),
   );
 
   // theme_sdl_editor_legend() requires a rendered atom. We call it only here to
@@ -100,7 +102,7 @@ function scald_dnd_library_add_item(&$library, $sid) {
     $library['atoms'][$sid]['meta']['legend'] = theme('sdl_editor_legend', array('atom' => $atom));
   }
 
-  // Allow other modules to alter this library item
+  // Allow other modules to alter this library item.
   drupal_alter('scald_dnd_library_item', $atom, $library['atoms'][$sid]);
 }
 
@@ -168,12 +170,13 @@ function scald_dnd_library_scald_render($atom, $context, $options) {
     $path = $atom->rendered->thumbnail_transcoded_url;
   }
   else {
-    $path = image_style_url('Library', $atom->thumbnail_source);
+    $path = image_style_url('library', $atom->thumbnail_source);
   }
 
   $attributes = array();
   if ($context == 'sdl_library_item') {
-    $attributes += array('class' => 'drop', 'draggable' => 'TRUE', 'data-atom-id' => $atom->sid);
+    // Mukurtu patch. Do not pass drag attributes because we have made the whole row draggable.
+    $attributes += array('draggable' => 'FALSE');
   }
   elseif ($context == 'sdl_preview') {
     $attributes += array('class' => 'drop', 'draggable' => 'TRUE', 'data-atom-id' => $atom->sid);
@@ -210,9 +213,9 @@ function theme_sdl_library_item($variables) {
 
   // Action links
   $links = scald_atom_user_build_actions_links($atom, NULL);
-  // Force all links to open in a new window
-  foreach ($links as $action => $link) {
-    $links[$action]['attributes']['target'] = '_blank';
+  // Force view link in the dnd library to open in a new window
+  if(current_path() == dnd_get_library()) {
+    $links['view']['attributes']['target'] = '_blank';
   }
   // The Insert link. Use the "_" prefix to avoid collision with possible
   // "insert" action.
@@ -234,7 +237,7 @@ function theme_sdl_library_item($variables) {
   );
   $rendered_links = drupal_render($links_element);
 
-  // Authors
+  // Authors.
   if (!empty($informations->authors)) {
     foreach ($informations->authors as $author) {
       $author_names[] = check_plain($author->name);
@@ -245,12 +248,14 @@ function theme_sdl_library_item($variables) {
     $authors = '';
   }
 
-  $return = "<div class='image'>{$image}</div>
-  <div class='meta type-" . drupal_html_class($atom->type) . " clearfix'>
+  // Mukurtu patch to make the whole row draggable.
+  $return =  "<div class='drop' draggable='TRUE' data-atom-id='" . $atom->sid . "'>";
+  $return .= "<div class='image'>{$image}</div>
+    <div class='meta type-" . drupal_html_class($atom->type) . " clearfix'>
     <div class='title'>{$informations->title}</div>
     <div class='author'>{$authors}</div>
     {$rendered_links}
-  </div>
+  </div></div>
   ";
   return $return;
 }
@@ -347,7 +352,7 @@ function scald_dnd_library_views_api() {
  */
 function scald_dnd_library_image_default_styles() {
   $presets = array();
-  $presets['Library'] = array(
+  $presets['library'] = array(
     'effects' => array(
       array(
         'name' => 'image_scale',
@@ -363,3 +368,13 @@ function scald_dnd_library_image_default_styles() {
   return $presets;
 }
 
+/**
+ * Implements hook_admin_paths().
+ */
+function scald_dnd_library_admin_paths() {
+  if (variable_get('dnd_modal_admin', FALSE)) {
+    return array(
+      dnd_get_library() => TRUE,
+    );
+  }
+}

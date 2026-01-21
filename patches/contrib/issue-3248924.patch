@@ -1,0 +1,13 @@
+diff --git a/modules/providers/scald_audio/scald_audio.module b/modules/providers/scald_audio/scald_audio.module
+index 93f164f..cc025db 100644
+--- a/modules/providers/scald_audio/scald_audio.module
++++ b/modules/providers/scald_audio/scald_audio.module
+@@ -104,7 +104,7 @@ function scald_audio_scald_add_form_fill(&$atoms, $form, $form_state) {
+         $atom->data['artist'] = isset($ret['tags']['artist'])?$ret['tags']['artist']:'';
+         $atom->data['title'] = isset($ret['tags']['title'])?$ret['tags']['title']:'';
+         $atom->data['album'] = isset($ret['tags']['album'])?$ret['tags']['album']:'';
+-        $atom->data['track'] = isset($ret['tags']['track'])?$ret['tags']['track']:isset($ret['tags']['track_number'])?$ret['tags']['track_number']:'';
++        $atom->data['track'] = isset($ret['tags']['track'])?$ret['tags']['track']:(isset($ret['tags']['track_number'])?$ret['tags']['track_number']:'');
+         $atom->data['year'] = isset($ret['tags']['year'])?$ret['tags']['year']:'';
+         $atom->data['genre'] = isset($ret['tags']['genre'])?$ret['tags']['genre']:'';
+ 

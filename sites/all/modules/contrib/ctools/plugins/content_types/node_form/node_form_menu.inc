@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @file
+ */
+
 if (module_exists('menu')) {
   /**
    * Plugins are described by creating a $plugin array which will be used
@@ -17,7 +21,7 @@ if (module_exists('menu')) {
 
 function ctools_node_form_menu_content_type_render($subtype, $conf, $panel_args, &$context) {
   $block = new stdClass();
-  $block->module = t('node_form');
+  $block->module = 'node_form';
 
   $block->title = t('Menu options');
   $block->delta = 'menu-options';
@@ -45,6 +49,6 @@ function ctools_node_form_menu_content_type_admin_title($subtype, $conf, $contex
 }
 
 function ctools_node_form_menu_content_type_edit_form($form, &$form_state) {
-  // provide a blank form so we have a place to have context setting.
+  // Provide a blank form so we have a place to have context setting.
   return $form;
 }

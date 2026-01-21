@@ -1,19 +1,74 @@
+CONTENTS OF THIS FILE
+---------------------
 
-Welcome to Views 3. Please see the advanced help for more information.
+ * Introduction
+ * Requirements
+ * Installation
+ * Configuration
+ * Troubleshooting
 
-If you're having trouble installing this module, please ensure that your
-tar program is not flattening the directory tree, truncating filenames
-or losing files.
 
-Installing Views:
+INTRODUCTION
+------------
 
-Place the entirety of this directory in sites/all/modules/views
-You must also install the CTools module (http://www.drupal.org/project/ctools)  to use Views.
+The Views module allows you to fetch content from the database and present it
+to the user in a number of ways (lists, posts, maps, graphs, galleries, tables,
+menu items, blocks, reports, forum posts, and so on).
 
-Navigate to administer >> build >> modules. Enable Views and Views UI.
+Views provides a graphical interface to an SQL query builder that can access
+virtually any information in your database, and then display it in any format.
 
-If you're new to Views, try the Simple Views module which can create some
-often used Views for you, this might save you some time.
+You can also use Views to present related content. For example, you can
+display a list of users along with links to the content they have created.
 
-Here you can find many modules extending the functionality of Views:
-  http://drupal.org/taxonomy/term/89
+NOTE: Some of the advanced features require additional modules to be installed.
+
+ * For a full description of the module, visit the project page:
+   https://www.drupal.org/project/views
+
+ * To submit bug reports and feature suggestions, or track changes:
+   https://www.drupal.org/project/issues/views
+
+ * To find additional modules extending the functionality of Views:
+   https://drupal.org/taxonomy/term/89
+
+
+REQUIREMENTS
+------------
+
+This module requires the following modules:
+
+ * Chaos tool suite (ctools) (https://drupal.org/project/ctools)
+
+
+INSTALLATION
+------------
+
+ * Install as you would normally install a contributed Drupal module. Visit
+   https://www.drupal.org/node/895232/ for further information.
+
+Navigate to administer >> modules. Enable Views and Views UI.
+
+
+CONFIGURATION
+-------------
+
+ * Configure the user permissions in Administration » People » Permissions:
+
+   - Administer views
+
+     Access the views administration pages.
+
+   - Bypass views access control
+
+     Bypass access control when accessing views.
+
+ * Customize Views settings in Administration » Structure » Views » Settings.
+   Use the 'Basic' and 'Advanced' tabs to configure Views.
+
+
+TROUBLESHOOTING
+---------------
+
+ * Additional help is available by installing the Advanced Help module at:
+   https://drupal.org/project/advanced_help

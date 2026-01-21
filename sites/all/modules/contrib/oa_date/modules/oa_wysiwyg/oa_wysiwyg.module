@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the oa WYSIWYG feature.
+ */
+
+include_once 'oa_wysiwyg.features.inc';

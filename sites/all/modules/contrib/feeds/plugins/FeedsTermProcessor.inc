@@ -9,6 +9,7 @@
  * Feeds processor plugin. Create taxonomy terms from feed items.
  */
 class FeedsTermProcessor extends FeedsProcessor {
+
   /**
    * Define entity type.
    */
@@ -56,7 +57,7 @@ class FeedsTermProcessor extends FeedsProcessor {
   /**
    * Validates a term.
    */
-  protected function entityValidate($term) {
+  protected function entityValidate($term, FeedsSource $source = NULL) {
     parent::entityValidate($term);
 
     if (drupal_strlen($term->name) == 0) {
@@ -129,7 +130,7 @@ class FeedsTermProcessor extends FeedsProcessor {
         break;
 
       case 'parentguid':
-        // value is parent_guid field value
+        // Value is parent_guid field value.
         $parent_tid = 0;
         $query = db_select('feeds_item')
           ->fields('feeds_item', array('entity_id'))

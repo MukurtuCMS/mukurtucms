@@ -1,0 +1,134 @@
+<?php
+
+/**
+ * @file
+ * A Feeds framework used to create extensible parsers.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function feeds_ex_menu() {
+  $items = array();
+  $items['_feeds_ex/encoding_autocomplete'] = array(
+    'title' => 'Encoding autocomplete',
+    'page callback' => 'feeds_ex_encoding_autocomplete',
+    'access arguments' => array('administer feeds'),
+    'type' => MENU_CALLBACK,
+    'file' => 'feeds_ex.pages.inc',
+  );
+  return $items;;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function feeds_ex_theme() {
+  return array(
+    'feeds_ex_configuration_table' => array(
+      'file' => 'feeds_ex.theme.inc',
+      'render element' => 'element',
+    ),
+  );
+}
+
+/**
+ * Implements hook_modules_enabled().
+ */
+function feeds_ex_modules_enabled(array $modules) {
+  if (in_array('querypath', $modules)) {
+    cache_clear_all('plugins:feeds:plugins', 'cache');
+  }
+}
+
+/**
+ * Implements hook_registry_files_alter().
+ *
+ * Add JMESPath tests if they are supported.
+ */
+function feeds_ex_registry_files_alter(array &$files, array $modules) {
+  if (version_compare(PHP_VERSION, '5.4.0', '<')) {
+    return;
+  }
+  if (!feeds_ex_library_path('jmespath.php', 'vendor/autoload.php')) {
+    return;
+  }
+
+  $path = drupal_get_path('module', 'feeds_ex');
+  $files[$path . '/src/Tests/FeedsExJmesPath.test'] = array(
+    'module' => 'feeds_ex',
+    'weight' => 1,
+  );
+  $files[$path . '/src/Tests/FeedsExJmesPathLines.test'] = array(
+    'module' => 'feeds_ex',
+    'weight' => 1,
+  );
+}
+
+/**
+ * Returns the path of a library.
+ *
+ * @param string $library
+ *   The name of the library. If libraries module is installed, look for
+ *   libraries with this name managed by libraries module.
+ * @param string $file
+ *   The filename to search for.
+ *
+ * @return string|bool
+ *   Returns the path of the library, or false if it does not exist.
+ */
+function feeds_ex_library_path($library, $file) {
+  if (module_exists('libraries') && file_exists(libraries_get_path($library) . '/' . $file)) {
+    return libraries_get_path($library) . '/' . $file;
+  }
+  elseif (file_exists(DRUPAL_ROOT . '/sites/all/libraries/' . $library . '/' . $file)) {
+    return 'sites/all/libraries/' . $library . '/' . $file;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Returns the path of the JSONPath library.
+ *
+ * We can't use feeds_ex_library_path() becuase we look in multiple locations.
+ * It's truly a kindness.
+ *
+ * @return string|bool
+ *   The relative path of the JSONPath directory, or false if not found.
+ */
+function feeds_ex_jsonpath_library_path() {
+  if (module_exists('libraries') && file_exists(libraries_get_path('jsonpath'))) {
+    $path = libraries_get_path('jsonpath');
+  }
+  elseif (file_exists(DRUPAL_ROOT . '/sites/all/libraries/jsonpath')) {
+    $path = 'sites/all/libraries/jsonpath';
+  }
+  // This is defined when simpletest downloads the library for us.
+  elseif (defined('FEEDS_EX_LIBRARY_PATH')) {
+    $path = FEEDS_EX_LIBRARY_PATH . '/jsonpath';
+  }
+
+  if (!isset($path)) {
+    return FALSE;
+  }
+
+  // Newer forks of JSONPath are all modern and fancy with their autoloaders.
+  if (file_exists($path . '/vendor/autoload.php')) {
+    return $path . '/vendor/autoload.php';
+  }
+  // Old school. Look for multiple versions.
+  foreach (glob($path . '/jsonpath*.php') as $file) {
+    return $file;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Machine name exists callback.
+ */
+function feeds_ex_source_exists($source_id, array $element) {
+  $sources = feeds_importer($element['#feeds_importer'])->parser->getMappingSources();
+  return isset($sources[$source_id]);
+}

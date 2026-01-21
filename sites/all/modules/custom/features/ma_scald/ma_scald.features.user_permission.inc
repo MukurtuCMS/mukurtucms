@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_scald.features.user_permission.inc
@@ -60,7 +61,6 @@ function ma_scald_user_default_permissions() {
   $permissions['administer scald atoms'] = array(
     'name' => 'administer scald atoms',
     'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'scald',
@@ -70,7 +70,6 @@ function ma_scald_user_default_permissions() {
   $permissions['bypass atom access restrictions'] = array(
     'name' => 'bypass atom access restrictions',
     'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'scald',
@@ -80,7 +79,6 @@ function ma_scald_user_default_permissions() {
   $permissions['bypass file access'] = array(
     'name' => 'bypass file access',
     'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'file_entity',
@@ -213,6 +211,7 @@ function ma_scald_user_default_permissions() {
   $permissions['delete terms in scald_authors'] = array(
     'name' => 'delete terms in scald_authors',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -222,6 +221,7 @@ function ma_scald_user_default_permissions() {
   $permissions['delete terms in scald_tags'] = array(
     'name' => 'delete terms in scald_tags',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -375,6 +375,7 @@ function ma_scald_user_default_permissions() {
   $permissions['edit terms in scald_authors'] = array(
     'name' => 'edit terms in scald_authors',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -384,6 +385,7 @@ function ma_scald_user_default_permissions() {
   $permissions['edit terms in scald_tags'] = array(
     'name' => 'edit terms in scald_tags',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -423,6 +425,7 @@ function ma_scald_user_default_permissions() {
   $permissions['restrict atom access'] = array(
     'name' => 'restrict atom access',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'scald',

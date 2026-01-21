@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * @file
+ * Some unit-like tests.
+ */
+
+/**
+ * Test specific parts of the bean type class.
+ */
+class BeanUnitTests extends BeanSetup {
+
+  /**
+   * Define this test.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Bean Unit Tests',
+      'description' => 'Test that the individual methods of the bean and bean type classes work.',
+      'group' => 'Bean',
+    );
+  }
+
+  /**
+   * Test the URL of the bean types.
+   */
+  function testBeanTypeURL() {
+    $test_plugin = array(
+      'label' => t('Test'),
+      'name' => 'test_name',
+      'description' => t('This is a test plugin'),
+      'handler' => array(
+        'class' => 'BeanTestPlugin',
+        'parent' => 'bean',
+      ),
+    );
+
+    $bean_type = new BeanDefault($test_plugin);
+    $bean_type->type = "test_name";
+    $this->assertEqual($bean_type->buildURL(), 'test-name', t('URL is formatted correctly.'));
+  }
+
+}

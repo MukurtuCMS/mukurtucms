@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ * Helper module for Views content pane tests.
+ */
+
+/**
+ * Implements hook_views_api().
+ */
+function views_content_test_views_api() {
+  return array(
+    'api' => 3.0,
+  );
+}

@@ -11,15 +11,15 @@
 function textformatter_help($path, $arg) {
   switch ($path) {
     case 'admin/help#textformatter' :
-      $output =  '<p>' . t("The text formatter module provides a new display formatter that can 
-        be used on any text, number, list, or taxonomy fields.") . '</p>'; 
-      $output .= '<p>' . t("Go to 'Manage display' for your entity field display settings and 
-        select 'List' as the formatter. Various options will then be available to either format 
+      $output =  '<p>' . t("The text formatter module provides a new display formatter that can
+        be used on any text, number, list, or taxonomy fields.") . '</p>';
+      $output .= '<p>' . t("Go to 'Manage display' for your entity field display settings and
+        select 'List' as the formatter. Various options will then be available to either format
         your field values as an html list or comma separated list.") . '</p>';
-      $output .= '<p>' . t("This would be mostly implemented with multi value fields. 
-        E.g. A text field could be created with unlimited values. Each value will then be added to 
-        the same html list. Taxonomy terms will work with comma separated auto complete lists too, 
-        to give the same result. The only exceptions are textarea field, lists can be created based 
+      $output .= '<p>' . t("This would be mostly implemented with multi value fields.
+        E.g. A text field could be created with unlimited values. Each value will then be added to
+        the same html list. Taxonomy terms will work with comma separated auto complete lists too,
+        to give the same result. The only exceptions are textarea field, lists can be created based
         on each line of the input.") . '</p>';
 
     return $output;
@@ -31,10 +31,11 @@ function textformatter_help($path, $arg) {
  * Implements hook_field_formatter_info().
  */
 function textformatter_field_formatter_info() {
+  $textformatter_info = _textformatter_field_info();
   return array(
     'textformatter_list' => array(
       'label' => t("List"),
-      'field types' => _textformatter_field_types(),
+      'field types' => $textformatter_info['fields'],
       'settings' => array(
         'textformatter_type' => 'ul',
         'textformatter_class' => 'textformatter-list',
@@ -46,7 +47,7 @@ function textformatter_field_formatter_info() {
         'textformatter_separator_custom' => '',
         'textformatter_separator_custom_tag' => 'span',
         'textformatter_separator_custom_class' => 'textformatter-separator',
-        'textformatter_contrib' => array(),
+        'textformatter_contrib' => $textformatter_info['settings'],
       ),
     ),
   );
@@ -110,8 +111,7 @@ function textformatter_field_formatter_settings_form($field, $instance, $view_mo
     $form['textformatter_separator_custom'] = array(
       '#type' => 'textfield',
       '#title' => t("Custom separator"),
-      '#description' => t("Override default comma separator with a custom separator string. 
-        You must add your own spaces in this string if you want them. E.g. ' + ', or ' => '"),
+      '#description' => t("Override default comma separator with a custom separator string. You must add your own spaces in this string if you want them. @example", array('@example' => "E.g. ' + ', or ' => '")),
       '#size' => 40,
       '#default_value' => $settings['textformatter_separator_custom'],
       '#states' => array(
@@ -167,7 +167,7 @@ function textformatter_field_formatter_settings_form($field, $instance, $view_mo
       '#element_validate' => array('_textformatter_validate_class'),
     );
   }
-  
+
   // Taxonomy term ref fields only.
   if ($field['type'] == 'taxonomy_term_reference') {
     $form['textformatter_term_plain'] = array(
@@ -305,7 +305,7 @@ function textformatter_field_formatter_view($entity_type, $entity, $field, $inst
 function textformatter_theme($existing, $type, $theme, $path) {
   return array(
     'textformatter_comma' => array(
-      'render element' => 'element',
+      'variables' => array('items' => NULL, 'settings' => NULL, 'attributes' => NULL),
     ),
   );
 }
@@ -314,16 +314,16 @@ function textformatter_theme($existing, $type, $theme, $path) {
  * Theme function to render comma separated lists.
  */
 function theme_textformatter_comma($variables) {
-  $items = $variables['element']['#items'];
-  $settings = $variables['element']['#settings'];
-  $attributes = drupal_attributes($variables['element']['#attributes']);
+  $items = $variables['items'];
+  $settings = $variables['settings'];
+  $attributes = drupal_attributes($variables['attributes']);
 
   // Optionally prefix the last item with 'and'.
   $last = '';
   if ($settings['textformatter_comma_and'] && (count($items) > 1) && !$settings['textformatter_comma_override']) {
     $last = ' ' . t('and') . ' ' . array_pop($items);
   }
-  
+
   // Default comma separator.
   $separator = ', ';
   //Override if we need to.
@@ -430,7 +430,7 @@ function textformatter_text_field_create_list($entity_type, $entity, $field, $in
   }
   else {
     foreach ($items as $delta => $item) {
-      $list_items[] = ($item['format'] ? check_markup($item['value'], $item['format'], $langcode) : field_filter_xss($item['value']));
+      $list_items[] = ($instance['settings']['text_processing'] ? check_markup($item['value'], $item['format'], $langcode) : field_filter_xss($item['value']));
     }
   }
 
@@ -463,13 +463,18 @@ function textformatter_taxonomy_field_create_list($entity_type, $entity, $field,
   $list_items = $tids = array();
 
   // Get an array of tids only.
-  foreach ($items as $item) { 
-    $tids[] = $item['tid']; 
+  foreach ($items as $item) {
+    $tids[] = $item['tid'];
   }
 
   $terms = taxonomy_term_load_multiple($tids);
 
   foreach ($items as $delta => $item) {
+    // Check the term for this item has actually been loaded.
+    // @see http://drupal.org/node/1281114
+    if (empty($terms[$item['tid']])) {
+      continue;
+    }
     // Use the item name if autocreating, as there won't be a term object yet.
     $term_name = ($item['tid'] === 'autocreate') ? $item['name'] : $terms[$item['tid']]->name;
     // Check if we should display as term links or not.
@@ -486,31 +491,35 @@ function textformatter_taxonomy_field_create_list($entity_type, $entity, $field,
 }
 
 /**
- * Helper to return array of field types that textformatter display formatter can be used on.
+ * Returns an array of info to add to hook_field_formatter_info().
+ *
+ * @return array
+ *   An array of fields and settings from hook_textformatter_field_info data.
  */
-function _textformatter_field_types() {
+function _textformatter_field_info() {
   // Invokes hook_textformatter_field_info
   $textformatter_info = textformatter_field_list_info();
-  $fields = array();
+  $field_info = array('fields' => array(), 'settings' => array());
 
-  // Create array of all field types.
+  // Create array of all field types and default settings..
   foreach ($textformatter_info as $module => $info) {
-    foreach ($info['fields'] as $field) {
-      $fields[] = $field;
+    $field_info['fields'] = array_merge($field_info['fields'], $info['fields']);
+    if (isset($info['settings']) && is_array($info['settings'])) {
+      $field_info['settings'] = array_merge($field_info['settings'], $info['settings']);
     }
   }
 
-  return $fields;
+  return $field_info;
 }
 
 /**
  * Helper to return the value key for a field instance.
  *
- * @param $field
+ * @param $field array
  *  The whole array of field instance info provided by the field api.
  *
- * @return
- *  (string) value key for the field.
+ * @return string
+ *  The value key for the field.
  */
 function _textformatter_get_field_value_key(array $field) {
   return (array_key_exists('columns', $field) && is_array($field['columns'])) ? key($field['columns']) : 'value';
@@ -519,8 +528,8 @@ function _textformatter_get_field_value_key(array $field) {
 /**
  * Helper to return an array of html tags, formatted for a select list.
  *
- * @return
- *   Array of available html tags.
+ * @return array
+ *   A keyed array of available html tags.
  */
 function _textformatter_wrapper_options() {
   return array(

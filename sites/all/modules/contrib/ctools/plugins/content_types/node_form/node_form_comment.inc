@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @file
+ */
+
 if (module_exists('comment')) {
   /**
    * Plugins are described by creating a $plugin array which will be used
@@ -17,7 +21,7 @@ if (module_exists('comment')) {
 
 function ctools_node_form_comment_content_type_render($subtype, $conf, $panel_args, &$context) {
   $block = new stdClass();
-  $block->module = t('node_form');
+  $block->module = 'node_form';
 
   $block->title = t('Comment options');
   $block->delta = 'comment-options';
@@ -45,6 +49,6 @@ function ctools_node_form_comment_content_type_admin_title($subtype, $conf, $con
 }
 
 function ctools_node_form_comment_content_type_edit_form($form, &$form_state) {
-  // provide a blank form so we have a place to have context setting.
+  // Provide a blank form so we have a place to have context setting.
   return $form;
 }

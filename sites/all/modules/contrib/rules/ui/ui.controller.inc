@@ -1,7 +1,8 @@
 <?php
 
 /**
- * @file Contains the UI controller for Rules.
+ * @file
+ * Contains the UI controller for Rules.
  */
 
 /**
@@ -16,7 +17,7 @@ class RulesUIController {
   /**
    * Generates menu items to manipulate rules configurations.
    *
-   * @param $base_path
+   * @param string $base_path
    *   The path to the overview page from where the configurations are edited.
    */
   public function config_menu($base_path) {
@@ -35,8 +36,8 @@ class RulesUIController {
     );
     $items[$base_path . '/manage/%rules_config/add/%rules_element'] = array(
       // Adding another part to the path would hit the menu path-part-limit
-      // for base paths like admin/config/workflow/rules. Therefor we have to
-      // use this fugly way for setting the title.
+      // for base paths like admin/config/workflow/rules. Therefore we have to
+      // use this ugly way for setting the title.
       'title callback' => 'rules_menu_add_element_title',
       // Wrap the integer in an array, so it is passed as is.
       'title arguments' => array(array($base_count + 4)),
@@ -60,7 +61,7 @@ class RulesUIController {
       'file path' => drupal_get_path('module', 'rules'),
     );
     $items[$base_path . '/manage/%rules_config/delete/event'] = array(
-      //@todo: improve title.
+      // @todo Improve title.
       'title' => 'Remove event',
       'page callback' => 'drupal_get_form',
       'page arguments' => array('rules_ui_remove_event', $base_count + 1, $base_count + 4, $base_path),
@@ -157,17 +158,19 @@ class RulesUIController {
   }
 
   /**
-   * Generates the render array for a overview configuration table for arbitrary
-   * rule configs that match the given conditions.
+   * Generates the render array for an overview configuration table.
+   *
+   * Generates the render array for an overview configuration table for
+   * arbitrary rule configs that match the given conditions.
    *
    * Note: The generated overview table contains multiple links for editing the
    * rule configurations. For the links to properly work use
    * RulesUIController::config_menu($base_path) to generate appropriate menu
    * items for the path at which the overview table is displayed.
    *
-   * @param $conditions
+   * @param array $conditions
    *   An array of conditions as needed by rules_config_load_multiple().
-   * @param $options
+   * @param array $options
    *   An array with optional options. Known keys are:
    *   - 'hide status op': If set to TRUE, enable/disable links are not added.
    *     Defaults to FALSE.
@@ -182,7 +185,7 @@ class RulesUIController {
    *     currently set RulesPluginUI::$basePath. If no base path has been set
    *     yet, the current path is used by default.
    *
-   * @return Array
+   * @return array
    *   A renderable array.
    */
   public function overviewTable($conditions = array(), $options = array()) {
@@ -199,7 +202,7 @@ class RulesUIController {
     if (!empty($options['base path'])) {
       RulesPluginUI::$basePath = $options['base path'];
     }
-    else if (!isset(RulesPluginUI::$basePath)) {
+    elseif (!isset(RulesPluginUI::$basePath)) {
       // Default to the current path, only if no path has been set yet.
       RulesPluginUI::$basePath = current_path();
     }
@@ -241,15 +244,29 @@ class RulesUIController {
     $table['#attributes']['class'][] = 'rules-overview-table';
     $table['#attached']['css'][] = drupal_get_path('module', 'rules') . '/ui/rules.ui.css';
 
-    // TODO: hide configs where access() is FALSE.
+    // @todo Hide configs where access() is FALSE.
     return $table;
   }
 
   /**
    * Generates the row for a single rules config.
    *
-   * @param $additional_cols
-   *   Additional columns to be added after the entity label column.
+   * @param array $conditions
+   *   An array of conditions as needed by rules_config_load_multiple().
+   * @param array $options
+   *   An array with optional options. Known keys are:
+   *   - 'hide status op': If set to TRUE, enable/disable links are not added.
+   *     Defaults to FALSE.
+   *   - 'show plugin': If set to FALSE, the plugin is not shown. Defaults to
+   *     TRUE.
+   *   - 'show events': If set to TRUE, the event column is shown. Defaults to
+   *     TRUE if only reaction rules are listed.
+   *   - 'show execution op': If set to TRUE an operation for execution a
+   *     component is shown for components, as well as a link to schedule a
+   *     component if the rules scheduler module is enabled.
+   *   - 'base path': Optionally, a different base path to use instead of the
+   *     currently set RulesPluginUI::$basePath. If no base path has been set
+   *     yet, the current path is used by default.
    */
   protected function overviewTableRow($conditions, $name, $config, $options) {
     // Build content includes the label, as well as a short overview including
@@ -279,9 +296,9 @@ class RulesUIController {
 
     // Add operations depending on the options and the exportable status.
     if (!$config->hasStatus(ENTITY_FIXED)) {
-      $row[] =  l(t('edit'), RulesPluginUI::path($name), array('attributes' => array('class' => array('edit', 'action'))));
+      $row[] = l(t('edit'), RulesPluginUI::path($name), array('attributes' => array('class' => array('edit', 'action'))));
       if (module_exists('rules_i18n')) {
-        $row[] =  l(t('translate'), RulesPluginUI::path($name, 'translate'), array('attributes' => array('class' => array('translate', 'action'))));
+        $row[] = l(t('translate'), RulesPluginUI::path($name, 'translate'), array('attributes' => array('class' => array('translate', 'action'))));
       }
     }
     else {
@@ -321,4 +338,5 @@ class RulesUIController {
     $row[] = l(t('export'), RulesPluginUI::path($name, 'export'), array('attributes' => array('class' => array('export', 'action'))));
     return $row;
   }
+
 }

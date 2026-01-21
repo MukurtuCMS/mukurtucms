@@ -1,0 +1,57 @@
+.select2-container.error {
+  background-image: none;
+  border: solid 1px red;
+}
+#select2-drop-mask {
+  width: 0!important;
+  height: 0!important;
+}
+.select2-results .select2-highlighted {
+  background: #e5eef7;
+  color: inherit;
+}
+.select2-container-multi.one-option-per-line .select2-choices .select2-search-choice {
+  clear: both;
+}
+.select2-result .visible-on-hover {
+  visibility: hidden;
+  color: #6b6c6e;
+  font-size: 10px;
+}
+.select2-result:HOVER .visible-on-hover {
+  visibility: visible;
+}
+.select2-container.select2-container-multi {
+  min-width: 195px;
+}
+.select2-container.ac-replaced-by-select2 {
+  min-width: 395px;
+}
+.container-inline .select2-container,
+div.image-style-new div.select2-container,
+.webform-container-inline div.select2-container {
+  display: inline-block;
+}
+div.image-style-new div.select2-display-none,
+.webform-container-inline div.select2-display-none,
+.container-inline div.select2-display-none {
+  display: none;
+}
+.hierarchical-select .select2-container {
+  margin-right: 15px;
+}
+.hierarchical-select .select2-container:LAST-CHILD {
+  margin-right: 0;
+}
+.select2-container .select2-choice {
+  padding: 0 0 0 4px;
+}
+.select2-container .select2-choice abbr {
+  top: 6px;
+}
+.select2-container {
+  max-width: 100%;
+}
+#views-ui-add-form .form-item-show-tagged-with .description {
+  display: none;
+}

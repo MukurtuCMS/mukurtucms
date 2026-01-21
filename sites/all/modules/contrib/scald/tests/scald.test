@@ -99,6 +99,7 @@ class ScaldWebTestCase extends DrupalWebTestCase {
   public function enablePrivateFileSystem() {
     module_enable(array('scald_image'));
     $web_user = $this->drupalcreateuser(array(
+      'administer fields',
       'administer site configuration',
       'administer scald',
     ));
@@ -689,6 +690,13 @@ class ScaldLocalizeTestCase extends ScaldWebTestCase {
     $this->drupalPost('fr/atom/' . $atom->sid . '/delete', array(), t('Delete'));
     $message = t('@type %title has been deleted.', array('@type' => 'L\'image', '%title' => $atom->title));
     $this->assertRaw($message, 'The type is translated in the notification that appears when deleting an atom.');
+  }
+
+  /**
+   * Tests if the Scald text group is successfully registered.
+   */
+  public function testScaldTextGroup() {
+    $this->assertTrue(i18n_string_group_info('scald'), 'Scald text group successfully registered.');
   }
 
   /**

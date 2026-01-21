@@ -1,0 +1,65 @@
+From  from@example.com Wed Nov 16 09:12:29 2011
+Return-Path: <sender@example.com>
+X-Original-To: test@example.com
+Delivered-To: test@example.com
+MIME-Version: 1.0
+Sender: sender@example.com
+Received: by 10.231.161.73 with HTTP; Wed, 16 Nov 2011 07:12:29 -0800 (PST)
+From: Dane Powell <from@example.com>
+Date: Wed, 16 Nov 2011 09:12:29 -0600
+Message-ID: <testmessage1@example.com>
+Subject: Test attachments 1
+To: mailflow <test@example.com>
+Content-Type: multipart/mixed; boundary=bcaec529a01bcea7e804aba87143
+X-IMAPbase: 1335812889 1
+Status:
+X-Status:
+X-Keywords:
+X-UID: 1
+
+--bcaec529a01bcea7e804aba87143
+Content-Type: multipart/alternative; boundary=bcaec529a01bcea7e404aba87141
+
+--bcaec529a01bcea7e404aba87141
+Content-Type: text/plain; charset=ISO-8859-1
+
+Hello world!
+
+--
+This is my signature
+
+--bcaec529a01bcea7e404aba87141
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+<span class=3D"Apple-style-span" style=3D"color: rgb(34, 34, 34); font-fami=
+ly: arial, sans-serif; font-size: 13px; background-color: rgba(255, 255, 25=
+5, 0.917969); ">taxonomy: [term1,term2]</span><br style=3D"color: rgb(34, 34, 34); font-f=
+amily: arial, sans-serif; font-size: 13px; background-color: rgba(255, 255,=
+ 255, 0.917969); "><br><br clear=3D"all"><div>Hello world!</div><div><br></div>-- <br>=
+This is my signature<br>
+
+
+
+--bcaec529a01bcea7e404aba87141--
+--bcaec529a01bcea7e804aba87143
+Content-Type: text/plain; charset=US-ASCII; name="README.txt"
+Content-Disposition: attachment; filename="README.txt"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_grxqm5jx0
+
+cGhwQ0FTIGlzIGF2YWlsYWJsZSBkaXJlY3RseSBmcm9tIGh0dHA6Ly93d3cuamEtc2lnLm9yZy93
+aWtpL2Rpc3BsYXkvQ0FTQy9waHBDQVMuIHBocENBUyBpcyBkaXN0cmlidXRlZCB1bmRlciB0aGUg
+TEdQTCBsaWNlbnNlLgoKWW91IG11c3QgZG93bmxvYWQgYW5kIGluc3RhbGwgcGhwQ0FTIGxpYnJh
+cnkgaW4gb3JkZXIgZm9yIHRoaXMgQ0FTIG1vZHVsZSB0byB3b3JrLiAgWW91IG1heSBlaXRoZXIg
+CnBsYWNlIGEgY29weSB5b3VyIG1vZHVsZXMvY2FzIGRpcmVjdG9yeSwgb3IgbWFrZSBzdXJlIGl0
+IGlzIGluIHlvdSBQSFAgaW5jbHVkZXMgcGF0aC9kaXJlY3RvcnkuIAoKWW91ciBQSFAgbXVzdCBo
+YXZlIHRoZSBmb2xsb3dpbmcgbW9kdWxlcyBlbmFibGVkOgogIC0td2l0aC1jdXJsCiAgLS13aXRo
+LW9wZW5zc2wKICAtLXdpdGgtZG9tCiAgLS13aXRoLXpsaWIKCkRydXBhbCBtb2RpZmljYXRpb25z
+Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLQoxKSBFbmFibGUgdGhlIENBUyBtb2R1bGUgaW4gYWRtaW4v
+bW9kdWxlcwoyKSBTZXQgdGhlIENBUyBzZXJ2ZXIgcGFyYW1ldGVycyBpbiBhZG1pbi91c2VyL2Nh
+cwozKSBFbmFibGUgdGhlIENBUyBsb2dpbiBibG9jayB0byBwcm92aWRlIGF1dGhlbnRpY2F0aW9u
+LiAKNCkgVGVzdCBhdXRoZW50aWNhdGlvbgo1KSBSZW1vdmUgcmVndWxhciB1c2VyIGxvZ2luIGJs
+b2NrCjYpIElmIHRoZSB1c2VyIGRhdGFiYXNlIGlzIGV4dGVybmFsLCByZW1vdmUgdGhlIGFiaWxp
+dHkgZm9yIHVzZXJzIHRvIGVkaXQKdGhlaXIgYWNjb3VudHMuCg==
+--bcaec529a01bcea7e804aba87143--

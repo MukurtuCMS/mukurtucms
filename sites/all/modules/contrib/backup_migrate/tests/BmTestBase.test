@@ -1,0 +1,301 @@
+<?php
+
+/**
+ * @file
+ * Shared functionality to make the rest of the tests simpler.
+ */
+
+/**
+ * Base class for testing a module's custom tags.
+ */
+abstract class BmTestBase extends DrupalWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    $modules[] = 'backup_migrate';
+    parent::setUp($modules);
+  }
+
+  /**
+   * Log in as user 1.
+   *
+   * The benefit of doing this is that it ignores permissions entirely, so the
+   * raw functionality can be tested.
+   */
+  protected function loginUser1() {
+    // Load user 1.
+    $account = user_load(1, TRUE);
+
+    // Reset the password.
+    $password = user_password();
+    $edit = array(
+      'pass' => $password,
+    );
+    user_save($account, $edit);
+    $account->pass_raw = $password;
+
+    // Login.
+    $this->drupalLogin($account);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function verbose($message, $title = NULL) {
+    // Handle arrays, objects, etc.
+    if (!is_string($message)) {
+      $message = "<pre>\n" . print_r($message, TRUE) . "\n</pre>\n";
+    }
+
+    // Optional title to go before the output.
+    if (!empty($title)) {
+      $title = '<h2>' . check_plain($title) . "</h2>\n";
+    }
+
+    parent::verbose($title . $message);
+  }
+
+  /**
+   * Confirm that a selector has the expected items.
+   */
+  protected function assertSelectOptions($select_id, array $options, $message = '') {
+    $elements = $this
+      ->xpath('//select[@id=:id]//option', array(
+        ':id' => $select_id,
+      ));
+    $results = $this->assertEqual(count($elements), count($options), t('The same number of items were found as were requested'));
+    $this->verbose($elements);
+
+    foreach ($options as $option) {
+      $elements = $this
+        ->xpath('//select[@id=:id]//option[@value=:option]', array(
+          ':id' => $select_id,
+          ':option' => $option,
+        ));
+      $this->verbose($elements);
+      $results *= $this->assertTrue(isset($elements[0]), $message ? $message : t('Option @option for field @id is present.', array(
+        '@option' => $option,
+        '@id' => $select_id,
+      )), t('Browser'));
+    }
+
+    return $results;
+  }
+
+  /**
+   * Confirm that a specific selector does not have items selected.
+   */
+  protected function assertNoOptionsSelected($id, $message = '') {
+    $elements = $this
+      ->xpath('//select[@id=:id]//option[@selected="selected"]', array(
+        ':id' => $id,
+      ));
+    return $this
+      ->assertTrue(!isset($elements[0]), $message ? $message : t('Field @id does not have any selected items.', array(
+        '@id' => $id,
+      )), t('Browser'));
+  }
+
+  /**
+   * Work out which compressor systems are supported by PHP.
+   *
+   * @return array
+   *   The list of supported compressors. Will always include the item 'none'.
+   */
+  protected function supportedCompressors() {
+    $items = array('none');
+
+    // Work out which systems are supported.
+    if (@function_exists("gzencode")) {
+      $items[] = 'gzip';
+    }
+    if (@function_exists("bzcompress")) {
+      $items[] = 'bzip';
+    }
+    if (class_exists('ZipArchive')) {
+      $items[] = 'zip';
+    }
+
+    return $items;
+  }
+
+  /**
+   * Get a list of the files in a specific destination.
+   *
+   * @param string $destination_id
+   *   The ID of the destination to check. Defaults to the manual file path.
+   *
+   * @return array
+   *   The backup files found in the requested backup destination.
+   */
+  protected function listBackupFiles($destination_id = 'manual') {
+    require_once dirname(__FILE__) . '/../includes/destinations.inc';
+
+    $items = array();
+
+    // Load the destination object.
+    $destination = backup_migrate_get_destination($destination_id);
+    if (!empty($destination)) {
+      $items = $destination->list_files();
+    }
+
+    return $items;
+  }
+
+  /**
+   * Run a specific backup.
+   *
+   * @param string $destination_id
+   *   The ID of the destination to check. Defaults to the manual file path.
+   * @param string $source_id
+   *   The ID of the source to check. Defaults to the database.
+   */
+  protected function runBackup($destination_id = 'manual', $source_id = 'db') {
+    $this->drupalGet(BACKUP_MIGRATE_MENU_PATH);
+    $this->assertResponse(200);
+    $edit = array(
+      'destination_id' => $destination_id,
+      'source_id' => $source_id,
+    );
+    $this->drupalPost(NULL, $edit, 'Backup now');
+    $this->assertResponse(200);
+    // Confirm the response is as expected. This is split up into separate
+    // pieces because it'd be more effort than is necessary right now to confirm
+    // what the exact filename is.
+    if ($source_id === 'db') {
+      $this->assertText('Default Database backed up successfully');
+    }
+    else {
+      $this->assertText(' backed up successfully');
+    }
+    $this->assertText('in destination');
+    if ($source_id === 'db') {
+      $this->assertLink('download');
+      $this->assertLink('restore');
+      $this->assertLink('delete');
+    }
+  }
+
+  /**
+   * Delete all of the files in a specific backup destination.
+   *
+   * @param string $destination_id
+   *   The ID of the destination to check. Defaults to the manual file path.
+   */
+  protected function deleteBackups($destination_id = 'manual') {
+    $destination = backup_migrate_get_destination($destination_id);
+    $files = $this->listBackupFiles($destination_id);
+    if (!empty($files)) {
+      foreach ($files as $file_id => $file) {
+        $destination->delete_file($file_id);
+      }
+    }
+  }
+
+  /**
+   * Work out whether a backup filename includes a timestamp.
+   *
+   * @param object $file
+   *   The backup file to examine.
+   *
+   * @return mixed
+   *   Returns 1 if found, 0 if not found, FALSE if an error occurs.
+   */
+  protected function fileHasTimestamp($file) {
+    require_once dirname(__FILE__) . '/../includes/files.inc';
+
+    // Get the default filename, this is used later.
+    $default_filename = _backup_migrate_default_filename();
+    $ext = implode('.', $file->ext);
+    $pattern = "/{$default_filename}-(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d)-(\d\d)-(\d\d).{$ext}/";
+
+    return preg_match($pattern, $file->file_info['filename']);
+  }
+
+  /**
+   * Confirm that a backup filename includes a timestamp.
+   *
+   * @param object $file
+   *   The backup file to examine.
+   *
+   * @return bool
+   *   Indicates whether the file includes a timestamp.
+   */
+  protected function assertFileTimestamp($file) {
+    return $this->assertTrue($this->fileHasTimestamp($file));
+  }
+
+  /**
+   * Confirm that a backup filename does not include a timestamp.
+   *
+   * @param object $file
+   *   The backup file to examine.
+   *
+   * @return bool
+   *   Indicates whether the file does not include a timestamp.
+   */
+  protected function assertNoFileTimestamp($file) {
+    return !$this->assertFalse($this->fileHasTimestamp($file));
+  }
+
+  /**
+   * Get a profile.
+   *
+   * @param string $profile_id
+   *   The name of the profile to load. Defaults to 'default'.
+   *
+   * @return object
+   *   The profile object.
+   */
+  protected function getProfile($profile_id = 'default') {
+    require_once dirname(__FILE__) . '/../includes/profiles.inc';
+
+    return backup_migrate_get_profile($profile_id);
+  }
+
+  /**
+   * Confirm the most recently sent e-mail(s) contain the expected string.
+   *
+   * @param string $field_name
+   *   Name of field or message property to assert: subject, body, id, etc.
+   * @param string $string
+   *   String to search for.
+   * @param int $expected
+   *   Number of times $string should occur in the field.
+   * @param int $email_depth
+   *   Number of emails to search for string, starting with most recent.
+   *
+   * @return bool
+   *   TRUE on pass, FALSE on fail.
+   *
+   * @see DrupalWebTestCase::assertMailString()
+   */
+  protected function assertMailStringCount($field_name, $string, $expected, $email_depth) {
+    $mails = $this->drupalGetMails();
+    $number_of_mails = count($mails);
+    $string_count = 0;
+
+    for ($i = $number_of_mails - 1; $i >= $number_of_mails - $email_depth && $i >= 0; $i--) {
+      $mail = $mails[$i];
+
+      // Normalize whitespace, as it isn't eacy to know what the mail system
+      // might have done. Any run of whitespace becomes a single space.
+      $normalized_mail = preg_replace('/\\s+/', ' ', $mail[$field_name]);
+      $normalized_string = preg_replace('/\\s+/', ' ', $string);
+      $string_count += substr_count($normalized_mail, $normalized_string);
+    }
+
+    $mail_count = min($number_of_mails, $email_depth);
+    $message = format_plural($mail_count, 'Text "@needle" was found @stringcount times in field "@field" of the most recent email message.', 'Text "@needle" was found @stringcount times in field "@field" of the @mailcount most recent email messages.', array(
+      '@needle' => $string,
+      '@stringcount' => $string_count,
+      '@field' => $field_name,
+      '@mailcount' => $mail_count,
+    ));
+
+    return $this->assertTrue(($string_count === $expected), $message);
+  }
+
+}

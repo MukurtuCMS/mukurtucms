@@ -22,8 +22,9 @@ interface MediaBrowserPluginInterface {
    *   An array of parameters which came in is $_GET['params']. The expected
    *   parameters are still being defined.
    *   - 'types': array of media types to support
-   *   - 'multiselect': boolean; TRUE enables multiselect
+   *   - 'multiselect': boolean; TRUE enables multiselect.
    */
+
   public function __construct($info, $params);
 
   /**

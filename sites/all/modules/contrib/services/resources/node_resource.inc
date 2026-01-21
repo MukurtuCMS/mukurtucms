@@ -116,6 +116,19 @@ function _node_resource_definition() {
               'default value' => variable_get('services_node_index_page_size', 20),
               'source' => array('param' => 'pagesize'),
             ),
+            array(
+              'name' => 'options',
+              'optional' => TRUE,
+              'type' => 'array',
+              'description' => 'Additional query options.',
+              'default value' => array(
+                'orderby' => array(
+                  'sticky' => 'DESC',
+                  'created' => 'DESC'
+                )
+              ),
+              'source' => array('param' => 'options'),
+            ),
           ),
           'access arguments' => array('access content'),
         ),
@@ -306,25 +319,36 @@ function _node_resource_create($node) {
   $form_state['values'] = $node;
   $form_state['values']['op'] = variable_get('services_node_save_button_' . $node_type . '_resource_create', t('Save'));
   $form_state['programmed_bypass_access_check'] = FALSE;
+  $form_state['no_cache'] = TRUE;
 
   // Build a stub node object for the form in a similar way as node_add() does,
   // but always make the node author default to the current user (if the user
   // has permission to change it, $form_state['values'] will override this
   // default when the form is submitted).
-
-  //Patched to support multi value fields (e.g. field_ media_asset "sid") - Dario 20150726
-  //based on proposed fix in comment https://www.drupal.org/node/2224803#comment-8844431
-  //$stub_node = (object) array_intersect_key($node, array_flip(array('type', 'language')));
-  $stub_node = $node;
+  $stub_node = (object) array_intersect_key($node, array_flip(array('type', 'language', 'tnid')));
   $stub_node->name = $user->name;
 
   // Contributed modules may check the triggering element in the form state.
   // The triggering element is usually set from the browser's POST request, so
   // we'll automatically set it as the submit action from here.
-  $stub_form = drupal_get_form($node_type . '_node_form', (object) $stub_node);
+  $stub_form_state = array(
+    'no_cache' => TRUE,
+    'build_info' => array(
+      'args' => array((object) $stub_node),
+    ),
+  );
+  $stub_form = drupal_build_form($node_type . '_node_form', $stub_form_state);
   $form_state['triggering_element'] = $stub_form['actions']['submit'];
+  $node = (object) array_merge((array) $stub_node, (array) $node);
 
-  drupal_form_submit($node_type . '_node_form', $form_state, (object)$stub_node);
+  drupal_form_submit($node_type . '_node_form', $form_state, $node);
+
+  // Mukurtu patch - check for our custom paragraph validation errors.
+  if (isset($_SESSION['paragraph validation errors']) AND count($_SESSION['paragraph validation errors'])) {
+    $paragraph_validation_errors = $_SESSION['paragraph validation errors'];
+    unset ($_SESSION['paragraph validation errors']);
+    return services_error(implode(" ", $paragraph_validation_errors), 406, array('form_errors' => $paragraph_validation_errors));
+  }
 
   if ($errors = form_get_errors()) {
     return services_error(implode(" ", $errors), 406, array('form_errors' => $errors));
@@ -407,12 +431,12 @@ function _node_resource_update($nid, $node) {
 
   $node_type = $node['type'];
   node_object_prepare($old_node);
+  $old_node = (object) array_merge((array) $old_node, (array) $node);
 
   // Setup form_state.
   $form_state = array();
   $form_state['values'] = $node;
   $form_state['values']['op'] = variable_get('services_node_save_button_' . $node_type . '_resource_update', t('Save'));
-  $form_state['node'] = $old_node;
   $form_state['programmed_bypass_access_check'] = FALSE;
 
   // Contributed modules may check the triggering element in the form state.
@@ -448,7 +472,7 @@ function _node_resource_delete($nid) {
 }
 
 /**
- * Return an array of optionally paged nids baed on a set of criteria.
+ * Return an array of optionally paged nids based on a set of criteria.
  *
  * An example request might look like
  *
@@ -466,6 +490,8 @@ function _node_resource_delete($nid) {
  *   indicating items to retrieve.
  * @param $page_size
  *   Integer number of items to be returned.
+ * @param $options
+ *   Additional query options.
  * @return
  *   An array of node objects.
  *
@@ -475,13 +501,11 @@ function _node_resource_delete($nid) {
  *     - Is there an easier syntax we can define which can make the urls
  *       for index requests more straightforward?
  */
-function _node_resource_index($page, $fields, $parameters, $page_size) {
+function _node_resource_index($page, $fields, $parameters, $page_size, $options = array()) {
   $node_select = db_select('node', 't')
-    ->addTag('node_access')
-    ->orderBy('sticky', 'DESC')
-    ->orderBy('created', 'DESC');
+    ->addTag('node_access');
 
-  services_resource_build_index_query($node_select, $page, $fields, $parameters, $page_size, 'node');
+  services_resource_build_index_query($node_select, $page, $fields, $parameters, $page_size, 'node', $options);
 
   if (!user_access('administer nodes')) {
     $node_select->condition('status', 1);
@@ -615,7 +639,7 @@ function _node_resource_load_node_comments($nid, $count = 0, $start = 0) {
   $return_comments = array();
 
   foreach ($comments as $comment) {
-    $return_comments[] = services_field_permissions_comment_clean('view', 'comment', $comment);
+    $return_comments[] = services_field_permissions_clean('view', 'comment', $comment);
   }
 
   return $return_comments;
@@ -684,6 +708,9 @@ function _node_resource_attach_file($nid, $field_name, $attach, $field_values) {
   foreach ($file_objs as $key => $file_obj) {
     if (isset($field_values[$key])) {
       foreach ($field_values[$key] as $key => $value) {
+        if ($key == 'fid') {
+          continue;
+        }
         $file_obj->$key = $value;
       }
     }

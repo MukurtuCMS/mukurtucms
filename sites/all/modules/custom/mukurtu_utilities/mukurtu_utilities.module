@@ -1,0 +1,56 @@
+<?php
+
+function mukurtu_utilities_action_info() {
+    return array(
+        'mukurtu_utilities_delete_orphan_refs_action' => array(
+            'type' => 'node',
+            'label' => t('Clean up references to deleted content'),
+            'behavior' => array('changes_property'),
+            'configurable' => FALSE,
+            'vbo_configurable' => FALSE,
+            'triggers' => array('any'),
+        ),
+    );
+}
+
+function mukurtu_utilities_delete_orphan_refs_action(&$node, $context) {
+    $fields = field_info_instances('node', $node->type);
+    $dirty = FALSE;
+
+    foreach($fields as $field) {
+        $field_info = field_info_field($field['field_name']);
+        $field_name = $field['field_name'];
+
+        // Check node references
+        if($field_info['type'] == 'node_reference') {
+            if(isset($node->{$field_name}[LANGUAGE_NONE])) {
+                foreach($node->{$field_name}[LANGUAGE_NONE] as $k => $nid) {
+                    $referenced_node = node_load($nid['nid']);
+                    if(!$referenced_node) {
+                        // Failed to load
+                        unset($node->{$field_name}[LANGUAGE_NONE][$k]);
+                        $dirty = TRUE;
+                    }
+                }
+            }
+        }
+
+        // Entity References
+        if($field_info['type'] == 'entityreference') {
+            $type = $field_info['settings']['target_type'];
+            if(isset($node->{$field_name}[LANGUAGE_NONE])) {
+                foreach($node->{$field_name}[LANGUAGE_NONE] as $k => $id) {
+                    $referenced_entity = entity_load($type, array($id['target_id']));
+                    if(!$referenced_entity) {
+                        unset($node->{$field_name}[LANGUAGE_NONE][$k]);
+                        $dirty = TRUE;
+                    }
+                }
+            }
+        }
+    }
+
+    if($dirty) {
+        node_save($node);
+    }
+}

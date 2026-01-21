@@ -1,0 +1,10 @@
+name = Resumable Download
+core = 7.x
+description = "Users can pause when they are downloding files even when private file option is enbaled. And file download speed can be limited on server side"
+configure = admin/config/media/file-system/resumable_download
+; Information added by Drupal.org packaging script on 2018-02-01
+version = "7.x-1.0-beta1+5-dev"
+core = "7.x"
+project = "resumable_download"
+datestamp = "1517480284"
+

@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * @file
+ * taxonomy_changed module, install file.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function taxonomy_changed_install() {
+  $schema['taxonomy_term_data'] = array();
+  taxonomy_changed_schema_alter($schema);
+  foreach ($schema['taxonomy_term_data']['fields'] as $name => $spec) {
+    db_add_field('taxonomy_term_data', $name, $spec);
+  }
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function taxonomy_changed_uninstall() {
+  $schema['taxonomy_term_data'] = array();
+  taxonomy_changed_schema_alter($schema);
+  foreach ($schema['taxonomy_term_data']['fields'] as $name => $spec) {
+    db_drop_field('taxonomy_term_data', $name);
+  }
+}
+
+/**
+ * Implements hook_schema_alter().
+ */
+function taxonomy_changed_schema_alter(&$schema) {
+  // Add field to existing schema.
+  $schema['taxonomy_term_data']['fields']['changed'] = array(
+    'description' => 'The Unix timestamp when the taxonomy was most recently saved.',
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+  );
+}

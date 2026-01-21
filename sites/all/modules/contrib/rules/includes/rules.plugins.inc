@@ -1,22 +1,27 @@
 <?php
 
 /**
- * @file Contains plugin info and implementations not needed for rule evaluation.
+ * @file
+ * Contains plugin info and implementations not needed for rule evaluation.
  */
-
 
 /**
  * Implements a rules action.
  */
 class RulesAction extends RulesAbstractPlugin implements RulesActionInterface {
 
+  /**
+   * @var string
+   */
   protected $itemName = 'action';
 
   /**
    * Execute the callback and update/save data as specified by the action.
    */
   protected function executeCallback(array $args, RulesState $state = NULL) {
-    rules_log('Evaluating the action %name.', array('%name' => $this->elementName), RulesLog::INFO, $this);
+    rules_log('Evaluating the action %name.', array(
+      '%name' => $this->label($this->elementName),
+    ), RulesLog::INFO, $this);
     $return = $this->__call('execute', empty($this->info['named parameter']) ? $args : array($args));
     // Get the (partially) wrapped arguments.
     $args = $state->currentArguments;
@@ -69,6 +74,7 @@ class RulesAction extends RulesAbstractPlugin implements RulesActionInterface {
       }
     }
   }
+
 }
 
 /**
@@ -76,7 +82,14 @@ class RulesAction extends RulesAbstractPlugin implements RulesActionInterface {
  */
 class RulesCondition extends RulesAbstractPlugin implements RulesConditionInterface {
 
+  /**
+   * @var string
+   */
   protected $itemName = 'condition';
+
+  /**
+   * @var bool
+   */
   protected $negate = FALSE;
 
   public function providesVariables() {
@@ -94,8 +107,12 @@ class RulesCondition extends RulesAbstractPlugin implements RulesConditionInterf
 
   protected function executeCallback(array $args, RulesState $state = NULL) {
     $return = (bool) $this->__call('execute', empty($this->info['named parameter']) ? $args : array($args));
-    rules_log('The condition %name evaluated to %bool', array('%name' => $this->elementName, '%bool' => $return ? 'TRUE' : 'FALSE'), RulesLog::INFO, $this);
-    return $this->negate ? !$return : $return;
+    $return = $this->negate ? !$return : $return;
+    rules_log('The condition %name evaluated to %bool', array(
+      '%name' => $this->label($this->elementName),
+      '%bool' => $return ? 'TRUE' : 'FALSE',
+    ), RulesLog::INFO, $this);
+    return $return;
   }
 
   public function __sleep() {
@@ -132,19 +149,28 @@ class RulesCondition extends RulesAbstractPlugin implements RulesConditionInterf
 
   public function label() {
     $label = parent::label();
-    return $this->negate ? t('NOT @condition', array('@condition' => $label)) : $label;
+    return $this->negate ? t('NOT !condition', array('!condition' => $label)) : $label;
   }
+
 }
 
 /**
  * An actual rule.
+ *
  * Note: A rule also implements the RulesActionInterface (inherited).
  */
 class Rule extends RulesActionContainer {
 
   protected $conditions = NULL;
+
+  /**
+   * @var string
+   */
   protected $itemName = 'rule';
 
+  /**
+   * @var string
+   */
   public $label = 'unlabeled';
 
   public function __construct($variables = array(), $providesVars = array()) {
@@ -159,8 +185,9 @@ class Rule extends RulesActionContainer {
   }
 
   /**
-   * Get an iterator over all contained conditions. Note that this iterator also
-   * implements the ArrayAcces interface.
+   * Gets an iterator over all contained conditions.
+   *
+   * Note that this iterator also implements the ArrayAccess interface.
    *
    * @return RulesRecursiveElementIterator
    */
@@ -183,8 +210,9 @@ class Rule extends RulesActionContainer {
   }
 
   /**
-   * Get an iterator over all contained actions. Note that this iterator also
-   * implements the ArrayAccess interface.
+   * Gets an iterator over all contained actions.
+   *
+   * Note that this iterator also implements the ArrayAccess interface.
    *
    * @return RulesRecursiveElementIterator
    */
@@ -193,11 +221,12 @@ class Rule extends RulesActionContainer {
   }
 
   /**
-   * Add a condition. Pass either an instance of the RulesConditionInterface
-   * or the arguments as needed by rules_condition().
+   * Adds a condition.
    *
-   * @return Rule
-   *   Returns $this to support chained usage.
+   * Pass either an instance of the RulesConditionInterface or the arguments as
+   * needed by rules_condition().
+   *
+   * @return $this
    */
   public function condition($name, $settings = array()) {
     $this->conditions->condition($name, $settings);
@@ -309,7 +338,9 @@ class Rule extends RulesActionContainer {
   }
 
   /**
-   * Rules may not provided any variable info assertions, as Rules are only
+   * Overrides RulesPlugin::variableInfoAssertions().
+   *
+   * Rules may not provide any variable info assertions, as Rules are only
    * conditionally executed.
    */
   protected function variableInfoAssertions() {
@@ -324,7 +355,7 @@ class Rule extends RulesActionContainer {
   }
 
   /**
-   * Overriden to expose the variables of all actions for embedded rules.
+   * Overridden to expose the variables of all actions for embedded rules.
    */
   public function providesVariables() {
     $provides = parent::providesVariables();
@@ -340,6 +371,7 @@ class Rule extends RulesActionContainer {
     parent::resetInternalCache();
     $this->conditions->resetInternalCache();
   }
+
 }
 
 /**
@@ -347,8 +379,20 @@ class Rule extends RulesActionContainer {
  */
 class RulesReactionRule extends Rule implements RulesTriggerableInterface {
 
+  /**
+   * @var string
+   */
   protected $itemName = 'reaction rule';
-  protected $events = array(), $eventSettings = array();
+
+  /**
+   * @var array
+   */
+  protected $events = array();
+
+  /**
+   * @var array
+   */
+  protected $eventSettings = array();
 
   /**
    * Implements RulesTriggerableInterface::events().
@@ -489,6 +533,7 @@ class RulesReactionRule extends Rule implements RulesTriggerableInterface {
   }
 
   protected function exportChildren($key = 'ON') {
+    $export = array();
     foreach ($this->events as $event_name) {
       $export[$key][$event_name] = (array) $this->getEventSettings($event_name);
     }
@@ -498,12 +543,14 @@ class RulesReactionRule extends Rule implements RulesTriggerableInterface {
   protected function importChildren($export, $key = 'ON') {
     // Detect and support old-style exports: a numerically indexed array of
     // event names.
-    if (is_string(reset($export[$key])) && is_numeric(key($export[$key]))) {
-      $this->events = $export[$key];
-    }
-    else {
-      $this->events = array_keys($export[$key]);
-      $this->eventSettings = array_filter($export[$key]);
+    if (isset($export[$key])) {
+      if (is_string(reset($export[$key])) && is_numeric(key($export[$key]))) {
+        $this->events = $export[$key];
+      }
+      else {
+        $this->events = array_keys($export[$key]);
+        $this->eventSettings = array_filter($export[$key]);
+      }
     }
     parent::importChildren($export);
   }
@@ -516,6 +563,7 @@ class RulesReactionRule extends Rule implements RulesTriggerableInterface {
     // No need to keep event settings for evaluation.
     $this->eventSettings = array();
   }
+
 }
 
 /**
@@ -523,22 +571,32 @@ class RulesReactionRule extends Rule implements RulesTriggerableInterface {
  */
 class RulesAnd extends RulesConditionContainer {
 
+  /**
+   * @var string
+   */
   protected $itemName = 'and';
 
   public function evaluate(RulesState $state) {
     foreach ($this->children as $condition) {
       if (!$condition->evaluate($state)) {
-        rules_log('AND evaluated to FALSE.');
+        rules_log('%condition evaluated to %bool.', array(
+          '%condition' => $this->label(),
+          '%bool' => 'FALSE',
+        ));
         return $this->negate;
       }
     }
-    rules_log('AND evaluated to TRUE.');
+    rules_log('%condition evaluated to %bool.', array(
+      '%condition' => $this->label(),
+      '%bool' => 'TRUE',
+    ));
     return !$this->negate;
   }
 
   public function label() {
     return !empty($this->label) ? $this->label : ($this->negate ? t('NOT AND') : t('AND'));
   }
+
 }
 
 /**
@@ -546,16 +604,25 @@ class RulesAnd extends RulesConditionContainer {
  */
 class RulesOr extends RulesConditionContainer {
 
+  /**
+   * @var string
+   */
   protected $itemName = 'or';
 
   public function evaluate(RulesState $state) {
     foreach ($this->children as $condition) {
       if ($condition->evaluate($state)) {
-        rules_log('OR evaluated to TRUE.');
+        rules_log('%condition evaluated to %bool.', array(
+          '%condition' => $this->label(),
+          '%bool' => 'TRUE',
+        ));
         return !$this->negate;
       }
     }
-    rules_log('OR evaluated to FALSE.');
+    rules_log('%condition evaluated to %bool.', array(
+      '%condition' => $this->label(),
+      '%bool' => 'FALSE',
+    ));
     return $this->negate;
   }
 
@@ -564,6 +631,8 @@ class RulesOr extends RulesConditionContainer {
   }
 
   /**
+   * Overrides RulesContainerPlugin::stateVariables().
+   *
    * Overridden to exclude all variable assertions as in an OR we cannot assert
    * the children are successfully evaluated.
    */
@@ -580,6 +649,7 @@ class RulesOr extends RulesConditionContainer {
     }
     return $vars;
   }
+
 }
 
 /**
@@ -587,6 +657,9 @@ class RulesOr extends RulesConditionContainer {
  */
 class RulesLoop extends RulesActionContainer {
 
+  /**
+   * @var string
+   */
   protected $itemName = 'loop';
   protected $listItemInfo;
 
@@ -693,6 +766,7 @@ class RulesLoop extends RulesActionContainer {
       $this->settings['item:label'] = reset($export['ITEM']);
     }
   }
+
 }
 
 /**
@@ -700,6 +774,9 @@ class RulesLoop extends RulesActionContainer {
  */
 class RulesActionSet extends RulesActionContainer {
 
+  /**
+   * @var string
+   */
   protected $itemName = 'action set';
 
 }
@@ -709,6 +786,9 @@ class RulesActionSet extends RulesActionContainer {
  */
 class RulesRuleSet extends RulesActionContainer {
 
+  /**
+   * @var string
+   */
   protected $itemName = 'rule set';
 
   /**
@@ -725,6 +805,7 @@ class RulesRuleSet extends RulesActionContainer {
   protected function importChildren($export, $key = 'RULES') {
     parent::importChildren($export, $key);
   }
+
 }
 
 /**
@@ -732,8 +813,16 @@ class RulesRuleSet extends RulesActionContainer {
  */
 class RulesEventSet extends RulesRuleSet {
 
+  /**
+   * @var string
+   */
   protected $itemName = 'event set';
-  // Event sets may recurse as we block recursions on rule-level.
+
+  /**
+   * Event sets may recurse as we block recursions on rule-level.
+   *
+   * @var bool
+   */
   public $recursion = TRUE;
 
   public function __construct($info = array()) {
@@ -751,7 +840,10 @@ class RulesEventSet extends RulesRuleSet {
   }
 
   /**
-   * Cache event-sets per event to allow efficient usage via rules_invoke_event().
+   * Rebuilds the event cache.
+   *
+   * We cache event-sets per event in order to allow efficient usage via
+   * rules_invoke_event().
    *
    * @see rules_get_cache()
    * @see rules_invoke_event()
@@ -809,7 +901,7 @@ class RulesEventSet extends RulesRuleSet {
     }
     // Cache a whitelist of configured events so we can use it to speed up later
     // calls. See rules_invoke_event().
-    variable_set('rules_event_whitelist', array_flip(array_keys($sets)));
+    rules_set_cache('rules_event_whitelist', array_flip(array_keys($sets)));
   }
 
   protected function stateVariables($element = NULL) {
@@ -824,4 +916,5 @@ class RulesEventSet extends RulesRuleSet {
   public function save($name = NULL, $module = 'rules') {
     return FALSE;
   }
+
 }
