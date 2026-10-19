@@ -1,3 +1,5 @@
+**Note:** This version of Mukurtu CMS is no longer under active development, and is based on end-of-life Drupal 7. It has been replaced by [Mukurtu CMS 4](https://github.com/MukurtuCMS/Mukurtu-CMS/issues).
+
 # Mukurtu CMS 3.0.7
 ### [Release Notes](VERSION.md)
 
