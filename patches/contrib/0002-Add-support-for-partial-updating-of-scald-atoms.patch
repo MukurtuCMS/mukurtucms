@@ -1,0 +1,18 @@
+diff --git a/plugins/FeedsProcessor.inc b/plugins/FeedsProcessor.inc
+index 284439f..582de3a 100644
+--- a/plugins/FeedsProcessor.inc
++++ b/plugins/FeedsProcessor.inc
+@@ -821,9 +821,11 @@ abstract class FeedsProcessor extends FeedsPlugin {
+     // source element and pass it to the processor's setTargetElement() to stick
+     // it on the right place of the target item.
+     foreach ($this->getMappings() as $mapping) {
+-      $value = $this->getSourceValue($source, $result, $mapping['source']);
++      if (ma_importexport_dc_is_xml_importer($source->id) OR in_array(strtolower($mapping['source']), $result->input_fields)) {
++        $value = $this->getSourceValue($source, $result, $mapping['source']);
+
+-      $this->mapToTarget($source, $mapping['target'], $target_item, $value, $mapping);
++        $this->mapToTarget($source, $mapping['target'], $target_item, $value, $mapping);
++      }
+     }
+
+     return $target_item;

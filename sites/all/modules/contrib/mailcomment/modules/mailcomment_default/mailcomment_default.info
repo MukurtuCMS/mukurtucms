@@ -1,0 +1,18 @@
+core = "7.x"
+dependencies[] = "mailcomment"
+dependencies[] = "feeds_ui"
+dependencies[] = "feeds_comment_processor"
+dependencies[] = "features"
+description = "An example Mail Comment Feeds importer to get you started"
+features[ctools][] = "feeds:feeds_importer_default:1"
+features[feeds_importer][] = "mailhandler_comments"
+name = "Mail Comment quick-start"
+package = "Mail Comment"
+
+
+; Information added by drupal.org packaging script on 2013-09-20
+version = "7.x-2.4"
+core = "7.x"
+project = "mailcomment"
+datestamp = "1379694483"
+

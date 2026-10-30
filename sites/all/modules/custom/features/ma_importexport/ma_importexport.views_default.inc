@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_importexport.views_default.inc
@@ -90,7 +91,7 @@ function ma_importexport_views_default_views() {
     'digital_heritage' => 'digital_heritage',
   );
   $handler->display->display_options['filters']['type']['group'] = 0;
-  /* Filter criterion: Content: Published or admin */
+  /* Filter criterion: Content: Published status or admin user */
   $handler->display->display_options['filters']['status_extra']['id'] = 'status_extra';
   $handler->display->display_options['filters']['status_extra']['table'] = 'node';
   $handler->display->display_options['filters']['status_extra']['field'] = 'status_extra';
@@ -152,11 +153,10 @@ function ma_importexport_views_default_views() {
   $handler->display->display_options['fields']['field_category']['element_default_classes'] = FALSE;
   $handler->display->display_options['fields']['field_category']['hide_alter_empty'] = FALSE;
   $handler->display->display_options['fields']['field_category']['delta_offset'] = '0';
-  /* Field: Field: Tags */
+  /* Field: Field: Keywords */
   $handler->display->display_options['fields']['field_tags']['id'] = 'field_tags';
   $handler->display->display_options['fields']['field_tags']['table'] = 'field_data_field_tags';
   $handler->display->display_options['fields']['field_tags']['field'] = 'field_tags';
-  $handler->display->display_options['fields']['field_tags']['label'] = 'Keywords';
   $handler->display->display_options['fields']['field_tags']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_tags']['element_default_classes'] = FALSE;
   $handler->display->display_options['fields']['field_tags']['hide_alter_empty'] = FALSE;
@@ -184,7 +184,7 @@ function ma_importexport_views_default_views() {
   $handler->display->display_options['fields']['field_tk_body']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_tk_body']['element_default_classes'] = FALSE;
   $handler->display->display_options['fields']['field_tk_body']['hide_alter_empty'] = FALSE;
-  /* Field: Content: Contributor */
+  /* Field: Field: Contributor */
   $handler->display->display_options['fields']['field_contributor']['id'] = 'field_contributor';
   $handler->display->display_options['fields']['field_contributor']['table'] = 'field_data_field_contributor';
   $handler->display->display_options['fields']['field_contributor']['field'] = 'field_contributor';
@@ -202,7 +202,7 @@ function ma_importexport_views_default_views() {
   $handler->display->display_options['fields']['field_creator']['type'] = 'taxonomy_term_reference_plain';
   $handler->display->display_options['fields']['field_creator']['group_column'] = 'entity_id';
   $handler->display->display_options['fields']['field_creator']['delta_offset'] = '0';
-  /* Field: Content: Original Date */
+  /* Field: Content: Original Date Description */
   $handler->display->display_options['fields']['field_date']['id'] = 'field_date';
   $handler->display->display_options['fields']['field_date']['table'] = 'field_data_field_date';
   $handler->display->display_options['fields']['field_date']['field'] = 'field_date';
@@ -250,7 +250,7 @@ function ma_importexport_views_default_views() {
   $handler->display->display_options['fields']['field_rights']['element_default_classes'] = FALSE;
   $handler->display->display_options['fields']['field_rights']['hide_alter_empty'] = FALSE;
   $handler->display->display_options['fields']['field_rights']['type'] = 'text_plain';
-  /* Field: Content: Source */
+  /* Field: Field: Source */
   $handler->display->display_options['fields']['field_source']['id'] = 'field_source';
   $handler->display->display_options['fields']['field_source']['table'] = 'field_data_field_source';
   $handler->display->display_options['fields']['field_source']['field'] = 'field_source';
@@ -309,38 +309,37 @@ function ma_importexport_views_default_views() {
   $handler->display->display_options['fields']['field_licence_trad_1']['table'] = 'field_data_field_licence_trad';
   $handler->display->display_options['fields']['field_licence_trad_1']['field'] = 'field_licence_trad';
   $handler->display->display_options['fields']['field_licence_trad_1']['element_label_colon'] = FALSE;
-  /* Field: Field: Licensing Options */
+  /* Field: Field: Standard and Creative Commons Licensing */
   $handler->display->display_options['fields']['field_licence_std_cc_1']['id'] = 'field_licence_std_cc_1';
   $handler->display->display_options['fields']['field_licence_std_cc_1']['table'] = 'field_data_field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc_1']['field'] = 'field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc_1']['label'] = 'Standard and Creative Commons Licensing URL';
   $handler->display->display_options['fields']['field_licence_std_cc_1']['type'] = 'license_formatter_export';
-  /* Field: Field: Licensing Options */
+  /* Field: Field: Standard and Creative Commons Licensing */
   $handler->display->display_options['fields']['field_licence_std_cc']['id'] = 'field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc']['table'] = 'field_data_field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc']['field'] = 'field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_licence_std_cc']['element_default_classes'] = FALSE;
   $handler->display->display_options['fields']['field_licence_std_cc']['hide_alter_empty'] = FALSE;
-  /* Field: Content: Published */
+  /* Field: Content: Published status */
   $handler->display->display_options['fields']['status']['id'] = 'status';
   $handler->display->display_options['fields']['status']['table'] = 'node';
   $handler->display->display_options['fields']['status']['field'] = 'status';
   $handler->display->display_options['fields']['status']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['status']['type'] = 'boolean';
   $handler->display->display_options['fields']['status']['not'] = 0;
-  /* Field: Content: Collection */
+  /* Field: Content: Collections */
   $handler->display->display_options['fields']['field_collection']['id'] = 'field_collection';
   $handler->display->display_options['fields']['field_collection']['table'] = 'field_data_field_collection';
   $handler->display->display_options['fields']['field_collection']['field'] = 'field_collection';
-  $handler->display->display_options['fields']['field_collection']['label'] = 'Collections';
   $handler->display->display_options['fields']['field_collection']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_collection']['type'] = 'entityreference_entity_id';
   $handler->display->display_options['fields']['field_collection']['settings'] = array(
     'link' => 0,
   );
   $handler->display->display_options['fields']['field_collection']['delta_offset'] = '0';
-  /* Field: Content: Sharing Protocol */
+  /* Field: Content: Sharing protocol */
   $handler->display->display_options['fields']['group_access']['id'] = 'group_access';
   $handler->display->display_options['fields']['group_access']['table'] = 'field_data_group_access';
   $handler->display->display_options['fields']['group_access']['field'] = 'group_access';
@@ -409,7 +408,7 @@ function ma_importexport_views_default_views() {
     'digital_heritage' => 'digital_heritage',
   );
   $handler->display->display_options['filters']['type']['group'] = 0;
-  /* Filter criterion: Content: Published or admin */
+  /* Filter criterion: Content: Published status or admin user */
   $handler->display->display_options['filters']['status_extra']['id'] = 'status_extra';
   $handler->display->display_options['filters']['status_extra']['table'] = 'node';
   $handler->display->display_options['filters']['status_extra']['field'] = 'status_extra';
@@ -429,6 +428,8 @@ function ma_importexport_views_default_views() {
   $handler->display->display_options['style_options']['provide_file'] = 0;
   $handler->display->display_options['style_options']['parent_sort'] = 0;
   $handler->display->display_options['style_options']['transform'] = 1;
+  $handler->display->display_options['style_options']['root_node'] = 'nodes';
+  $handler->display->display_options['style_options']['item_node'] = 'node';
   $handler->display->display_options['defaults']['header'] = FALSE;
   $handler->display->display_options['defaults']['footer'] = FALSE;
   $handler->display->display_options['defaults']['relationships'] = FALSE;
@@ -542,11 +543,10 @@ print $output;
   $handler->display->display_options['fields']['field_category']['hide_alter_empty'] = FALSE;
   $handler->display->display_options['fields']['field_category']['type'] = 'taxonomy_term_reference_plain';
   $handler->display->display_options['fields']['field_category']['delta_offset'] = '0';
-  /* Field: Field: Tags */
+  /* Field: Field: Keywords */
   $handler->display->display_options['fields']['field_tags']['id'] = 'field_tags';
   $handler->display->display_options['fields']['field_tags']['table'] = 'field_data_field_tags';
   $handler->display->display_options['fields']['field_tags']['field'] = 'field_tags';
-  $handler->display->display_options['fields']['field_tags']['label'] = 'Keywords';
   $handler->display->display_options['fields']['field_tags']['alter']['strip_tags'] = TRUE;
   $handler->display->display_options['fields']['field_tags']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_tags']['element_default_classes'] = FALSE;
@@ -576,7 +576,7 @@ print $output;
   $handler->display->display_options['fields']['field_tk_body']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_tk_body']['element_default_classes'] = FALSE;
   $handler->display->display_options['fields']['field_tk_body']['hide_alter_empty'] = FALSE;
-  /* Field: Content: Contributor */
+  /* Field: Field: Contributor */
   $handler->display->display_options['fields']['field_contributor']['id'] = 'field_contributor';
   $handler->display->display_options['fields']['field_contributor']['table'] = 'field_data_field_contributor';
   $handler->display->display_options['fields']['field_contributor']['field'] = 'field_contributor';
@@ -594,7 +594,7 @@ print $output;
   $handler->display->display_options['fields']['field_creator']['type'] = 'taxonomy_term_reference_plain';
   $handler->display->display_options['fields']['field_creator']['group_column'] = 'entity_id';
   $handler->display->display_options['fields']['field_creator']['delta_offset'] = '0';
-  /* Field: Content: Original Date */
+  /* Field: Content: Original Date Description */
   $handler->display->display_options['fields']['field_date']['id'] = 'field_date';
   $handler->display->display_options['fields']['field_date']['table'] = 'field_data_field_date';
   $handler->display->display_options['fields']['field_date']['field'] = 'field_date';
@@ -644,7 +644,7 @@ print $output;
   $handler->display->display_options['fields']['field_rights']['element_default_classes'] = FALSE;
   $handler->display->display_options['fields']['field_rights']['hide_alter_empty'] = FALSE;
   $handler->display->display_options['fields']['field_rights']['type'] = 'text_plain';
-  /* Field: Content: Source */
+  /* Field: Field: Source */
   $handler->display->display_options['fields']['field_source']['id'] = 'field_source';
   $handler->display->display_options['fields']['field_source']['table'] = 'field_data_field_source';
   $handler->display->display_options['fields']['field_source']['field'] = 'field_source';
@@ -714,7 +714,7 @@ print $output;
   $handler->display->display_options['fields']['field_licence_trad_1']['table'] = 'field_data_field_licence_trad';
   $handler->display->display_options['fields']['field_licence_trad_1']['field'] = 'field_licence_trad';
   $handler->display->display_options['fields']['field_licence_trad_1']['element_label_colon'] = FALSE;
-  /* Field: Field: Licensing Options */
+  /* Field: Field: Standard and Creative Commons Licensing */
   $handler->display->display_options['fields']['field_licence_std_cc_1']['id'] = 'field_licence_std_cc_1';
   $handler->display->display_options['fields']['field_licence_std_cc_1']['table'] = 'field_data_field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc_1']['field'] = 'field_licence_std_cc';
@@ -722,7 +722,7 @@ print $output;
   $handler->display->display_options['fields']['field_licence_std_cc_1']['alter']['strip_tags'] = TRUE;
   $handler->display->display_options['fields']['field_licence_std_cc_1']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_licence_std_cc_1']['type'] = 'license_formatter_export';
-  /* Field: Field: Licensing Options */
+  /* Field: Field: Standard and Creative Commons Licensing */
   $handler->display->display_options['fields']['field_licence_std_cc']['id'] = 'field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc']['table'] = 'field_data_field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc']['field'] = 'field_licence_std_cc';
@@ -791,10 +791,10 @@ print $output;
     t('[field_licence_trad-value]'),
     t('Traditional Knowledge Labels'),
     t('Standard and Creative Commons Licensing URL'),
-    t('Licensing Options'),
-    t('Published'),
+    t('Standard and Creative Commons Licensing'),
+    t('Published status'),
     t('Collections'),
-    t('Sharing Protocol'),
+    t('Sharing protocol'),
     t('Export as zip'),
     t('Export as XML'),
     t('title'),
@@ -803,7 +803,7 @@ print $output;
     t('Broken handler field_data_field_communities.field_communities'),
     t('Broken handler field_data_field_culturalprotocol.field_culturalprotocol'),
     t('Broken handler field_data_field_relation.field_relation'),
-    t('Original Date'),
+    t('Original Date Description'),
     t('Sharing Protocols'),
   );
   $export['export'] = $view;

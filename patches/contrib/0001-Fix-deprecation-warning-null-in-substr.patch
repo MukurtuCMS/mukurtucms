@@ -1,0 +1,26 @@
+From 89cd16aacf8b9726b62a99d464cecf79be5ff031 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Thu, 27 Apr 2023 10:11:44 -0700
+Subject: [PATCH] Fix deprecation warning, null in substr
+
+---
+ search_api.module | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/search_api.module b/search_api.module
+index e59fe33c..da8cfb26 100644
+--- a/search_api.module
++++ b/search_api.module
+@@ -2340,6 +2340,9 @@ function search_api_is_text_type($type, array $allowed = array('text')) {
+  *   TRUE iff $type is a list type ("list<*>").
+  */
+ function search_api_is_list_type($type) {
++  if (is_null($type)) {
++    return FALSE;
++  }
+   return substr($type, 0, 5) == 'list<';
+ }
+ 
+-- 
+2.34.1
+

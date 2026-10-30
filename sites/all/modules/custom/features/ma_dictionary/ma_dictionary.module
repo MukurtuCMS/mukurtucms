@@ -1,0 +1,1477 @@
+<?php
+/**
+ * @file
+ * Code for the Mukurtu Dictionary feature.
+ */
+
+include_once 'ma_dictionary.features.inc';
+
+/**
+ * Implements hook_init().
+ */
+function ma_dictionary_init() {
+  $dictionary_fix = variable_get('mukurtu_dictionary_install_fix', FALSE);
+  if (!$dictionary_fix) {
+    // Dictionary feature keeps installing as overridden.
+    // Tired of trying to resolve that, just manually set them.
+    // Once it's figured out we can remove this block.
+    $existing_item = menu_link_get_preferred('node/add/dictionary-word', 'main-menu');
+    $main_menu = menu_load_links("main-menu");
+    if (empty($existing_item) || $existing_item['link_path'] == 'node/add') {
+      $item = array(
+        'link_path' => 'node/add/dictionary-word',
+        'link_title' => '+ Dictionary Word',
+        'menu_name' => 'main-menu',
+        'weight' => -45,
+        'expanded' => 0,
+        'customized' => 1,
+        'options' => array(
+          'attributes' => array('title' => 'Add a word to the dictionary'),
+          'identifier' => 'main-menu_-dictionary-word:node/add/dictionary-word',
+        ),
+        'plid' => $main_menu[0]['mlid'],
+      );
+      menu_link_save($item);
+    } else {
+      // Exists but is top level, we need to make it a child.
+      if (isset($existing_item['plid']) && $existing_item['plid'] == 0) {
+        $existing_item['plid'] = $main_menu[0]['mlid'];
+        menu_link_save($existing_item);
+      }
+    }
+
+    $admin = user_role_load_by_name('administrator');
+    $admin_permissions = array(
+      'clear import_dictionary_word_additional_entries feeds',
+      'clear import_dictionary_word_lists feeds',
+      'clear import_dictionary_words feeds',
+      'import import_dictionary_word_additional_entries feeds',
+      'import import_dictionary_word_lists feeds',
+      'import import_dictionary_words feeds',
+      'tamper import_dictionary_word_additional_entries',
+      'tamper import_dictionary_word_lists',
+      'tamper import_dictionary_words',
+      'unlock import_dictionary_word_additional_entries feeds',
+      'unlock import_dictionary_word_lists feeds',
+      'unlock import_dictionary_words feeds',
+    );
+    $mukurtuadmin = user_role_load_by_name('Mukurtu Administrator');
+    $mukurtuadmin_permissions = array(
+      'clear import_dictionary_word_additional_entries feeds',
+      'clear import_dictionary_word_lists feeds',
+      'clear import_dictionary_words feeds',
+      'import import_dictionary_word_additional_entries feeds',
+      'import import_dictionary_word_lists feeds',
+      'import import_dictionary_words feeds',
+    );
+    if ($admin) {
+      user_role_grant_permissions($admin->rid, $admin_permissions);
+    }
+    if ($mukurtuadmin) {
+      user_role_grant_permissions($mukurtuadmin->rid, $mukurtuadmin_permissions);
+    }
+    // End manual dictionary feature tweaking.
+    variable_set('mukurtu_dictionary_install_fix', TRUE);
+  }
+}
+
+/**
+ * Implements hook_post_features_rebuild().
+ */
+function ma_dictionary_post_features_rebuild($component) {
+    // Clear warnings on dictionary rebuild. Not the best way of doing this,
+    // but people were getting very confused about the define permission warnings.
+    $install_warnings = drupal_get_messages('warning', TRUE);
+}
+
+function ma_dictionary_menu() {
+
+    // Form to set default language
+    $items['dashboard/set-default-language'] = array(
+      'title' => 'Set Default Language',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('ma_dictionary_set_default_language'),
+      'access arguments' => array('administer taxonomy'),
+      'type' => MENU_CALLBACK,
+    );
+    return $items;
+}
+
+function ma_dictionary_set_default_language() {
+    $language = taxonomy_vocabulary_machine_name_load('language');
+    $terms = taxonomy_get_tree($language->vid);
+
+    foreach ($terms as $term) {
+        $options[$term->tid] = $term->name;
+    }
+
+    $form['default_language'] = array (
+      '#type' => 'radios',
+      '#title' => 'Select the default language used when creating dictionary words',
+      '#default_value' => variable_get ('mukurtu_default_language'),
+      '#options' => $options,
+    );
+
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Submit'),
+    );
+
+    return $form;
+}
+
+function ma_dictionary_set_default_language_submit ($form, &$form_state) {
+    if ($tid = $form_state['values']['default_language']) {
+        variable_set ('mukurtu_default_language', $tid);
+        $term = taxonomy_term_load($tid);
+        drupal_set_message('Default language set to <i>' . $term->name . '</i>.');
+    }
+    drupal_goto ('dashboard');
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_dictionary_form_views_exposed_form_alter(&$form, &$form_state) {
+    // Add a button to reset search and filters
+    // Search API provides a button on the view that will reset the search, but not the filters. Leaving that off and creating our own that will reset both.
+    if (strpos($form['#id'], 'views-exposed-form-dictionary-words-all') !== FALSE) {
+        if (count(arg()) > 1 OR count(drupal_get_query_parameters())) {
+            $form['reset'] = array('#markup' => l(t('Reset'),'dictionary', array('attributes' => array('class' => array ('btn', 'btn-primary', 'form-submit')), 'html' => TRUE)));
+        }
+    }
+}
+
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_dictionary_form_dictionary_word_node_form_alter(&$form, &$form_state) {
+  // "Item Sharing Settings" field customizations versus how it works by default (as used in the DH node form) //
+  // Not required for Dictionary Words
+  $form['field_item_privacy_setting'][LANGUAGE_NONE]['#required'] = FALSE;
+
+  // The field has a default value. This is just to catch cases on demo sites where words were set already before this field was added
+  if (!$form['field_item_privacy_setting'][LANGUAGE_NONE]['#default_value']) {
+    $form['field_item_privacy_setting'][LANGUAGE_NONE]['#default_value'] = 'all';
+  }
+
+  // Hide the field unless a Community is selected in the first value
+  $form['field_item_privacy_setting']['#states'] = array(
+    'invisible' => array(
+      ':input[id="edit-oggroup-fieldset-0-dropdown-first"]' => array('value' => 0),
+    ),
+  );
+
+  // Actions to perform when adding or editing dictionary words
+  if ($form['#node_edit_form'] == TRUE) {
+      // Remove any languages the user isn't a member of
+      $user_language_communities = _ma_dictionary_get_user_language_communities();
+      foreach($form['field_dictionary_word_language'][LANGUAGE_NONE]['#options'] as $lang_id => $lang) {
+          if(!isset($user_language_communities[$lang_id])) {
+              unset($form['field_dictionary_word_language'][LANGUAGE_NONE]['#options'][$lang_id]);
+          }
+      }
+  }
+
+  // Actions to perform when adding (not editing) dictionary words
+  if ($form['#action'] == '/node/add/dictionary-word') {
+    // Set the default language, if one is defined, or the first language if no default is defined
+    $default_language = variable_get ('mukurtu_default_language');
+    if (!$default_language) {
+      $language = taxonomy_vocabulary_machine_name_load('language');
+      $terms = taxonomy_get_tree($language->vid);
+      if (count($terms)) {
+        $default_language = $terms[0]->tid;
+      }
+    }
+    $form['field_dictionary_word_language'][LANGUAGE_NONE]['#default_value'] = $default_language;
+
+    // Set default language community to anything valid. It'll be changed to the correct value on save
+    if(!empty($form['field_dictionary_word_language']['und']['#options'])) {
+        $first_language_tid = array_keys($form['field_dictionary_word_language']['und']['#options'])[0];
+        $first_language_community = _ma_dictionary_get_language_community_from_tid($first_language_tid);
+        if($first_language_community) {
+            $form['field_language_community'][LANGUAGE_NONE][0]['default']['#default_value'] = $first_language_community;
+        }
+    }
+  }
+
+  // Change paragraphs button text to be dictionary specific
+  $form['field_word_entry'][LANGUAGE_NONE]['add_more']['add_more']['#value'] = t('Add new word entry');
+
+  //   kpr($form);
+   //    kpr(debug_backtrace(TRUE));
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_dictionary_form_language_community_node_form_alter(&$form, &$form_state) {
+
+  // Remove any languages that already have language communities
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'language_community')
+    ->addMetaData('account', user_load(1)); // Run the query as user 1.
+
+  $result = $query->execute();
+
+  // Building list of language tids for existing communities
+  $existing_language_tids = array();
+  if (isset($result['node'])) {
+    foreach ($result['node'] as $result_node) {
+      $existing_language_community = node_load($result_node->nid);
+      if ($existing_language_community && !empty($existing_language_community->field_community_language[LANGUAGE_NONE])) {
+        // Language communities only have one language association
+        $existing_language_tids[] = $existing_language_community->field_community_language[LANGUAGE_NONE][0]['tid'];
+      }
+    }
+  }
+
+  // If this is a pre-existing language community, don't remove its own language tid from the list
+  if (!empty($form['#node']->field_community_language)) {
+    foreach ($existing_language_tids as $key => $existing_tid) {
+      if ($existing_tid == $form['#node']->field_community_language[LANGUAGE_NONE][0]['tid']) {
+        unset($existing_language_tids[$key]);
+      }
+    }
+  }
+
+  // Remove those tids from the form options
+  foreach ($existing_language_tids as $language_tid) {
+    if (isset($form['field_community_language'][LANGUAGE_NONE]['#options'][$language_tid])) {
+      unset($form['field_community_language'][LANGUAGE_NONE]['#options'][$language_tid]);
+    }
+  }
+
+  // If a tid is passed as an argument, try and pre-populate fields
+  $args = arg();
+  $passed_tid = $args[count($args) - 1];
+  if (is_numeric($passed_tid) && $passed_tid > 0) {
+    $passed_term = taxonomy_term_load($passed_tid);
+    if (!empty($passed_term) && $passed_term->vocabulary_machine_name == 'language') {
+      if (isset($form['field_community_language'][LANGUAGE_NONE]['#options'][$passed_term->tid])) {
+        $form['field_community_language'][LANGUAGE_NONE]['#default_value'] = $passed_term->tid;
+        $form['title']['#default_value'] = $passed_term->name . ' ' . t('Language Community');
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_widget_form_alter.
+ */
+function ma_dictionary_field_widget_form_alter(&$element, &$form_state, $context) {
+    if(isset($element['#field_name']) && $element['#field_name'] == 'field_word_entry') {
+        $n_entries = 0;
+        if(is_numeric($element['#max_delta']) && $element['#max_delta'] > -1) {
+            $n_entries = $element['#max_delta'];
+            foreach(range(0, $n_entries) as $i) {
+                // Change the field group title for each word entry, customized based on source/translation
+                $word_number = $i + 1;
+                $new_word_title = "#$word_number ";
+                $source = "";
+                $translation = "";
+
+                if(!empty($element[$i]['field_source'][LANGUAGE_NONE][0]['value']['#default_value'])) {
+                    $source = $element[$i]['field_source'][LANGUAGE_NONE][0]['value']['#default_value'] . ' ';
+                }
+
+                if(!empty($element[$i]['field_translation'][LANGUAGE_NONE][0]['value']['#default_value'])) {
+                    $translation .= $element[$i]['field_translation'][LANGUAGE_NONE][0]['value']['#default_value'] . ' ';
+                }
+
+                if(!empty($source)) {
+                    if(!empty($translation)) {
+                        $new_word_title .= $source . ' - ' . $translation;
+                    } else {
+                        $new_word_title .= $source;
+                    }
+                } else {
+                    $new_word_title .= $translation;
+                }
+
+                // This is pretty gross. All elements fieldgroup points to the same object by reference.
+                // Here we make a copy and change just the title, so we can have different titles for the same
+                // field group
+                $group_clone = (object) (array) $element[$i]['#groups']['group_word_bundle'];
+                $group_clone->label = $new_word_title;
+                $element[$i]['#fieldgroups']['group_word_bundle'] = $group_clone;
+
+
+                // Remove paragraph bundle type text
+                unset($element[$i]['paragraph_bundle_title']['info']['#markup']);
+
+                // Change add sample sentence text
+                $element[$i]['field_sample_sentence'][LANGUAGE_NONE]['add_more']['#value'] = t('Add another sample sentence');
+
+                // Change add another recording text
+                $element[$i]['field_dictionary_word_recording'][LANGUAGE_NONE]['add_more']['#value'] = t('Add another recording');
+            }
+        }
+    }
+}
+
+
+/**
+ * Implements template_preprocess_views_view.
+ */
+function ma_dictionary_preprocess_views_view(&$vars) {
+  $view = &$vars['view'];
+
+  // Add JS for browse mode switcher on Dictionary view
+  if ($view->name == 'dictionary_words') {
+    drupal_add_library('system', 'jquery.cookie');
+    drupal_add_js(drupal_get_path('module', 'ma_dictionary') . '/js/dictionary_browse_mode_switcher.js');
+  }
+
+}
+
+/**
+ * Implements hook_url_outbound_alter
+ */
+// For the title (first letter) facet, restrict to one letter (or digit, or non-letter) at a time.
+// Interestingly, this cannot be done in the facet config, by whatever combo of Operator and "Limit to one active item"
+
+function ma_dictionary_url_outbound_alter(&$path, &$options, $original_path) {
+  if (!$path) {
+    return;
+  }
+  
+  if (substr($path, 0, 11) == 'dictionary/') {
+    if (substr_count($path, 'title') > 1) { // this catches first letter links adding to an existing first-letter-filtered URL
+      $start_of_first_title = strpos ($path, '/title/');
+      $end_of_first_title = strpos ($path, '/', $start_of_first_title + 8);
+      $path = substr($path, 0, $start_of_first_title) . substr($path, $end_of_first_title); // strip out the first (ie. existing) title filter on the outbound link
+    }
+  }
+}
+
+/**
+ *
+ */
+function ma_dictionary_node_view($node, $view_mode = 'full', $langcode = NULL) {
+    if($node->type == 'dictionary_word' && $view_mode == 'full') {
+        // Replace the link to the language taxonomy with a link to the dictionary browse page, with language pre-selected.
+        // Language is required and only one is allowed, so hardcoding is fine here.
+        $language_alias = drupal_get_path_alias('taxonomy/term/' . $node->field_dictionary_word_language['und'][0]['tid']);
+        $language = substr($language_alias, strripos($language_alias, '/') + 1);
+        $node->content['field_dictionary_word_language'][0]['#href'] = '/dictionary/language/' . $language;
+
+        // Replace links for keywords to link to the dictionary browse page with keyword pre-selected
+        if(isset($node->content['field_tags'])) {
+            foreach($node->content['field_tags']['#items'] as $key => $value) {
+                $node->content['field_tags'][0]['#items'][$key] = str_replace('/tags/','/dictionary/keywords/' , $node->content['field_tags'][0]['#items'][$key]);
+            }
+        }
+    }
+
+    // Only render the first word entry per term in the search results
+    if($node->type == 'dictionary_word' && $view_mode == 'search_result') {
+        if(count($node->field_word_entry) > 0) {
+            $first = TRUE;
+            foreach($node->content['field_word_entry']['#items'] as $key => $item) {
+                if(!$first) {
+                    unset($node->content['field_word_entry'][$key]);
+                }
+                $first = FALSE;
+            }
+        }
+    }
+
+    // Add link in browse page
+    if($node->type == 'dictionary_word' && $view_mode == 'dictionary_word_summary') {
+        if(!empty($node->content['field_word_entry'][0]['entity']['paragraphs_item'])) {
+            foreach($node->content['field_word_entry'][0]['entity']['paragraphs_item'] as $k => $word_entry) {
+                $node->content['field_word_entry'][0]['entity']['paragraphs_item'][$k]['field_alternate_spelling'][0]['#markup'] = l($node->content['field_word_entry'][0]['entity']['paragraphs_item'][$k]['field_alternate_spelling'][0]['#markup'], drupal_get_path_alias("node/{$node->nid}"));
+            }
+        }
+    }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_dictionary_form_node_delete_confirm_alter(&$form, &$form_state) {
+    if($form['#node']->type == 'language_community' && isset($form['#node']->nid)) {
+        if(ma_dictionary_language_community_referenced($form['#node'])) {
+            $form['description']['#markup'] = "<p><b>WARNING: This Language Community is still actively referenced by dictionary words. Deleting the Language Community may have unintended consequences.</b></p>" . $form['description']['#markup'];
+        }
+    }
+}
+
+function ma_dictionary_entity_view($entity, $type, $view_mode, $langcode) {
+    if($type == 'paragraphs_item' && $entity->bundle == 'dictionary_word_bundle') {
+        // If no alternate spelling is given, put the standard term in
+        if(empty($entity->field_alternate_spelling) || $entity->field_alternate_spelling[LANGUAGE_NONE][0]['value'] == '') {
+            // Lookup the parent dictionary word node
+            $query = new EntityFieldQuery();
+            $query->entityCondition('entity_type', 'node')
+                ->entityCondition('bundle', 'dictionary_word')
+                ->propertyCondition('status', 1) // published? yes
+                ->fieldCondition('field_word_entry', 'revision_id', $entity->revision_id)
+                ->range(0, 10);
+            $result = $query->execute();
+
+            // If there is more than one result, the paragraph was re-used somewhere, so don't load the title
+            if (isset($result['node']) && count($result['node']) == 1) {
+                $nid = key($result['node']);
+
+                $word_node = node_load($nid);
+                if($word_node) {
+                    $entity->field_alternate_spelling[LANGUAGE_NONE][]['value'] = $word_node->title;
+                    $rendered_field = field_view_field($type, $entity, 'field_alternate_spelling', $view_mode);
+                    $entity->content['field_alternate_spelling'] = $rendered_field;
+                }
+            }
+        }
+
+        if($view_mode == 'word_entry_in_word_list') {
+            // Replace the field group header label with specific word entry info
+            $term_name = $entity->field_alternate_spelling[LANGUAGE_NONE][0]['value'];
+            $term_translation = (!empty($entity->field_translation)) ? " - " . $entity->field_translation[LANGUAGE_NONE][0]['value'] : "";
+            $term_source = (!empty($entity->field_source)) ? " (" . $entity->field_source[LANGUAGE_NONE][0]['value'] . ")" : "";
+            $label = $term_name . $term_translation . $term_source;
+            $group_clone = (object) (array) $entity->content['#groups']['group_teaser'];
+            $group_clone->label = $label;
+            $entity->content['#fieldgroups']['group_teaser'] = $group_clone;
+        }
+
+        // Rewrite links to part of speech taxonomy to link to dictionary browse page with part of speech pre-selected
+        if(isset($entity->content['field_part_of_speech'])) {
+            foreach($entity->content['field_part_of_speech']['#items'] as $key => $value) {
+                $part_tid = $entity->content['field_part_of_speech']['#items'][$key]['tid'];
+                $entity->content['field_part_of_speech'][0]['#items'][$key] = str_replace('/part-speech/','/dictionary/field_word_entry:field_part_of_speech/' , $entity->content['field_part_of_speech'][0]['#items'][$key]);
+                $entity->content['field_part_of_speech'][0]['#items'][$key] = str_replace('">','-' . $part_tid . '">' , $entity->content['field_part_of_speech'][0]['#items'][$key]);
+            }
+        }
+
+        // Wrap sample sentences in a div
+        if(isset($entity->content['field_sample_sentence'])) {
+            foreach($entity->content['field_sample_sentence']['#items'] as $key => $value) {
+                $entity->content['field_sample_sentence'][$key]['#markup'] = '<div class="sample-sentence">' . $entity->content['field_sample_sentence'][$key]['#markup'] . '</div>';
+            }
+        }
+
+        // Only render one recording in teaser
+        if($view_mode == 'dictionary_teaser') {
+            if(isset($entity->field_dictionary_word_recording[LANGUAGE_NONE]) && count($entity->field_dictionary_word_recording[LANGUAGE_NONE]) > 1) {
+                $first = TRUE;
+                foreach($entity->content['field_dictionary_word_recording']['#items'] as $key => $item) {
+                    if(!$first) {
+                        unset($entity->content['field_dictionary_word_recording'][$key]);
+                    }
+                    $first = FALSE;
+                }
+            }
+        }
+
+        // Temporary fix for likely safe_value paragraph issue.
+        // Alternate spelling displaying with encoded characters.
+        if (isset($entity->content['field_alternate_spelling'][0]['#markup'])) {
+            $entity->content['field_alternate_spelling'][0]['#markup'] = decode_entities($entity->content['field_alternate_spelling'][0]['#markup']);
+        }
+    }
+}
+
+/**
+ * Implements hook_entity_delete
+ */
+function ma_dictionary_entity_delete($entity, $type) {
+    if($type == 'paragraphs_item' && $entity->bundle == 'dictionary_word_bundle') {
+        if(isset($entity->item_id)) {
+            // Find all dictionary words that reference this entry (should be only 1)
+            $word_nodes = ma_dictionary_words_with_entry($entity->item_id);
+
+            // Load each dictionary word and search for the entry
+            foreach($word_nodes as $nid) {
+                $node = node_load($nid);
+                if($node && isset($node->field_word_entry)) {
+                    foreach($node->field_word_entry[LANGUAGE_NONE] as $key => $value) {
+                        // If we find the entry, remove it
+                        if($value['value'] == $entity->item_id) {
+                            unset($node->field_word_entry[LANGUAGE_NONE][$key]);
+                        }
+                    }
+                    node_save($node);
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Implements hook_node_delete
+ */
+function ma_dictionary_node_delete($node) {
+    // CER isn't removing references from Word Lists when dictionary words are deleted, do that here
+    if($node->type == 'dictionary_word') {
+        if(isset($node->field_word_list)) {
+            $word_lists = _ma_dictionary_flatten_reference_field($node->field_word_list);
+        } else {
+            $word_lists = array();
+        }
+
+        // These are the word lists the word is being removed from. Load each and remove the reference
+        foreach($word_lists as $removed_word_list_nid) {
+            entity_get_controller('node')->resetCache(array($removed_word_list_nid));
+            $word_list = node_load($removed_word_list_nid);
+
+            if($word_list) {
+                foreach($word_list->field_words[LANGUAGE_NONE] as $key => $word_list_word) {
+                    if($word_list_word['target_id'] == $node->nid) {
+                        unset($word_list->field_words[LANGUAGE_NONE][$key]);
+                        node_save($word_list);
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Implements hook_node_access
+ */
+function ma_dictionary_node_access($node, $op, $account) {
+    global $user;
+    $type = is_string($node) ? $node : $node->type;
+
+    // Don't delete any language communities that are still being referenced by dictionary words
+    if($type == 'language_community') {
+        if($op == 'delete') {
+            if(ma_dictionary_language_community_referenced($node)) {
+                return NODE_ACCESS_DENY;
+            }
+        }
+    }
+
+    // The following dictionary_word permissions seem redundant, but are there for when the paragraphs module checks
+    // host entity access. Without these, new paragraphs (word entries) will be disallowed for new, unsaved dictionary words.
+    if($type == 'dictionary_word') {
+        if($op == 'create') {
+            // First, check if there are any language communities.
+            $query = new EntityFieldQuery();
+            $query->entityCondition('entity_type', 'node')
+                ->entityCondition('bundle', 'language_community')
+                ->propertyCondition('status', NODE_PUBLISHED)
+                ->addMetaData('account', user_load(1));
+            $result = $query->execute();
+
+            // If there are no language communities, don't allow creation of new words.
+            if (empty($result['node'])) {
+                return NODE_ACCESS_DENY;
+            }
+        }
+
+        $groups = og_get_groups_by_user(NULL, 'node');
+        if(!empty($groups)) {
+            foreach($groups as $group) {
+                $og_node = node_load($group);
+                if($og_node->type == 'language_community') {
+                    if($op == 'create' && og_user_access('node', $group, 'create dictionary_word content')) {
+                        if(!isset($node->nid) && isset($node->uid) && $node->uid == $user->uid) {
+                            return NODE_ACCESS_ALLOW;
+                        }
+                    }
+
+                    if($op == 'update' && og_user_access('node', $group, 'update own dictionary_word content') && $node->uid == $user->uid) {
+                        return NODE_ACCESS_ALLOW;
+                    }
+
+                    if($op == 'update' && og_user_access('node', $group, 'update any dictionary_word content')) {
+                        return NODE_ACCESS_ALLOW;
+                    }
+                }
+            }
+        }
+    }
+
+    return NODE_ACCESS_IGNORE;
+}
+
+/**
+ * Implements hook_node_validate.
+ */
+function ma_dictionary_node_validate($node, $form, &$form_state) {
+    if($node->type == 'dictionary_word') {
+        $user_language_communities = _ma_dictionary_get_user_language_communities();
+        $new_word_language = $node->field_dictionary_word_language[LANGUAGE_NONE][0]['tid'];
+
+        $access = FALSE;
+        // Look for the selected language in the list of the user's language community memberships
+        foreach($user_language_communities as $language => $roles) {
+            if($language == $new_word_language) {
+                $access = TRUE;
+            }
+        }
+
+        if(!$access) {
+            form_set_error('word_language', t('You must be a member of the language community.'));
+        }
+    }
+}
+
+function ma_dictionary_node_prepare($node) {
+    if($node->type == 'dictionary_word') {
+        if(empty($node->field_word_entry)) {
+            // Start with an empty word entry form for any new dictionary word
+            // It's the only bundle type, we don't want the user to have to click a button needlessly
+            $paragraph = new ParagraphsItemEntity(array('field_name' => 'field_word_entry', 'bundle' => 'dictionary_word_bundle'));
+            $paragraph->is_new = TRUE;
+            $paragraph->setHostEntity('node', $node);
+            $paragraph->field_source = array();
+            $paragraph->field_translation = array();
+            $paragraph->field_pronunciation = array();
+            $paragraph->field_dictionary_word_recording = array();
+            $paragraph->field_definition = array();
+            $paragraph->field_part_of_speech = array();
+        }
+    }
+}
+
+/**
+ * Implements hook_node_presave.
+ */
+function ma_dictionary_node_presave($node) {
+  if ($node->type != 'dictionary_word') {
+    return;
+  }
+
+  // We always want the dictionary word's language community to be set to the
+  // language community that has the corresponding related language taxonomy term.
+  // Language community is a hidden field.
+  if (isset($node->field_dictionary_word_language[LANGUAGE_NONE])) {
+    $lang_nid = _ma_dictionary_get_language_community_from_tid($node->field_dictionary_word_language[LANGUAGE_NONE][0]['tid']);
+    if ($lang_nid) {
+      $node->field_language_community['und'][0]['target_id'] = $lang_nid;
+    }
+  }
+
+  // Aggregate media from paragraphs into media assets field.
+  // This is for search facets/previews.
+  $node->field_media_asset[LANGUAGE_NONE] = _ma_dictionary_get_media_assets($node);
+}
+
+/**
+ * Implements hook_feeds_processor_targets_alter().
+ */
+function ma_dictionary_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
+    if($entity_type == 'node' && $bundle_name == 'word_list') {
+        $targets['field_words:guid_or_nid'] = array(
+            'name' => t('Dictionary Words (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The field instance Words of field_words matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_importexport_set_target',
+            'real_target' => 'field_words',
+        );
+    }
+
+    if($entity_type == 'node' && $bundle_name == 'dictionary_word') {
+        $targets['field_related_dictionary_words:guid_or_nid'] = array(
+            'name' => t('Related Dictionary Words (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The field instance Related Dictionary Words of field_related_dictionary_words matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_importexport_set_target',
+            'real_target' => 'field_related_dictionary_words',
+        );
+        $targets['field_dictionary_word_related_dh:guid_or_nid'] = array(
+            'name' => t('Related Digital Heritage Items (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The field instance Related Digital Heritage Items of field_dictionary_word_related_dh matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_importexport_set_target',
+            'real_target' => 'field_dictionary_word_related_dh',
+        );
+        $targets['field_word_list:guid_or_nid'] = array(
+            'name' => t('Word List (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The field instance Word List of field_word_list matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_importexport_set_target',
+            'real_target' => 'field_word_list',
+        );
+        $targets['og_group_ref:guid_or_nid'] = array(
+            'name' => t('Protocol (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The field instance Protocol of og_group_ref matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_importexport_set_target',
+            'real_target' => 'og_group_ref',
+        );
+
+        // Word entry/paragraph fields
+        $targets['field_alternate_spelling'] = array(
+            'name' => t('Alternate Spelling for the first word entry (field_alternate_spelling)'),
+            'description' => t('The field instance Alternate Spelling of field_alternate_spelling for the first word entry.'),
+            'callback' => 'ma_dictionary_set_target',
+            'real_target' => 'field_alternate_spelling',
+        );
+        $targets['field_source'] = array(
+            'name' => t('Source for the first word entry (field_source)'),
+            'description' => t('The field instance Source of field_source for the first word entry.'),
+            'callback' => 'ma_dictionary_set_target',
+            'real_target' => 'field_source',
+        );
+        $targets['field_translation'] = array(
+            'name' => t('Translation for the first word entry (field_translation)'),
+            'description' => t('The field instance Translation of field_translation for the first word entry.'),
+            'callback' => 'ma_dictionary_set_target',
+            'real_target' => 'field_translation',
+        );
+        $targets['field_definition'] = array(
+            'name' => t('Definition for the first word entry (field_definition)'),
+            'description' => t('The field instance Definition of field_definition for the first word entry.'),
+            'callback' => 'ma_dictionary_set_target',
+            'real_target' => 'field_definition',
+        );
+        $targets['field_pronunciation'] = array(
+            'name' => t('Pronunciation for the first word entry (field_pronunciation)'),
+            'description' => t('The field instance Pronunciation of field_pronunciation for the first word entry.'),
+            'callback' => 'ma_dictionary_set_target',
+            'real_target' => 'field_pronunciation',
+        );
+        $targets['field_sample_sentence'] = array(
+            'name' => t('Sample sentences for the first word entry (field_sample_sentence)'),
+            'description' => t('The field instance Sample Sentences of field_sample_sentence for the first word entry.'),
+            'callback' => 'ma_dictionary_set_target',
+            'real_target' => 'field_sample_sentence',
+        );
+        $targets['field_part_of_speech'] = array(
+            'name' => t('Part of speech for the first word entry (field_part_of_speech)'),
+            'description' => t('The field instance Part of Speech of field_part_of_speech for the first word entry.'),
+            'callback' => 'ma_dictionary_set_target',
+            'real_target' => 'field_part_of_speech',
+        );
+        $targets['field_dictionary_word_recording'] = array(
+            'name' => t('Recordings for the first word entry (field_dictionary_word_recording)'),
+            'description' => t('The field instance Recording of field_dictionary_word_recording for the first word entry.'),
+            'callback' => 'ma_dictionary_set_target',
+            'real_target' => 'field_dictionary_word_recording',
+        );
+    }
+
+    if($entity_type == 'paragraphs_item' && $bundle_name == 'dictionary_word_bundle') {
+        $targets['item_id:guid_or_nid'] = array(
+            'name' => t('Parent Dictionary Word (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The parent Dictionary Word of item_id matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_dictionary_paragraph_set_target',
+            'real_target' => 'item_id',
+        );
+    }
+}
+
+/**
+ * Implements hook_feeds_presave().
+ */
+function ma_dictionary_feeds_presave(FeedsSource $source, $entity, $item) {
+    $scald_dnd_enabled_fields = ma_importexport_get_scald_dnd_enabled_fields();
+    if (isset($entity->type) && $entity->type == 'dictionary_word') {
+        // Replace embedded Scald atom GUIDs with local SIDs
+        if(isset($scald_dnd_enabled_fields[$entity->type])) {
+            foreach($scald_dnd_enabled_fields[$entity->type] as $field) {
+                if(!empty($entity->{$field})) {
+                    foreach($entity->{$field}[LANGUAGE_NONE] as $key => $field_value) {
+                        $entity->{$field}[LANGUAGE_NONE][$key]['value'] = ma_importexport_scald_dnd_decode($field_value['value']);
+                    }
+                }
+            }
+        }
+    }
+
+    if(isset($entity->bundle) && $entity->bundle == 'dictionary_word_bundle') {
+        if(isset($entity->feeds_item->entity_id) && $entity->feeds_item->entity_id > 0) {
+            $entity->item_id = $entity->feeds_item->entity_id;
+        }
+    }
+}
+
+
+function ma_dictionary_paragraph_set_target($source, $entity, $target, $value, $mapping)
+{
+    $new_target = str_replace(':guid_or_nid', '', $target);
+
+    foreach($value as $id) {
+        if($id) {
+            // Check if ID is a valid GUID.  If so, we use that.
+            $nid = ma_importexport_feeds_lookup_node_by_guid($id);
+            if(!$nid) {
+                // Otherwise we assume ID is a NID
+                $nid = $id;
+            }
+            $node = node_load($nid);
+            if($node) {
+                // If the node is not a dictionary word, skip
+                if($node->type != 'dictionary_word') {
+                    $entity->feeds_item->skip = TRUE;
+                    drupal_set_message(t('Dictionary word entry referenced a non dictionary word @id', array('@id' => $value)));
+                }
+
+                // We only want one reference per word entry. If the word entry is already referenced by another word, skip it
+                // Only old entries could be previously referenced
+                if(!$entity->feeds_item->is_new) {
+                    $word_nodes = ma_dictionary_words_with_entry($entity->feeds_item->entity_id);
+
+                    if(count($word_nodes) > 1 || (count($word_nodes) == 1 && $word_nodes[0] != $node->nid)) {
+                        $entity->feeds_item->skip = TRUE;
+                        drupal_set_message(t('Dictionary word entry is already referenced by dictionary word @id', array('@id' => $word_nodes[0])));
+                    }
+                } else {
+                    $entity->field_name = "field_word_entry";
+                    $entity->setHostEntity('node', $node);
+                }
+            } else {
+                $entity->feeds_item->skip = TRUE;
+                drupal_set_message(t('Dictionary word @id could not be found', array('@id' => $value)));
+            }
+        }
+    }
+}
+
+/**
+ * Callback for ma_dictionary_feeds_processor_targets_alter
+ */
+function ma_dictionary_set_target($source, $entity, $target, $value, $mapping)
+{
+    // Load the first word entry.
+    $first_word_entry = NULL;
+    $save_paragraph = FALSE;
+
+    // If this is an existing item, it will already have a word entry, so reuse that
+    if(isset($entity->field_word_entry[LANGUAGE_NONE][0]['value'])) {
+        $first_word_entry = entity_load_single('paragraphs_item', $entity->field_word_entry[LANGUAGE_NONE][0]['value']);
+        $save_paragraph = TRUE;
+    }
+
+    // If not, Drupal will have created us an empty word entry, so we just need to fill in the values
+    if($first_word_entry == NULL) {
+        $first_word_entry = $entity->field_word_entry[LANGUAGE_NONE][0]['entity'];
+
+        // For brand new words, we can safely exit now on empty values
+        if(empty($value) || empty($value[0])) {
+            return;
+        }
+    }
+
+    $first_word_entry_wrapper = entity_metadata_wrapper('paragraphs_item', $first_word_entry);
+
+    switch ($target) {
+        // Simple text fields, single value
+    case 'field_alternate_spelling':
+    case 'field_source':
+        $first_word_entry_wrapper->{$target}->set($value[0]);
+        break;
+    case 'field_translation':
+        $first_word_entry_wrapper->{$target}->set(ma_importexport_scald_dnd_decode($value[0]));
+        break;
+        // Long text fields, single value
+    case 'field_pronunciation':
+        $first_word_entry_wrapper->{$target}->format = 'filtered_html';
+        $first_word_entry_wrapper->{$target}->value = $value[0];
+        break;
+    case 'field_definition':
+        $first_word_entry_wrapper->{$target}->set(ma_importexport_scald_dnd_decode($value[0]));
+        break;
+        // Multi-value text
+    case 'field_sample_sentence':
+        $i = 0;
+        foreach($value as $v) {
+            if(!empty($v)) {
+                $first_word_entry_wrapper->{$target}[$i++] = ma_importexport_scald_dnd_decode($v);
+            }
+        }
+        break;
+    case 'field_part_of_speech':
+        $i = 0;
+        foreach($value as $part_of_speech) {
+            if(!empty($part_of_speech)) {
+                $part_of_speech_term = ma_core_get_create_tax_term($part_of_speech, 'part_of_speech');
+                if($part_of_speech_term) {
+                    $first_word_entry_wrapper->{$target}[$i++] = $part_of_speech_term->tid;
+                }
+            }
+        }
+        break;
+    case 'field_dictionary_word_recording':
+        $i = 0;
+        foreach($value as $audio_atom) {
+            // Try Recording as a GUID first
+            $sid = ma_importexport_feeds_lookup_atom_by_guid($audio_atom);
+            if(!empty($sid) && is_numeric($sid)) {
+                $atom = scald_atom_load($sid);
+            }
+
+            // If using Recording as a GUID didn't work, try it as an atom SID
+            if(!$atom) {
+                $atom = scald_atom_load($audio_atom);
+            }
+
+            // If we found a valid atom, use it as the recording
+            if(!empty($atom) && $atom->sid > 0 && $atom->type == 'audio') {
+                $first_word_entry_wrapper->{$target}[$i++] = $atom->sid;
+            }
+        }
+        break;
+    default:
+        break;
+    }
+
+    // We only need to save if this was an existing word entry. New word entries will get saved with the host node.
+    if($save_paragraph) {
+        $first_word_entry->revision = TRUE;
+        $first_word_entry->save(TRUE);
+        $entity->field_word_entry['und'][0]['revision_id'] = $first_word_entry->revision_id;
+    }
+}
+
+
+function ma_dictionary_node_insert($node) {
+    if($node->type == 'language_community') {
+        if($node->is_new) {
+            // For newly created language communities, make the creator a language steward by default.
+            $rid = array_search ('language steward', og_roles('node', 'language_community', $node->nid));
+            og_role_grant('node', $node->nid, $node->uid, $rid);
+        }
+    }
+}
+
+function _ma_dictionary_flatten_reference_field($field, $lang = LANGUAGE_NONE) {
+    $result = array();
+
+    if(isset($field[$lang])) {
+        foreach($field[$lang] as $element) {
+            $result[] = $element['target_id'];
+        }
+    }
+
+    return $result;
+}
+
+// Helper function to return an array of roles a user has per language community
+function _ma_dictionary_get_user_language_communities($account = NULL) {
+    $user_language_communities = array();
+
+    if(empty($account)) {
+        global $user;
+        $account = $user;
+    }
+
+    $groups = og_get_groups_by_user($account, 'node');
+    foreach($groups as $group) {
+        $group_node = node_load($group);
+        if($group_node->type == 'language_community') {
+            $roles = og_get_user_roles('node', $group, $account->uid);
+            foreach($roles as $role) {
+                if($role == 'language contributor' || $role == 'language steward') {
+                    $user_language_communities[$group_node->field_community_language[LANGUAGE_NONE][0]['tid']][] = $role;
+                }
+            }
+        }
+    }
+
+    return $user_language_communities;
+}
+
+// Helper function to lookup language community nid from language taxonomy id
+function _ma_dictionary_get_language_community_from_tid($tid) {
+    if(is_numeric($tid) & $tid > 0) {
+        $query = new EntityFieldQuery();
+
+        $query->entityCondition('entity_type', 'node')
+            ->entityCondition('bundle', 'language_community')
+            ->fieldCondition('field_community_language', 'tid', $tid)
+            ->range(0,1);
+
+        $result = $query->execute();
+
+        if(isset($result['node'])) {
+            return array_keys($result['node'])[0];
+        }
+    }
+    return NULL;
+}
+
+// Alter the display of contributor taxonomy term pages to include dictionary nodes that reference the term.
+// TODO: This should be generalized for any taxonomy terms used in scald atoms
+function ma_dictionary_page_alter(&$page) {
+    if(isset($page['content']['system_main']['term_heading']['term']['#bundle'])) {
+        if($page['content']['system_main']['term_heading']['term']['#bundle'] == 'contributor') {
+            if(isset($page['content']['system_main']['term_heading']['term']['#term'])) {
+                $tid = $page['content']['system_main']['term_heading']['term']['#term']->tid;
+                $dictionary_nids = _ma_dictionary_taxonomy_select_nodes($tid);
+                $standard_nids = taxonomy_select_nodes($tid, TRUE);
+
+                $all_nids = array_merge($standard_nids,$dictionary_nids);
+                $all_nids = array_unique($all_nids);
+
+                $term = taxonomy_term_load($tid);
+
+                // Some of this is copied from taxonomy_term_page
+                $build['term_heading'] = array(
+                    '#prefix' => '<div class="term-listing-heading">',
+                    '#suffix' => '</div>',
+                    'term' => taxonomy_term_view($term, 'full'),
+                );
+
+                if(!empty($all_nids)) {
+                    $nodes = node_load_multiple($all_nids);
+                    $build += node_view_multiple($nodes);
+                    $build['pager'] = array(
+                        '#theme' => 'pager',
+                        '#weight' => 5,
+                    );
+                }
+                else {
+                    $build['no_content'] = array(
+                        '#prefix' => '<p>',
+                        '#markup' => t('There is currently no content classified with this term.'),
+                        '#suffix' => '</p>',
+                    );
+                }
+
+                $page['content']['system_main'] = $build;
+            }
+        }
+    }
+
+}
+
+
+/**
+ * Implement scald_index_node_atoms to index scald atoms that are within paragraphs, that are within nodes
+ */
+function ma_dictionary_scald_index_node_atoms_alter($node, &$sid_all) {
+    $atom_ref_fields = array('field_dictionary_word_recording');
+
+    $dnd_fields = array('field_translation',
+                        'field_pronunciation',
+                        'field_definition',
+                        'field_sample_sentence',);
+
+
+    // Scald index doesn't index paragraphs in nodes, so we'll search the dictionary word's
+    // paragraphs and add the scald atoms to the list
+    if($node->type == 'dictionary_word') {
+        if(!empty($node->field_word_entry) && isset($node->field_word_entry[LANGUAGE_NONE])) {
+            foreach($node->field_word_entry[LANGUAGE_NONE] as $word_entry) {
+                $word_entry_paragraph = entity_load_single('paragraphs_item', $word_entry['value']);
+                if($word_entry_paragraph) {
+
+                    // Check atom reference fields
+                    foreach($atom_ref_fields as $atom_ref_field) {
+                        if(!empty($word_entry_paragraph->{$atom_ref_field}) && isset($word_entry_paragraph->{$atom_ref_field}[LANGUAGE_NONE])) {
+                            foreach($word_entry_paragraph->{$atom_ref_field}[LANGUAGE_NONE] as $atom_ref_atom) {
+                                if(!in_array($atom_ref_atom['sid'], $sid_all)) {
+                                    $sid_all[$atom_ref_atom['sid']]['sid'] = $atom_ref_atom['sid'];
+                                    $sid_all[$atom_ref_atom['sid']]['field_name'] = 'field_word_entry';
+                                }
+                            }
+
+                        }
+                    }
+
+                    // Check DND enabled fields
+                    $scald_pattern = '/\[scald=(\d+):/';
+
+                    foreach($dnd_fields as $dnd_field) {
+                        if(!empty($word_entry_paragraph->{$dnd_field}) && isset($word_entry_paragraph->{$dnd_field}[LANGUAGE_NONE])) {
+                            foreach($word_entry_paragraph->{$dnd_field}[LANGUAGE_NONE] as $dnd_text) {
+                                preg_match_all($scald_pattern, $dnd_text['value'], $matches);
+                                if(!empty($matches) && count($matches) > 1) {
+                                    foreach($matches[1] as $sid) {
+                                        if(!in_array($sid, $sid_all)) {
+                                            $sid_all[$sid]['sid'] = $sid;
+                                            $sid_all[$sid]['field_name'] = 'field_word_entry';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+// For a given taxonomy id, find all the scald atoms that reference that contributor
+function _ma_dictionary_taxonomy_select_nodes($tid) {
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'scald_atom')
+        ->fieldCondition('field_contributor', 'tid', $tid)
+        ->range(0, 10)
+        ->addMetaData('account', user_load(1));
+    $result = $query->execute();
+
+    $nids = array();
+    if(!empty($result) && isset($result['scald_atom'])) {
+        foreach($result['scald_atom'] as $atom) {
+            $nodes = scald_index_get_nodes($atom->sid);
+            if(!empty($nodes)) {
+                foreach($nodes as $node) {
+                    $nids[] = $node;
+                }
+            }
+        }
+    }
+
+    return $nids;
+}
+
+/**
+ *  Lookup paragraph id from guid
+ */
+function ma_dictionary_lookup_paragraph_by_guid($guid) {
+  return db_select('feeds_item')
+    ->fields('feeds_item', array('entity_id'))
+    ->condition('entity_type', 'paragraphs_item')
+    ->condition('guid', $guid)
+    ->execute()
+    ->fetchField();
+}
+
+/**
+ * Lookup nodes that have a given dictionary word entry by paragraph id
+ */
+function ma_dictionary_words_with_entry($pid) {
+    $query = new EntityFieldQuery();
+
+    $query->entityCondition('entity_type', 'node')
+        ->entityCondition('bundle', 'dictionary_word')
+        ->fieldCondition('field_word_entry', 'value', $pid)
+        ->range(0,10);
+
+    $result = $query->execute();
+
+    if(isset($result['node'])) {
+        return array_keys($result['node']);
+    }
+    return array();
+}
+
+// Checks if a language community is still being referenced
+function ma_dictionary_language_community_referenced($node) {
+    if(!isset($node->nid)) {
+        return FALSE;
+    }
+
+    $query = new EntityFieldQuery();
+
+    $query->entityCondition('entity_type', 'node')
+        ->entityCondition('bundle', 'dictionary_word')
+        ->fieldCondition('field_language_community', 'target_id', $node->nid)
+        ->range(0,10);
+
+    $result = $query->execute();
+
+    if(isset($result['node'])) {
+        return count($result['node']) > 0;
+    }
+
+    return FALSE;
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function ma_dictionary_form_alter(&$form, &$form_state, $form_id) {
+
+  // Modifications to the sort order definition form.
+  if ($form_id == 'eck__entity__form_edit_alphabetical_order_definition_alphabetical_order_definition' OR $form_id == 'eck__entity__form_add_alphabetical_order_definition_alphabetical_order_definition') {
+
+    // Custom description prefix, including the status of the PHP Intl ext.
+    $description = '<p>If the language(s) used in the dictionary contain custom or accented characters, you may want to customize its alphabetization rules, to affect both the sorting of the words in the dictionary, and the sorting of the letters in the title letter grid filter. There are two ways to do this. The simpler way is to install the PHP Internationalization (Intl) extension on this site\'s server, then choose the language which most closely matches the dictionary language (or try the English default). This will usually produce satisfactory results. If however this is insufficient for your needs, or if your web host or server administrator is unable to enable the PHP Intl extension, then you can select "User-defined sort" to define a custom alphabetical order.</p><p>If this site does not use any custom or accented characters, no action is required.</p>';
+    $description .= "<p><b>Status of PHP Intl extension: ";
+    $intl_status = 'disabled';
+    if (extension_loaded('intl')) {
+      $intl_status = 'enabled';
+    }
+    else {
+      $form['field_aod_language']['#access']= FALSE; // To prevent function not found error.
+    }
+    $description .= $intl_status . '</b></p>';
+    $form['#prefix'] = $description;
+
+    // Set the default language to English. Setting in the field config can miss this depending on how the user got here.
+    if (!$form['field_aod_language'][LANGUAGE_NONE]['#default_value']) {
+      $form['field_aod_language'][LANGUAGE_NONE]['#default_value'] = 'en';
+    }
+
+    // Hide the URL redirect field.
+    $form['redirect']['#access'] = FALSE;
+  }
+}
+
+/**
+ * Implements hook_entity_presave().
+ */
+function ma_dictionary_entity_presave($entity, $type) {
+
+  // Set the AOD properties to variables to reduce processing later.
+  if ($type == 'alphabetical_order_definition') {
+
+    // Custom sorting vars
+    if ($entity->field_aod_active['und'][0]['value']) {
+      // For the custom order, add both cases.
+      $custom_order_both_cases = array();
+      foreach ($entity->field_aod_character['und'] as $character) {
+        $character = $character['value'];
+        if (!ctype_space($character)) {
+          $custom_order_both_cases[] = mb_strtoupper($character);
+          $custom_order_both_cases[] = mb_strtolower($character);
+        }
+      }
+      $custom_order_both_cases = array_unique ($custom_order_both_cases);
+      variable_set('mukurtu_aod_sort_order', $custom_order_both_cases);
+      variable_del('mukurtu_aod_language');
+    }
+    else {
+      if (isset($entity->field_aod_language[0]['value'])) {
+        $language = $entity->field_aod_language[LANGUAGE_NONE][0]['value'];
+      }
+      variable_set('mukurtu_aod_language', $language);
+      variable_del('mukurtu_aod_sort_order');
+    }
+
+    // Padding var
+    if (isset($entity->field_aod_letter_padding['und'][0]['value'])) {
+      variable_set('field_aod_letter_padding', $entity->field_aod_letter_padding['und'][0]['value']);
+    }
+
+
+  }
+}
+
+/**
+ * Custom/accented character sorting, called by patched search_api_glossary.module.
+ */
+function ma_dictionary_glossary_sort ($a_value, $b_value) {
+
+  // If there is a custom order, use that.
+  if ($custom_order = variable_get('mukurtu_aod_sort_order')) {
+
+    $a_value_order = array_search(mb_strtolower($a_value), $custom_order);
+    $b_value_order = array_search(mb_strtolower($b_value), $custom_order);
+    if ($a_value && $a_value_order === FALSE) {
+      $_SESSION['glossary_missing_chars'][] = $a_value;
+    }
+    if ($b_value && $b_value_order === FALSE) {
+      $_SESSION['glossary_missing_chars'][] = $b_value;
+    }
+    return ($a_value_order < $b_value_order) ? -1 : 1;
+  }
+
+  // There is no custom order. Check if PHP Intl extension is enabled, and use that.
+  elseif (extension_loaded('intl')) {
+    $locale = variable_get('mukurtu_aod_language', 'en'); // Use English if this was never set.
+    $coll = collator_create($locale);
+    return collator_compare($coll, $a_value, $b_value );
+  }
+
+  // There is no custom order or PHP Intl extension, but there are special characters, so warn admins.
+  else {
+    $_SESSION['glossary_special_chars_no_sort_def'][] = 1;
+  }
+
+}
+
+/**
+ * Implements hook_page_build.
+ */
+function ma_dictionary_page_build(&$page) {
+
+  // Inform admin users of any problems with custom characters.
+  if (current_path() == 'dictionary') {
+    $mukurtu_admin = user_role_load_by_name('Mukurtu Administrator');
+    $drupal_admin = user_role_load_by_name('administrator');
+    if (user_has_role($mukurtu_admin->rid) || user_has_role($drupal_admin->rid)) {
+
+      // Missing characters from a custom sort.
+      if (isset($_SESSION['glossary_missing_chars'])) {
+        $missing_chars = array_unique($_SESSION['glossary_missing_chars']);
+        sort($missing_chars);
+        drupal_set_message("The following characters need to be defined in the " . l('custom sort order', ma_dictionary_get_aod_add_edit_path(), array('query' => drupal_get_destination())) . " in order to sort correctly: " . implode(', ', $missing_chars));
+        unset($_SESSION['glossary_missing_chars']);
+      }
+
+      // Need a custom sort or PHP Intl enabled.
+      elseif (isset($_SESSION['glossary_special_chars_no_sort_def'])) {
+        drupal_set_message('The dictionary language has custom or accented characters in it which may cause poor alphabetical sorting of the words in the list and letters in the Title filter. To resolve, configure ' . l ('this Dashboard option', ma_dictionary_get_aod_add_edit_path(), array('query' => drupal_get_destination())) . '.');
+        unset($_SESSION['glossary_special_chars_no_sort_def']);
+      }
+    }
+  }
+}
+
+/**
+ * Get AOD add/edit path.
+ */
+function ma_dictionary_get_aod_add_edit_path() {
+  $aodes = entity_load('alphabetical_order_definition');
+  if (count($aodes)) {
+    $aode = end($aodes); // There should normally be only one AOD entity, but in case there are more, use the most recent one.
+    $aod_path_end = $aode->id . '/edit';
+  }
+  else {
+    $aod_path_end =  'add';
+  }
+  return 'admin/structure/entity-type/alphabetical_order_definition/alphabetical_order_definition/' . $aod_path_end;
+}
+
+/**
+ * Provides list options for field_aod_language().
+ */
+function ma_dictionary_collation_locale_options() {
+  if (extension_loaded('intl')) {
+    $locales = ResourceBundle::getLocales('');
+    $options = [];
+    foreach ($locales as $locale) {
+      $language = locale_get_display_language($locale);
+      $region = locale_get_display_region($locale);
+      $options [$locale] = $language;
+      if ($region) {
+        $options[$locale] .= ' (' . $region . ')';
+      }
+    }
+    return $options;
+  }
+}
+
+/**
+ * Custom re-sorting of search results, called by hacked search_api_db service postQuery.
+ */
+function ma_dictionary_resort_search_results (&$results, $sort_direction) {
+
+  // Modify the dictionary search results according to the custom sort.
+
+  if (count($results['results']) == 0) {
+    return;
+  }
+
+  if ($custom_order = variable_get('mukurtu_aod_sort_order')) {
+  }
+  elseif (extension_loaded('intl')) {
+    $locale = variable_get('mukurtu_aod_language', 'en'); // Use English if this was never set.
+    $coll = collator_create($locale);
+  }
+  if (isset($custom_order) OR isset($locale)) {
+
+    // Use the efq_extra_field extended entity query to grab the node title in an EFQ.
+    // This is much quicker than node_load_multiple on all the NIDs.
+    // TODO: now that this is in place, we can custom sort DH items with probably minimal impact.
+    $query = new EntityFieldQueryExtraFields();
+    $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'dictionary_word')
+      ->propertyCondition('status', NODE_PUBLISHED)
+      ->entityCondition('entity_id', array_keys($results['results']), 'IN')
+      ->addExtraField('', 'title', 'title', 'node');
+    $words_result = $query->execute();
+    if (count($words_result['node'])) {
+      // Build a list of words to sort.
+      $sort_list = [];
+      foreach ($words_result['node'] as $word_result) {
+        $sort_list[$word_result->nid] = $word_result->extraFields->title;
+      }
+
+      // We have the words. Now sort them.
+
+      // Use custom sort
+      if (isset($custom_order)) {
+        uasort($sort_list, 'compare_keys_by_alphabet');
+      }
+      // Use PHP Intl collation.
+      else {
+        collator_asort($coll, $sort_list);
+      }
+
+      // The words are now sorted. Now modify the results.
+      $sorted_results = [];
+      foreach ($sort_list as $sort_list_item_nid => $sort_list_item) {
+        $sorted_results[$sort_list_item_nid] = $results['results'][$sort_list_item_nid];
+      }
+      if ($sort_direction == 'ASC') {
+        $results['results'] = $sorted_results;
+      }
+      else {
+        $results['results'] = array_reverse($sorted_results, TRUE);
+      }
+    }
+  }
+}
+
+/**
+ * uasort function to sort an array by a custom alphabetical order.
+ * Lifted, with minor mods, from https://stackoverflow.com/a/41602945/5128322.
+ */
+function compare_by_alphabet($alphabet, $str1, $str2) {
+  // $alphabet = "AaÀàÁáÂâÅåÃãÄäÆæBbCcÇçDdÐðEeÈèÉéÊêËëFfGgHhIiÌìÍíÎîÏïJjKkLlMmNnÑñOoÒòÓóÔôÕõÖöØøPpQqRrSsßŠšTtUuÙùÚúÛûÜüVvWwXxYyŸÿÝýZzŽžÞþ0123456789";
+  $l1 = mb_strlen($str1);
+  $l2 = mb_strlen($str2);
+  $c = min($l1, $l2);
+  for ($i = 0; $i < $c; $i++)
+  {
+    $s1 = mb_substr($str1, $i, 1);
+    $s2 = mb_substr($str2, $i, 1);
+    if ($s1===$s2) continue;
+    $i1 = mb_strpos($alphabet, $s1);
+    if ($i1===false) {
+      $_SESSION['glossary_missing_chars'][] = $s1;
+      continue;
+    }
+    $i2 = mb_strpos($alphabet, $s2);
+    if ($i2===false) {
+      $_SESSION['glossary_missing_chars'][] = $s2;
+      continue;
+    }
+    if ($i2===$i1) continue;
+    if ($i1 < $i2) return -1;
+    else return 1;
+  }
+  if ($l1 < $l2) return -1;
+  elseif ($l1 > $l2) return 1;
+  return 0;
+}
+function compare_keys_by_alphabet($a, $b) {
+  $alphabet = variable_get('mukurtu_aod_sort_order');
+  $alphabet = implode('', $alphabet);
+  $result = compare_by_alphabet($alphabet, $a, $b);
+  return $result;
+}
+
+// Return the number of accessible words in a word list.
+function ma_dictionary_get_word_count($word_list) {
+  $item_count = 0;
+  $word_list_wrapper = entity_metadata_wrapper('node', $word_list);
+  $words = $word_list_wrapper->field_words->value();
+  if (count($words)) {
+      if (user_access('bypass content access control')) {
+          $item_count += count($words);
+      }
+      else {
+          foreach ($words as $word) {
+              if (node_access('view', $word)) {
+                  $item_count++;
+              }
+          }
+      }
+  }
+  return $item_count;
+}
+
+// Return all media assets from dictionary word paragraphs
+// that we want to consider for search facets and previews.
+function _ma_dictionary_get_media_assets($node) {
+  $media_assets = array();
+  if ($node->type != 'dictionary_word') {
+    return $media_assets;
+  }
+
+  // Check all word entries (paragraphs) for media assets.
+  if (!empty($node->field_word_entry[LANGUAGE_NONE])) {
+    foreach($node->field_word_entry[LANGUAGE_NONE] as $word_entry) {
+      $word = entity_load_single('paragraphs_item', $word_entry['value']);
+
+      // Check word entry recordings.
+      if (!empty($word->field_dictionary_word_recording[LANGUAGE_NONE])) {
+        foreach($word->field_dictionary_word_recording[LANGUAGE_NONE] as $recording) {
+          $media_assets[$recording['sid']] = $recording;
+        }
+      }
+    }
+  }
+
+  return array_values($media_assets);
+}

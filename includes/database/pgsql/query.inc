@@ -30,7 +30,7 @@ class InsertQuery_pgsql extends InsertQuery {
       foreach ($this->insertFields as $idx => $field) {
         if (isset($table_information->blob_fields[$field])) {
           $blobs[$blob_count] = fopen('php://memory', 'a');
-          fwrite($blobs[$blob_count], $insert_values[$idx]);
+          fwrite($blobs[$blob_count], (string) $insert_values[$idx]);
           rewind($blobs[$blob_count]);
 
           $stmt->bindParam(':db_insert_placeholder_' . $max_placeholder++, $blobs[$blob_count], PDO::PARAM_LOB);
@@ -120,7 +120,15 @@ class InsertQuery_pgsql extends InsertQuery {
 
     $max_placeholder = 0;
     $values = array();
-      if (count($this->insertValues)) {
+    if (!is_array($this->insertValues)) {
+      if (version_compare(PHP_VERSION, '7.4', '>=')) {
+        throw new UnexpectedValueException();
+      }
+      else {
+        drupal_trigger_fatal_error('Unexpected Value');
+      }
+    }
+    if (count($this->insertValues)) {
       foreach ($this->insertValues as $insert_values) {
         $placeholders = array();
 
@@ -182,7 +190,7 @@ class UpdateQuery_pgsql extends UpdateQuery {
 
       if (isset($table_information->blob_fields[$field])) {
         $blobs[$blob_count] = fopen('php://memory', 'a');
-        fwrite($blobs[$blob_count], $value);
+        fwrite($blobs[$blob_count], (string) $value);
         rewind($blobs[$blob_count]);
         $stmt->bindParam($placeholder, $blobs[$blob_count], PDO::PARAM_LOB);
         ++$blob_count;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_core.features.menu_custom.inc
@@ -30,7 +31,6 @@ function ma_core_menu_default_menu_custom() {
   t('The Browse Menu is for viewing content.
 ');
   t('This menu shows for all users. It includes the "utility" buttons (login, logout, my account) and for all content curators and above, the content creation buttons.');
-
 
   return $menus;
 }

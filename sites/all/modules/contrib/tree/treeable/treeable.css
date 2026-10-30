@@ -1,0 +1,9 @@
+
+.treeable-form-item {
+  float: left;
+}
+
+.treeable-form-weight,
+.treeable-form-parent {
+  width: 0;
+}

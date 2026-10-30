@@ -42,44 +42,49 @@ function dnd_theme() {
 }
 
 /**
- * Implementation of hook_element_info_alter().
+ * Get the list of Scald contexts that can be used in a WYSIWYG, keyed by type.
  *
- * Add a process to all textareas.
+ * @return array
+ *   Returns an associative array, keyed by the atom type machine name and whose
+ *   values are associative arrays, each keyed by the context machine name and
+ *   whose values are the user facing name of this context for this atom type.
  */
-function dnd_element_info_alter(&$types) {
-  if (isset($types['textarea'])) {
-    $types['textarea']['#process'][] = 'dnd_process_textarea';
+function dnd_scald_wysiwyg_context_list() {
+  $contexts = &drupal_static(__FUNCTION__, NULL);
+  if (!isset($contexts)) {
+    $types = scald_types();
+    foreach (scald_contexts_public() as $name => $definition) {
+      if (empty($definition['parseable'])) {
+        continue;
+      }
+
+      // There "formats" is actually used nowhere in Scald. Every context is
+      // available to all atom types.
+      $definition['formats'] = $types;
+
+      foreach ($definition['formats'] as $type => $data) {
+        $contexts[$type][$name] = $definition['title'];
+      }
+    }
+    drupal_alter('scald_wysiwyg_context_list', $contexts);
   }
+
+  return $contexts;
 }
 
 /**
- * Settings array:
- * What should it take, if anything?  Probably a source * maybe editor specific configuration shit?
- *
- * - source for library json/ajax shit
- * - target selector
- * - item selector
- *
- * perhaps like so:
- *
- * global =>
- *   droppable targets
- *   library source for textarea
- *
- * tinymce/othereditor =>
- *   target selector logic
- *   configuration options
- *   callback should be smart about attachment and detachment
+ * Get the list of Scald contexts machine names that are allowed in WYSIWYG.
  */
-function dnd_process_textarea($element, $form_state) {
-  if (!empty($element['#dnd-enabled'])) {
-    $element['#attached']['library'][] = array('dnd', 'library');
-    $settings = (array) @$form_state['field'][$element['#field_name']][$element['#language']]['instance']['settings'];
-    $context_default = isset($settings['context_default']) ? $settings['context_default'] : variable_get('dnd_context_default', 'sdl_editor_representation');
-    $element['#attributes']['data-dnd-context'][] = $context_default;
+function dnd_scald_wysiwyg_context_slugs() {
+  $contexts_type = dnd_scald_wysiwyg_context_list();
+  $slugs = array();
+  foreach ($contexts_type as $contexts) {
+    foreach ($contexts as $slug => $label) {
+      $slugs[$slug] = $slug;
+    }
   }
 
-  return $element;
+  return array_values($slugs);
 }
 
 /**
@@ -87,22 +92,21 @@ function dnd_process_textarea($element, $form_state) {
  */
 function dnd_library() {
   $path = drupal_get_path('module', 'dnd');
-  $types = scald_types();
-  $contexts = array();
-  foreach (scald_contexts() as $name => $definition) {
-    if (!empty($definition['hidden']) || empty($definition['parseable'])) {
-      continue;
-    }
+  $contexts = dnd_scald_wysiwyg_context_list();
+  $config = array();
 
-    // There "formats" is actually used nowhere in Scald. Every context is
-    // available to all atom types.
-    $definition['formats'] = $types;
+  foreach (dnd_scald_wysiwyg_context_slugs() as $slug) {
+    $config[$slug] = scald_context_config_load($slug);
+  }
 
-    foreach ($definition['formats'] as $type => $data) {
-      $contexts[$type][$name] = $definition['title'];
+  $qtip_settings = '';
+  if (function_exists('qtip_fetch_instances_field')) {
+    $instance = variable_get('dnd_qtip_instance', '');
+    if (!empty($instance)) {
+      $qtip_settings = qtip_clean_settings(qtip_load($instance));
     }
   }
-  drupal_alter('scald_wysiwyg_context_list', $contexts);
+
   $libraries['library'] = array(
     'title' => 'DnD Library',
     'website' => 'http://drupal.org/project/scald',
@@ -113,13 +117,9 @@ function dnd_library() {
     'js' => array(
       // Drag and drop
       $path . '/js/dnd-library.js' => array(),
-      // javascript workaround for the continue button
+      // Javascript workaround for the continue button.
       $path . '/js/dnd-modal.js' => array(),
-      // This file is included automatically if the CKEditor plugin is enabled.
-      // However we need to load it directly in Drupal so that strings can be
-      // translated.
-      $path . '/plugins/ckeditor/lang/en.js' => array(),
-      // Settings for the library url
+      // Settings for the library url.
       array(
         'type' => 'setting',
         'data' => array(
@@ -127,12 +127,15 @@ function dnd_library() {
             'url' => url(dnd_get_library()),
             'contexts' => $contexts,
             'contextDefault' => variable_get('dnd_context_default', 'sdl_editor_representation'),
+            'usesCaptionDefault' => variable_get('dnd_uses_caption_default', TRUE),
+            'contexts_config' => $config,
+            'qTipSettings' => $qtip_settings,
           ),
         ),
       ),
     ),
     'css' => array(
-      // Contains the library theming
+      // Contains the library theming.
       $path . '/css/dnd-library.css' => array(
         'type' => 'file',
         'media' => 'screen',
@@ -140,8 +143,8 @@ function dnd_library() {
     ),
   );
 
-  // Add the qTip library as a dependency if it exists
-  if (module_exists('qtip')) {
+  // Add the qTip library as a dependency if it exists.
+  if (function_exists('qtip_library')) {
     $libraries['library']['dependencies'][] = array('qtip', 'qtip');
   }
 
@@ -234,26 +237,43 @@ function dnd_library_alter(&$libraries, $module) {
 }
 
 /**
- * Implements hook_edit_editor_attachments_alter().
+ * Implements hook_entity_view_alter().
+ *
+ * Adds the dnd library in case we have quickedit enabled and dnd enabled on the entity.
  */
-function dnd_edit_editor_attachments_alter(&$attachments, $editor, $metadata) {
-  // When Edit module uses CKEditor editor widget, add DnD library if necessary.
-  if ($editor == 'ckeditor') {
-    // If there is at least one field with CKEditor + DnD enabled, add the DnD
-    // library.
-    foreach ($metadata as $field => $data) {
-      if ($data['editor'] == 'ckeditor') {
-        list($entity_type, $entity_id, $field_name, $language, $view_mode) = explode('/', $field);
-        $entity = entity_load_single($entity_type, $entity_id);
-        list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
-        $instance_info = field_info_instance($entity_type, $field_name, $bundle);
-        if (!empty($instance_info['settings']['dnd_enabled'])) {
-          $attachments['library'][] = array('dnd', 'library');
-          return;
-        }
+function dnd_entity_view_alter(&$build, $type) {
+  if (!module_exists('quickedit')) {
+    return;
+  }
+
+  if (!user_access('access in-place editing')) {
+    return;
+  }
+
+  // In-place editing is only supported on the front-end.
+  if (path_is_admin(current_path())) {
+    return;
+  }
+
+  $dnd_enabled = FALSE;
+  foreach ($build as $item) {
+    if (!is_array($item)) {
+      continue;
+    }
+    if (isset($item['#field_name'])) {
+      $instance_info = field_info_instance($type, $item['#field_name'], $build['#bundle']);
+      if (!empty($instance_info['settings']['dnd_enabled'])) {
+        $dnd_enabled = TRUE;
+      }
+      if (isset($item['#field_type']) && $item['#field_type'] === 'atom_reference') {
+        $dnd_enabled = TRUE;
       }
     }
   }
+  if ($dnd_enabled) {
+    $build['#attached']['library'][] = array('dnd', 'library');
+  }
+  return;
 }
 
 /**
@@ -276,41 +296,6 @@ function dnd_suppress_library($set = TRUE) {
     drupal_add_js(array('dnd' => array('suppress' => 1)), 'setting');
   }
   return $suppress;
-}
-
-/**
- * Implements hook_wywiwyg_plugin().
- */
-function dnd_wysiwyg_plugin($editor, $version) {
-  $plugins = array();
-  switch ($editor) {
-    case 'ckeditor':
-      $plugins['dnd'] = array(
-        'path' => drupal_get_path('module', 'dnd') . '/plugins/ckeditor',
-        'filename' => 'plugin.js',
-        'buttons' => array(
-          'dnd' => t('Scald DnD integration'),
-        ),
-        'load' => TRUE,
-      );
-      break;
-  }
-
-  return $plugins;
-}
-
-/**
- * Implements hook_ckeditor_plugin().
- */
-function dnd_ckeditor_plugin() {
-  return array(
-    'dnd' => array(
-      'name' => 'dnd',
-      'desc' => t('Scald Drag and Drop integration'),
-      'path' =>  drupal_get_path('module', 'dnd') . '/plugins/ckeditor/',
-      'buttons' => array(),
-    ),
-  );
 }
 
 /**

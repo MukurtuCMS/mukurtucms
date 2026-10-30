@@ -82,14 +82,18 @@ class entity_views_plugin_row_entity_view extends views_plugin_row {
   /**
    * Overridden to return the entity object.
    */
-  function get_value($values, $field = NULL) {
+  public function get_value($values, $field = NULL) {
     return isset($this->entities[$this->view->row_index]) ? $this->entities[$this->view->row_index] : FALSE;
   }
 
   public function render($values) {
     if ($entity = $this->get_value($values)) {
+      // Add the view object as views_plugin_row_node_view::render() would.
+      // Otherwise the views theme suggestions won't work properly.
+      $entity->view = $this->view;
       $render = $this->rendered_content[entity_id($this->entity_type, $entity)];
       return drupal_render($render);
     }
   }
+
 }

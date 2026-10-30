@@ -1,0 +1,280 @@
+// Taxonomy Record, general
+.record-filter {
+    border-bottom: 5px solid @brand-primary;
+    .nav-pills {
+        li {
+            a {
+                border-radius: 0px;
+                font-weight: bold;
+                font-size: 16px;
+                padding-left: 40px;
+                padding-right: 40px;
+
+                &:hover {
+                    background-color: @mukurtu-navbar-default-link-hover-bg;
+                    color: #fff;
+                }
+            }
+
+            &.active {
+                .nav-bottom-triangle;
+            }
+        }
+    }
+}
+
+#quicktabs-container-mukurtu_records_quicktabs {
+    padding-top: 20px;
+}
+
+#quicktabs-mukurtu_records_quicktabs.quicktabs-wrapper.quicktabs-style-excel ul.quicktabs-tabs li.active::after {
+    margin-left: -15%;
+}
+
+.view-mode-taxonomy_record_teaser {
+    .field-name-title {
+        .chevron-right;
+        background-position: 95% 50%;
+
+        h2 {
+            margin-top: 0px;
+
+            a {
+                .font-light;
+                font-size: 24px;
+
+                // Desktop
+                @media (min-width: @screen-md-min) {
+                    font-size: 30px;
+                }
+            }
+        }
+    }
+
+    .field-name-field-media-asset {
+        img {
+            padding-top: 10px;
+        }
+    }
+
+    .field-name-field-summary {
+        padding-bottom: 20px;
+    }
+
+    .field {
+        font-size: 16px;
+        // Desktop
+        @media (min-width: @screen-md-min) {
+            font-size: 17px;
+        }
+
+        .label-inline {
+            display: inline;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .textformatter-list {
+            display: inline;
+        }
+
+        a {
+            font-size: 16px;
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                font-size: 17px;
+            }
+            .mukurtu-standard-link;
+        }
+    }
+}
+
+.node-person.view-mode-full {
+    .owl-carousel {
+        text-align: center;
+    }
+
+    .view-content {
+        padding-top: 20px;
+    }
+
+    .view-mukurtu-records-referenced-content {
+        .row {
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+            .view-border;
+        }
+    }
+
+    .metadata-sidebar {
+        padding-top: 30px;
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            padding-top: 0px;
+        }
+    }
+
+    .field-name-field-node-aggregate {
+        font-weight: bold;
+        font-size: 18px;
+        text-transform: uppercase;
+        letter-spacing: @mukurtu-expanded-letter-spacing;
+    }
+
+    .field-name-scald-thumbnail {
+        img {
+            margin: auto;
+        }
+    }
+
+    .field-name-field-related-people {
+        // No dividers
+        .field::after {
+            content : none;
+        }
+
+        .col-sm-12 {
+            padding: 0px 0px 0px 10px;
+        }
+
+        .field-name-field-related-person {
+            padding: 0px;
+        }
+
+        .field-name-field-relationship-type {
+            padding: 0px 0px 0px 5px;
+            margin-top: -10px;
+        }
+    }
+
+    .field-name-table-of-contents {
+        h3 {
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: @mukurtu-expanded-letter-spacing;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0px;
+
+            li {
+                .arrow-right;
+                padding-left: 20px;
+                background-position: center left;
+
+                a {
+                    .font-light;
+                    font-size: 22px;
+                }
+            }
+        }
+    }
+
+    // Left column and botttom only
+    .col-sm-8, .col-sm-12 {
+        .field {
+            .label-above {
+                .metadata-primary-field-label;
+            }
+        }
+    }
+}
+
+// Related people, tiny thumbnail image
+.node-person.view-mode-related_person_teaser {
+    .col-xs-3,
+    .col-xs-9,
+    .field {
+        padding: 0px;
+    }
+
+    .field-name-title {
+        padding-left: 20px;
+        margin-bottom: 10px;
+
+        h4 {
+            font-size: 16px;
+            font-weight: bold;
+        }
+    }
+
+    .field-name-field-media-asset {
+        padding-top: 10px;
+    }
+
+    // Hide extra images
+    .field-name-field-media-asset >div:not(:first-child) {
+        display: none;
+    }
+
+}
+
+
+.paragraphs-items-field-sections-full {
+    .paragraphs-item-text-section {
+        font-size: 16px;
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            font-size: 19px;
+        }
+
+        >div {
+            .col-sm-12 {
+                .section-accent-bar;
+                padding-bottom: 20px;
+            }
+        }
+    }
+
+    h3 {
+        font-family: @font-family-sans-serif-light;
+        font-size: 36px;
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            font-size: 44px;
+        }
+    }
+
+    h2 {
+        font-family: @font-family-sans-serif-light;
+        font-size: 30px;
+        padding-top: 6px;
+        padding-bottom: 12px;
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            font-size: 36px;
+        }
+    }
+
+    /*h3 {
+        font-weight: bold;
+        font-size: 20px;
+        padding-top: 6px;
+        padding-bottom: 12px;
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            font-size: 23px;
+        }
+    }*/
+
+    h4 {
+        font-weight: bold;
+        font-size: 18px;
+        padding-bottom: 12px;
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            font-size: 22px;
+        }
+    }
+
+    h5 {
+        font-weight: bold;
+        font-size: 16px;
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            font-size: 19px;
+        }
+    }
+}

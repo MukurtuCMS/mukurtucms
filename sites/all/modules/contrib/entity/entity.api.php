@@ -156,10 +156,10 @@
  *   In case the 'admin ui' is used, no callback needs to be specified.
  * - entity cache: (optional) Whether entities should be cached using the cache
  *   system. Requires the entitycache module to be installed and enabled and the
- *   module key to be specified. As cached entities are only retrieved by id key,
- *   the cache would not apply to exportable entities retrieved by name key.
- *   If enabled and the entitycache module is active, 'field cache' is obsolete
- *   and is automatically disabled. Defaults to FALSE.
+ *   module key to be specified. As cached entities are only retrieved by id
+ *   key, the cache would not apply to exportable entities retrieved by name
+ *   key. If enabled and the entitycache module is active, 'field cache' is
+ *   obsolete and is automatically disabled. Defaults to FALSE.
  *
  * @see hook_entity_info()
  * @see entity_metadata_hook_entity_info()
@@ -256,7 +256,7 @@ function entity_metadata_hook_entity_info() {
  * by entity_metadata_wrapper().
  * For providing property information for fields see entity_hook_field_info().
  *
- * @return
+ * @return array
  *   An array whose keys are entity type names and whose values are arrays
  *   containing the keys:
  *   - properties: The array describing all properties for this entity. Entries
@@ -380,9 +380,9 @@ function entity_metadata_hook_entity_info() {
  *     with an array of info about the bundle specific properties, structured in
  *     the same way as the entity properties array.
  *
- *  @see hook_entity_property_info_alter()
- *  @see entity_get_property_info()
- *  @see entity_metadata_wrapper()
+ * @see hook_entity_property_info_alter()
+ * @see entity_get_property_info()
+ * @see entity_metadata_wrapper()
  */
 function hook_entity_property_info() {
   $info = array();
@@ -460,6 +460,96 @@ function entity_hook_field_info() {
 function hook_entity_views_field_handlers_alter(array &$field_handlers) {
   $field_handlers['duration'] = 'example_duration_handler';
   $field_handlers['node'] = 'example_node_handler';
+}
+
+/**
+ * Act after default entities have been rebuilt.
+ *
+ * This hook is invoked after default entities have been fully saved to the
+ * database, but with the lock still active.
+ *
+ * @param array $entities
+ *   An array of the entities that have been saved, keyed by name.
+ * @param array $originals
+ *   An array of the original copies of the entities that have been saved,
+ *   keyed by name.
+ *
+ * @see _entity_defaults_rebuild()
+ */
+function hook_ENTITY_TYPE_defaults_rebuild($entities, $originals) {
+
+}
+
+/**
+ * Act on an entity before it is about to be created or updated.
+ *
+ * @param $entity
+ *   The entity object.
+ *
+ * @see hook_entity_presave()
+ */
+function hook_ENTITY_TYPE_presave($entity) {
+  $entity->changed = REQUEST_TIME;
+}
+
+/**
+ * Act on entities when inserted.
+ *
+ * @param $entity
+ *   The entity object.
+ *
+ * @see hook_entity_insert()
+ */
+function hook_ENTITY_TYPE_insert($entity) {
+  // Insert the new entity into a fictional table of all entities.
+  list($id) = entity_extract_ids($type, $entity);
+  db_insert('example_entity')
+    ->fields(array(
+      'type' => $type,
+      'id' => $id,
+      'created' => REQUEST_TIME,
+      'updated' => REQUEST_TIME,
+    ))
+    ->execute();
+}
+
+/**
+ * Act on entities when updated.
+ *
+ * @param $entity
+ *   The entity object.
+ *
+ * @see hook_entity_update()
+ */
+function hook_ENTITY_TYPE_update($entity) {
+  // Update the entity's entry in a fictional table of all entities.
+  $info = entity_get_info($type);
+  list($id) = entity_extract_ids($type, $entity);
+  db_update('example_entity')
+    ->fields(array(
+      'updated' => REQUEST_TIME,
+    ))
+    ->condition('type', $type)
+    ->condition('id', $id)
+    ->execute();
+}
+
+/**
+ * Act on entities when deleted.
+ *
+ * @param $entity
+ *   The entity object.
+ *
+ * @see hook_entity_delete()
+ */
+function hook_ENTITY_TYPE_delete($entity) {
+  // Delete the entity's entry from a fictional table of all entities.
+  $info = entity_get_info($type);
+  list($id) = entity_extract_ids($type, $entity);
+  db_delete('example_entity')
+    ->condition('type', $type)
+    ->condition('id', $id)
+    ->execute();
 }
 
 /**

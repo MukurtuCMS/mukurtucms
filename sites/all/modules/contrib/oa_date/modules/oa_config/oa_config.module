@@ -1,0 +1,20 @@
+<?php
+/**
+ * @file
+ * Code for the oa Config feature.
+ */
+
+include_once 'oa_config.features.inc';
+
+/**
+ * Implements hook_og_role_insert().
+ */
+function oa_config_og_role_insert($role) {
+  // If this is the administer member role for group/space w/ gid 0, set default.
+  if (empty($role->gid) && $role->name == OG_ADMINISTRATOR_ROLE) {
+    $variable_name = 'og_group_manager_default_rids_' . $role->group_type . '_' . $role->group_bundle;
+    if (variable_get($variable_name) === NULL) {
+      variable_set($variable_name, array($role->rid));
+    }
+  }
+}

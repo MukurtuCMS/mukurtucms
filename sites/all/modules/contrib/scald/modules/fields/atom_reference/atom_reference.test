@@ -33,6 +33,7 @@ class ScaldAtomRefereneTestCase extends ScaldWebTestCase {
   function testAtomReferenceField() {
     $web_user = $this->drupalCreateUser(array(
       'administer content types',
+      'administer fields',
       'administer site configuration',
       'administer scald',
       'view any atom',

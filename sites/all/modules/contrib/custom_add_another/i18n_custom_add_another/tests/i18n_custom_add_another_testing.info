@@ -1,0 +1,13 @@
+name = Custom add another i18n testing
+package = Fields
+core = 7.x
+
+dependencies[] = i18n_custom_add_another
+
+hidden = true
+
+; Information added by Drupal.org packaging script on 2021-02-12
+version = "7.x-1.1"
+core = "7.x"
+project = "custom_add_another"
+datestamp = "1613148309"

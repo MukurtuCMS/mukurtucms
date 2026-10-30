@@ -1,0 +1,7 @@
+{
+  "name": "drupal/registry_rebuild",
+  "description": "Provides the registry_rebuild script.",
+  "type": "drupal-drush",
+  "license": "GPL-2.0+",
+  "require": {}
+}

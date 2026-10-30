@@ -15,9 +15,51 @@ function atom_reference_field_schema($field) {
         'unsigned' => TRUE,
         'not null' => FALSE,
       ),
+      'options'     => array(
+        'description' => 'An options set for rendering the referenced atom.',
+        'type'        => 'blob',
+        'length'      => 'big',
+        'not null'    => FALSE,
+        'serialize' => TRUE,
+        'object default' => array(),
+        'initial' => serialize(array()),
+      ),
     ),
     'indexes' => array(
       'sid' => array('sid'),
     ),
   );
+}
+
+/**
+ * Add the {atom_reference}.options column.
+ *
+ */
+function atom_reference_update_7001() {
+  $new_field = array(
+    'description' => 'An options set for rendering the referenced atom.',
+    'type'        => 'blob',
+    'length'      => 'big',
+    'not null'    => FALSE,
+    'serialize' => TRUE,
+    'object default' => array(),
+    'initial' => serialize(array()),
+  );
+
+  $fields = field_read_fields(array(
+    'module' => 'atom_reference',
+    'deleted' => 0,
+  ));
+
+  foreach ($fields as $field) {
+    $tables = array(
+      _field_sql_storage_tablename($field),
+      _field_sql_storage_revision_tablename($field),
+    );
+    foreach ($tables as $table) {
+      if (!db_field_exists($table, $field['field_name'] . '_options')) {
+        db_add_field($table, $field['field_name'] . '_options', $new_field);
+      }
+    }
+  }
 }

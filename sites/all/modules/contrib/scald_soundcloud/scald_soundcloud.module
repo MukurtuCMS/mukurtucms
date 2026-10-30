@@ -1,0 +1,294 @@
+<?php
+/**
+ * @file
+ *   Defines a SoundCloud provider for Scald.
+ *
+ *   Note: Had to slightly hack php-soundcloud SDK to accept "30x" http response codes as valid
+ *    to be able to read the 'resolve' response.
+ */
+
+define('SOUNDCLOUD_ID_REGEXP',        '/^[a-zA-Z0-9]+$/');
+define('SOUNDCLOUD_WEB_REGEXP',       '#^https?://([-\w]+\.)?soundcloud\.com/(.+$)#');
+define('SOUNDCLOUD_WEB',              'http://soundcloud.com');
+define('SCALD_APP_CLIENT_ID',         '4ddcde86e34b0c95e0d6222dd1edd38f');
+
+/**
+ * Implements hook_scald_atom_providers().
+ * Tell Scald that we'll be providing some audio atoms.
+ */
+function scald_soundcloud_scald_atom_providers() {
+  return array(
+    'audio' => 'Audio hosted on SoundCloud'
+  );
+  // This code will never be hit, but is necessary to mark the string
+  // for translation on localize.d.o
+  t('Audio hosted on SoundCloud');
+}
+
+/**
+ * Implements hook_scald_add_form().
+ */
+function scald_soundcloud_scald_add_form(&$form, &$form_state) {
+  $form['identifier'] = array(
+    '#type' => 'textfield',
+    '#title' => t('SoundCloud track identifier or track/set URL'),
+    '#element_validate' => array('scald_soundcloud_validate_id'),
+    '#default_value' => '',
+  );
+}
+
+/**
+ * Implements hook_scald_add_form_fill().
+ */
+function scald_soundcloud_scald_add_form_fill(&$atoms, $form, $form_state) {
+  $atom = is_array($atoms) ? reset($atoms) : $atoms;
+
+  // Get the identifier
+  $identifier = scald_soundcloud_parse_id($form_state['values']['identifier'], TRUE);
+
+  // Get track info
+  $infos = scald_soundcloud_audio($identifier);
+
+  $atom->base_id = $identifier;
+  $atom->title = $infos->title;
+
+  // Prefill the author
+  $atom->scald_authors[LANGUAGE_NONE][0] = array(
+    'tid' => 0,
+    'taxonomy_term' => (object)(array('name' => $infos->author))
+  );
+
+  // Prefill tags
+  foreach ($infos->tags as $index => $tag) {
+    $atom->scald_tags[LANGUAGE_NONE][$index] = array(
+      'tid' => $index,  // Beware, this is not a real tid, it's just an index
+      'taxonomy_term' => (object)(array('name' => $tag))
+    );
+  }
+
+  if (isset($infos->thumbnail)) {
+    // Download a copy of the audio thumbnail. This makes it possible
+    // to do interesting manipulation with image styles presets.
+    $thumb = drupal_http_request($infos->thumbnail['src']);
+    if ($thumb->code == 200) {
+      $dest = 'public://soundcloud/' . $infos->id . '.jpg';
+      if (file_prepare_directory(dirname($dest), FILE_CREATE_DIRECTORY)) {
+        $file = file_save_data($thumb->data, $dest);
+      }
+    }
+
+    // Set the file status to temporary
+    $query = db_update('file_managed')
+      ->condition('fid', $file->fid)
+      ->fields(array('status' => 0))
+      ->execute();
+
+    $atom->scald_thumbnail[LANGUAGE_NONE][0] = (array)$file;
+  }
+
+  $atom->data['kind'] = $infos->kind;
+  $atom->data['track_count'] = $infos->track_count;
+  $atom->data['permalink_url'] = $infos->permalink_url;
+}
+
+/**
+ * Implements hook_scald_fetch().
+ */
+function scald_soundcloud_scald_fetch($atom, $type) {
+  $file_items = field_get_items('scald_atom', $atom, 'scald_thumbnail');
+  if (!empty($file_items)) {
+    $file_item = current($file_items);
+    if (file_exists($file_item['uri'])) {
+      $atom->file_source = $atom->thumbnail_source = $file_item['uri'];
+    }
+  }
+  // If no uploaded thumbnail we default to the generic one
+  else {
+    $atom->thumbnail_source = drupal_get_path('module', 'scald_soundcloud') . '/images/soundcloud.png';
+  }
+}
+
+/**
+ * Implements hook_scald_prerender().
+ */
+function scald_soundcloud_scald_prerender($atom, $context, $options, $mode) {
+  if ($mode == 'atom') {
+    // base height for a single track
+    $iframe_height = 166;
+    if (isset($atom->data['track_count']) && ($atom->data['track_count'] > 1)) {
+      // Empirique computation to show 10 tracks max (like on soundcloud website)
+      $iframe_height = 175 + 57 + min($atom->data['track_count'], 10) * 24;
+    }
+
+    $atom->rendered->player = theme('scald_soundcloud_player',
+      array('vars' =>
+        array(
+          'id' => $atom->base_id,
+          'iframe_height' => $iframe_height,
+        ),
+      )
+    );
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function scald_soundcloud_theme() {
+  return array(
+    'scald_soundcloud_player' => array(
+      'variables' => array('vars' => NULL),
+      'template' => 'scald_soundcloud_player'
+    ),
+  );
+}
+
+/**
+ * Get all necessary on an given audio track using SoundCloud API
+ * @param $id
+ *   Unique identifier of the audio track on SoundCloud
+ * @return object
+ *   Object containing all necessary info.
+ */
+function scald_soundcloud_audio($id) {
+
+  // create a client object with your app credentials
+  require_once drupal_get_path('module', 'scald_soundcloud') . '/php-soundcloud/Services/Soundcloud.php';
+  $client = new Services_Soundcloud(SCALD_APP_CLIENT_ID, NULL);
+
+  try {
+    // Fetch data for a track or playlist
+    $data = json_decode($client->get($id));
+  }
+  catch (Exception $e) {
+    watchdog('scald_soundcloud', 'Exception : @exception', array('@exception' => $e->getMessage()));
+    return FALSE;
+  }
+
+  $info = new stdClass();
+  // ID
+  $info->id = $id;
+  // Title
+  $info->title = $data->title;
+  // Author
+  $info->author = $data->user->username;
+  // Thumbnail
+  if ($data->artwork_url) {
+    // Artwork is always 100x100
+    $info->thumbnail = array(
+      'src'    => $data->artwork_url,
+      'width'  => 100,
+      'height' => 100,
+    );
+  }
+
+  // Tags
+  $info->tags = explode(" ", $data->tag_list);
+  // License
+  $info->license = 'SC';
+
+  // Extra SC data
+  $info->kind = $data->kind;
+  $info->track_count = ($data->kind == 'track') ? 1 : count($data->tracks);
+  $info->permalink_url = $data->permalink_url;
+
+  return $info;
+}
+
+/**
+ * Checks if an audio has already been imported, based on its audio id.
+ * @param $id
+ *   The audio identifier
+ * @return mixed
+ *   FALSE if the audio was never imported, the scald identifier of
+ *   the audio otherwise.
+ */
+function scald_soundcloud_already_imported($id) {
+  $query = array('provider' => 'scald_soundcloud', 'base_id' => $id);
+  return scald_search($query, FALSE, TRUE);
+}
+
+/**
+ * Form element validation handler for SoundCloud identifier
+ *
+ */
+function scald_soundcloud_validate_id($element, &$form_state) {
+  $id = scald_soundcloud_parse_id($form_state['values']['identifier'], TRUE);
+  if (!$id) {
+    form_error($element, t('Invalid SoundCloud ID or URL.'));
+  }
+  elseif (scald_soundcloud_already_imported($id)) {
+    form_error($element, t('SoundCloud track already imported.'));
+  }
+}
+
+/**
+ * Parse an Audio ID and check validity
+ *
+ */
+function scald_soundcloud_parse_id($string, $check) {
+  $id = FALSE;
+  $string = trim($string);
+
+  if (!preg_match(SOUNDCLOUD_ID_REGEXP, $string)) {
+    // The string ID is not easy to parse, let's try to analyze it
+    if (preg_match(SOUNDCLOUD_WEB_REGEXP, $string, $m)) {
+      // This string is a full SoundCloud URL
+      $id = scald_soundcloud_resolve_url($string);
+    }
+    elseif (preg_match("/^http/", $string)) {
+      // This string is a URL, most likely a shortened one. (http://dai.ly, http://bit.ly, etc...)
+      $response = drupal_http_request($string);
+      if ($response->code == 200 && isset($response->redirect_code) && ($response->redirect_code == 301 || $response->redirect_code == 302)) {
+        return scald_soundcloud_parse_id($response->redirect_url, $check);
+      }
+    }
+  }
+  else {
+    // If a simple numeric ID was specified, we assume it's a 'track'
+    $id = 'tracks/' . $string;
+  }
+
+  if ($id && $check) {
+    // Last check to confirm this track really exists on soundcloud
+    if (!scald_soundcloud_audio($id)) {
+      $id = FALSE;
+    }
+  }
+  return $id;
+}
+
+
+/**
+ * Resolve a SoundCloud ID from a track URL
+ * @param $track_url
+ *   The fully qualified track url.
+ *   Ex: http://soundcloud.com/banditos/banditos-live-montreal-2012
+ * @return id
+ *   FALSE if the track was not resolved, otherwise its unique
+ *   SoundCloud ID
+ */
+function scald_soundcloud_resolve_url($track_url) {
+  require_once drupal_get_path('module', 'scald_soundcloud') . '/php-soundcloud/Services/Soundcloud.php';
+  $client = new Services_Soundcloud(SCALD_APP_CLIENT_ID, NULL);
+  try {
+    $resolve = json_decode($client->get('resolve', array('url' => $track_url)));
+  }
+  catch (Exception $e) {
+    watchdog('scald_soundcloud', 'Exception : @exception', array('@exception' => $e->getMessage()));
+    return FALSE;
+  }
+
+  $api_url_full = $resolve->location;
+  $api_url_parts = explode('/', $api_url_full);
+
+  // numeric id
+  $id = array_pop($api_url_parts);
+  $id = explode('?', $id); // get rid of the query garbage
+  $id = reset($id);
+
+  // tracks or playlists
+  $type = array_pop($api_url_parts);
+
+  return $type . '/' . $id;
+}

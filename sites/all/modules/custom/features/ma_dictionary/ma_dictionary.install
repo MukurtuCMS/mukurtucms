@@ -1,0 +1,68 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the dictionary feature.
+ */
+
+/**
+ * Create the "Browse Dictionary" browse menu item.
+ */
+function ma_dictionary_install() {
+  $item = array(
+    'link_path' => 'dictionary',
+    'link_title' => 'Dictionary',
+    'menu_name' => 'menu-browse-menu',
+    'weight' => -40,
+    'customized' => 1,
+  );
+  $mlid = menu_link_save($item);
+
+  // Disable by default.
+  $ml = menu_link_load($mlid);
+  $ml['hidden'] = TRUE;
+  menu_link_save($ml);
+}
+
+/**
+ * Implements hook_enable().
+ */
+function ma_dictionary_enable() {
+  variable_set('mukurtu_dictionary_install_fix', FALSE);
+}
+
+/**
+ * Index existing dictionary words for search facets.
+ */
+function ma_dictionary_update_7001(&$sandbox) {
+  // Find all dictionary words.
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'dictionary_word')
+    ->addMetaData('account', user_load(1));
+  $results = $query->execute();
+
+  // Exit if no dictionary words exist.
+  if (empty($results['node'])) {
+    return;
+  }
+
+  // Load each dictionary word, aggregate the media,
+  // save the dictionary word.
+  $nids = array_keys($results['node']);
+  if (!function_exists('_ma_dictionary_get_media_assets')) {
+    module_load_include('module', 'ma_dictionary');
+  }
+  foreach ($nids as $nid) {
+    $node = node_load($nid);
+    $node->field_media_asset[LANGUAGE_NONE] = _ma_dictionary_get_media_assets($node);
+    node_save($node);
+  }
+}
+
+/**
+ * Revert the Dictionary feature to add the new Additional Media Assets field.
+ */
+function ma_dictionary_update_7002(&$sandbox) {
+  features_revert_module('ma_dictionary');
+}

@@ -165,12 +165,7 @@ function node_filter_form() {
   );
   foreach ($session as $filter) {
     list($type, $value) = $filter;
-    if ($type == 'term') {
-      // Load term name from DB rather than search and parse options array.
-      $value = module_invoke('taxonomy', 'term_load', $value);
-      $value = $value->name;
-    }
-    elseif ($type == 'language') {
+    if ($type == 'language') {
       $value = $value == LANGUAGE_NONE ? t('Language neutral') : module_invoke('locale', 'language_name', $value);
     }
     else {
@@ -508,14 +503,17 @@ function node_admin_nodes() {
   $options = array();
   foreach ($nodes as $node) {
     $langcode = entity_language('node', $node);
-    $l_options = $langcode != LANGUAGE_NONE && isset($languages[$langcode]) ? array('language' => $languages[$langcode]) : array();
+    $uri = entity_uri('node', $node);
+    if ($langcode != LANGUAGE_NONE && isset($languages[$langcode])) {
+      $uri['options']['language'] = $languages[$langcode];
+    }
     $options[$node->nid] = array(
       'title' => array(
         'data' => array(
           '#type' => 'link',
           '#title' => $node->title,
-          '#href' => 'node/' . $node->nid,
-          '#options' => $l_options,
+          '#href' => $uri['path'],
+          '#options' => $uri['options'],
           '#suffix' => ' ' . theme('mark', array('type' => node_mark($node->nid, $node->changed))),
         ),
       ),

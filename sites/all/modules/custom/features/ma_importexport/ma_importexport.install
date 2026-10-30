@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * Remove orphaned feeds guids.
+ */
+function ma_importexport_update_7101() {
+  _ma_import_export_cleanup_guids();
+}

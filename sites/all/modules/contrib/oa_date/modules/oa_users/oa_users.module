@@ -1,0 +1,305 @@
+<?php
+/**
+ * @file
+ * Code for the Open Atrium Users feature.
+ */
+
+include_once 'oa_users.features.inc';
+
+/**
+ * Implements hook_menu().
+ */
+function oa_users_menu() {
+  $items['user/%user/settings'] = array(
+    'title' => 'Settings',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('oa_users_settings_form', 1),
+    'access callback' => 'user_edit_access',
+    'access arguments' => array(1),
+  );
+  $items['oa_users/add/%ctools_js/%node'] = array(
+    'title' => t('Add New User'),
+    'page callback' => 'oa_users_register_external_user_modal',
+    'page arguments' => array(2, 3),
+    'access callback' => TRUE,
+    'file' => 'plugins/content_types/oa_users_add_external_user.inc',
+    'file path' => drupal_get_path('module', 'oa_users'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+function oa_users_menu_alter(&$items) {
+  // @TODO change dashboard to use not-panelizer-of-user-view and switch
+  // switch activity to use user_view panel.
+  $items['user/%user/view'] = $items['user/%user'];
+  $items['user/%user/view']['access callback'] = 'oa_users_user_is_current_user';
+  $items['user/%user/view']['type'] = MENU_LOCAL_TASK;
+  $items['user/%user/view']['title'] = 'Dashboard';
+  $items['user/%user/view']['weight'] = $items['user/%pm_arg/activity']['weight'] - 1;
+  unset($items['user/%user/view']['title callback'], $items['user/%user/view']['title arguments']);
+
+  unset($items['user/$user']);
+  $items['user/%pm_arg'] = $items['user/%pm_arg/activity'];
+  $items['user/%pm_arg']['type'] = MENU_NORMAL_ITEM;
+  $items['user/%pm_arg/activity']['type'] = MENU_DEFAULT_LOCAL_TASK;
+}
+
+function oa_users_user_is_current_user($account) {
+  global $user;
+  return $account->uid == $user->uid;
+}
+
+/**
+ * Implements hook_ctools_plugin_directory
+ */
+function oa_users_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'ctools' && $plugin_type == 'content_types') {
+    return 'plugins/content_types';
+  }
+}
+
+/**
+ * Implements hook_og_permission().
+ */
+function oa_users_og_permission() {
+  return array(
+    'add external user' => array(
+      'title' => t('Add External User'),
+      'description' => t('Allows a member to add users to the site and a space, group, or team simultaneously.'),
+      'default role' => array(OG_ADMINISTRATOR_ROLE),
+    ),
+  );
+}
+
+/**
+ * Page callback for user/%user/settings.
+ *
+ * Provide a settings form, and hooks for modules to add their own settings.
+ */
+function oa_users_settings_form($form, &$form_state, $user) {
+  $form['#submit'][] = 'oa_users_settings_form_submit';
+
+  drupal_alter('oa_user_settings_form', $form, $form_state, $user);
+
+  return system_settings_form($form);
+}
+
+/**
+ * Form submit callback for user/%user/settings.
+ *
+ * Provides a hook for modules that added fields to the form to add them to the
+ * user's data column.
+ */
+function oa_users_settings_form_submit($form, &$form_state) {
+  $user = $form_state['build_info']['args'][0];
+  $settings['data'] = module_invoke_all('oa_user_settings_form_submit', $form_state, $user);
+
+  user_save($user, $settings);
+}
+
+/**
+ * Provide information for rendering a user.
+ */
+function oa_users_build_user_details($user, $image_style = 'oa_small_thumbnail') {
+  $details = array();
+  $details['user'] = $user;
+  $details['realname'] = oa_core_realname($user);
+  $details['name'] = isset($user) ? $user->name : '';
+  $details['picture'] = oa_users_picture($user, $image_style);
+
+  //Build out links.
+  $details['links']['dashboard'] = isset($user) ? 'user/' . $user->uid . '/view' : '';
+  $details['links']['edit_profile'] = isset($user) ? 'user/' . $user->uid . '/edit' : '';
+  $details['links']['logout'] = 'user/logout';
+  return $details;
+}
+
+/**
+ * Implements hook_oa_users_picture().
+ */
+function oa_users_oa_users_picture($account = NULL, $image_style = 'oa_small_thumbnail', $url = FALSE) {
+  if (isset($account) && !isset($account->field_user_picture)) {
+    // Ensure full user is loaded if needed.
+    $account = user_load($account->uid);
+  }
+  if (isset($account) && !empty($account->field_user_picture)) {
+    $picture = $account->field_user_picture[LANGUAGE_NONE][0];
+    $image = array(
+      'style_name' => $image_style,
+      'path' => $picture['uri'],
+      'width' => $picture['width'],
+      'height' => $picture['height'],
+      'alt' => t('Your profile picture'),
+    );
+    if ($url) {
+      return image_style_url($image_style, $picture['uri']);
+    }
+    else {
+      return theme('image_style', $image);
+    }
+  }
+  else {
+    $width = ($image_style == 'panopoly_image_thumbnail') ? 90 : 30;
+    $path = variable_get('user_picture_default', '');
+    if (empty($path)) {
+      $path = drupal_get_path('module', 'oa_users') . '/oa-user.png';
+    }
+    $image = array(
+      'style_name' => $image_style,
+      'path' => $path,
+      'width' => $width,
+      'height' => $width,
+      'alt' => t('Your profile picture'),
+    );
+    // Image styles only supported for images in /files dir so for now, ignore
+    // the image style.
+    if ($url) {
+      return $path;
+    }
+    else {
+      return theme('image', $image);
+    }
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function oa_users_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id === 'user_profile_form') {
+    if ($form['#user_category'] === 'user-info') {
+      field_attach_form('user', $form['#user'], $form, $form_state);
+
+      $form['og_user_node']['#access'] = FALSE;
+      $form['links']['#weight'] = -2;
+      $form['field_user_display_name']['#weight'] = -1;
+      $form['field_user_picture']['#weight'] = 0;
+      $form['field_user_about']['#weight'] = 1;
+
+      drupal_set_title(t('User Info'));
+    }
+    elseif ($form['#user_category'] === 'account') {
+      // move required display name after username
+      $form['field_user_display_name']['#weight'] = -9;
+      $form['account']['field_user_display_name'] = $form['field_user_display_name'];
+      unset($form['field_user_display_name']);
+      // disable fields from user-info category
+      $form['field_user_picture']['#access'] = FALSE;
+      $form['field_user_about']['#access'] = FALSE;
+
+      drupal_set_title(t('Account Info'));
+    }
+  }
+}
+
+/**
+ * Implements hook_user_categories().
+ */
+function oa_users_user_categories() {
+  return array(array(
+    'name' => 'user-info',
+    'title' => t('User Info'),
+    'weight' => 1,
+  ));
+}
+
+/**
+ * Implements hook_oa_core_layout_alter().
+ */
+function oa_users_oa_core_layout_alter(&$data) {
+  if (isset($data['user:user:default'])) {
+    // Change layout from radix_phelan to radix_selby
+    _oa_core_change_panel_layout($data, 'user:user:default', 'radix_selby', 'contentheader', array('column2' => 'sidebar'));
+    $data['user:user:default']->display->title = '%user:name';
+    if (isset($data['user:user:default']->display->content['new-23b1f4f1-cda8-42ca-880a-afc2ae92f3e9'])) {
+      $data['user:user:default']->display->content['new-23b1f4f1-cda8-42ca-880a-afc2ae92f3e9']->position = 1;
+      $data['user:user:default']->display->content['new-23b1f4f1-cda8-42ca-880a-afc2ae92f3e9']->configuration['formatter_settings']['image_style'] = 'panopoly_image_quarter';
+    }
+  }
+}
+
+/**
+ * Implements hook_oa_core_add_panes().
+ */
+function oa_users_oa_core_add_panes() {
+  $info = array();
+  $info['user:user:default']['80a6a21b-20e6-4acf-9772-eb089cc6082b'] = array(
+    'panel' => 'sidebar',
+    'type' => 'oa_core_user_spaces',
+    'subtype' => 'oa_core_user_spaces',
+    'configuration' => array(
+      'featured_spaces' => 1,
+      'context' => 'panelizer',
+      'override_title' => 0,
+      'override_title_text' => '',
+      'image_size' => 'none',
+      'show_description' => 0,
+      'show_sections' => 0,
+      'tabs' => array(
+        'Favorite' => 'Favorite',
+        'Memberships' => 'Memberships',
+        'All' => 0,
+      ),
+      'link_class' => 'btn',
+      'show_links' => 0,
+      'num_per_page' => 15,
+    ),
+    'style' => array(
+      'settings' => NULL,
+      'style' => 'oa_styles_oa_pane',
+    ),
+    'position' => 0,
+  );
+  $info['user:user:default']['d3a2a9fb-f88a-4730-bfab-c36f4e0af395'] = array(
+    'panel' => 'sidebar',
+    'type' => 'entity_field',
+    'subtype' => 'user:field_user_about',
+    'configuration' => array(
+      'label' => 'hidden',
+      'formatter' => 'text_default',
+      'delta_limit' => 0,
+      'delta_offset' => 0,
+      'delta_reversed' => FALSE,
+      'formatter_settings' => array(),
+      'context' => array(),
+      'override_title' => 0,
+      'override_title_text' => '',
+    ),
+    'position' => 2,
+  );
+  // Remove the profile widget added by panopoly
+  $info['user:user:default']['d76e85cd-4625-4a52-a17b-e5c65e1a0247'] = array();
+  return $info;
+}
+
+
+/**
+ * Implements hook_theme()
+ */
+function oa_users_theme() {
+  $path = drupal_get_path('module', 'oa_users') . '/templates';
+  return array(
+    'oa_users_submitted' => array(
+      'template'  => 'oa-users-submitted',
+      'arguments' => array(
+        'userlink'  => '',
+        'date' => '',
+        'picture' => '',
+        'label'  => '',
+        'onlabel'  => '',
+        'bylabel'  => '',
+      ),
+      'path' => $path,
+    ),
+    'oa_members_toolbar' => array(
+      'template'  => 'oa-members-toolbar',
+      'path' => $path,
+    ),
+  );
+}

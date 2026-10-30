@@ -1,0 +1,11 @@
+<?php
+
+function mukurtu_display_formatters_image_carousel_install() {
+    // Create the Owl Carousel Mukurtu Single Image settings
+    module_load_include('inc', 'owlcarousel_ui', 'owlcarousel_ui.admin');
+    $settings_name = owlcarousel_add_settings_group('mukurtu_single_image');
+    if($settings_name) {
+        $variables = drupal_json_decode('{"items":1,"margin":0,"loop":false,"center":false,"mouseDrag":true,"touchDrag":true,"pullDrag":true,"freeDrag":false,"stagePadding":0,"merge":false,"mergeFit":true,"autoWidth":false,"startPosition":0,"urlHashListner":false,"nav":true,"navRewind":true,"navText":["\u003Ci class=\u0027fa fa-chevron-left\u0027\u003E\u003C\/i\u003E","\u003Ci class=\u0027fa fa-chevron-right\u0027\u003E\u003C\/i\u003E"],"slideBy":1,"dots":true,"dotsEach":"1","dotsData":false,"lazyLoad":false,"lazyContent":false,"autoplay":false,"autoplayTimeout":5000,"autoplayHoverPause":false,"smartSpeed":250,"fluidSpeed":250,"autoplaySpeed":false,"navSpeed":false,"dotsSpeed":false,"dragEndSpeed":false,"callbacks":false,"responsiveRefreshRate":200,"responsiveClass":false,"video":false,"videoHeight":false,"videoWidth":false,"animateOut":false,"animateIn":false,"fallbackEasing":"swing","info":false,"nestedItemSelector":false,"itemElement":"div","stageElement":"div","navContainer":false,"dotsContainer":false}');
+        owlcarousel_create_instance_settings($settings_name, $variables);
+    }
+}

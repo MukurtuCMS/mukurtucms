@@ -1,0 +1,70 @@
+name = 'THEMETITLE'
+description = 'A Drupal Bootstrap 3 based sub-theme.'
+core = 7.x
+base theme = bootstrap
+php = 5.3.0
+
+
+;;;;;;;;;;;;;;;;;;;;;
+;; Regions
+;;;;;;;;;;;;;;;;;;;;;
+
+regions[navigation]     = 'Navigation'
+regions[header]         = 'Top Bar'
+regions[highlighted]    = 'Highlighted'
+regions[help]           = 'Help'
+regions[content]        = 'Content'
+regions[sidebar_first]  = 'Primary'
+regions[sidebar_second] = 'Secondary'
+regions[footer]         = 'Footer'
+regions[page_top]       = 'Page top'
+regions[page_bottom]    = 'Page bottom'
+
+
+;;;;;;;;;;;;;;;;;;;;;
+;; Stylesheets
+;;;;;;;;;;;;;;;;;;;;;
+
+stylesheets[all][] = css/style.css
+
+
+;;;;;;;;;;;;;;;;;;;;;
+;; Scripts
+;;;;;;;;;;;;;;;;;;;;;
+
+; Uncomment the following scripts if using Less source JavaScript files.
+;scripts[] = 'bootstrap/js/affix.js'
+;scripts[] = 'bootstrap/js/alert.js'
+;scripts[] = 'bootstrap/js/button.js'
+;scripts[] = 'bootstrap/js/carousel.js'
+;scripts[] = 'bootstrap/js/collapse.js'
+;scripts[] = 'bootstrap/js/dropdown.js'
+;scripts[] = 'bootstrap/js/modal.js'
+;scripts[] = 'bootstrap/js/tooltip.js'
+;scripts[] = 'bootstrap/js/popover.js'
+;scripts[] = 'bootstrap/js/scrollspy.js'
+;scripts[] = 'bootstrap/js/tab.js'
+;scripts[] = 'bootstrap/js/transition.js'
+
+; Uncomment the following scripts if using Sass source JavaScript files.
+;scripts[] = 'bootstrap/assets/javascripts/bootstrap/affix.js'
+;scripts[] = 'bootstrap/assets/javascripts/bootstrap/alert.js'
+;scripts[] = 'bootstrap/assets/javascripts/bootstrap/button.js'
+;scripts[] = 'bootstrap/assets/javascripts/bootstrap/carousel.js'
+;scripts[] = 'bootstrap/assets/javascripts/bootstrap/collapse.js'
+;scripts[] = 'bootstrap/assets/javascripts/bootstrap/dropdown.js'
+;scripts[] = 'bootstrap/assets/javascripts/bootstrap/modal.js'
+;scripts[] = 'bootstrap/assets/javascripts/bootstrap/tooltip.js'
+;scripts[] = 'bootstrap/assets/javascripts/bootstrap/popover.js'
+;scripts[] = 'bootstrap/assets/javascripts/bootstrap/scrollspy.js'
+;scripts[] = 'bootstrap/assets/javascripts/bootstrap/tab.js'
+;scripts[] = 'bootstrap/assets/javascripts/bootstrap/transition.js'
+
+
+;;;;;;;;;;;;;;;;;;;;;
+;; Theme Settings
+;;;;;;;;;;;;;;;;;;;;;
+
+; Uncomment if using Sass or Less source files. This disables the CDN provider
+; so compiled source files can be used instead.
+;settings[bootstrap_cdn_provider] = ''

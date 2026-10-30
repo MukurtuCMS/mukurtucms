@@ -1,0 +1,46 @@
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+
+BEGIN:VEVENT
+SUMMARY:One-day Date-type Event
+DTSTART;VALUE=DATE:20131020
+DTEND;VALUE=DATE:20131021
+UID:date_ical_date_type_test01
+DESCRIPTION:This is an all day event that takes place on Oct 20, 2013.
+END:VEVENT
+
+BEGIN:VEVENT
+SUMMARY:Two-day Date-type Event
+DTSTART;VALUE=DATE:20131020
+DTEND;VALUE=DATE:20131022
+UID:date_ical_date_type_test02
+DESCRIPTION:This all day event runs from Oct 20-21, 2013.
+END:VEVENT
+
+BEGIN:VEVENT
+SUMMARY:Date-type Event w/ 1-day DURATION
+DTSTART;VALUE=DATE:20131020
+DURATION:P1D
+UID:date_ical_date_type_test03
+DESCRIPTION:This all day event starts on Oct 20, 2013 and lasts 1 day.
+END:VEVENT
+
+BEGIN:VEVENT
+SUMMARY:Date-type Event w/ 2-day DURATION
+DTSTART;VALUE=DATE:20131020
+DURATION:P2D
+UID:date_ical_date_type_test04
+DESCRIPTION:This all day event starts on Oct 20, 2013 and lasts 2 days.
+END:VEVENT
+
+BEGIN:VEVENT
+SUMMARY:Date-type Event w/ no DTEND or DURATION
+DTSTART;VALUE=DATE:20131020
+UID:date_ical_date_type_test05
+DESCRIPTION:This all day event defines no ending, and should thus be 1 day.
+END:VEVENT
+
+END:VALENDAR

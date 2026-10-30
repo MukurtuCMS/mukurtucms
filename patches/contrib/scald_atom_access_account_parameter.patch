@@ -1,0 +1,13 @@
+diff --git a/scald.module b/scald.module
+index f86cb612..e1438a67 100644
+--- a/scald.module
++++ b/scald.module
+@@ -1006,7 +1006,7 @@ function scald_rendered_to_sas($string, $render_language = 'XHTML') {
+  */
+ function scald_invoke_atom_access($atom, $action, $account = NULL) {
+   // @codingStandardsIgnoreEnd
+-  if (user_access('administer scald atoms')) {
++  if (user_access('administer scald atoms', $account)) {
+     return SCALD_ATOM_ACCESS_ALLOW;
+   }
+

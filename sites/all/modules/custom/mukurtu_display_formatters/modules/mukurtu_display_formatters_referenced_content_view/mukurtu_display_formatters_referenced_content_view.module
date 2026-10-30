@@ -1,0 +1,264 @@
+<?php
+/**
+* @file
+* Define Mukurtu tabbed record field formatter
+*
+*/
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function mukurtu_display_formatters_referenced_content_view_field_formatter_info() {
+    return array(
+        'mukurtu_referenced_content_formatter' => array(
+            'label' => t('Mukurtu Referenced Content View'),
+            'field types' => array('entityreference'),
+            'settings' => array()
+        ),
+    );
+}
+
+/**
+* Implements hook_field_formatter_settings_form().
+*/
+function mukurtu_display_formatters_referenced_content_view_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+    $display = $instance['display'][$view_mode];
+    $settings = $display['settings'];
+    $element = array();
+    return $element;
+}
+
+/**
+* Implements hook_field_formatter_settings_summary().
+*/
+function mukurtu_display_formatters_referenced_content_view_field_formatter_settings_summary($field, $instance, $view_mode) {
+    $display = $instance['display'][$view_mode];
+    $settings = $display['settings'];
+    $summary = t('Provides a view of referenced content');
+    return $summary;
+}
+
+/**
+* Implements hook_field_formatter_view().
+*/
+function mukurtu_display_formatters_referenced_content_view_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+    $element = array();
+    $settings = $display['settings'];
+
+    $nids = array();
+    foreach($items as $item) {
+        $nids[] = $item['target_id'];
+    }
+
+
+    $url_parameters = drupal_get_query_parameters();
+    if(isset($url_parameters['taxonomy'])) {
+        drupal_add_js(drupal_get_path('module', 'mukurtu_display_formatters_referenced_content_view') .'/js/mukurtu_referenced_content.js', 'file');
+        $filter = $url_parameters['taxonomy'];
+    } else {
+        $filter = 'all';
+    }
+
+
+    $view = views_get_view('mukurtu_records_referenced_content');
+    $view->set_display('block');
+    $view_args = array($entity->nid, implode('+', $nids), $filter);
+    $view->set_arguments($view_args);
+    $view->set_items_per_page(5);
+    $view->pre_execute();
+    $view->execute();
+
+    $element[]['#markup'] = $view->render();
+
+    //    $delta = facetapi_hash_delta(facetapi_build_delta('search_api@default_node_index', 'block', 'field_category'));
+    //    dpm($delta);
+    //    $element[] = module_invoke('facetapi', 'block_view', $delta);
+    //    $element[0]['#markup'] .= drupal_render($facet_view->render());
+    //    dpm($element);
+    return $element;
+}
+
+/**
+* Implements hook_views_api().
+*/
+function mukurtu_display_formatters_referenced_content_view_views_api() {
+    return array(
+        'api' => 3.0,
+        'path' => drupal_get_path('module', 'mukurtu_display_formatters_referenced_content_view')
+    );
+}
+
+/**
+ * Implements hook_views_default_views().
+ */
+function mukurtu_display_formatters_referenced_content_view_views_default_views() {
+    $view = new view();
+    $view->name = 'mukurtu_records_referenced_content';
+    $view->description = '';
+    $view->tag = 'default';
+    $view->base_table = 'search_api_index_default_node_index';
+    $view->human_name = 'Mukurtu Records Referenced Content';
+    $view->core = 7;
+    $view->api_version = '3.0';
+    $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+    /* Display: Master */
+    $handler = $view->new_display('default', 'Master', 'default');
+    $handler->display->display_options['title'] = 'Search API Test';
+    $handler->display->display_options['use_ajax'] = TRUE;
+    $handler->display->display_options['use_more_always'] = FALSE;
+    $handler->display->display_options['access']['type'] = 'perm';
+    $handler->display->display_options['cache']['type'] = 'none';
+    $handler->display->display_options['query']['type'] = 'views_query';
+    $handler->display->display_options['exposed_form']['type'] = 'basic';
+    $handler->display->display_options['exposed_form']['options']['submit_button'] = 'Search';
+    $handler->display->display_options['pager']['type'] = 'full';
+    $handler->display->display_options['pager']['options']['items_per_page'] = '5';
+    $handler->display->display_options['pager']['options']['offset'] = '0';
+    $handler->display->display_options['pager']['options']['id'] = '0';
+    $handler->display->display_options['pager']['options']['quantity'] = '9';
+    $handler->display->display_options['style_plugin'] = 'default';
+    $handler->display->display_options['row_plugin'] = 'entity';
+    $handler->display->display_options['row_options']['view_mode'] = 'taxonomy_record_teaser';
+    /* Header: Global: PHP */
+    $handler->display->display_options['header']['php']['id'] = 'php';
+    $handler->display->display_options['header']['php']['table'] = 'views';
+    $handler->display->display_options['header']['php']['field'] = 'php';
+    $handler->display->display_options['header']['php']['empty'] = TRUE;
+    $handler->display->display_options['header']['php']['php_output'] = '<div class=\'record-filter\'>
+<ul class=\'nav nav-pills\'>
+<?php
+$url_parameters = drupal_get_query_parameters();
+if(isset($url_parameters[\'taxonomy\'])) {
+    $filter = $url_parameters[\'taxonomy\'];
+} else {
+    $filter = \'all\';
+}
+if(isset($view->args[0])) {
+    $vocabs = mukurtu_taxonomy_records_get_vocabulary_list($view->args[0]);
+    $path = current_path();
+    $path_alias = drupal_lookup_path(\'alias\', $path);
+
+    $class = $filter == \'all\' ? \'class="active"\' : \'\';
+    $url_parameters[\'taxonomy\'] = \'all\';
+    $filter_link = l(\'All\', $path_alias, array(\'query\' => $url_parameters));
+    print "<li $class>$filter_link</li>";
+    foreach($vocabs as $vocab) {
+        $class = $filter == $vocab->machine_name ? \'class="active"\' : \'\';
+        $url_parameters[\'taxonomy\'] = $vocab->machine_name;
+
+        $filter_link = l($vocab->name, $path_alias, array(\'query\' => $url_parameters));
+        $option = "<li $class>$filter_link</li>";
+        print $option;
+    }
+}
+
+?>
+</ul>
+</div>';
+    /* Footer: Global: View area */
+    $handler->display->display_options['footer']['view']['id'] = 'view';
+    $handler->display->display_options['footer']['view']['table'] = 'views';
+    $handler->display->display_options['footer']['view']['field'] = 'view';
+    $handler->display->display_options['footer']['view']['view_to_insert'] = 'search_api_test:search_api_views_facets_block_1';
+    $handler->display->display_options['footer']['view']['inherit_arguments'] = TRUE;
+    /* Field: Indexed Node: CER » Context */
+    $handler->display->display_options['fields']['cer_lineage']['id'] = 'cer_lineage';
+    $handler->display->display_options['fields']['cer_lineage']['table'] = 'search_api_index_default_node_index';
+    $handler->display->display_options['fields']['cer_lineage']['field'] = 'cer_lineage';
+    /* Sort criterion: Search: Relevance */
+    $handler->display->display_options['sorts']['search_api_relevance']['id'] = 'search_api_relevance';
+    $handler->display->display_options['sorts']['search_api_relevance']['table'] = 'search_api_index_default_node_index';
+    $handler->display->display_options['sorts']['search_api_relevance']['field'] = 'search_api_relevance';
+    $handler->display->display_options['sorts']['search_api_relevance']['order'] = 'DESC';
+    /* Contextual filter: Global: Null */
+    $handler->display->display_options['arguments']['null_1']['id'] = 'null_1';
+    $handler->display->display_options['arguments']['null_1']['table'] = 'views';
+    $handler->display->display_options['arguments']['null_1']['field'] = 'null';
+    $handler->display->display_options['arguments']['null_1']['default_action'] = 'not found';
+    $handler->display->display_options['arguments']['null_1']['default_argument_type'] = 'fixed';
+    $handler->display->display_options['arguments']['null_1']['summary']['number_of_records'] = '0';
+    $handler->display->display_options['arguments']['null_1']['summary']['format'] = 'default_summary';
+    $handler->display->display_options['arguments']['null_1']['summary_options']['items_per_page'] = '25';
+    /* Contextual filter: Indexed Node: Node ID */
+    $handler->display->display_options['arguments']['nid']['id'] = 'nid';
+    $handler->display->display_options['arguments']['nid']['table'] = 'search_api_index_default_node_index';
+    $handler->display->display_options['arguments']['nid']['field'] = 'nid';
+    $handler->display->display_options['arguments']['nid']['default_action'] = 'not found';
+    $handler->display->display_options['arguments']['nid']['exception']['value'] = '';
+    $handler->display->display_options['arguments']['nid']['default_argument_type'] = 'fixed';
+    $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
+    $handler->display->display_options['arguments']['nid']['break_phrase'] = 1;
+    $handler->display->display_options['arguments']['nid']['not'] = 0;
+    /* Contextual filter: Global: Null */
+    $handler->display->display_options['arguments']['null']['id'] = 'null';
+    $handler->display->display_options['arguments']['null']['table'] = 'views';
+    $handler->display->display_options['arguments']['null']['field'] = 'null';
+    $handler->display->display_options['arguments']['null']['default_action'] = 'default';
+    $handler->display->display_options['arguments']['null']['default_argument_type'] = 'fixed';
+    $handler->display->display_options['arguments']['null']['default_argument_options']['argument'] = 'all';
+    $handler->display->display_options['arguments']['null']['summary']['number_of_records'] = '0';
+    $handler->display->display_options['arguments']['null']['summary']['format'] = 'default_summary';
+    $handler->display->display_options['arguments']['null']['summary_options']['items_per_page'] = '25';
+    /* Filter criterion: Search: Fulltext search */
+    $handler->display->display_options['filters']['search_api_views_fulltext']['id'] = 'search_api_views_fulltext';
+    $handler->display->display_options['filters']['search_api_views_fulltext']['table'] = 'search_api_index_default_node_index';
+    $handler->display->display_options['filters']['search_api_views_fulltext']['field'] = 'search_api_views_fulltext';
+    $handler->display->display_options['filters']['search_api_views_fulltext']['operator'] = 'OR';
+    $handler->display->display_options['filters']['search_api_views_fulltext']['expose']['operator_id'] = 'search_api_views_fulltext_op';
+    $handler->display->display_options['filters']['search_api_views_fulltext']['expose']['label'] = 'Fulltext search';
+    $handler->display->display_options['filters']['search_api_views_fulltext']['expose']['operator'] = 'search_api_views_fulltext_op';
+    $handler->display->display_options['filters']['search_api_views_fulltext']['expose']['identifier'] = 'search_api_views_fulltext';
+    $handler->display->display_options['filters']['search_api_views_fulltext']['expose']['remember_roles'] = array(
+        2 => '2',
+        1 => 0,
+        6 => 0,
+        3 => 0,
+        5 => 0,
+        4 => 0,
+    );
+    /* Filter criterion: Global: PHP */
+    $handler->display->display_options['filters']['php']['id'] = 'php';
+    $handler->display->display_options['filters']['php']['table'] = 'views';
+    $handler->display->display_options['filters']['php']['field'] = 'php';
+    $handler->display->display_options['filters']['php']['use_php_setup'] = 1;
+    $handler->display->display_options['filters']['php']['php_setup'] = '$static = mukurtu_taxonomy_records_get_content_by_vocabulary($view->args[0], $view->args[2]);
+';
+    $handler->display->display_options['filters']['php']['php_filter'] = 'if(empty($static)) {
+    return FALSE;
+}
+
+if(in_array($data->entity, $static)) {
+    return FALSE;
+}
+
+return TRUE;';
+
+    /* Display: Block */
+    $handler = $view->new_display('block', 'Block', 'block');
+    $translatables['mukurtu_records_referenced_content'] = array(
+        t('Master'),
+        t('Search API Test'),
+        t('more'),
+        t('Search'),
+        t('Reset'),
+        t('Sort by'),
+        t('Asc'),
+        t('Desc'),
+        t('Items per page'),
+        t('- All -'),
+        t('Offset'),
+        t('« first'),
+        t('‹ previous'),
+        t('next ›'),
+        t('last »'),
+        t('CER » Context'),
+        t('All'),
+        t('Fulltext search'),
+        t('Block'),
+    );
+
+
+  $views[$view->name] = $view;
+  return $views;
+}

@@ -1,0 +1,7 @@
+<?php
+
+function mukurtu_feeds_tamper_plugins_ctools_plugin_directory($owner, $plugin_type) {
+    if ($owner == 'feeds_tamper' && $plugin_type == 'plugins') {
+        return 'plugins/';
+    }
+}

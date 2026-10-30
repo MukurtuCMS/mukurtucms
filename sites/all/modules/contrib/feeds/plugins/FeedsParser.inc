@@ -15,14 +15,22 @@ class FeedsParserResult extends FeedsResult {
   public $items;
   public $current_item;
 
+  // Mukurtu specific change. We want to keep track of which
+  // fields were actually provided in the input. We'll use
+  // this information in the processor later to allow
+  // partial update of content (leaving unspecified fields
+  // intact for existing entities).
+  public $input_fields;
+
   /**
    * Constructor.
    */
-  public function __construct($items = array()) {
+  public function __construct($items = array(), $nid = NULL, $input_fields = array()) {
     $this->title = '';
     $this->description = '';
     $this->link = '';
     $this->items = $items;
+    $this->input_fields = $input_fields;
   }
 
   /**
@@ -46,6 +54,7 @@ class FeedsParserResult extends FeedsResult {
   public function currentItem() {
     return empty($this->current_item) ? NULL : $this->current_item;
   }
+
 }
 
 /**
@@ -70,7 +79,7 @@ abstract class FeedsParser extends FeedsPlugin {
    * @param $fetcher_result
    *   FeedsFetcherResult returned by fetcher.
    */
-  public abstract function parse(FeedsSource $source, FeedsFetcherResult $fetcher_result);
+  abstract public function parse(FeedsSource $source, FeedsFetcherResult $fetcher_result);
 
   /**
    * Clear all caches for results for given source.
@@ -89,8 +98,6 @@ abstract class FeedsParser extends FeedsPlugin {
    * @return
    *   An array of mapping sources, or FALSE if the sources can be defined by
    *   typing a value in a text field.
-   *
-   *   Example:
    *   @code
    *   array(
    *     'title' => t('Title'),
@@ -164,6 +171,7 @@ abstract class FeedsParser extends FeedsPlugin {
           return $node->uid;
         }
         break;
+
       case 'parent:nid':
         return $source->feed_nid;
     }
@@ -171,6 +179,21 @@ abstract class FeedsParser extends FeedsPlugin {
     $item = $result->currentItem();
     return isset($item[$element_key]) ? $item[$element_key] : '';
   }
+
+  /**
+   * Returns if the parsed result can have a title.
+   *
+   * Parser classes should override this method in case they support a source
+   * title.
+   *
+   * @return bool
+   *   TRUE if the parsed result can have a title.
+   *   FALSE otherwise.
+   */
+  public function providesSourceTitle() {
+    return FALSE;
+  }
+
 }
 
 /**
@@ -180,8 +203,11 @@ abstract class FeedsParser extends FeedsPlugin {
  * @see FeedsEnclosure
  */
 class FeedsElement {
-  // The standard value of this element. This value can contain be a simple type,
-  // a FeedsElement or an array of either.
+
+  /**
+   * The standard value of this element. This value can contain be a simple
+   * type, a FeedsElement or an array of either.
+   */
   protected $value;
 
   /**
@@ -217,6 +243,7 @@ class FeedsElement {
     }
     return (string) $this->getValue();
   }
+
 }
 
 /**
@@ -258,6 +285,7 @@ class FeedsTermElement extends FeedsElement {
   public function getValue() {
     return $this->name;
   }
+
 }
 
 /**
@@ -265,6 +293,7 @@ class FeedsTermElement extends FeedsElement {
  */
 class FeedsGeoTermElement extends FeedsTermElement {
   public $lat, $lon, $bound_top, $bound_right, $bound_bottom, $bound_left, $geometry;
+
   /**
    * @param $term
    *   An array or a stdClass object that is a Drupal taxonomy term. Can include
@@ -273,6 +302,7 @@ class FeedsGeoTermElement extends FeedsTermElement {
   public function __construct($term) {
     parent::__construct($term);
   }
+
 }
 
 /**
@@ -285,9 +315,9 @@ class FeedsEnclosure extends FeedsElement {
    *
    * @param string
    */
-   protected $mime_type;
+  protected $mime_type;
 
-   /**
+  /**
    * The default list of allowed extensions.
    *
    * @param string
@@ -416,44 +446,50 @@ class FeedsEnclosure extends FeedsElement {
    *
    * @return string
    *   The content of the referenced resource.
+   *
+   * @throws FeedsHTTPRequestException
+   *   In case the result code of the HTTP request is not in the 2xx series.
    */
   public function getContent() {
     feeds_include_library('http_request.inc', 'http_request');
-    $result = http_request_get($this->getUrlEncodedValue());
-    if ($result->code != 200) {
-      throw new Exception(t('Download of @url failed with code !code.', array('@url' => $this->getUrlEncodedValue(), '!code' => $result->code)));
-    }
+    $result = feeds_http_request($this->getUrlEncodedValue());
+    http_request_check_result($this->getUrlEncodedValue(), $result);
     return $result->data;
   }
 
   /**
    * Get a Drupal file object of the enclosed resource, download if necessary.
    *
-   * @param $destination
+   * @param string $destination
    *   The path or uri specifying the target directory in which the file is
    *   expected. Don't use trailing slashes unless it's a streamwrapper scheme.
+   * @param int $replace
+   *   Replace behavior when the destination file already exists.
    *
-   * @return
-   *   A Drupal temporary file object of the enclosed resource.
+   * @see file_save_data()
+   *
+   * @return object|false
+   *   A Drupal temporary file object of the enclosed resource or FALSE if the
+   *   value is empty.
    *
    * @throws Exception
    *   If file object could not be created.
    */
-  public function getFile($destination) {
-    $file = NULL;
+  public function getFile($destination, $replace = FILE_EXISTS_RENAME) {
+    $file = FALSE;
     if ($this->getValue()) {
       // Prepare destination directory.
       file_prepare_directory($destination, FILE_MODIFY_PERMISSIONS | FILE_CREATE_DIRECTORY);
       // Copy or save file depending on whether it is remote or local.
       if (drupal_realpath($this->getSanitizedUri())) {
-        $file           = new stdClass();
-        $file->uid      = 0;
-        $file->uri      = $this->getSanitizedUri();
+        $file = new stdClass();
+        $file->uid = 0;
+        $file->uri = $this->getSanitizedUri();
         $file->filemime = $this->getMIMEType();
         $file->filename = $this->getSafeFilename();
 
         if (drupal_dirname($file->uri) !== $destination) {
-          $file = file_copy($file, $destination);
+          $file = file_copy($file, $destination, $replace);
         }
         else {
           // If file is not to be copied, check whether file already exists,
@@ -462,6 +498,9 @@ class FeedsEnclosure extends FeedsElement {
           $existing_files = file_load_multiple(array(), array('uri' => $file->uri));
           if (count($existing_files)) {
             $existing = reset($existing_files);
+            if ($replace == FEEDS_FILE_EXISTS_SKIP) {
+              return $existing;
+            }
             $file->fid = $existing->fid;
             $file->filename = $existing->filename;
           }
@@ -480,7 +519,7 @@ class FeedsEnclosure extends FeedsElement {
             $filename = transliteration_clean_filename($filename);
           }
 
-          $file = file_save_data($this->getContent(), $destination . $filename);
+          $file = file_save_data($this->getContent(), $destination . $filename, $replace);
         }
         catch (Exception $e) {
           watchdog_exception('Feeds', $e, nl2br(check_plain($e)));
@@ -495,14 +534,19 @@ class FeedsEnclosure extends FeedsElement {
       return $file;
     }
   }
+
 }
 
 /**
  * Defines a date element of a parsed result (including ranges, repeat).
+ *
+ * @deprecated This is no longer in use and will not be maintained.
  */
 class FeedsDateTimeElement extends FeedsElement {
 
-  // Start date and end date.
+  /**
+   * Start date and end date.
+   */
   public $start;
   public $end;
 
@@ -585,7 +629,7 @@ class FeedsDateTimeElement extends FeedsElement {
    *
    * @param object $entity
    *   The entity to build the date field on.
-   * @param str $field_name
+   * @param string $field_name
    *   The name of the field to build.
    * @param int $delta
    *   The delta in the field.
@@ -599,7 +643,7 @@ class FeedsDateTimeElement extends FeedsElement {
     $use_start = $oldfield->start;
     $use_end = $oldfield->end;
 
-    // Set timezone if not already in the FeedsDateTime object
+    // Set timezone if not already in the FeedsDateTime object.
     $to_tz = date_get_timezone($info['settings']['tz_handling'], date_default_timezone());
     $temp = new FeedsDateTime(NULL, new DateTimeZone($to_tz));
 
@@ -649,6 +693,7 @@ class FeedsDateTimeElement extends FeedsElement {
       $entity->{$field_name}[$language][$delta]['value2'] = $use_end->format(date_type_format($info['type']));
     }
   }
+
 }
 
 /**
@@ -659,6 +704,8 @@ class FeedsDateTimeElement extends FeedsElement {
  * class.
  *
  * @see FeedsDateTimeElement
+ *
+ * @deprecated Use DateObject instead.
  */
 class FeedsDateTime extends DateTime {
   public $granularity = array();
@@ -667,24 +714,11 @@ class FeedsDateTime extends DateTime {
   private $_serialized_timezone;
 
   /**
-   * Helper function to prepare the object during serialization.
+   * The original time value passed into the constructor.
    *
-   * We are extending a core class and core classes cannot be serialized.
-   *
-   * Ref: http://bugs.php.net/41334, http://bugs.php.net/39821
+   * @var mixed
    */
-  public function __sleep() {
-    $this->_serialized_time = $this->format('c');
-    $this->_serialized_timezone = $this->getTimezone()->getName();
-    return array('_serialized_time', '_serialized_timezone');
-  }
-
-  /**
-   * Upon unserializing, we must re-build ourselves using local variables.
-   */
-  public function __wakeup() {
-    $this->__construct($this->_serialized_time, new DateTimeZone($this->_serialized_timezone));
-  }
+  protected $originalValue;
 
   /**
    * Overridden constructor.
@@ -696,6 +730,8 @@ class FeedsDateTime extends DateTime {
    *   PHP DateTimeZone object, NULL allowed
    */
   public function __construct($time = '', $tz = NULL) {
+    $this->originalValue = $time;
+
     if (is_numeric($time)) {
       // Assume UNIX timestamp if it doesn't look like a simple year.
       if (strlen($time) > 4) {
@@ -734,6 +770,44 @@ class FeedsDateTime extends DateTime {
   }
 
   /**
+   * Helper function to prepare the object during serialization.
+   *
+   * We are extending a core class and core classes cannot be serialized.
+   *
+   * Ref: http://bugs.php.net/41334, http://bugs.php.net/39821
+   */
+  public function __sleep() {
+    $this->_serialized_time = $this->format('c');
+    $this->_serialized_timezone = $this->getTimezone()->getName();
+    return array('_serialized_time', '_serialized_timezone');
+  }
+
+  /**
+   * Upon unserializing, we must re-build ourselves using local variables.
+   */
+  #[\ReturnTypeWillChange]
+  public function __wakeup() {
+    $this->__construct($this->_serialized_time, new DateTimeZone($this->_serialized_timezone));
+  }
+
+  /**
+   * Returns the string representation.
+   *
+   * Will try to use the literal input, if that is a string. Fallsback to
+   * ISO-8601.
+   *
+   * @return string
+   *   The string version of this DateTime object.
+   */
+  public function __toString() {
+    if (is_scalar($this->originalValue)) {
+      return (string) $this->originalValue;
+    }
+
+    return $this->format('Y-m-d\TH:i:sO');
+  }
+
+  /**
    * This function will keep this object's values by default.
    */
   public function merge(FeedsDateTime $other) {
@@ -769,6 +843,7 @@ class FeedsDateTime extends DateTime {
    * In order to set a timezone for a datetime that doesn't have such
    * granularity, merge() it with one that does.
    */
+  #[\ReturnTypeWillChange]
   public function setTimezone($tz, $force = FALSE) {
     // PHP 5.2.6 has a fatal error when setting a date's timezone to itself.
     // http://bugs.php.net/bug.php?id=45038
@@ -777,8 +852,8 @@ class FeedsDateTime extends DateTime {
     }
 
     if (!$this->hasTime() || !$this->hasGranularity('zone') || $force) {
-      // this has no time or timezone granularity, so timezone doesn't mean much
-      // We set the timezone using the method, which will change the day/hour, but then we switch back
+      // This has no time or timezone granularity, so timezone doesn't mean much
+      // We set the timezone using the method, which will change the day/hour, but then we switch back.
       $arr = $this->toArray();
       parent::setTimezone($tz);
       $this->setDate($arr['year'], $arr['month'], $arr['day']);
@@ -831,7 +906,7 @@ class FeedsDateTime extends DateTime {
     $temp = date_parse($time);
     // This PHP method currently doesn't have resolution down to seconds, so if
     // there is some time, all will be set.
-    foreach (self::$allgranularity AS $g) {
+    foreach (self::$allgranularity as $g) {
       if ((isset($temp[$g]) && is_numeric($temp[$g])) || ($g == 'zone' && (isset($temp['zone_type']) && $temp['zone_type'] > 0))) {
         $this->granularity[] = $g;
       }
@@ -847,6 +922,7 @@ class FeedsDateTime extends DateTime {
   protected function toArray() {
     return array('year' => $this->format('Y'), 'month' => $this->format('m'), 'day' => $this->format('d'), 'hour' => $this->format('H'), 'minute' => $this->format('i'), 'second' => $this->format('s'), 'zone' => $this->format('e'));
   }
+
 }
 
 /**
@@ -864,12 +940,16 @@ function feeds_to_unixtime($date, $default_value) {
   if (is_numeric($date)) {
     return $date;
   }
-  elseif (is_string($date) && !empty($date)) {
-    $date = new FeedsDateTimeElement($date);
+
+  if ($date instanceof FeedsDateTimeElement) {
     return $date->getValue();
   }
-  elseif ($date instanceof FeedsDateTimeElement) {
-    return $date->getValue();
+
+  if (is_string($date) || is_object($date) && method_exists($date, '__toString')) {
+    if ($date_object = date_create(trim($date))) {
+      return $date_object->format('U');
+    }
   }
+
   return $default_value;
 }

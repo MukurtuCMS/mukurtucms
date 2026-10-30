@@ -1,0 +1,684 @@
+<?php
+/**
+ * @file
+ * Code for the Mukurtu Digital Heritage Admin Notifications feature.
+ */
+
+include_once 'ma_dhan.features.inc';
+
+/**
+ * Implements hook_node_delete().
+ */
+function ma_dhan_node_delete($node) {
+
+  ////
+  // Update a DHAN when a DH node is deleted.
+  // This differs from the ma_collaboration_tools, where deleting a child page will delete its following node, and no notification occurs.
+  // Here we want to inform admins of DH deletions.
+  ////
+  if ($node->type == 'digital_heritage') {
+    if (!$dhan_nid = ma_dhan_get_dhan_nid($node->nid)) {
+      return;
+    }
+    $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid);
+
+    // Unset the users_notified on the DHAN, then add a new DHAN email FC.
+    $dhan_node_w->field_users_notified->set([]);
+    $dhan_node_w->save();
+    ma_dhan_set_dhan_email_fc($dhan_node_w, $node, 'deleted');
+
+    // Update field_all_users_notified
+    $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid); // reload the notification wrapper, since it may have been updated in ma_dhan_field_collection_item_insert (as fired from ma_dhan_set_dhan_email_fc)
+    ma_shared_notification_components_update_field_all_users_notified($dhan_node_w);
+
+  }
+
+  ////
+  // Update a CP or Community's DH's DHANs when the CP/Community is deleted, since their notify lists need to be updated.
+  ////
+  if ($node->type == 'cultural_protocol_group' or $node->type == 'community') {
+    ma_dhan_update_dh_dhan_notify_lists($node, TRUE);
+  }
+
+}
+
+/**
+ * Implements hook_node_insert().
+ */
+function ma_dhan_node_insert($node) {
+
+  ////
+  // Create a DHAN when a DH node is created.
+  ////
+
+  if ($node->type == 'digital_heritage') {
+
+    // Create and save the DHAN node.
+    $values = array(
+      'type' => 'dhan',
+      'uid' => 1,
+      'status' => 1,
+    );
+    $dhan_node = entity_create('node', $values);
+    $dhan_node_w = entity_metadata_wrapper('node', $dhan_node);
+    $dhan_node_w->title->set($node->title . ' (DHAN)');
+    $dhan_node_w = ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($node, $dhan_node_w);
+    $dhan_node_w->field_following_content->set($node->nid);
+    $dhan_node_w->save();
+
+    // Attach the dhan_node email field collection to the dhan_node node.
+    ma_dhan_set_dhan_email_fc($dhan_node_w, $node, 'created');
+
+    // Update field_all_users_notified
+    $dhan_node_w = entity_metadata_wrapper('node',  $dhan_node_w->getIdentifier()); // reload the dhan_node wrapper, since it may have been updated in ma_dhan_field_collection_item_insert (as fired from ma_dhan_set_dhan_email_fc)
+    ma_shared_notification_components_update_field_all_users_notified($dhan_node_w);
+
+  }
+
+}
+
+/**
+ * Implements hook_node_update().
+ */
+function ma_dhan_node_update($node) {
+
+  ////
+  // Update a DHAN when a DH node is updated.
+  ////
+  if ($node->type == 'digital_heritage') {
+    $dh_old_w = entity_metadata_wrapper('node', $node->original);
+    $dh_new_w = $cw = entity_metadata_wrapper('node', $node);
+
+    // When updating a DH node, only create a DHAN email FC instance if certain fields are changed.
+
+    // Fields to ignore.
+    $ignore_fields = [
+      'field_pre_actions',
+      'path',
+      'redirect',
+      // 'field_item_privacy_setting',
+      'field_related_dh_items', // It’s a 2-way relationship and if a DH node A adds DH node B as a related item, we don’t want a notification on DH node B.
+      'field_related_dictionary_words', // It’s a 2-way relationship and if a Dictionary node adds DH node as a related item, we don’t want a notification on the DH node.
+      'field_related_content', // It's a 2-way relationship.
+      'field_personal_collections', // We don't want DHAN notifications for items being added to personal collections.
+      'field_book_children', // If you add a page to a book, the admin will already be notified of the new page, no need to notify them separately that the parent page was changed (where its only change is the fact that a new page was added)
+      'field_book_parent', // This should never happen as a book child page cannot be moved to new book, but leaving here for good measure.
+      'field_community_record_children', // If you add a community record to a parent DH node, the admin will already be notified of the new child, no need to notify them separately of this.
+      'field_community_record_parent', // This should never happen, leaving for good measure.
+    ];
+
+    // $properties_within_fields_to_ignore does what it says, wherein those properties can be nested anywhere within the field that is being compared.
+    $properties_within_fields_to_ignore = [
+      'safe_value',
+      'safe_summary',
+      'all_day',
+      'show_repeat_settings',
+      'show_todate',
+      'offset',
+      'offset2',
+    ];
+
+    $data = array_merge(['title' => ['label' => 'Title']], field_info_instances('node', $dh_new_w->getBundle()));
+    $fields_list = array_keys($data);
+    $diff_list = [];
+    foreach ($fields_list as $key => $field_name) {
+      // Ignore if field name belong to ignore list
+      if (in_array($field_name, $ignore_fields)) {
+        continue;
+      }
+      $old_value = $dh_old_w->{$field_name}->raw();
+      $new_value = $dh_new_w->{$field_name}->raw();
+      if (ma_shared_notification_components_check_for_field_value_change($old_value, $new_value, $properties_within_fields_to_ignore)) {
+        $diff_list[$field_name] = $data[$field_name]['label'];
+      }
+    }
+
+    // There are changes to the fields.
+    if (count($diff_list)) {
+
+      if (!$dhan_nid = ma_dhan_get_dhan_nid($node->nid)) {
+        return;
+      }
+      $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid);
+
+      // First update the DHAN, if there are changes to its community or protocol fields.
+      // We probably don't need to check against field_community_ref, as at this point only the og_group_ref fields is changed (even if a protocol is changed) due to custom protocol field. But leaving in for good measure.
+      if (array_key_exists('og_group_ref', $diff_list) OR array_key_exists('field_community_ref', $diff_list)) {
+        $dhan_node_w = ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($node, $dhan_node_w);
+        $dhan_node_w->save();
+      }
+
+      // Unset the users_notified on the DHAN, then add a new DHAN email FC.
+      $dhan_node_w->field_users_notified->set([]);
+      $dhan_node_w->save();
+      ma_dhan_set_dhan_email_fc($dhan_node_w, $node, 'updated', $diff_list);
+
+      // Update field_all_users_notified
+      $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid); // reload the notification wrapper, since it may have been updated in ma_dhan_field_collection_item_insert (as fired from ma_dhan_set_dhan_email_fc)
+      ma_shared_notification_components_update_field_all_users_notified($dhan_node_w);
+    }
+  }
+
+}
+
+/**
+ * Helper function to update a CP or Community's DH's DHAN's notify lists.
+ */
+function ma_dhan_update_dh_dhan_notify_lists($node, $deletion = FALSE) {
+  // Get all DH items within this comm/cp.
+  $fieldcondition = [
+    'community' => ['field' => 'field_community_ref', 'col' => 'nid'],
+    'cultural_protocol_group' => ['field' => 'og_group_ref', 'col' => 'target_id'],
+  ];
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->addMetaData('account', user_load(1))
+    ->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'digital_heritage')
+    ->propertyCondition('status', NODE_PUBLISHED)
+    ->fieldCondition($fieldcondition[$node->type]['field'], $fieldcondition[$node->type]['col'], $node->nid)
+    ->execute();
+  if (count($result['node'])) {
+    // Update the DHANs for all the DH nodes in this comm/cp.
+    foreach ($result['node'] as $dh_nid => $v) {
+      $dh_node = node_load($dh_nid);
+      if (!$dhan_nid = ma_dhan_get_dhan_nid($dh_nid)) {
+        continue;
+      }
+      $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid);
+      $comm_cp_nid_being_deleted = FALSE;
+      if ($deletion) {
+        $comm_cp_nid_being_deleted = $node->nid;
+      }
+      $dhan_node_w = ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($dh_node, $dhan_node_w, $comm_cp_nid_being_deleted);
+      $dhan_node_w->save();
+    }
+  }
+}
+
+// Set the notification lists on a DHAN node wrapper (to be saved by calling function).
+function ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($dh_node, $dhan_node_w, $comm_cp_being_deleted_nid = FALSE) {
+
+  // Build the list of parent comms and cps.
+  $comms_cps = [];
+  foreach ($dh_node->field_community_ref[LANGUAGE_NONE] as $comm) {
+    $comms_cps[] = $comm['nid'];
+  }
+  foreach ($dh_node->og_group_ref[LANGUAGE_NONE] as $cp) {
+    $comms_cps[] = $cp['target_id'];
+  }
+
+  // Build the notify list.
+  $notify_list = [];
+  foreach ($comms_cps as $comm_cp_nid) {
+    if ($comm_cp_nid <> $comm_cp_being_deleted_nid) { // if this function was called from hook_node_delete of a comm/cp, it's not actually yet deleted so we have to force skip it here.
+      $comm_cp_node = node_load($comm_cp_nid);
+      if (isset($comm_cp_node->field_dhan_notified_users[LANGUAGE_NONE])) {
+        $notify_list = array_merge($notify_list, array_column($comm_cp_node->field_dhan_notified_users[LANGUAGE_NONE], 'target_id'));
+      }
+    }
+  }
+  // Remove duplicates
+  $notify_list = array_unique($notify_list);
+
+  // Build notify_frequency lists.
+  $notify_frequency = [
+    'right away' => [],
+    'daily digest' => [],
+    'weekly digest' => [],
+  ];
+  foreach ($notify_list as $notify_uuid) {
+    $account = user_load($notify_uuid);
+    $user_frequency = isset($account->field_dhan_frequency[LANGUAGE_NONE][0]['value']) ? $account->field_dhan_frequency[LANGUAGE_NONE][0]['value'] : 'right away';
+    $notify_frequency[$user_frequency][] = $notify_uuid;
+  }
+
+  // Set the fields on the notification wrapper, and return the wrapper to be saved in calling function.
+  $dhan_node_w->field_notify_immediately->set($notify_frequency['right away']);
+  $dhan_node_w->field_notify_day->set($notify_frequency['daily digest']);
+  $dhan_node_w->field_notify_week->set($notify_frequency['weekly digest']);
+  $dhan_node_w->field_notify_all->set(array_merge($notify_frequency['right away'], $notify_frequency['daily digest'], $notify_frequency['weekly digest']));
+
+  return $dhan_node_w;
+}
+
+
+// Attach the dhan email field collection to a given dhan node.
+function ma_dhan_set_dhan_email_fc($dhan_node_w, $dh_node, $op, $diff_list = []) {
+  $fc_email = entity_create('field_collection_item', array('field_name' => 'field_notification_email'));
+  $fc_email->setHostEntity('node', node_load($dhan_node_w->getIdentifier()));
+  $fce_w = entity_metadata_wrapper('field_collection_item', $fc_email);
+
+  // Set the time
+  $fce_w->field_notification_date_gene->set(time());
+
+  // Set the action
+  $fce_w->field_notification_action->set($op);
+
+  // Set the subject
+  $fce_w->field_notification_subject->set('"' . $dh_node->title . '" has been ' . $op . '.');
+
+  // Set the body
+  switch ($op) {
+    case 'updated':
+    case 'deleted':
+      global $user;
+      $author_id = $user->uid;
+      $dh_path = $dh_node->path["alias"];
+      break;
+    case 'created':
+      $author_id = $dh_node->uid;
+      $dh_path =  pathauto_create_alias('node', 'return', '/node/' . $dh_node->nid, ['node' => $dh_node], $dh_node->type);
+      break;
+  }
+  $body = 'The Digital Heritage item "' . $dh_node->title . '", was ' . $op . ' by ' . $dh_node->name . ' on ' . date('l, F j', $dh_node->timestamp) . ' at ' . date('g:ia', $dh_node->timestamp) . '.';
+  $body .= "\n\nYou are being notified of this because you have chosen to receive notifications for either a Community or a Protocol that this item is in.";
+  if ($op == 'updated') {
+    $body .= "\n\nThe following field(s) were updated: " . implode (', ', $diff_list)  . '.';
+  }
+  if ($op <> 'deleted') {
+    $body .= "\n\nView the Digital Heritage item: " . $GLOBALS["base_url"] . '/' . $dh_path;
+  }
+  $fce_w->field_notification_body->set($body);
+
+  // Set the notification "author".
+  $fce_w->field_notification_author->set($author_id);
+
+  // Save the field collection.
+  $fce_w->save();
+}
+
+/**
+ * Custom notification field.
+ */
+function ma_dhan_notification_field($entity) {
+
+  $user_roles = og_get_user_roles('node', $entity->nid);
+  if (in_array('protocol steward', $user_roles) OR in_array('community manager', $user_roles)) { // The Notify / Do not notify button should only show up is user is a CM or PS of the node.
+
+    global $user;
+    $user = user_load($user->uid); // Must reload user object to get the hidden field_dhan_frequency field.
+
+    $notified = ma_dhan_is_notified($entity, $user->uid);
+
+    // Create output.
+    $frequency = 'right away';
+    if (isset($user->field_dhan_frequency[LANGUAGE_NONE][0]['value'])) {
+      $frequency = $user->field_dhan_frequency[LANGUAGE_NONE][0]['value'];
+    }
+    $freq_map = [
+      'right away' => 'as they occur',
+      'daily digest' => 'daily',
+      'weekly digest' => 'weekly',
+    ];
+    $output = '<div class="dh-notifications">';
+    if ($notified) {
+      $output .= '<p>You are receiving notifications ' . $freq_map[$frequency] . '.</p>';
+      $output .= '<p>' . l('Stop receiving notifications.', 'node/' . $entity->nid . '/no-dhan') . '</p>';
+      $filter = $entity->type;
+      if ($filter == 'cultural_protocol_group') {
+        $filter = 'protocol';
+      }
+      $output .= '<p>' . l ('View your notifications', '/user/' . $user->uid . '/digital-heritage-notifications', ['query' => [$filter => $entity->nid]]) . '</p>';
+    }
+    else {
+      $output .= '<p>You are not receiving notifications.' . '</p>';
+      $output .= '<p>' . l('Receive notifications.', 'node/' . $entity->nid . '/dhan') . '</p>';
+    }
+    $output .= '</div>';
+    return $output;
+
+  }
+
+}
+
+/**
+ * Helper function for DHAN view to show the DHAN frequency form in the header.
+ */
+function ma_dhan_show_default_dhan_frequency_form($view) {
+  global $user;
+  if ($view->args[0] == $user->uid) { // Only shows to user when viewing their own notifications.
+    $form = drupal_get_form('ma_dhan_dhan_frequency');
+    return drupal_render($form);
+  }
+}
+
+/**
+ * Returns if a given user is set to be notified on a given Protocol / Community.
+ */
+function ma_dhan_is_notified($entity, $uid) {
+  if (isset($entity->field_dhan_notified_users[LANGUAGE_NONE])) {
+    foreach ($entity->field_dhan_notified_users[LANGUAGE_NONE] AS $notified_user) {
+      if ($uid == $notified_user['target_id']) {
+        return TRUE;
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function ma_dhan_menu() {
+
+  $items['node/%node/dhan'] = array(
+    'page callback' => 'ma_dhan_notify_process',
+    'page arguments' => array(1, 'dhan'),
+    'access callback' => TRUE,
+  );
+
+  $items['node/%node/no-dhan'] = array(
+    'page callback' => 'ma_dhan_notify_process',
+    'page arguments' => array(1, 'no_dhan'),
+    'access callback' => TRUE,
+  );
+
+  return $items;
+}
+
+/**
+ * Callback to process the user clicking the notify / do not notify button.
+ */
+function ma_dhan_notify_process($node, $op) {
+  global $user;
+  $nw = entity_metadata_wrapper ('node', $node);
+  if ($op=='dhan') {
+    $nw->field_dhan_notified_users[] = $user->uid;
+  }
+  else {
+    $new_notified_users = [];
+    $notified_users = $nw->field_dhan_notified_users->value();
+    foreach ($notified_users as $notified_user) {
+      if ($notified_user->uid <> $user->uid) {
+        $new_notified_users[] = $notified_user->uid;
+      }
+    }
+    $nw->field_dhan_notified_users->set($new_notified_users);
+  }
+  $nw->save();
+
+  // Update this comm/community's notify lists.
+  ma_dhan_update_dh_dhan_notify_lists($node);
+
+  // Return to the node.
+  drupal_goto('node/' . $node->nid);
+}
+
+
+/**
+ * Access callback called by the DHAN view.
+ */
+function ma_dhan_dhan_report_access() {
+  $viewing_user = arg(1);
+  global $user;
+  // Can view if own profile page
+  if ($user->uid == $viewing_user) {
+    return TRUE;
+  }
+  // Can view if admin or Mukurtu admin
+  $admin = user_role_load_by_name('administrator');
+  $mukurtuadmin = user_role_load_by_name('Mukurtu Administrator');
+  if (user_has_role($admin->rid) || user_has_role($mukurtuadmin->rid)) {
+    return TRUE;
+  }
+}
+
+/**
+ *  Implements hook_form_FORM_ID_alter().
+ */
+function ma_dhan_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
+
+  // The exposed filters on the DHAN view.
+  if ($form['#id'] == 'views-exposed-form-dhan-page') {
+
+    $uid = arg(1);
+    $user = user_load($uid);
+    if (!$user) {
+      return; // Should never happen.
+    }
+
+    // Make the date field smaller.
+    $form['date']['value']['#size'] = 10;
+
+    // Do not show "commented on" as an action option, as it only applies to Following notifications.
+    unset($form['action']['#options']['commented on']);
+
+    // Do not show "Anonymous" as a user option
+    unset ($form['user']['#options'][0]);
+
+    // Add the Protocol and Community exposed filters,
+    // showing only the Protocols that the user is a steward and Communities user is a Manager of,
+    // Views on its own can't do this. Especially apply the filter which is handled in ma_dhan_views_post_execute.
+    $community_options = $protocol_options = ['All' => '- Any -'];
+    $groups = og_get_groups_by_user($user);
+    if (count($groups)) {
+      foreach ($groups['node'] as $gid) {
+        $user_roles_in_group = og_get_user_roles('node', $gid, $uid);
+        if (in_array('community manager', $user_roles_in_group)) {
+          $comm_cp_w = entity_metadata_wrapper('node', $gid);
+          $community_options[$gid] = $comm_cp_w->label();
+          $users_to_notify = $comm_cp_w->field_dhan_notified_users->raw();
+          if (!in_array($uid, $users_to_notify)) {
+            $community_options[$gid] .= ' (not receiving notifications)';
+          }
+        }
+        if (in_array('protocol steward', $user_roles_in_group)) {
+          $comm_cp_w = entity_metadata_wrapper('node', $gid);
+          $protocol_options[$gid] = $comm_cp_w->label();
+          $users_to_notify = $comm_cp_w->field_dhan_notified_users->raw();
+          if (!in_array($uid, $users_to_notify)) {
+            $protocol_options[$gid] .= ' (not receiving notifications)';
+          }
+        }
+      }
+    }
+//    $form['community'] = [
+//      '#type' => 'select',
+//      '#options' => $community_options,
+//      '#default_value' => 'All',
+//      '#prefix' => '<label>' . t('Community') . '</label>',
+//    ];
+    $form['protocol'] = [
+      '#type' => 'select',
+      '#options' => $protocol_options,
+      '#default_value' => 'All',
+      '#prefix' => '<label>' . t('Protocol') . '</label>',
+    ];
+    // Added form elements need to go into their own widgets (as described at https://www.drupal.org/project/views/issues/893392#comment-5700698),
+    // or else they end up within the submit div.
+    $new_form_info = array(
+//      'filter-community' => array('value' => 'community'),
+      'filter-protocol' => array('value' => 'protocol'),
+    );
+    $form['#info'] = array_merge($form['#info'], $new_form_info); // The order of filters in $form['#info'] is the order they will appear. In this case, we want the community and protocol at the end, so we can just append them.
+
+
+    // Use chosen for all the select filters (all filters except Date)
+    // Only User really needs this (because all users are displayed), but using for all for consistency.
+    $form['user']['#chosen'] = TRUE;
+    $form['action']['#chosen'] = TRUE;
+    $form['community']['#chosen'] = TRUE;
+    $form['protocol']['#chosen'] = TRUE;
+
+  }
+}
+
+
+/**
+ * Implements hook_views_post_execute.
+ */
+function ma_dhan_views_post_execute(&$view) {
+
+  // DH notifications view
+  if ($view->name == "dhan") {
+
+    $uid = $view->args[0];
+    $user = user_load($uid);
+    if (!$user) {
+      return; // Should never happen.
+    }
+
+    // Set a custom page title
+    drupal_set_title('Digital Heritage Notifications for ' . $user->name);
+
+    ////////
+    // Filter down the DH notifications view. Views UI could not handle this, so we are doing it here.
+    // It would be better to do this in a views query alter so that pagers could work (as now there is no paging),
+    // plus more efficient, but I do not think it is possible. If this becomes slow then will need to set a hidden field
+    // on the DHAN with a list of all the comms and communities is referenced DH is in. That could get ugly with node updates, so avoid.
+    ////////
+
+    if (isset($_GET['community'])) {
+      if (is_numeric($_GET['community'])) {
+        $community_filter = $_GET['community'];
+      }
+    }
+
+    if (isset($_GET['protocol'])) {
+      if (is_numeric($_GET['protocol'])) {
+        $protocol_filter = $_GET['protocol'];
+      }
+    }
+
+    $show_node = []; // Use this as a cache so that we don't have to repeat the test on every node (as there are multiple actions / field collections per node)
+
+    foreach ($view->result as $i => $row) { // This is why it's inefficient. We are looping through the view results individually instead of applying a filter at the query level.
+      $dh_nid = $row->node_field_data_field_following_content_nid;
+      // First check against the cache.
+      if ($show_node[$dh_nid] == 'show') {
+        continue;
+      }
+      if ($show_node[$dh_nid] == 'do not show') {
+        unset ($view->result[$i]);
+        continue;
+      }
+
+      $dh_node = node_load($dh_nid);
+
+      // Build the list of $comm_cps (communities and protocols) that this DH node is in,
+      // applying the community or protocol filters (if set)
+      $comms_cps= [];
+      foreach ($dh_node->field_community_ref[LANGUAGE_NONE] as $comm) {
+        if (!isset($community_filter) OR $comm['nid'] == $community_filter) {
+          $comms_cps[] = $comm['nid'];
+        }
+      }
+      foreach ($dh_node->og_group_ref[LANGUAGE_NONE] as $cp) {
+        $protocols[] = $cp['target_id'];
+        if (!isset($protocol_filter) OR $cp['target_id'] == $protocol_filter) {
+          $comms_cps[] = $cp['target_id'];
+        }
+      }
+
+      // We now have our list of $comm_cps. Now filter out those that the user is not set to receive notifications on.
+      foreach ($comms_cps as $comm_cp_nid) {
+        $comm_cp_w = entity_metadata_wrapper('node', $comm_cp_nid);
+        if ($comm_cp_w->__isset('field_dhan_notified_users')) { // Need to do this check first in case a comm or cp was deleted (the entity reference remains)
+          $users_to_notify = $comm_cp_w->field_dhan_notified_users->raw();
+          if (in_array($uid, $users_to_notify)) {
+            $show_node[$dh_nid] = 'show'; // User is receiving notifications on at least one of the DH's communities or protocols.
+            continue 2;
+          }
+        }
+      }
+      $show_node[$dh_nid] = 'do not show'; // User is not receiving notification on any of the DH's communities or protocols.
+      unset ($view->result[$i]);
+      continue;
+    }
+  }
+}
+
+/**
+ * Notification frequency form (header of the DHAN view).
+ */
+function ma_dhan_dhan_frequency($form, &$form_state) {
+  $account = user_load(arg(1));
+  $def_val = isset($account->field_dhan_frequency[LANGUAGE_NONE][0]['value']) ? $account->field_dhan_frequency[LANGUAGE_NONE][0]['value'] : 'right away';
+  global $user;
+  $form = [
+    'dhan_frequency' => [
+      '#type' => 'select',
+      '#title' => t('Digital Heritage Notification Frequency: '),
+      '#options' => field_info_field('field_dhan_frequency')['settings']['allowed_values'],
+      '#default_value' => $def_val,
+      '#disabled' => $user->uid <> $account->uid ? TRUE : FALSE,
+      '#attributes' => [
+        'onChange' => 'this.form.submit();',
+      ],
+    ],
+    'submit' => [
+      '#type' => 'submit',
+    ],
+  ];
+  return $form;
+}
+
+/**
+ * Submit handler for the DHAN frequency form.
+ */
+function ma_dhan_dhan_frequency_submit ($form, &$form_state) {
+
+  $account = user_load(arg(1));
+  $existing_freq = $account->field_dhan_frequency[LANGUAGE_NONE][0]['value'];
+  $new_freq = $form_state['values']['dhan_frequency'];
+  if ($existing_freq <> $new_freq) {
+    // Update the DHAN frequency on the user object.
+    $account->field_dhan_frequency[LANGUAGE_NONE][0]['value'] = $new_freq;
+    user_save($account);
+  }
+
+  // Update the DHANs for all the CPs and Comms the user is following.
+  $frequency_field_map = [
+    'right away' => 'field_notify_immediately',
+    'daily digest' => 'field_notify_day',
+    'weekly digest' => 'field_notify_week',
+  ];
+  // Get all DHANs the user is marked as a follower of.
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->addMetaData('account', user_load(1))
+    ->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'dhan')
+    ->propertyCondition('status', NODE_PUBLISHED)
+    ->fieldCondition('field_notify_all', 'target_id', $account->uid)
+    ->execute();
+  if (isset($result['node']) && count($result['node'])) {
+    // Loop through these, and check the child page if this user is using their default notification frequency for that node, and if so, update the Following node.
+    foreach (array_keys($result['node']) as $nid) {
+      $dhan_w = entity_metadata_wrapper('node', $nid);
+      $dhan_w->{$frequency_field_map[$existing_freq]}->set(array_diff($dhan_w->{$frequency_field_map[$existing_freq]}->raw(), [$account->uid])); // Remove the user from the old frequency
+      $dhan_w->{$frequency_field_map[$new_freq]}[] = $account->uid; // Add the user to the new frequency
+      $dhan_w->save();
+    }
+  }
+
+}
+
+/**
+ * Helper function to get the DHAN NID given DH NID
+ */
+function ma_dhan_get_dhan_nid($dh_nid) {
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->addMetaData('account', user_load(1))
+    ->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'dhan')
+    ->propertyCondition('status', NODE_PUBLISHED)// or else it will retrieve node references for deleted DH items
+    ->fieldCondition('field_following_content', 'target_id', $dh_nid)
+    ->execute();
+  if (isset($result['node'])) {
+    return reset($result['node'])->nid;
+  }
+  else {
+    // This gets noisy, so leaving out: watchdog('ma_dhan', 'There is no DHAN for DH %nid', array('%nid' => $dh_nid), WATCHDOG_WARNING);
+  }
+}
+
+/**
+ * Helper function to return if node is a Community or a CP.
+ */
+function ma_dhan_is_cp_or_comm($node) {
+  if (in_array($node->type, ['community', 'cultural_protocol_group'])) {
+    return TRUE;
+  }
+}

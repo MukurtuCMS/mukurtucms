@@ -1,0 +1,44 @@
+diff --git a/og.module b/og.module
+index 6f28205..32d0275 100755
+--- a/og.module
++++ b/og.module
+@@ -545,6 +545,26 @@ function og_node_access($node, $op, $account) {
+         ($account->uid == $node->uid && og_user_access_entity("$op own $type content", 'node', $node, $account));
+     }
+
++    // mukurtu patch
++    // Edit perms on nodes-in-CP nodes should be determined by our custom logic, same as view perms
++    // Patch required because on Update (but not View), OG's NODE_ACCESS_DENY overrides mukurtu_protocol_fields NODE_ACCESS_ALLOW
++    if ($op == 'update') {
++      if (ma_cultural_protocol_node_type_can_have_cp($node->type)) {
++        // For update, dictionary words should use standard OG not cultural protocols.
++        // They are governed by language communities, not cultural protocols.
++        if ($node->type == 'dictionary_word') {
++          // However, when a CP denies a user from viewing a DW, we do want to deny update.
++          if (!node_access('view', $node)) {
++            return NODE_ACCESS_DENY;
++          }
++          // If we reach here, user can view DW, fall through and let OG handle the rest.
++        } else {
++          return mukurtu_protocol_field_update_node_in_cp_access($node);
++        }
++      }
++    }
++    // end patch
++
+     if (!$access && $op == 'update' && og_is_group('node', $node)) {
+       // The node is a group, so check "update group" permission.
+       $access = og_user_access_entity('update group', 'node', $node, $account);
+@@ -2296,6 +2296,12 @@ function og_user_access_entity($perm, $entity_type, $entity, $account = NULL) {
+       return TRUE;
+     }
+     else {
++      // mukurtu patch
++      // The following is buggy. Group admins of Community have edit permission on Community nodes, so they are then falsely given edit permission on CP nodes (a subgroup) therein that they don't own. See: http://drupal.aspcode.net/ppst/63547274810018958098124/debuging-og-access-field
++      // So simply returning FALSE here instead.
++      return FALSE;
++      // end patch
++
+       // An entity can be a group and group content in the same time. The group
+       // didn't return TRUE, but the user still might have access to the
+       // permission in group content context.

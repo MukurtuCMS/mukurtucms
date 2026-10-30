@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function i18n_custom_add_another_testing_field_widget_info() {
+  return array(
+    'i18n_caa_test_field_widget' => array(
+      'label' => t('Custom add another'),
+      'field types' => array('text'),
+      'behaviors' => array(
+        'multiple values' => FIELD_BEHAVIOR_DEFAULT,
+        'default value' => FIELD_BEHAVIOR_NONE,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function i18n_custom_add_another_testing_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+
+  switch ($instance['widget']['type']) {
+
+    case 'i18n_caa_test_field_widget':
+      $field_parents = $element['#field_parents'];
+      $field_name = $element['#field_name'];
+      $language = $element['#language'];
+
+      $parents = array_merge($field_parents, array($field_name, $language, $delta));
+
+      $element += array(
+        '#parents' => $parents,
+      );
+
+      if ($field['cardinality'] == FIELD_CARDINALITY_UNLIMITED) {
+        $element['remove_button'] = array(
+          '#delta' => $delta,
+          '#name' => implode('_', $parents) . '_remove_button',
+          '#type' => 'submit',
+          '#value' => t('Remove'),
+          '#validate' => array(),
+          '#submit' => array(),
+          '#limit_validation_errors' => array(),
+          '#weight' => 1000,
+        );
+      }
+
+      return $element;
+  }
+}

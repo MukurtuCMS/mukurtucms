@@ -1,4 +1,4 @@
-(function($, Drupal, undefined){
+(function($, Drupal, undefined) {
   /**
    * When set to enable mediaelement for all audio/video files add it to the page.
    */
@@ -9,12 +9,10 @@
         $.each(settings.mediaelement, function(selector, options) {
           var opts;
           $(selector, context).once('mediaelement', function() {
-            if (options.controls) {
-              $(this).mediaelementplayer(options.opts);
+            if (!options.controls) {
+              options.opts.features = [];
             }
-            else {
-              $(this).mediaelement();
-            }
+            $(this).mediaelementplayer(options.opts);
           });
         });
       }
@@ -25,6 +23,6 @@
           $(this).mediaelementplayer();
         });
       }
-    }
+    },
   };
 })(jQuery, Drupal);

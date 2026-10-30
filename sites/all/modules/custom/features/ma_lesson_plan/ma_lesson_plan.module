@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * @file
+ * Code for the Mukurtu Lesson Plan feature.
+ */
+
+include_once 'ma_lesson_plan.features.inc';
+
+/**
+ * Implements hook_inline_entity_form_entity_form_alter().
+ */
+function ma_lesson_plan_inline_entity_form_entity_form_alter(&$entity_form, &$form_state) {
+  if ($entity_form["#entity"]->type == 'lesson') {
+    unset ($entity_form['status']); // Hide the Published field on the inline Lesson form (it defaults to Published).
+    unset ($entity_form['redirect']); // Hide the "No Redirects" text that shows up in the inline form when editing an existing Lesson.
+
+    // custom_add_another does not work on field collections on the initial item if field collection is set to "Hide initial item" (see https://www.drupal.org/project/custom_add_another/issues/2861382)
+    // This sets our custom add more text manually for the initial item on the field collections.
+    $entity_form["field_lesson_micro_tasks"]["und"]["add_more"]["#value"] = 'Add a micro-task';
+    $entity_form["field_lesson_days"][LANGUAGE_NONE]["add_more"]["#value"] = 'Add a day';
+
+  }
+}
+
+/**
+ * Implements hook_inline_entity_form_table_fields_alter().
+ */
+function ma_lesson_plan_inline_entity_form_table_fields_alter(&$fields, $context) {
+  if ($context['field_name'] == 'field_unit_lessons') { // Uncomment this if we want to hide the Published status for ALL inline entity tables.
+    unset ($fields['status']); // Hide the Published field in the Lessons table.
+  }
+}

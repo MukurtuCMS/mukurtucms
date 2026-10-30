@@ -1,0 +1,93 @@
+<?php
+
+/**
+ * @file
+ * Scald Index Installation
+ */
+
+/**
+ * Implements hook_install().
+ */
+function scald_index_install() {
+  if (!db_table_exists('scald_index')) {
+    drupal_install_schema('scald_index');
+  }
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function scald_index_uninstall() {
+  drupal_uninstall_schema('scald_index');
+}
+
+/**
+ * Implements hook_enable().
+ */
+function scald_index_enable() {
+  drupal_flush_all_caches();
+  drupal_set_message(t('Scald Index Enabled. To index existing content for scald items, visit: <a href="@url">@url</a>', array('@url' => '/admin/structure/scald/atoms-index/rebuild')));
+}
+
+/**
+ * Implements hook_schema().
+ */
+function scald_index_schema() {
+  $schema = array();
+  $schema['scald_index'] = array(
+    'fields' => array(
+      'id' => array(
+        'description' => 'Extra auto increment field so we can have a PRIMARY key',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'sid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'nid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'type' => array(
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ),
+      'field_name' => array(
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ),
+      'status' => array(
+        'description' => 'Boolean indicating whether the node is published.',
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 0,
+        'size' => 'tiny',
+      ),
+    ),
+    'primary key' => array('id'),
+    'indexes' => array(
+      'nid' => array('nid'),
+      'sid' => array('sid'),
+      'field_name' => array('field_name'),
+    ),
+  );
+  return $schema;
+}
+
+/**
+ * Add column id and primary key to scald_index table.
+ */
+function scald_index_update_7001() {
+  // If you have a "All parts of a PRIMARY KEY must be NOT NULL" error,
+  // see https://www.drupal.org/node/2665362 issue.
+  db_add_field('scald_index', 'id', array(
+      'description' => 'Extra auto increment field so we can have a PRIMARY key',
+      'type' => 'serial',
+      'not null' => TRUE,
+    ),
+    array('primary key' => array('id'))
+  );
+}

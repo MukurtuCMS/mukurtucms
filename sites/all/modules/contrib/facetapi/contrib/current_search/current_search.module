@@ -105,6 +105,10 @@ function current_search_theme() {
       'render element' => 'element',
       'file' => 'current_search.theme.inc',
     ),
+    'current_search_accessible_markup' => array(
+      'arguments' => array('text' => NULL, 'active' => FALSE),
+      'file' => 'current_search.theme.inc',
+    ),
   );
 }
 

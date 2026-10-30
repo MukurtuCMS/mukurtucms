@@ -77,7 +77,10 @@ function rules_i18n_action_t($text) {
 }
 
 /**
- * Implements the form_alter callback for the "Translate a text" action to set a default selector.
+ * Implements hook_form_FORMID_alter() for the action_t form.
+ *
+ * Implements the form_alter callback for the "Translate a text" action
+ * to set a default selector.
  */
 function rules_i18n_action_t_form_alter(&$form, &$form_state, $options, $element) {
   if (isset($form['parameter']['language']['settings']['language:select']) && empty($element->settings['language:select'])) {
@@ -115,7 +118,7 @@ function rules_i18n_rules_evaluator_info() {
       'type' => array('text', 'list<text>', 'token', 'list<token>'),
       // Be sure to translate after doing PHP evaluation.
       'weight' => -8,
-     ),
+    ),
   );
 }
 
@@ -124,10 +127,16 @@ function rules_i18n_rules_evaluator_info() {
  */
 class RulesI18nStringEvaluator extends RulesDataInputEvaluator {
 
+  /**
+   * Access callback.
+   */
   public static function access() {
     return user_access('translate admin strings');
   }
 
+  /**
+   * Overrides RulesDataInputEvaluator::prepare().
+   */
   public function prepare($text, $var_info, $param_info = NULL) {
     if (!empty($param_info['translatable'])) {
       $this->setting = TRUE;
@@ -177,9 +186,12 @@ class RulesI18nStringEvaluator extends RulesDataInputEvaluator {
     return $value;
   }
 
+  /**
+   * Overrides RulesDataInputEvaluator::help().
+   */
   public static function help($var_info, $param_info = array()) {
     if (!empty($param_info['translatable'])) {
-      if ($param_info['custom translation language']) {
+      if (!empty($param_info['custom translation language'])) {
         $text = t('Translations can be provided at the %translate tab. The argument value is translated to the configured language.', array('%translate' => t('Translate')));
       }
       else {
@@ -193,4 +205,5 @@ class RulesI18nStringEvaluator extends RulesDataInputEvaluator {
       return $render;
     }
   }
+
 }

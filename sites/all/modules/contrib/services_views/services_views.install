@@ -1,0 +1,69 @@
+<?php
+
+/**
+ * @file
+ * Install file for the Services Views module.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function services_views_requirements($phase) {
+  $requirements = array();
+  if ($phase == 'runtime') {
+    $insecure_views = array();
+    foreach (services_endpoint_load_all() as $endpoint_name => $endpoint) {
+      $resources = services_get_resources($endpoint_name);
+      $requirements['services_views_' . $endpoint_name] = array(
+        'title' => 'Services Views: ' . $endpoint->name,
+        'value' => t('Views Endpoint Disabled'),
+        'description' => t('The views endpoint is disabled, therefore there is no security risk.'),
+        'severity' => REQUIREMENT_OK,
+      );
+      // Check to see if we are using the views resource endpoint.
+      if (!empty($resources['views']['endpoint']) && $resources['views']['endpoint']['operations']['retrieve']['enabled']) {
+        $requirements['services_views_' . $endpoint_name]['value'] = t('Views Endpoint Enabled');
+        $requirements['services_views_' . $endpoint_name]['description'] = t('The views resource is enabled, but there are no displays without access control.');
+        if (empty($insecure_views[$endpoint_name])) {
+          $insecure_views[$endpoint_name] = array();
+        }
+        // If we are, run a report of all the views displays that do not have
+        // access control.
+        $prefix = 'services_views_' . $endpoint_name;
+        $whitelist = variable_get($prefix . '_white_list', 0);
+        $listed_views = variable_get($prefix . "_view_displays", array());
+        foreach (views_get_enabled_views() as $view_name => $view) {
+          foreach ($view->display as $view_display_name => $display) {
+            $listed_view_key = $view_name . '|' . $view_display_name;
+            if ((($whitelist && !empty($listed_views[$listed_view_key])) || (!$whitelist && empty($listed_views[$listed_view_key]))) && !empty($display->display_options) && !empty($display->display_options['access']) && $display->display_options['access']['type'] == 'none') {
+              if (empty($insecure_views[$endpoint_name][$view_name])) {
+                $insecure_views[$endpoint_name][$view_name] = array();
+              }
+              $insecure_views[$endpoint_name][$view_name][] = $view_display_name;
+            }
+          }
+        }
+        if (!empty($insecure_views[$endpoint_name])) {
+          $requirements['services_views_' . $endpoint_name]['description'] = t(
+            "The views resource is enabled and there @views with insecure displays exposed via this endpoint. Manage the views resource <a href='@url'>settings</a> or view a list of <a href='@url2'>insecure views</a>. Its preferred that you use single Services type displays to limit the accessibility of information on your site.",
+            array(
+              '@views' => format_plural(count($insecure_views[$endpoint_name]), 'is 1 view', 'are @count views'),
+              '@url' => url('admin/structure/services/list/' . $endpoint_name . '/view_resource'),
+              '@url2' => url('admin/reports/insecure-view-displays'),
+            )
+          );
+          $requirements['services_views_' . $endpoint_name]['severity'] = REQUIREMENT_ERROR;
+        }
+      }
+    }
+  }
+  return $requirements;
+}
+
+/**
+ * Limit view resource support to services type view displays for security.
+ */
+function services_views_update_7101() {
+  services_views_convert_white_list_to_clones();
+  return "Please be sure to export the newly cloned view displays and service views whitelist settings via features if you use that workflow. Failure to do so will cause backward compatibility to fail.";
+}

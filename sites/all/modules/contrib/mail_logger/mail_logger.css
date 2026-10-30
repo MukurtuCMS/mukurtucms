@@ -1,0 +1,68 @@
+.mail-logger_wrapper  {
+  margin: 0 0 10px 0;
+  width: 100%;
+}
+
+.mail-logger-wrapper td {
+  text-align: left;
+  vertical-align: top;
+}
+
+#mail-logger-log td {
+  vertical-align: top;
+}
+
+.mail-logger-wrapper td:first-child {
+  width: 150px;
+  margin: 5px 10px;
+  font-weight: bold;
+}
+
+.mail-logger-wrapper tr:nth-child(2n+1) {
+  background-color: #eee;   /* Lighter gray */
+}
+
+.mail-logger-wrapper tr:nth-child(2n) {
+  background-color: #fff;   /* White */
+}
+
+.mail-body-label  {
+  font-weight: bold;
+}
+
+.mail-body-data  {
+  background-color: #fff;   /* White */
+  padding: 10px;
+}
+
+.form-item-from-date {
+  float: left;
+}
+
+.form-item-to-date {
+  float: left;
+  margin-left: 2em !important;
+}
+
+#mail-logger-search-field {
+  clear: both;
+}
+
+#edit-search-value {
+  display: inline;
+}
+
+.form-item-search-value {
+  display: inline;
+  margin-left: 2em !important;
+  vertical-align: bottom;
+}
+
+.form-item-search-field {
+  display: inline;
+  margin-top: 6px !important;
+}
+
+.form-item-filter {
+  clear: both;
+}

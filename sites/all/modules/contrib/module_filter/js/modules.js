@@ -2,6 +2,17 @@
 
 Drupal.behaviors.moduleFilter = {
   attach: function(context) {
+    $('#system-modules td.description').once('description', function() {
+      $(this).click(function() {
+        $('.inner.expand', $(this)).toggleClass('expanded');
+      });
+      $('.inner.expand', $(this)).children().click(function(e) {
+        if ($(this).parent().hasClass('expanded')) {
+          e.stopPropagation();
+        }
+      });
+    });
+
     $('.module-filter-inputs-wrapper', context).once('module-filter', function() {
       var filterInput = $('input[name="module_filter[name]"]', context);
       var selector = '#system-modules table tbody tr';

@@ -73,7 +73,7 @@ function _file_resource_definition() {
           'access arguments append' => TRUE,
           'args' => array(
             array(
-              'name' => 'cid',
+              'name' => 'fid',
               'type' => 'int',
               'description' => 'The id of the file to delete',
               'source' => array('path' => '0'),
@@ -117,6 +117,18 @@ function _file_resource_definition() {
               'description' => 'Number of records to get per page.',
               'default value' => variable_get('services_file_index_page_size', 20),
               'source' => array('param' => 'pagesize'),
+            ),
+            array(
+              'name' => 'options',
+              'optional' => TRUE,
+              'type' => 'array',
+              'description' => 'Additional query options.',
+              'default value' => array(
+                'orderby' => array(
+                  'timestamp' => 'DESC'
+                )
+              ),
+              'source' => array('param' => 'options'),
             ),
           ),
           'access callback' => '_file_resource_access',
@@ -197,14 +209,39 @@ function _file_resource_create($file) {
  */
 function _file_resource_create_raw() {
   $files = array();
+
+  if (!isset($_FILES['files']['name'])) {
+    return services_error(t("Missing data, the file upload cannot be uploaded."), 500);
+  }
+
+  // Convert a typical html file input payload to what we need down the line,
+  // that way this resource is more developer friendly.
+  if (!is_array($_FILES['files']['name'])) {
+    $_FILES['files']['name'] = array($_FILES['files']['name']);
+    $_FILES['files']['type'] = array($_FILES['files']['type']);
+    $_FILES['files']['tmp_name'] = array($_FILES['files']['tmp_name']);
+    $_FILES['files']['error'] = array($_FILES['files']['error']);
+    $_FILES['files']['size'] = array($_FILES['files']['size']);
+  }
+
   foreach ($_FILES['files']['name'] as $field_name => $file_name) {
-    // Sanitize the user-input file name before saving to the file system.
+
+    // Sanitize the user-input file name before saving to the file system. Note,
+    // if the file extensions isn't valid here, the file's extension will have
+    // been converted to a .txt, which means the file will be successfully
+    // uploaded with a .txt extension instead (if it passes the $validators
+    // below.
     $_FILES['files']['name'][$field_name] = _services_file_check_name_extension($file_name);
 
     // file_save_upload() validates the file extension and name's length. File
     // size is limited by the upload_max_filesize directive in php.ini.
     $scheme = file_default_scheme();
-    $file = file_save_upload($field_name, array(), "$scheme://");
+
+    // Set file validators: allowed extension
+    $validators = array();
+    $extensions = variable_get('services_allowed_extensions', SERVICES_ALLOWED_EXTENSIONS);
+    $validators['file_validate_extensions'] = array($extensions);
+    $file = file_save_upload($field_name, $validators, "$scheme://");
 
     if (!empty($file->fid)) {
       // Change the file status from temporary to permanent.
@@ -220,7 +257,7 @@ function _file_resource_create_raw() {
       );
     }
     else {
-      return services_error(t('An unknown error occured'), 500);
+      return services_error(t('Failed to save the file.'), 500);
     }
   }
   return $files;
@@ -253,7 +290,7 @@ function _file_resource_retrieve($fid, $include_file_contents, $get_image_style)
 
     $file->image_styles = array();
     // Add image style information if available.
-    if ($get_image_style) {
+    if ($get_image_style && !empty($file->uri) && strpos($file->filemime, 'image') === 0) {
       foreach (image_styles() as $style) {
         $style_name = $style['name'];
         $file->image_styles[$style_name] = image_style_url($style_name, $file->uri);
@@ -280,7 +317,7 @@ function _file_resource_delete($fid) {
 }
 
 /**
- * Return an array of optionally paged fids baed on a set of criteria.
+ * Return an array of optionally paged fids based on a set of criteria.
  *
  * An example request might look like
  *
@@ -298,16 +335,17 @@ function _file_resource_delete($fid) {
  *   indicating items to retrieve.
  * @param $page_size
  *   Integer number of items to be returned.
+ * @param $options
+ *   Additional query options.
  * @return
  *   An array of file objects.
  *
  * @see _node_resource_index() for more notes
  **/
-function _file_resource_index($page, $fields, $parameters, $page_size) {
-  $file_select = db_select('file_managed', 't')
-    ->orderBy('timestamp', 'DESC');
+function _file_resource_index($page, $fields, $parameters, $page_size, $options = array()) {
+  $file_select = db_select('file_managed', 't');
 
-  services_resource_build_index_query($file_select, $page, $fields, $parameters, $page_size, 'file');
+  services_resource_build_index_query($file_select, $page, $fields, $parameters, $page_size, 'file', $options);
 
   $results = services_resource_execute_index_query($file_select);
 
@@ -420,8 +458,8 @@ function _services_file_check_destination($destination) {
  *   A safe file name and extension.
  */
 function _services_file_check_name_extension($name) {
-  // This whitelist is copied from file_save_upload().
-  $extensions = 'jpg jpeg gif png txt doc xls pdf ppt pps odt ods odp';
+  //Fetch the file extensions set in the variable at the time module is enabled
+  $extensions = variable_get('services_allowed_extensions', SERVICES_ALLOWED_EXTENSIONS);
 
   // Get the part of the name after the last period (".").
   $name = explode('.', $name);

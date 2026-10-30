@@ -7,7 +7,7 @@
 /**
  * Handles the view of an atom within a context.
  *
- * Contrary to scald_rendered(), which displays basically a "player", this
+ * Contrary to scald_render(), which displays basically a "player", this
  * function displays the player and all atom fields. Fields are reorderable and
  * customisable in the Field UI as usual.
  *
@@ -35,9 +35,6 @@ function scald_atom_view($atom, $context = 'full', $langcode = NULL) {
 
   $build += array(
     '#theme' => 'scald_atom',
-    '#atom' => $atom,
-    '#view_mode' => $context,
-    '#language' => $langcode,
   );
 
   // Allow modules to modify the structured atom.
@@ -66,12 +63,8 @@ function scald_atom_build_content($atom, $view_mode = 'full', $langcode = NULL) 
   $atom->content = array();
 
   // Allow modules to change the view mode.
-  $context = array(
-    'entity_type' => 'scald_atom',
-    'entity' => $atom,
-    'langcode' => $langcode,
-  );
-  drupal_alter('entity_view_mode', $view_mode, $context);
+  $atom_by_view_mode = entity_view_mode_prepare('scald_atom', array($atom->sid => $atom), $view_mode, $langcode);
+  $view_mode = key($atom_by_view_mode);
 
   // Building content of atom.
   field_attach_prepare_view('scald_atom', array($atom->sid => $atom), $view_mode, $langcode);
@@ -96,5 +89,10 @@ function scald_atom_build_content($atom, $view_mode = 'full', $langcode = NULL) 
   module_invoke_all('scald_atom_view', $atom, $view_mode, $langcode);
   module_invoke_all('entity_view', $atom, 'scald_atom', $view_mode, $langcode);
 
-  $atom->content += array('#view_mode' => $view_mode);
+  $atom->content += array(
+    '#entity_type' => 'scald_atom',
+    '#entity' => $atom,
+    '#view_mode' => $view_mode,
+    '#language' => $langcode,
+  );
 }

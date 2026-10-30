@@ -1,0 +1,43 @@
+diff --git a/colorbox.theme.inc b/colorbox.theme.inc
+index cd4a237..4dfcb54 100644
+--- a/colorbox.theme.inc
++++ b/colorbox.theme.inc
+@@ -186,6 +186,13 @@ function theme_colorbox_imagefield($variables) {
+     $image = theme('image', $variables['image']);
+   }
+
++  // Add Zoom Library
++  $zoom_path = libraries_get_path('zoom');
++  $js = $zoom_path . "/jquery.zoom.min.js";
++  if (file_exists($js)) {
++    drupal_add_js($js);
++  }
++
+   $options = drupal_parse_url($variables['path']);
+   $options += array(
+     'html' => TRUE,
+diff --git a/js/colorbox.js b/js/colorbox.js
+index 567ad38..2d403aa 100644
+--- a/js/colorbox.js
++++ b/js/colorbox.js
+@@ -21,6 +21,7 @@ Drupal.behaviors.initColorbox = {
+
+     // Use "data-colorbox-gallery" if set otherwise use "rel".
+     settings.colorbox.rel = function () {
++
+       if ($(this).data('colorbox-gallery')) {
+         return $(this).data('colorbox-gallery');
+       }
+@@ -36,6 +37,12 @@ Drupal.behaviors.initColorbox = {
+     $(context).bind('cbox_complete', function () {
+       Drupal.attachBehaviors('#cboxLoadedContent');
+     });
++
++    // Zoom colorbox images
++    $(window).bind('cbox_complete', function () {
++      $('#cboxLoadedContent').zoom({on:'mouseover', magnify: 2});
++    });
++
+   }
+ };
+

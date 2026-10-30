@@ -1,0 +1,5 @@
+name = Mukurtu Referenced Content Display Formatter
+description = Provides a view of referenced content
+package = Mukurtu
+core = 7.x
+files[] = mukurtu_display_formatters_referenced_content_view.module

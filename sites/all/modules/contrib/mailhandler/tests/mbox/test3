@@ -1,0 +1,73 @@
+From  from@example.com Wed Nov 16 09:12:29 2011
+Return-Path: <sender@example.com>
+X-Original-To: test@example.com
+Delivered-To: test@example.com
+MIME-Version: 1.0
+Sender: sender@example.com
+Received: by 10.231.161.73 with HTTP; Wed, 16 Nov 2011 07:12:29 -0800 (PST)
+From: Dane Powell <from@example.com>
+Date: Wed, 16 Nov 2011 09:12:29 -0600
+Message-ID: <testmessage1@example.com>
+Subject: Test message 1 of 2
+To: mailflow <test@example.com>
+Content-Type: multipart/alternative; boundary=14dae9340e1786f4d904b1db8933
+X-IMAPbase: 1335812889 1
+Status:
+X-Status:
+X-Keywords:
+X-UID: 1
+
+--14dae9340e1786f4d904b1db8933
+Content-Type: text/plain; charset=ISO-8859-1
+
+Hello world!
+
+--
+This is my signature
+
+--14dae9340e1786f4d904b1db8933
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+<div>Hello world!</div><div><br></div>-- <br>=
+This is my signature<br>
+
+
+
+--14dae9340e1786f4d904b1db8933--
+
+From  from@example.com Wed Nov 16 09:12:30 2011
+Return-Path: <sender@example.com>
+X-Original-To: test@example.com
+Delivered-To: test@example.com
+MIME-Version: 1.0
+Sender: sender@example.com
+Received: by 10.231.161.73 with HTTP; Wed, 16 Nov 2011 07:12:30 -0800 (PST)
+From: Dane Powell <from@example.com>
+Date: Wed, 16 Nov 2011 09:12:30 -0600
+Message-ID: <testmessage2@example.com>
+Subject: Test message 2 of 2
+To: mailflow <test@example.com>
+Content-Type: multipart/alternative; boundary=14dae9340e1786f4d904b1db8934
+Status:
+X-Status:
+X-Keywords:
+X-UID: 2
+--14dae9340e1786f4d904b1db8934
+Content-Type: text/plain; charset=ISO-8859-1
+
+Hello world!
+
+--
+This is my signature
+
+--14dae9340e1786f4d904b1db8934
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+<div>Hello world!</div><div><br></div>-- <br>=
+This is my signature<br>
+
+
+
+--14dae9340e1786f4d904b1db8934--

@@ -1,0 +1,360 @@
+/* From oa_comment.css, with modifications */
+
+#comments {
+  clear: both;
+}
+
+.oa-comment i {
+  font-size: 1.2em;
+}
+
+.oa-comment .oa-user-picture img {
+  height: 30px;
+  width: 30px;
+}
+
+form.comment-form .comment-reply-post-button {
+  position: relative;
+  bottom: 65px;
+  height: 0;
+}
+
+form.comment-form .comment-reply-post-button input.form-submit {
+  float: right;
+  margin-right: 0;
+}
+
+form.comment-form .reply-comment-parent {
+  padding: 0 150px 1em 5em;
+}
+
+form.comment-form .text-format-wrapper .clearfix:after {
+  clear: none;
+}
+
+#modal-content form.comment-form {
+  margin-top: 1em;
+}
+
+#modal-content form.comment-form .comment-reply-post-button {
+  position: relative;
+  bottom: 65px;
+}
+
+#modal-content form.comment-form .comment-reply-post-button input.form-submit {
+  float: right;
+  margin-right: 0;
+}
+
+#modal-content input.p-icon-button {
+  font-size: 2em;
+}
+
+.oa-list.oa-comment .oa-description {
+  font-size: 14px;
+}
+
+.oa-list.oa-comment .oa-pullout-left {
+  padding-top: 16px;
+  padding-bottom: 0;
+  height: 24px;
+  font-size: 12px;
+  width: auto;
+  min-width: 20px;
+}
+
+.oa-list .oa-comment-reply-body,
+#comments .oa-list .oa-comment-reply-body {
+  font-size: 14px;
+  padding: 8px 5px 0 5px;
+}
+
+.oa-list .pull-right,
+#comments .oa-list .pull-right {
+  padding-left: 5px;
+}
+
+.oa-list .pull-right + p,
+#comments .oa-list .pull-right + p {
+  margin-top: 5px;
+}
+
+.oa-list .oa-comment-hide,
+#comments .oa-list .oa-comment-hide {
+  height: 30px;
+}
+
+.oa-list .oa-comment-hide {
+  height: 2em;
+}
+
+.oa-list .oa-comment-hide:hover,
+#comments .oa-list .oa-comment-hide:hover {
+  background-color: #e0eeff;
+}
+
+.comment-form {
+  clear: both;
+}
+
+.field-name-comment-body label {
+  font-size: 24px;
+}
+
+.comment-created-date .user-info .marker {
+  margin-right: 5px;
+}
+
+/*Hide the date on comments when on xs screen.*/
+@media (max-width: 767px) {
+  .comment-created-date {
+    display: none;
+  }
+}
+
+.comment-user-info {
+  font-size: 12px;
+  color: #555;
+}
+
+#toggle-comment-visibility {
+  float: right;
+}
+
+.view-oa-comment-media hr {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-color: #e3e3e3;
+}
+
+table.comment-alter-diff {
+  float: right;
+  clear: right;
+  margin-left: 10px;
+}
+
+.oa-comment .links {
+  clear: right;
+}
+
+.oa-comment .oa-comment-extra {
+  margin-top: 5px;
+}
+
+.oa-comment .oa-pull-right.comment-created-date {
+  margin-left: 5px;
+}
+
+/* Worktracker comments */
+.node-type-oa-worktracker-task .field-name-comment-body {
+  margin-top: 42px;
+}
+
+/* Embedded Comments */
+.paragraphs-item-paragraph-content .view-mode-featured #comments.comment-wrapper {
+  margin-left: 24px;
+}
+
+.accordion-toggle .oa-list-header .oa-comment-reply-body p {
+  cursor: pointer;
+}
+
+/* Mukurtu modification */
+.indented .indented .indented .indented .indented .indented .indented .indented .indented {
+  margin-left: 0;
+}
+
+/* Mukurtu modification */
+.indented {
+  margin-left: 25px;
+}
+
+@media (max-width: 767px) {
+  .indented {
+    margin-left: 0 !important;
+  }
+}
+
+/* From oa_basetheme_style.css */
+
+.oa-list .links {
+  float: right;
+  margin-right: 5px;
+}
+
+.oa-list .links a {
+  padding: 0 5px;
+  color: #777;
+  font-size: 0.9em;
+}
+
+.oa-list h5 {
+  display: inline;
+}
+
+.oa-list .pull-left img,
+.oa-list .oa-pull-left img {
+  margin-right: 10px;
+}
+
+.oa-list .pull-right img,
+.oa-list .oa-pull-right img {
+  margin-left: 5px;
+}
+
+.oa-list .user-picture img {
+  max-width: 30px;
+  max-height: 30px;
+}
+
+.oa-list .accordion {
+  margin-bottom: 0;
+  position: relative;
+}
+
+.oa-list .accordion h5 {
+  padding: 0 5px;
+  margin: 0;
+}
+
+.oa-list .accordion-heading .accordion-toggle {
+  padding: 0;
+  display: block;
+}
+
+.oa-list .accordion-heading .accordion-toggle:hover {
+  background-color: #E0EEFF;
+}
+
+.oa-list.unpublished {
+  background-color: #FFF1F1;
+}
+
+.oa-list.unpublished .status {
+  color: red;
+  font-weight: bold;
+}
+
+.group-content .accordion-toggle {
+  clear: right;
+}
+
+.group-content .accordion-toggle i {
+  float: right;
+}
+
+.oa-list-metadata {
+  float: right;
+  text-align: right;
+}
+
+.oa-list-header {
+  padding: 0 5px;
+}
+
+.oa-list-header.oa-description {
+  line-height: 20px;
+  overflow: hidden;
+  padding: 0;
+}
+
+.oa-list-category {
+  text-align: right;
+}
+
+
+/* From oa_theme_style.css, with modifications */
+
+.oa-reply-icon {
+  display: inline;
+}
+
+.oa-reply-text {
+  display: none;
+}
+
+#comments {
+  margin-top: 0;
+}
+
+.oa-list.oa-comment .accordion-toggle {
+  border-bottom: 1px solid #DDD;
+  padding-bottom: 15px;
+}
+
+.oa-list.oa-comment .links {
+  float: left;
+  color: #a4a8ab;
+  text-transform: uppercase;
+  font-size: 11px;
+  margin-left: -5px;
+}
+
+.oa-list.oa-comment .comment-label .oa-pullout-left {
+  position: static;
+  border: none;
+  display: inline-block;
+  padding: 3px 3px;
+  background: #337ab7;
+  margin-left: 5px;
+  color: white;
+  font-size: 10px;
+  font-weight: normal;
+  height: auto;
+  min-width: 0;
+  border-bottom-left-radius: 20%;
+  border-bottom-right-radius: 20%;
+  border-top-left-radius: 20%;
+  border-top-right-radius: 20%;
+  line-height: 1em;
+}
+
+.comment-label > a {
+  display: inline-block;
+  padding: 3px 3px;
+  background: #337ab7;
+  margin-left: 5px;
+  color: white;
+  font-size: 10px;
+  font-weight: normal;
+  height: auto;
+  min-width: 0;
+  border-bottom-left-radius: 20%;
+  border-bottom-right-radius: 20%;
+  border-top-left-radius: 20%;
+  border-top-right-radius: 20%;
+  line-height: 1em;
+}
+
+/* Further customizations, largely gleaned from various misc CSS (other than above) in OA */
+
+.oa-list.well {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 5px;
+  margin-bottom: -1px;
+  border-radius: 0;
+  min-height: 20px;
+}
+
+#comments h2 {
+  text-transform: uppercase;
+  font-size: 20px;
+  margin: 0 0 0.8em 0;
+  letter-spacing: .04em;
+  font-weight: bold;
+  color: #337ab7;
+}
+
+.comment-wrapper {
+  padding: 2em 0 0;
+}
+
+.comment-wrapper .oa-date {
+  color: #337ab7;
+}
+
+.oa-comment-reply-body .user-info {
+  margin-bottom: 10px;
+}

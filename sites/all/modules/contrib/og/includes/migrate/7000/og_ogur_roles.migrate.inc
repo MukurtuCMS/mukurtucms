@@ -10,8 +10,8 @@ class OgMigrateOgurRoles extends MigrationBase {
   /**
    * Override constructor from Migration class.
    */
-  public function __construct() {
-    parent::__construct();
+  public function __construct($arguments) {
+    parent::__construct($arguments);
     $this->description = t('Create OG Roles for OGUR roles from system role table.');
     $this->enabled = !$this->isComplete();
     $this->dependencies[] = 'OgMigrateAddFields';

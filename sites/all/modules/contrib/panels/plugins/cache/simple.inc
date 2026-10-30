@@ -5,7 +5,7 @@
  * Provides a simple time-based caching option for panel panes.
  */
 
-// Plugin definition
+// Plugin definition.
 $plugin = array(
   'title' => t("Simple cache"),
   'description' => t('Simple caching is a time-based cache. This is a hard limit, and once cached it will remain that way until the time limit expires.'),
@@ -25,7 +25,7 @@ $plugin = array(
  */
 function panels_simple_cache_get_cache($conf, $display, $args, $contexts, $pane = NULL) {
   $cid = panels_simple_cache_get_id($conf, $display, $args, $contexts, $pane);
-  $cache = cache_get($cid, 'cache');
+  $cache = cache_get($cid, 'cache_panels');
   if (!$cache) {
     return FALSE;
   }
@@ -42,7 +42,7 @@ function panels_simple_cache_get_cache($conf, $display, $args, $contexts, $pane 
  */
 function panels_simple_cache_set_cache($conf, $content, $display, $args, $contexts, $pane = NULL) {
   $cid = panels_simple_cache_get_id($conf, $display, $args, $contexts, $pane);
-  cache_set($cid, $content);
+  cache_set($cid, $content, 'cache_panels');
 }
 
 /**
@@ -53,13 +53,25 @@ function panels_simple_cache_set_cache($conf, $content, $display, $args, $contex
 function panels_simple_cache_clear_cache($display) {
   $cid = 'panels_simple_cache';
 
-  // This is used in case this is an in-code display, which means did will be something like 'new-1'.
-  if (isset($display->owner) && isset($display->owner->id)) {
-    $cid .= ':' . $display->owner->id;
+  // If the panel is stored in the database it'll have a numeric did value.
+  if (is_numeric($display->did)) {
+    $cid .= ':' . $display->did;
   }
-  $cid .= ':' . $display->did;
+  // Exported panels won't have a numeric did but may have a usable cache_key.
+  elseif (!empty($display->cache_key)) {
+    $cid .= ':' . str_replace('panel_context:', '', $display->cache_key);
+  }
+  // Alternatively use the css_id.
+  elseif (!empty($display->css_id)) {
+    $cid .= ':' . $display->css_id;
+  }
+  // Failover to just appending the did, which may be the completely unusable
+  // string 'new'.
+  else {
+    $cid .= ':' . $display->did;
+  }
 
-  cache_clear_all($cid, 'cache', TRUE);
+  cache_clear_all($cid, 'cache_panels', TRUE);
 }
 
 /**
@@ -116,7 +128,7 @@ function panels_simple_cache_get_id($conf, $display, $args, $contexts, $pane) {
     $id .= ':' . $language->language;
   }
 
-  if(!empty($pane->configuration['use_pager']) && !empty($_GET['page'])) {
+  if (!empty($pane->configuration['use_pager']) && !empty($_GET['page'])) {
     $id .= ':p' . check_plain($_GET['page']);
   }
 
@@ -146,4 +158,3 @@ function panels_simple_cache_settings_form($conf, $display, $pid) {
 
   return $form;
 }
-

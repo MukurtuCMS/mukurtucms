@@ -100,6 +100,13 @@ class SearchApiViewsHandlerFilterFulltext extends SearchApiViewsHandlerFilterTex
       return;
     }
 
+    // Don't validate on form reset.
+    if (!empty($form_state['triggering_element'])
+        && !empty($form['reset'])
+        && $form_state['triggering_element']['#value'] === $form['reset']['#value']) {
+      return;
+    }
+
     // We only need to validate if there is a minimum word length set.
     if ($this->options['min_length'] < 2) {
       return;
@@ -119,8 +126,23 @@ class SearchApiViewsHandlerFilterFulltext extends SearchApiViewsHandlerFilterTex
     }
 
     $words = preg_split('/\s+/', $input);
+    $quoted = FALSE;
     foreach ($words as $i => $word) {
-      if (drupal_strlen($word) < $this->options['min_length']) {
+      $word_length = drupal_strlen($word);
+      if (!$word_length) {
+        unset($words[$i]);
+        continue;
+      }
+      // Protect quoted strings.
+      if ($quoted && $word[strlen($word) - 1] === '"') {
+        $quoted = FALSE;
+        continue;
+      }
+      if ($quoted || $word[0] === '"') {
+        $quoted = TRUE;
+        continue;
+      }
+      if ($word_length < $this->options['min_length']) {
         unset($words[$i]);
       }
     }
@@ -144,7 +166,8 @@ class SearchApiViewsHandlerFilterFulltext extends SearchApiViewsHandlerFilterTex
       return;
     }
     $fields = $this->options['fields'];
-    $fields = $fields ? $fields : array_keys($this->getFulltextFields());
+    $available_fields = array_keys($this->getFulltextFields());
+    $fields = $fields ? array_intersect($fields, $available_fields) : $available_fields;
 
     // If something already specifically set different fields, we silently fall
     // back to mere filtering.

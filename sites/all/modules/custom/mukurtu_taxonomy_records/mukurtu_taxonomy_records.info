@@ -1,0 +1,7 @@
+name = Mukurtu Taxonomy Records
+description = Adds the ability to extend taxonomy terms with records.
+package = Mukurtu
+dependencies[] = ma_core
+core = 7.x
+version = "7.x-0.1"
+

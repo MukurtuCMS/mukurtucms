@@ -278,6 +278,9 @@ function hook_facetapi_enabled_facets_alter(array &$enabled_facets, $searcher, $
  *   - title: The human readable name of the sort displayed in the admin UI.
  *   - callback: The uasort() callback the render array is passed to.
  *   - description: The description of the sort displayed in the admin UI.
+ *   - requirements: An array of requirements that must pass in order for this
+ *       sort to be displayed. Requirements are associative arrays keyed by
+ *       function to requirement options. Optional.
  *   - weight: (optional) The default weight of the sort specifying its
  *     default processing order. Defaults to 0.
  *
@@ -290,6 +293,8 @@ function hook_facetapi_sort_info() {
   $sorts['active'] = array(
     'label' => t('Facet active'),
     'callback' => 'facetapi_sort_active',
+    // @see: facetapi_get_available_sorts().
+    'requirements' => array('facetapi_sort_active_requirements' => TRUE),
     'description' => t('Sort by whether the facet is active or not.'),
     'weight' => -50,
   );
@@ -511,7 +516,7 @@ function hook_facetapi_force_delta_mapping() {
     'my_searcher' => array(
       // The realm we are mapping, usually block.
       'block' => array(
-        // Machine readable names of facets whose mappping are being forced.
+        // Machine readable names of facets whose mapping are being forced.
         // Regardless of whether they are enabled via the Facet API interface,
         // their blocks will be available to enable and position via
         // admin/structure/block.

@@ -10,6 +10,9 @@
  */
 class FeedsMapperUniqueTestCase extends FeedsMapperTestCase {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Unique target callbacks',

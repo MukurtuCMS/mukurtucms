@@ -1,0 +1,132 @@
+.node-unit_plan-form {
+  .group-lessons {
+    legend {
+        display: none;
+    }
+    #edit-field-unit-lessons-und-body {
+      padding: 0;
+    }
+    #edit-field-unit-lessons-und {
+        border: none;
+    }
+    .edit-field-unit-lessons-und--4 {
+        border: none;
+    }
+    .field-name-field-pre-actions {
+      display: none;
+    }
+  }
+}
+
+
+.node-lesson.view-mode-full, .node-lesson.view-mode-default, .node-lesson.view-mode-teacher_view {
+
+  .field-name-ds-switch-field {
+    float: right;
+    font-size: 16px !important;
+    padding: 0 !important;
+  }
+  .field-name-ds-switch-field::after {
+    border-style: none !important;
+  }
+
+  .field-name-body {
+    clear: both;
+  }
+
+  .lesson-body {
+    // Copied and tweaked from .digital-heritage-body
+    >.field, >.field-collection-container {
+      .metadata-field-padding;
+      font-size: 16px;
+      // Desktop
+      @media (min-width: @screen-md-min) {
+        font-size: 18px;
+      }
+      > a {
+        .mukurtu-standard-link;
+      }
+      >.label-above, >.field>.label-above {
+        .metadata-primary-field-label;
+      }
+    }
+    // Copied and tweaked from .digital-heritage-body
+    >.field::after {
+      content: "";
+      display: inline-block;
+      left: 0;
+      bottom: 0;
+      height: 1px;
+      width: 100%;
+      padding-top: 30px;
+      border-bottom: 5px solid @mukurtu-primary-field-divider-color;
+    }
+
+    .entity-field-collection-item {
+      .label-above, .label-inline {
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        padding-bottom: 5px;
+      }
+      margin-top: 10px;
+      padding-top: 10px;
+      padding-left: 25px;
+
+      border-top: 2px solid @mukurtu-primary-field-divider-color;
+
+      .field {
+        padding-bottom: 20px;
+        &:last-child {
+          padding-bottom: 0;
+        }
+      }
+
+    }
+
+  }
+}
+
+.node-unit-plan.view-mode-full, .node-unit-plan.view-mode-default, .node-unit-plan.view-mode-teacher_view {
+
+  .node-lesson {
+    .field-name-ds-switch-field {
+      display: none;
+    }
+  }
+
+  .field-name-ds-switch-field {
+    float: right;
+    margin-bottom: 1em;
+  }
+
+  .unit-plan-body {
+    .group-480-thumbnail-and-link {
+      margin: 0;
+    }
+  }
+
+  .unit-plan-sidebar {
+  }
+
+  .unit-plan-bottom {
+
+    .field-name-field-unit-lessons {
+      clear: both;
+      .field-name-title {
+        h2 {
+          margin-top: 0;
+        }
+      }
+    }
+    .quicktabs-tabs {
+      left: 0 !important;
+      right: 0 !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      width: 100% !important;
+    }
+
+  }
+
+}

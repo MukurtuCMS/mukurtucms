@@ -21,7 +21,7 @@ function _popup_title($title, $path) {
     );
 
     $url = array_shift($candidates);
-    $title = '<img src="' . $url . '" alt="' . $title . '" />';
+    $title = '<img src="/' . $url . '" alt="' . $title . '" />';
   }
   return $title;
 }

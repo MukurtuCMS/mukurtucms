@@ -19,7 +19,7 @@ function leaflet_views_views_plugins() {
         'help' => t('Displays a View as a Leaflet map.'),
         'path' => drupal_get_path('module', 'leaflet_views'),
         'handler' => 'leaflet_views_plugin_style',
-        'theme' => 'leaflet-map',
+        'theme' => 'leaflet_map',
         'uses fields' => TRUE,
         'uses row plugin' => FALSE,
         'uses options' => TRUE,

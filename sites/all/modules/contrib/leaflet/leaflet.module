@@ -8,6 +8,30 @@
 module_load_include('inc', 'leaflet', 'leaflet.formatters');
 
 /**
+  * Implements hook_help().
+  */
+function leaflet_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#leaflet':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('The Leaflet module provides integration with Leaflet, the modern open-source JavaScript library for mobile-friendly interactive maps.') . '</p>';
+
+      $output .= '<p>' . t('The module provides a field formatter that can show a map for fields that contain geospatial data.  It includes Views integration that plots data on a map (using the sub module Leaflet Views) and an API for displaying data on a map. For more information, see the online documentation for the <a href="@leaflet">Leaflet module</a>.', array('@leaflet' => 'http://drupal.org/node/1645460')) . '</p>';
+
+      $output .= '<h3>' . t('Uses') . '</h3>';
+      $output .= '<dl>';
+      $output .= '<dt>' . t('Field Formatter') . '</dt>';
+      $output .= '<dd>' . t('Leaflet includes a field formatter that makes it possible to show geospatial data (for example longitude and latitude) on a map.  You can use tokens instead of static text for Popups that use the Leaflet field formatter.') . '</dd>';
+      $output .= '<dt>' . t('Views Integration') . '</dt>';
+      $output .= '<dd>' . t('You can have maps on node displays and maps on views displays, thanks to Views integration. The process is very similar to adding and setting up a plugin on Views.  To render a map using Views, enable the included module Leaflet_views.') . '</dd>';
+      $output .= '<dt>' . t('Leaflet API') . '</dt>';
+      $output .= '<dd>' . t('Rendering a map is as simple as calling a single method, leaflet_render_map(), which takes 3 parameters $map, $features, and $height.') . '</dd>';
+      return $output;
+  }
+}
+
+/**
  * Implements hook_theme().
  */
 function leaflet_theme($existing, $type, $theme, $path) {
@@ -27,10 +51,10 @@ function leaflet_libraries_info() {
     // Only used in administrative UI of Libraries API.
     'name' => 'Leaflet JavaScript Library',
     'vendor url' => 'http://leafletjs.com/',
-    'download url' => 'http://cdn.leafletjs.com/downloads/leaflet-0.7.5.zip',
+    'download url' => 'http://cdn.leafletjs.com/leaflet/v1.0.2/leaflet.zip',
     'version arguments' => array(
       'file' => 'leaflet.js',
-      // Handle things like  version:"1.0.0-beta.2"
+      // Handle patterns like  version: "1.0.2+4bbb16c"
       'pattern' => '/version[=: ]*[\'"]([\d+\.]+[\-a-z\.\d]*)[\'"]/',
     ),
     'files' => array(
@@ -48,7 +72,8 @@ function leaflet_libraries_info() {
         // For AdvAgg module. See [#2294639] This runs after leaflet.js.
         'leaflet_imagepath' => array(
           'type' => 'inline',
-          'data' => 'L.Icon.Default.imagePath = "' . base_path() . libraries_get_path('leaflet') . '/images";',
+          // Note: ends with "/"
+          'data' => 'L.Icon.Default.imagePath = "' . base_path() . libraries_get_path('leaflet') . '/images/";',
         ),
       ),
       'css' => array(
@@ -88,7 +113,9 @@ function leaflet_libraries_info() {
  *   A renderable array.
  */
 function leaflet_build_map($map, $features = array(), $height = '400px') {
-  $map_id = drupal_html_id('leaflet_map');
+  // [#2777321] With two maps on 1 page, drupal_html_id() sometimes fails to
+  // return a unique id. Make it so.
+  $map_id = drupal_html_id('leaflet_map') . '-' . rand();
   $build = array(
     '#theme' => 'html_tag',
     '#tag' => 'div',

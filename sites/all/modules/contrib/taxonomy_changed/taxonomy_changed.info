@@ -1,0 +1,13 @@
+name = Taxonomy Changed
+description = "Make Drupal has the ability to track changed time for taxonomy terms."
+package = Taxonomy
+core = 7.x
+
+dependencies[] = taxonomy
+dependencies[] = views
+; Information added by Drupal.org packaging script on 2014-02-24
+version = "7.x-1.0"
+core = "7.x"
+project = "taxonomy_changed"
+datestamp = "1393246708"
+

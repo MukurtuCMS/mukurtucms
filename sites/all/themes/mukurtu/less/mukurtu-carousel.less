@@ -1,0 +1,218 @@
+.slick-slide {
+    outline: none;
+}
+
+.slick-carousel-single,
+.slick-carousel-slider-for {
+    button.slick-arrow {
+        height: 50px;
+    }
+
+    .slick-prev {
+        .carousel-nav-left;
+    }
+
+    .slick-next {
+        .carousel-nav-right;
+    }
+
+    .slick-slide {
+
+        .field-name-download-atom {
+            padding-bottom: 20px;
+        }
+
+        img {
+            display: inherit;
+            width: inherit;
+        }
+
+        .scald-file-icon {
+            display: inline;
+        }
+
+        .field-name-scald-thumbnail {
+            text-align: center;
+        }
+    }
+}
+
+
+
+.mukurtu-loader-loading {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    z-index: 1;
+    width: 50px;
+    height: 50px;
+    border: 8px solid @mukurtu-primary-field-divider-color;
+    border-radius: 50%;
+    border-top: 8px solid @brand-primary;
+    border-bottom: 8px solid @brand-primary;
+    -webkit-animation: spin 2s linear infinite;
+    animation: spin 2s linear infinite;
+}
+
+.mukurtu-loader-background {
+    opacity: 0.5;
+}
+
+.slick-carousel-multipage {
+    .slick-slide {
+        position: relative;
+        margin: 10px;
+    }
+
+    .current-page {
+        border: 4px solid @brand-secondary;
+    }
+
+    .slick-prev {
+        .carousel-nav-left;
+        &::before {
+            top: -5px;
+        }
+    }
+
+    .slick-next {
+        .carousel-nav-right;
+        &::before {
+            top: -5px;
+        }
+    }
+}
+
+.mukurtu-page-number {
+    padding: 10px;
+    text-align: right;
+
+    .placeholder {
+        font-weight: bold;
+    }
+}
+
+.mukurtu-page-select-wrapper {
+    width: 140px;
+
+    &::after {
+        content : "";
+        display: inline-block;
+        position: absolute;
+        left: 125px;
+        margin: auto;
+        top: 18px;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 6px 6px 0 6px;
+        border-color: @brand-secondary transparent transparent transparent;
+    }
+}
+
+.mukurtu-page-select {
+    form {
+        color: @text-color;
+        font-size: 14px;
+        font-weight: bold;
+
+        select {
+            -webkit-appearance: none;
+            border: none;
+            background: @mukurtu-navbar-collapse-bg;
+            padding: 10px 20px;
+        }
+    }
+}
+
+.slick-carousel-slider-nav {
+    .slick-slide {
+        margin: 10px;
+    }
+
+    .slick-current {
+        border-bottom: @navbar-mukurtu-accent-height solid @brand-secondary;
+    }
+
+    .slick-prev {
+        .carousel-nav-left;
+        &::before {
+            top: -5px;
+        }
+    }
+
+    .slick-next {
+        .carousel-nav-right;
+        &::before {
+            top: -5px;
+        }
+    }
+}
+
+/*
+.mukurtu-owl-carousel-single {
+    .owl-nav {
+        position: absolute;
+        top: 50%;
+        width: 100%;
+
+        .owl-prev {
+            .carousel-nav-left;
+        }
+
+        .owl-next {
+            .carousel-nav-right;
+        }
+    }
+
+    .owl-item {
+        .field-name-download-atom {
+            padding-bottom: 20px;
+        }
+
+        img {
+            display: inherit;
+            width: inherit;
+        }
+
+        .scald-file-icon {
+            display: inline;
+        }
+
+        .field-name-scald-thumbnail {
+            text-align: center;
+        }
+    }
+
+    .owl-dots {
+        position: absolute;
+        bottom: -30px;
+        display: inline-block;
+        text-align: center;
+        width: 100%;
+
+        .owl-dot {
+            display: inline-block;
+
+            span {
+                background: none repeat scroll 0 0 @mukurtu-primary-field-divider-color;
+                border-radius: 20px;
+                display: block;
+                height: 12px;
+                margin: 5px 7px;
+                //opacity: 0.5;
+                width: 12px;
+            }
+
+            &.active {
+                span {
+                    background: none repeat scroll 0 0 @brand-secondary;
+                }
+            }
+        }
+    }
+}
+*/

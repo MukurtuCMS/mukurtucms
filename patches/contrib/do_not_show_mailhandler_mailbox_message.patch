@@ -1,0 +1,12 @@
+diff --git a/mailhandler.install b/mailhandler.install
+index 7ab71a8..7a5cff6 100644
+--- a/mailhandler.install
++++ b/mailhandler.install
+@@ -77,7 +77,6 @@ function mailhandler_schema() {
+  */
+ function mailhandler_enable() {
+   cache_clear_all('plugins:feeds:plugins', 'cache');
+-  drupal_set_message(t("Now that you've enabled Mailhandler, you need to <a href='@mailbox-add'>add a mailbox</a> corresponding to an IMAP/POP3/mbox mailbox.", array('@mailbox-add' => url('admin/structure/mailhandler/add'))));
+ }
+
+ /**

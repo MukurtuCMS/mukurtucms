@@ -5,8 +5,8 @@
  */
 
 // Constants
-define("FITVIDS_DEFAULT_REGIONS", '.region');
-define("FITVIDS_PLUGIN_URL", 'https://github.com/davatron5000/FitVids.js');
+define("FITVIDS_DEFAULT_REGIONS", 'body');
+define("FITVIDS_PLUGIN_URL", 'https://raw.github.com/davatron5000/FitVids.js/master/jquery.fitvids.js');
 define("FITVIDS_PLUGIN_FILENAME", 'jquery.fitvids.js');
 
 /**
@@ -26,7 +26,11 @@ function fitvids_help($path, $arg) {
       $output .= '<h3>' . t('About') . '</h3>';
       $output .= '<p>' . t("FitVids is a jQuery plugin for fluid width video embeds.") . '</p>';
       $output .= '<p>' . t("It's useful if you are using a responsive theme (such as Omega), and want the videos to scale.") . '</p>';
-      $output .= '<p>' . t("It currently supports Vimeo,YouTube, Blip.tv, Viddler, Kickstarter.") . '</p>';
+      $output .= '<p>' . t("By default it supports Vimeo, YouTube and Kickstarter.") . '</p>';
+      $output .= '<h3>' . t('jQuery plugin') . '</h3>';
+      $output .= '<p>' . t("Download the plugin from " . FITVIDS_PLUGIN_URL) . '</p>';
+      $output .= '<h3>' . t('Compatibility') . '</h3>';
+      $output .= '<p>' . t("Older versions of the media_youtube and media_vimeo modules wrap videos in HTML which may stop FitVids working properly. You can configure FitVids to remove the unneccesary markup.") . '</p>';
       $output .= '<h3>' . t('Further info') . '</h3>';
       $output .= '<p>' . t("There is an explanatory blog post at http://daverupert.com/2011/09/responsive-video-embeds-with-fitvids/") . '</p>';
       $output .= '<p>' . t("See the code at https://github.com/davatron5000/FitVids.js/") . '</p>';
@@ -74,16 +78,16 @@ function fitvids_form($form, &$form_state) {
   $path = libraries_get_path('fitvids') . '/jquery.fitvids.js';
   $installed = file_exists($path);
   if (!$installed) {
-    $message = t('You need to download the FitVids.js jQuery plugin to use this module. Download it from !fitvids-site, copy it to the !fitvids-library directory, and rename it to !fitvids-filename.', array(
+    $message = t('You need to download the FitVids.js jQuery plugin to use this module. Download it from !fitvids-site and copy it to !fitvids-library/!fitvids-filename.', array(
       '!fitvids-site' => l(t('here'), FITVIDS_PLUGIN_URL),
       '!fitvids-library' => libraries_get_path('fitvids'),
       '!fitvids-filename' => FITVIDS_PLUGIN_FILENAME,
     ));
-    drupal_set_message(filter_xss_admin($message), $type = 'warning');;
+    drupal_set_message(filter_xss_admin($message), $type = 'warning');
   }
 
   $form['fitvids_intro'] = array(
-    '#markup' => '<p>FitVids is a jQuery plugin for fluid width video embeds. It currently supports Vimeo,YouTube, Blip.tv, Viddler, Kickstarter.</p>',
+    '#markup' => '<p>FitVids is a jQuery plugin for fluid width video embeds. By default, it supports YouTube, Vimeo and Kickstarter.</p>',
   );
 
   $form['fitvids_selectors'] = array(
@@ -100,16 +104,25 @@ function fitvids_form($form, &$form_state) {
     '#title' => t('Custom iframe URLs'),
     '#default_value' => variable_get('fitvids_customselectors', ''),
     '#rows' => 3,
-    '#description' => t('Only YouTube, Vimeo, Blip.tv, Viddler and Kickstarter are supported by default, but you can tell FitVids about videos from other sites by adding the domain of the player. <br />E.g., "http://www.dailymotion.com". Use a new line for each URL. You don\'t need to add add trailing slashes.'),
+    '#description' => t('Only YouTube, Vimeo and Kickstarter are supported by default, but you can tell FitVids about videos from other sites by adding the domain of the player. <br />E.g., "http://www.dailymotion.com". Use a new line for each URL. You don\'t need to add trailing slashes.'),
+  );
+
+  $form['fitvids_simplifymarkup'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Simplify media_youtube and media_vimeo markup'),
+    '#default_value' => variable_get('fitvids_simplifymarkup', TRUE),
+    '#description' => t('Older versions of the media_youtube and media_vimeo modules wrap videos in HTML which may stop FitVids working properly. Enable this to remove the unneccesary markup.'),
   );
 
   return system_settings_form($form);
 }
 
 /**
+ * Implements hook_page_build().
+ * 
  * Include the FitVids.js script on every page
  */
-function fitvids_init() {
+function fitvids_page_build(&$page) {
 
   // Is the library installed?
   $path = libraries_get_path('fitvids') . '/jquery.fitvids.js';
@@ -128,6 +141,7 @@ function fitvids_init() {
 
   // Generate the custom vendor selectors
   $fitvids_customselectors = variable_get('fitvids_customselectors', '');
+  $fitvids_customselectors_array = array();
   if ($fitvids_customselectors != '') {
     $fitvids_customselectors_array = explode(PHP_EOL, $fitvids_customselectors);
     $custom_selectors = '';
@@ -145,46 +159,16 @@ function fitvids_init() {
   // Get fitvids containers
   $fitvids_selectors = variable_get('fitvids_selectors', FITVIDS_DEFAULT_REGIONS);
   $fitvids_selectors_array = explode(PHP_EOL, $fitvids_selectors);
-
-  // Generate Drupal behaviour js
-  $inline_code = '/* Output by FitVids module */' . PHP_EOL;
-  $inline_code .= '(function ($) {
-    Drupal.behaviors.fitvids = {
-      attach: function (context, settings) {' . PHP_EOL;
-      
-  // TODO Remove these bits when Media stops adding the wrapper divs
-  // Play nice with Media's iframe wrappers, by removing explicit widths and heights
-  // For youtube
-  $inline_code .= 'if ($(".media-youtube-outer-wrapper").length) {' . PHP_EOL;
-  $inline_code .= ' $(".media-youtube-outer-wrapper").removeAttr("style");' . PHP_EOL;
-  $inline_code .= ' $(".media-youtube-preview-wrapper").removeAttr("style");' . PHP_EOL;
-  $inline_code .= ' $(".media-youtube-outer-wrapper").removeClass("media-youtube-outer-wrapper");' . PHP_EOL;
-  $inline_code .= ' $(".media-youtube-preview-wrapper").removeClass("media-youtube-preview-wrapper");' . PHP_EOL;
-  $inline_code .= '}' . PHP_EOL;
-  // For Vimeo
-  $inline_code .= 'if ($(".media-vimeo-outer-wrapper").length) {' . PHP_EOL;
-  $inline_code .= ' $(".media-vimeo-outer-wrapper").removeAttr("style");' . PHP_EOL;
-  $inline_code .= ' $(".media-vimeo-preview-wrapper").removeAttr("style");' . PHP_EOL;
-  $inline_code .= ' $(".media-vimeo-outer-wrapper").removeClass("media-vimeo-outer-wrapper");' . PHP_EOL;
-  $inline_code .= ' $(".media-vimeo-preview-wrapper").removeClass("media-vimeo-preview-wrapper");' . PHP_EOL;
-  $inline_code .= '}' . PHP_EOL;
-
-  // Write out the fitVids selectors
-  foreach ($fitvids_selectors_array as $selector) {
-    $selector = trim($selector);
-    $inline_code .= '$("' . $selector . '", context).fitVids(' . $custom_selectors . ');' . PHP_EOL;
-  }
-
-  $inline_code .= '}
-      };
-    }(jQuery));';
-
-  drupal_add_js($inline_code, array(
-    'type' => 'inline',
-    'scope' => 'footer',
-    'weight' => 5,
-    'every_page' => TRUE,
-  ));
+  
+  // Simplify markup?
+  $simplifymarkup = variable_get('fitvids_simplifymarkup', TRUE);
+  
+  // Export the variables to Drupal.settings
+  drupal_add_js(array('fitvids' => array(
+    'custom_domains' => $fitvids_customselectors_array,
+    'selectors' => $fitvids_selectors_array,
+    'simplifymarkup' => $simplifymarkup,
+  )), 'setting');
 }
 
 /**

@@ -1,0 +1,49 @@
+<?php
+/**
+ * @file
+ * Tests for scald_dailymotion.module.
+ */
+
+/**
+ * Defines a base class for testing the Scald module.
+ */
+class ScaldDailymotionFetchTestCase extends DrupalUnitTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Scald Dailymotion: Fetch data testcase',
+      'description' => 'Test the Scald Dailymotion data fetching.',
+      'group' => 'Scald Dailymotion',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    require_once __DIR__ . '/../scald_dailymotion.module';
+    parent::setUp();
+  }
+
+  /**
+   * Test Scald Dailymotion video retrieving.
+   */
+  public function testScaldDailymotionVideo() {
+    $video = scald_dailymotion_video('x26ezrb');
+    $this->assertEqual($video->id, 'x26ezrb', 'Video ID correctly set');
+    $this->assertTrue(isset($video->title), 'Video has a title');
+
+    // Test video dimensions.
+    $this->assertEqual($video->height, 380, 'Video height got retrieved locally');
+    $this->assertTrue(isset($video->width), 'Video has a width');
+
+    // Test the thumbnail retrieving.
+    $this->assertTrue(isset($video->thumbnail_url), 'Video has a thumbnail');
+    $thumbnail = drupal_http_request($video->thumbnail_url);
+    $this->assertEqual($thumbnail->code, 200, 'Video got retrieved correctly');
+  }
+
+}

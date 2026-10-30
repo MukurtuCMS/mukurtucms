@@ -1,10 +1,12 @@
 <?php
+
 /**
  * @file
  * Renders a full entity in a views area.
  */
 
 class entity_views_handler_area_entity extends views_handler_area {
+
   public function option_definition() {
     $options = parent::option_definition();
     $options['entity_type'] = array('default' => 'node');
@@ -14,7 +16,7 @@ class entity_views_handler_area_entity extends views_handler_area {
     return $options;
   }
 
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
 
     $entity_type_options = array();
@@ -40,7 +42,7 @@ class entity_views_handler_area_entity extends views_handler_area {
     $form['entity_id'] = array(
       '#type' => 'textfield',
       '#title' => t('Entity id'),
-      '#description' => t('Choose the entity you want to display in the area.'),
+      '#description' => t('Choose the entity you want to display in the area. To render an entity given by a contextual filter use "%1" for the first argument, "%2" for the second, etc.'),
       '#default_value' => $this->options['entity_id'],
     );
 
@@ -105,6 +107,9 @@ class entity_views_handler_area_entity extends views_handler_area {
    * Render an entity using the view mode.
    */
   public function render_entity($entity_type, $entity_id, $view_mode) {
+    $tokens = $this->get_render_tokens();
+    // Replace argument tokens in entity id.
+    $entity_id = strtr($entity_id, $tokens);
     if (!empty($entity_type) && !empty($entity_id) && !empty($view_mode)) {
       $entity = entity_load_single($entity_type, $entity_id);
       if (!empty($this->options['bypass_access']) || entity_access('view', $entity_type, $entity)) {
@@ -117,4 +122,32 @@ class entity_views_handler_area_entity extends views_handler_area {
       return '';
     }
   }
+
+  /**
+   * Get the 'render' tokens to use for advanced rendering.
+   *
+   * This runs through all of the fields and arguments that
+   * are available and gets their values. This will then be
+   * used in one giant str_replace().
+   */
+  public function get_render_tokens() {
+    $tokens = array();
+    if (!empty($this->view->build_info['substitutions'])) {
+      $tokens = $this->view->build_info['substitutions'];
+    }
+    $count = 0;
+    foreach ($this->view->display_handler->get_handlers('argument') as $arg => $handler) {
+      $token = '%' . ++$count;
+      if (!isset($tokens[$token])) {
+        $tokens[$token] = '';
+      }
+      // Use strip tags as there should never be HTML in the path.
+      // However, we need to preserve special characters like " that
+      // were removed by check_plain().
+      $tokens['%' . $count] = $handler->argument;
+    }
+
+    return $tokens;
+  }
+
 }

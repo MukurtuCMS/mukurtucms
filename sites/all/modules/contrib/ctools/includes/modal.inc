@@ -15,6 +15,7 @@
  *   ctools_include('modal');
  *   ctools_modal_add_js();
  * }
+ * @endcode
  *
  * You can have links and buttons bound to use the modal by adding the
  * class ctools-use-modal.
@@ -55,9 +56,9 @@ function ctools_modal_add_js() {
         'alt' => t('Close window'),
       )),
       'throbber' => theme('image', array(
-          'path' => ctools_image_path('throbber.gif'),
-          'title' => t('Loading...'),
-          'alt' => t('Loading'),
+        'path' => ctools_image_path('throbber.gif'),
+        'title' => t('Loading...'),
+        'alt' => t('Loading'),
       )),
     ),
   );
@@ -74,7 +75,7 @@ function ctools_modal_add_js() {
 }
 
 /**
- * @todo this is deprecated
+ * @todo Deprecated this.
  */
 function ctools_modal_add_plugin_js($plugins) {
   $css = array();
@@ -85,7 +86,7 @@ function ctools_modal_add_plugin_js($plugins) {
         if (file_exists($file)) {
           $js[$file] = TRUE;
         }
-        else if (file(exists($subtype['path'] . '/' . $file))) {
+        elseif (file_exists($subtype['path'] . '/' . $file)) {
           $js[$subtype['path'] . '/' . $file] = TRUE;
         }
       }
@@ -95,7 +96,7 @@ function ctools_modal_add_plugin_js($plugins) {
         if (file_exists($file)) {
           $css[$file] = TRUE;
         }
-        else if (file(exists($subtype['path'] . '/' . $file))) {
+        elseif (file_exists($subtype['path'] . '/' . $file)) {
           $css[$subtype['path'] . '/' . $file] = TRUE;
         }
       }
@@ -140,7 +141,7 @@ function ctools_modal_command_dismiss() {
 }
 
 /**
- * Display loading screen in the modal
+ * Display loading screen in the modal.
  */
 function ctools_modal_command_loading() {
   return array(
@@ -189,7 +190,7 @@ function ctools_modal_text_button($text, $dest, $alt, $class = '') {
  * Wrap a form so that we can use it properly with AJAX. Essentially if the
  * form wishes to render, it automatically does that, otherwise it returns
  * the render array so we can see submission results.
-
+ *
  * @param array $form
  *   An associative array containing the structure of the form.
  * @param array $form_state
@@ -222,7 +223,7 @@ function ctools_modal_form_wrapper($form_id, &$form_state) {
 
   $output = drupal_build_form($form_id, $form_state);
   if (!empty($form_state['ajax']) && (!$form_state['executed'] || $form_state['rebuild'])) {
-     return ctools_modal_form_render($form_state, $output);
+    return ctools_modal_form_render($form_state, $output);
   }
 
   return $output;

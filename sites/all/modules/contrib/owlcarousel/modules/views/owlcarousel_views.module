@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ * owlcarousel_views.module
+ */
+
+/**
+ * Implements hook_views_api().
+ */
+function owlcarousel_views_views_api() {
+  return array(
+    'api' => 3,
+  );
+}

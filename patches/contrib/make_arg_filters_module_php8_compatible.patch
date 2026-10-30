@@ -1,0 +1,27 @@
+diff --git a/argfilters.module b/argfilters.module
+index 5331a6f..38eb380 100755
+--- a/argfilters.module
++++ b/argfilters.module
+@@ -16,14 +16,16 @@ function argfilters_views_query_substitutions() {
+   // set.
+   $replacements = array();
+   if (is_array($view->argument)) {
+-    foreach($view->argument as $index => $argument) {
++    foreach ($view->argument as $index => $argument) {
+       // Shift all indeces up one step, to sync with the outward-facing
+       // denumeration used in the Views interface.
+-      $newindex = $index + 1;
+-      $replacements["!$newindex"] = $argument->argument;
+-      // TODO: Use $view->argument to load the validated title for the argument
+-      // object, if there is any. For now, we only use the raw input value.
+-      $replacements["%$newindex"] = $argument->argument;
++      if (is_numeric($index)) {
++        $newindex = $index + 1;
++        $replacements["!$newindex"] = $argument->argument;
++        // TODO: Use $view->argument to load the validated title for the argument
++        // object, if there is any. For now, we only use the raw input value.
++        $replacements["%$newindex"] = $argument->argument;
++      }
+     }
+   }
+ 

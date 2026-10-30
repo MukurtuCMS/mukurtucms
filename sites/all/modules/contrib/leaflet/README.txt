@@ -14,7 +14,7 @@ Installation
 
 1. Install the Drupal Leaflet module as per normal.
 
-2. Download the Leaflet library from http://leafletjs.com. Leaflet 0.7.5 or later
+2. Download the Leaflet library from http://leafletjs.com. Leaflet 1.0.2 or later
    is recommended. Extract it to your drupal root /sites/all/libraries/leaflet.
    The file 'leaflet.js' must reside at /sites/all/libraries/leaflet/leaflet.js.
    All other files and folder(s) that come with the library are also needed.
@@ -93,7 +93,7 @@ In the Description field, select "<entire node>" and then select a View mode.
 For a tutorial, please read http://marzeelabs.org/blog/2012/09/24/building-maps-in-drupal-using-leaflet-views/
 
 Roadmap
--------
+--------
 
 * UI for managing maps
 * Better documentation

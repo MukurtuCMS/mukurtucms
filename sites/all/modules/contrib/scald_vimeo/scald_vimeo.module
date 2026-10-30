@@ -1,0 +1,414 @@
+<?php
+
+/**
+ * @file
+ * Defines a Vimeo provider for Scald.
+ */
+
+// @codingStandardsIgnoreStart
+define('VIMEO_ID_REGEXP', '/^[a-zA-Z0-9]+$/');
+define('VIMEO_WEB_REGEXP', '#^https?://vimeo.com/([a-zA-Z0-9]+)(_.*)?$#');
+define('VIMEO_API_VIDEO', 'http://vimeo.com/api/v2/video/');
+define('VIMEO_API_OEMBED', 'http://vimeo.com/api/oembed.json?url=http%3A//vimeo.com/');
+define('VIMEO_API', 'http://vimeo.com/api/v2/');
+// @codingStandardsIgnoreEnd
+
+/**
+ * Implements hook_scald_atom_providers().
+ *
+ * Tell Scald that we'll be providing some video atoms.
+ */
+function scald_vimeo_scald_atom_providers() {
+  return array(
+    'video' => 'Video hosted on Vimeo',
+  );
+  // This code will never be hit, but is necessary to mark the string
+  // for translation on localize.d.o.
+  // @codingStandardsIgnoreLine
+  t('Video hosted on Vimeo');
+}
+
+/**
+ * Implements hook_scald_add_form().
+ */
+function scald_vimeo_scald_add_form(&$form, &$form_state) {
+  $form['identifier'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Vimeo video identifier or URL'),
+    '#element_validate' => array('scald_vimeo_validate_id'),
+    '#default_value' => '',
+  );
+}
+
+/**
+ * Implements hook_scald_add_form_fill().
+ */
+function scald_vimeo_scald_add_form_fill(&$atom, $form, $form_state) {
+
+  // Get the identifier.
+  $identifier = scald_vimeo_parse_id($form_state['values']['identifier'], TRUE);
+
+  // Get video info.
+  $infos = scald_vimeo_video($identifier);
+
+  $atom->base_id = $identifier;
+  $atom->title = $infos->title;
+
+  // Prefill the author.
+  $langcode = field_language('scald_atom', $atom, 'scald_authors');
+  $atom->scald_authors[$langcode][0] = array(
+    'tid' => 0,
+    'taxonomy_term' => (object) (array('name' => $infos->author)),
+  );
+
+  if (!empty($infos->tags)) {
+    // Prefill tags.
+    $langcode = field_language('scald_atom', $atom, 'scald_tags');
+    foreach ($infos->tags as $index => $tag) {
+      $atom->scald_tags[$langcode][$index] = array(
+      // Beware, this is not a real tid, it's just an index.
+        'tid' => $index,
+        'taxonomy_term' => (object) (array('name' => $tag)),
+      );
+    }
+  }
+
+  $atom->data['video_width'] = $infos->width;
+  $atom->data['video_height'] = $infos->height;
+
+  // Download a copy of the video thumbnail. This makes it possible
+  // to do interesting manipulation with image styles presets.
+  $thumb = drupal_http_request($infos->thumbnail['src']);
+  if ($thumb->code == 200 && $directory = ScaldAtomController::getThumbnailPath('video')) {
+    $dest = $directory . '/vimeo-' . $infos->id . '.jpg';
+    $file = file_save_data($thumb->data, $dest);
+
+    if ($file) {
+      // Set the file status to temporary.
+      $query = db_update('file_managed')
+        ->condition('fid', $file->fid)
+        ->fields(array('status' => 0))
+        ->execute();
+      $langcode = field_language('scald_atom', $atom, 'scald_thumbnail');
+      $atom->scald_thumbnail[$langcode][0] = (array) $file;
+    }
+  }
+}
+
+/**
+ * Implements hook_scald_fetch().
+ */
+function scald_vimeo_scald_fetch($atom, $type) {
+  $items = field_get_items('scald_atom', $atom, 'scald_thumbnail');
+  if ($items && file_exists($items[0]['uri'])) {
+    $atom->file_source = $atom->thumbnail_source = $items[0]['uri'];
+  }
+}
+
+/**
+ * Implements hook_scald_prerender().
+ */
+function scald_vimeo_scald_prerender($atom, $context, $options, $mode) {
+  if ($mode == 'atom') {
+    // Load context configuration to retrieve dimension data if present.
+    $context_config = scald_context_config_load($context);
+    $video_width = (isset($atom->data['video_width'])) ? $atom->data['video_width'] : 480;
+    $video_height = (isset($atom->data['video_height'])) ? $atom->data['video_height'] : 365;
+    // Allow context configuration to override video dimension variables.
+    if (!empty($context_config->data['width'])) {
+      $video_width = $context_config->data['width'];
+    }
+    if (!empty($context_config->data['height'])) {
+      $video_height = $context_config->data['height'];
+    }
+    $atom->rendered->player = theme('scald_vimeo_player',
+      array(
+        'vars' => array(
+          'video_id'      => $atom->base_id,
+          'video_width'   => $video_width,
+          'video_height'  => $video_height,
+          'thumbnail'     => $atom->thumbnail_source,
+          'title'         => check_plain($atom->title),
+        ),
+        'atom' => $atom,
+      )
+    );
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function scald_vimeo_theme() {
+  return array(
+    'scald_vimeo_player' => array(
+      'variables' => array('vars' => NULL, 'atom' => NULL),
+      'template' => 'scald_vimeo_player',
+    ),
+  );
+}
+
+/**
+ * Function to register.
+ *
+ * Creates an atom based on a Vimeo video id or an object
+ * containing the video informations..
+ *
+ * @param mixed $video
+ *   Unique identifier of the video on Vimeo, or object
+ *   returned by scald_vimeo_video.
+ *
+ * @return int
+ *   Unique identifier of the new atom
+ */
+function scald_vimeo_register($video) {
+  global $user;
+  // Fetch the needed informations from Vimeo.
+  if (is_object($video)) {
+    $infos = $video;
+  }
+  else {
+    $infos = scald_vimeo_video($video);
+  }
+
+  // Check if the video has already been imported to prevent duplicate.
+  $old = scald_vimeo_already_imported($infos->id);
+  if ($old) {
+    return FALSE;
+  }
+
+  // Download a copy of the video thumbnail. This makes it possible
+  // to do interesting manipulation with image styles presets.
+  $thumb = drupal_http_request($infos->thumbnail['src']);
+  $dir = 'public://vimeo';
+  if ($thumb->code == 200 && file_prepare_directory($dir, FILE_CREATE_DIRECTORY)) {
+    $dest = $dir . '/' . $infos->id . '.jpg';
+    $file = file_save_data($thumb->data, $dest);
+  }
+
+  // Create an atom.
+  $atom = new ScaldAtom('video', 'scald_vimeo', array(
+    'base_id' => $infos->id,
+    'title' => $infos->title,
+  ));
+
+  // Save video width and height.
+  if (!isset($atom->data)) {
+    $atom->data = array();
+  }
+  $atom->data['video_width'] = $infos->width;
+  $atom->data['video_height'] = $infos->height;
+
+  // Set file.
+  if ($file) {
+    $query = db_update('file_managed')
+      ->condition('fid', $file->fid)
+      ->fields(array('status' => 0))
+      ->execute();
+    $langcode = field_language('scald_atom', $atom, 'scald_thumbnail');
+    $atom->scald_thumbnail[$langcode][0] = (array) $file;
+  }
+
+  // And save it.
+  $atom_sid = scald_atom_save($atom);
+  // Finally, return this id.
+  return $atom_sid;
+}
+
+/**
+ * Analyze a Vimeo RSS feed to extract videos information.
+ *
+ * @param string $type
+ *   RSS Type of the feed. Example, 'user', 'video', 'tag'.
+ * @param string $id
+ *   Identifier or string associated with the type. For example, user name,
+ *   video id or tag.
+ *
+ * @return array
+ *   An array of object, each one containing an analyzed video.
+ */
+function scald_vimeo_feed($type, $id) {
+  $items = array();
+  switch ($type) {
+    case 'user':
+      $url = VIMEO_API . $id . '/videos.php';
+      $feed = drupal_http_request($url);
+      if ($feed->code != 404 && !empty($feed->data)) {
+        $data = unserialize($feed->data);
+        if (count($data) > 0) {
+          foreach ($data as $video) {
+            $items[] = scald_vimeo_parse_item($video);
+          }
+        }
+      }
+      break;
+
+    case 'video':
+      $url = VIMEO_API_VIDEO . $id . '.php';
+      $feed = drupal_http_request($url);
+      if ($feed->code != 404 && !empty($feed->data)) {
+        $data = unserialize($feed->data);
+        if (count($data) > 0) {
+          foreach ($data as $video) {
+            $items[] = scald_vimeo_parse_item($video);
+          }
+        }
+      }
+      // Fallback to oembed.
+      if (empty($items)) {
+        $url = VIMEO_API_OEMBED . $id;
+        $feed = drupal_http_request($url);
+        if ($feed->code != 404 && !empty($feed->data)) {
+          $data = drupal_json_decode($feed->data);
+          $items[] = scald_vimeo_parse_item_oembed($data);
+        }
+      }
+      break;
+  }
+  return $items;
+}
+
+/**
+ * Analyze the Vimeo feed for a specific video.
+ */
+function scald_vimeo_video($id) {
+  $items = scald_vimeo_feed('video', $id);
+  return $items[0];
+}
+
+/**
+ * Analyze a XML DOMElement item to extract interesting info.
+ *
+ * @param object $item
+ *   An object of classe DOMElement corresponding to an element of the feed.
+ *
+ * @return array
+ *   An abject containing various video informations.
+ */
+function scald_vimeo_parse_item($item) {
+
+  $info = new stdClass();
+
+  // Fetch the video ID.
+  $info->id = $item['id'];
+
+  // Video Title.
+  $info->title = $item['title'];
+
+  // Video dimensions.
+  $info->width = $item['width'];
+  $info->height = $item['height'];
+
+  // Thumbnail data.
+  $info->thumbnail = array(
+    'src'    => $item['thumbnail_large'],
+    'width'  => $item['width'],
+    'height' => $item['height'],
+  );
+
+  // Video tags.
+  $info->tags = explode(', ', $item['tags']);
+
+  // Author.
+  $info->author = $item['user_name'];
+
+  // Creation Date.
+  $info->pubDate = $item['upload_date'];
+
+  // License.
+  $info->license = 'VM';
+  return $info;
+}
+
+/**
+ * Extract information from oembed.
+ */
+function scald_vimeo_parse_item_oembed($item) {
+  $info = new stdClass();
+
+  // Fetch the video ID.
+  $info->id = $item['video_id'];
+
+  // Video Title.
+  $info->title = $item['title'];
+
+  // Video dimensions.
+  $info->width = $item['width'];
+  $info->height = $item['height'];
+
+  // Thumbnail data.
+  $info->thumbnail = array(
+    'src'    => $item['thumbnail_url'],
+    'width'  => $item['thumbnail_width'],
+    'height' => $item['thumbnail_height'],
+  );
+
+  // Author.
+  $info->author = $item['author_name'];
+
+  // License.
+  $info->license = 'VM';
+  return $info;
+}
+
+/**
+ * Checks if a video has already been imported, based on its video id.
+ *
+ * @param int $id
+ *   The video identifier.
+ *
+ * @return mixed
+ *   FALSE if the video was never imported, the scald identifier of
+ *   the video otherwise.
+ */
+function scald_vimeo_already_imported($id) {
+  $query = array('provider' => 'scald_vimeo', 'base_id' => $id);
+  return scald_search($query, FALSE, TRUE);
+}
+
+/**
+ * Form element validation handler for Vimeo identifier.
+ */
+function scald_vimeo_validate_id($element, &$form_state) {
+  $id = scald_vimeo_parse_id($form_state['values']['identifier'], TRUE);
+  if (!$id) {
+    form_error($element, t('Invalid Vimeo video identifier.'));
+  }
+  elseif (scald_vimeo_already_imported($id)) {
+    form_error($element, t('Vimeo video already imported.'));
+  }
+}
+
+/**
+ * Parse a Vimeo ID and check validity.
+ */
+function scald_vimeo_parse_id($string, $check) {
+  $id = NULL;
+  $string = trim($string);
+  if (!preg_match(VIMEO_ID_REGEXP, $string)) {
+    // The string ID is not easy to parse, let's try to analyze it.
+    if (preg_match(VIMEO_WEB_REGEXP, $string, $m)) {
+      // This string is a full Vimeo URL.
+      $id = $m[1];
+    }
+    elseif (preg_match("/^http/", $string)) {
+      // This string is a URL, most likely a shortened one.
+      // (http://dai.ly, http://bit.ly, etc...).
+      $response = drupal_http_request($string);
+      if ($response->code == 200 && isset($response->redirect_code) && ($response->redirect_code == 301 || $response->redirect_code == 302)) {
+        return scald_vimeo_parse_id($response->redirect_url, $check);
+      }
+    }
+  }
+  else {
+    $id = $string;
+  }
+
+  if ($id && $check) {
+    // Last check to confirm this video really exists on Vimeo.
+    if (!scald_vimeo_video($id)) {
+      $id = FALSE;
+    }
+  }
+  return $id;
+}

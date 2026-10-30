@@ -11,7 +11,7 @@
 function node_overview_types() {
   $types = node_type_get_types();
   $names = node_type_get_names();
-  $field_ui = module_exists('field_ui');
+  $field_ui = module_exists('field_ui') && user_access('administer fields');
   $header = array(t('Name'), array('data' => t('Operations'), 'colspan' => $field_ui ? '4' : '2'));
   $rows = array();
 
@@ -417,14 +417,16 @@ function node_type_delete_confirm($form, &$form_state, $type) {
   $form['name'] = array('#type' => 'value', '#value' => $type->name);
 
   $message = t('Are you sure you want to delete the content type %type?', array('%type' => $type->name));
-  $caption = '';
 
   $num_nodes = db_query("SELECT COUNT(*) FROM {node} WHERE type = :type", array(':type' => $type->type))->fetchField();
   if ($num_nodes) {
-    $caption .= '<p>' . format_plural($num_nodes, '%type is used by 1 piece of content on your site. If you remove this content type, you will not be able to edit the %type content and it may not display correctly.', '%type is used by @count pieces of content on your site. If you remove %type, you will not be able to edit the %type content and it may not display correctly.', array('%type' => $type->name)) . '</p>';
+    drupal_set_title($message, PASS_THROUGH);
+    $caption = '<p>' . format_plural($num_nodes, '%type is used by 1 piece of content on your site. You cannot remove this content type until you have removed all of the %type content.', '%type is used by @count pieces of content on your site. You cannot remove this content type until you have removed all of the %type content.', array('%type' => $type->name)) . '</p>';
+    $form['description'] = array('#markup' => $caption);
+    return $form;
   }
 
-  $caption .= '<p>' . t('This action cannot be undone.') . '</p>';
+  $caption = '<p>' . t('This action cannot be undone.') . '</p>';
 
   return confirm_form($form, $message, 'admin/structure/types', $caption, t('Delete'));
 }

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Scald Installation
+ * Scald Installation.
  *
  * The database schema is heavily commented; review for details.
  *
@@ -253,6 +253,9 @@ function scald_schema() {
 function scald_install() {
   // Get Scald hooks to run earlier than other modules.
   db_query("UPDATE {system} SET weight = -50 WHERE name = 'scald'");
+
+  // By default, the context export will not be handled by Features.
+  variable_set('scald_switch_feature_export', FALSE);
 }
 
 /**
@@ -274,6 +277,7 @@ function scald_uninstall() {
   variable_del('scald_custom_contexts');
   variable_del('scald_author_vocabulary');
   variable_del('scald_tags_vocabulary');
+  variable_del('scald_switch_feature_export');
 }
 
 /**
@@ -465,7 +469,7 @@ function _scald_create_tags_vocabulary() {
 /**
  * Add the {scald_atoms}.data column.
  *
- * "A serialized array of atom and provider specific additionnal data"
+ * A serialized array of atom and provider specific additionnal data.
  */
 function scald_update_7001() {
   $new_field = array(

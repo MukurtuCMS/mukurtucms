@@ -1,0 +1,65 @@
+<?php
+
+/**
+ * @file
+ * Tests permission inheritance for oa_subspaces
+ */
+
+class oa_sectionsNodePublicAccess extends oa_sectionsNodeAccessBase {
+  static function getInfo() {
+    return array(
+      'name' => 'OA Section Public Node Access test (slow)',
+      'description' => 'Test that can access section nodes in a public space correctly',
+      'group' => 'OA - Sections',
+    );
+  }
+
+  function test_oa_sectionsPublicAccess() {
+    extract($this->createOaSpaceAndUsers());
+    $team = $this->createNodeInOaSpace($space, array(
+      'type' => 'oa_team',
+      'uid' => $space_admin->uid,
+      'field_oa_team_users' => array(LANGUAGE_NONE => array(
+        array('target_id' => $space_member->uid),
+        array('target_id' => $space_admin->uid),
+      )),
+    ));
+    $space_member_2 = $this->createUserInOaSpace($space);
+    $non_member = $this->drupalCreateUser();
+
+    // Group that just $space_member is part of.
+    $group = $this->drupalCreateNode(array('type' => 'oa_group'));
+    og_group('node', $group, array('entity' => $space_member));
+    // Test a public space.
+    $this->oaTestOaSectionAccess('a public space', $space, $space_admin, $space_member, $space_member_2, $non_member, $group, $team);
+  }
+
+  function test_oa_sectionsPrivateAccess() {
+    extract($this->createOaSpaceAndUsers());
+    $team = $this->createNodeInOaSpace($space, array(
+      'type' => 'oa_team',
+      'uid' => $space_admin->uid,
+      'field_oa_team_users' => array(LANGUAGE_NONE => array(
+        array('target_id' => $space_member->uid),
+        array('target_id' => $space_admin->uid),
+      )),
+    ));
+    $space_member_2 = $this->createUserInOaSpace($space);
+    $non_member = $this->drupalCreateUser();
+
+    // Group that just $space_member is part of.
+    $group = $this->drupalCreateNode(array('type' => 'oa_group'));
+    og_group('node', $group, array('entity' => $space_member));
+
+    // Test a private space.
+    $space_private = $this->drupalCreateNode(array(
+      'type' => 'oa_space',
+      'uid' => $space_admin->uid,
+      'group_access' => array(LANGUAGE_NONE => array(array('value' => 1))),
+    ));
+    og_group('node', $space_private, array('entity' => $space_member));
+    og_group('node', $space_private, array('entity' => $space_member_2));
+    $this->oaTestOaSectionAccess('a private space', $space_private, $space_admin, $space_member, $space_member_2, $non_member, $group);
+  }
+
+}

@@ -47,9 +47,8 @@ function cer_entity_settings_exit() {
       $entity->cer_settings->set(NULL);
 
       $entity = $entity->value();
-      // We don't use $entity->save() here in order to prevent an infinite loop.
-      field_attach_presave($entity_type, $entity);
-      field_attach_update($entity_type, $entity);
+      $entity->cer_processed = TRUE;
+      entity_save($entity_type, $entity);
     }
   }
 }

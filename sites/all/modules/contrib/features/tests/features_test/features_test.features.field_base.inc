@@ -10,7 +10,7 @@
 function features_test_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'field_features_test'
+  // Exported field_base: 'field_features_test'.
   $field_bases['field_features_test'] = array(
     'active' => 1,
     'cardinality' => 1,

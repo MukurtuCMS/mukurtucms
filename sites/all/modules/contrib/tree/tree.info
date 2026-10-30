@@ -1,0 +1,24 @@
+name = Tree
+description = "Provides support for storing tree data structures."
+core = 7.x
+
+dependencies[] = ctools
+
+; Providers.
+files[] = tree.provider.inc
+files[] = provider/Tree_Provider_Abstract.class.php
+files[] = provider/Tree_Provider_Simple.class.php
+files[] = provider/Tree_Provider_NestedSet.class.php
+
+; Storages.
+files[] = tree.storage.inc
+files[] = storage/Tree_Storage_SQL.class.php
+files[] = storage/Tree_Storage_Testable.class.php
+
+files[] = tests/tree.test
+
+; Information added by Drupal.org packaging script on 2018-10-12
+version = "7.x-1.0-alpha1+12-dev"
+core = "7.x"
+project = "tree"
+datestamp = "1539322383"

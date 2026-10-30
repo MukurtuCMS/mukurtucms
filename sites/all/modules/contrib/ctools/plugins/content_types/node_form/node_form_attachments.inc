@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @file
+ */
+
 if (module_exists('upload')) {
   /**
    * Plugins are described by creating a $plugin array which will be used
@@ -17,7 +21,7 @@ if (module_exists('upload')) {
 
 function ctools_node_form_attachments_content_type_render($subtype, $conf, $panel_args, &$context) {
   $block = new stdClass();
-  $block->module = t('node_form');
+  $block->module = 'node_form';
 
   $block->title = t('Attach files');
   $block->delta = 'url-path-options';
@@ -46,6 +50,6 @@ function ctools_node_form_attachments_content_type_admin_title($subtype, $conf, 
 }
 
 function ctools_node_form_attachments_content_type_edit_form($form, &$form_state) {
-  // provide a blank form so we have a place to have context setting.
+  // Provide a blank form so we have a place to have context setting.
   return $form;
 }

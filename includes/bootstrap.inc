@@ -8,7 +8,7 @@
 /**
  * The current system version.
  */
-define('VERSION', '7.41');
+define('VERSION', '7.103');
 
 /**
  * Core API compatibility.
@@ -18,7 +18,7 @@ define('DRUPAL_CORE_COMPATIBILITY', '7.x');
 /**
  * Minimum supported version of PHP.
  */
-define('DRUPAL_MINIMUM_PHP', '5.2.4');
+define('DRUPAL_MINIMUM_PHP', '5.3.3');
 
 /**
  * Minimum recommended value of PHP memory_limit.
@@ -254,8 +254,13 @@ define('DRUPAL_PHP_FUNCTION_PATTERN', '[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*'
  * http://tools.ietf.org/html/rfc7231#section-7.1.1.1
  *
  * Example: Sun, 06 Nov 1994 08:49:37 GMT
+ *
+ * This constant was introduced in PHP 7.0.19 and PHP 7.1.5 but needs to be
+ * defined by Drupal for earlier PHP versions.
  */
-define('DATE_RFC7231', 'D, d M Y H:i:s \G\M\T');
+if (!defined('DATE_RFC7231')) {
+  define('DATE_RFC7231', 'D, d M Y H:i:s \G\M\T');
+}
 
 /**
  * Provides a caching wrapper to be used in place of large array structures.
@@ -354,6 +359,7 @@ abstract class DrupalCacheArray implements ArrayAccess {
   /**
    * Implements ArrayAccess::offsetExists().
    */
+  #[\ReturnTypeWillChange]
   public function offsetExists($offset) {
     return $this->offsetGet($offset) !== NULL;
   }
@@ -361,6 +367,7 @@ abstract class DrupalCacheArray implements ArrayAccess {
   /**
    * Implements ArrayAccess::offsetGet().
    */
+  #[\ReturnTypeWillChange]
   public function offsetGet($offset) {
     if (isset($this->storage[$offset]) || array_key_exists($offset, $this->storage)) {
       return $this->storage[$offset];
@@ -373,6 +380,7 @@ abstract class DrupalCacheArray implements ArrayAccess {
   /**
    * Implements ArrayAccess::offsetSet().
    */
+  #[\ReturnTypeWillChange]
   public function offsetSet($offset, $value) {
     $this->storage[$offset] = $value;
   }
@@ -380,6 +388,7 @@ abstract class DrupalCacheArray implements ArrayAccess {
   /**
    * Implements ArrayAccess::offsetUnset().
    */
+  #[\ReturnTypeWillChange]
   public function offsetUnset($offset) {
     unset($this->storage[$offset]);
   }
@@ -445,6 +454,9 @@ abstract class DrupalCacheArray implements ArrayAccess {
    * Destructs the DrupalCacheArray object.
    */
   public function __destruct() {
+    if ($this->bin == 'cache_form' && !variable_get('drupal_cache_array_persist_cache_form', FALSE)) {
+      return;
+    }
     $data = array();
     foreach ($this->keysToPersist as $offset => $persist) {
       if ($persist) {
@@ -699,13 +711,26 @@ function drupal_environment_initialize() {
   // Set sane locale settings, to ensure consistent string, dates, times and
   // numbers handling.
   setlocale(LC_ALL, 'C');
+
+  // PHP's built-in phar:// stream wrapper is not sufficiently secure. Override
+  // it with a more secure one, which requires PHP 5.3.3. For lower versions,
+  // unregister the built-in one without replacing it. Sites needing phar
+  // support for lower PHP versions must implement hook_stream_wrappers() to
+  // register their desired implementation.
+  if (in_array('phar', stream_get_wrappers(), TRUE)) {
+    stream_wrapper_unregister('phar');
+    if (version_compare(PHP_VERSION, '5.3.3', '>=')) {
+      include_once DRUPAL_ROOT . '/includes/file.phar.inc';
+      file_register_phar_wrapper();
+    }
+  }
 }
 
 /**
  * Validates that a hostname (for example $_SERVER['HTTP_HOST']) is safe.
  *
- * @return
- *  TRUE if only containing valid characters, or FALSE otherwise.
+ * @return bool
+ *   TRUE if it only contains valid characters, FALSE otherwise.
  */
 function drupal_valid_http_host($host) {
   // Limit the length of the host name to 1000 bytes to prevent DoS attacks with
@@ -716,6 +741,16 @@ function drupal_valid_http_host($host) {
     && substr_count($host, '.') <= 100
     && substr_count($host, ':') <= 100
     && preg_match('/^\[?(?:[a-zA-Z0-9-:\]_]+\.?)+$/', $host);
+}
+
+/**
+ * Checks whether an HTTPS request is being served.
+ *
+ * @return bool
+ *   TRUE if the request is HTTPS, FALSE otherwise.
+ */
+function drupal_is_https() {
+  return isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on';
 }
 
 /**
@@ -731,7 +766,7 @@ function drupal_settings_initialize() {
   if (file_exists(DRUPAL_ROOT . '/' . conf_path() . '/settings.php')) {
     include_once DRUPAL_ROOT . '/' . conf_path() . '/settings.php';
   }
-  $is_https = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on';
+  $is_https = drupal_is_https();
 
   if (isset($base_url)) {
     // Parse fixed base URL from settings.php.
@@ -772,17 +807,20 @@ function drupal_settings_initialize() {
     // Otherwise use $base_url as session name, without the protocol
     // to use the same session identifiers across HTTP and HTTPS.
     list( , $session_name) = explode('://', $base_url, 2);
-    // HTTP_HOST can be modified by a visitor, but we already sanitized it
-    // in drupal_settings_initialize().
+    // HTTP_HOST can be modified by a visitor, but we already sanitized it in
+    // drupal_environment_initialize().
     if (!empty($_SERVER['HTTP_HOST'])) {
-      $cookie_domain = $_SERVER['HTTP_HOST'];
-      // Strip leading periods, www., and port numbers from cookie domain.
-      $cookie_domain = ltrim($cookie_domain, '.');
-      if (strpos($cookie_domain, 'www.') === 0) {
-        $cookie_domain = substr($cookie_domain, 4);
-      }
-      $cookie_domain = explode(':', $cookie_domain);
-      $cookie_domain = '.' . $cookie_domain[0];
+      $cookie_domain = _drupal_get_cookie_domain($_SERVER['HTTP_HOST']);
+    }
+
+    // Drupal 7.83 included a security improvement whereby www. is no longer
+    // stripped from the cookie domain. However, this can cause problems with
+    // existing session cookies where some users are left unable to login. In
+    // order to avoid that, prepend a leading dot to the session_name that was
+    // derived from the base_url when a www. subdomain is in use.
+    // @see https://www.drupal.org/project/drupal/issues/2522002
+    if (strpos($session_name, 'www.') === 0) {
+      $session_name = '.' . $session_name;
     }
   }
   // Per RFC 2109, cookie domains must contain at least one dot other than the
@@ -801,6 +839,24 @@ function drupal_settings_initialize() {
   }
   $prefix = ini_get('session.cookie_secure') ? 'SSESS' : 'SESS';
   session_name($prefix . substr(hash('sha256', $session_name), 0, 32));
+}
+
+/**
+ * Derive the cookie domain to use for session cookies.
+ *
+ * @param $host
+ *   The value of the HTTP host name.
+ *
+ * @return
+ *   The string to use as a cookie domain.
+ */
+function _drupal_get_cookie_domain($host) {
+  $cookie_domain = $host;
+  // Strip leading periods and port numbers from cookie domain.
+  $cookie_domain = ltrim($cookie_domain, '.');
+  $cookie_domain = explode(':', $cookie_domain);
+  $cookie_domain = '.' . $cookie_domain[0];
+  return $cookie_domain;
 }
 
 /**
@@ -828,14 +884,21 @@ function drupal_settings_initialize() {
  * @param $filename
  *   The filename of the item if it is to be set explicitly rather
  *   than by consulting the database.
+ * @param bool $trigger_error
+ *   Whether to trigger an error when a file is missing or has unexpectedly
+ *   moved. This defaults to TRUE, but can be set to FALSE by calling code that
+ *   merely wants to check whether an item exists in the filesystem.
  *
  * @return
  *   The filename of the requested item or NULL if the item is not found.
  */
-function drupal_get_filename($type, $name, $filename = NULL) {
+function drupal_get_filename($type, $name, $filename = NULL, $trigger_error = TRUE) {
+  // The $files static variable will hold the locations of all requested files.
+  // We can be sure that any file listed in this static variable actually
+  // exists as all additions have gone through a file_exists() check.
   // The location of files will not change during the request, so do not use
   // drupal_static().
-  static $files = array(), $dirs = array();
+  static $files = array();
 
   // Profiles are a special case: they have a fixed location and naming.
   if ($type == 'profile') {
@@ -847,64 +910,321 @@ function drupal_get_filename($type, $name, $filename = NULL) {
   }
 
   if (!empty($filename) && file_exists($filename)) {
+    // Prime the static cache with the provided filename.
     $files[$type][$name] = $filename;
   }
   elseif (isset($files[$type][$name])) {
-    // nothing
+    // This item had already been found earlier in the request, either through
+    // priming of the static cache (for example, in system_list()), through a
+    // lookup in the {system} table, or through a file scan (cached or not). Do
+    // nothing.
   }
-  // Verify that we have an active database connection, before querying
-  // the database. This is required because this function is called both
-  // before we have a database connection (i.e. during installation) and
-  // when a database connection fails.
   else {
+    // Look for the filename listed in the {system} table. Verify that we have
+    // an active database connection before doing so, since this function is
+    // called both before we have a database connection (i.e. during
+    // installation) and when a database connection fails.
+    $database_unavailable = TRUE;
     try {
       if (function_exists('db_query')) {
         $file = db_query("SELECT filename FROM {system} WHERE name = :name AND type = :type", array(':name' => $name, ':type' => $type))->fetchField();
         if ($file !== FALSE && file_exists(DRUPAL_ROOT . '/' . $file)) {
           $files[$type][$name] = $file;
         }
+        $database_unavailable = FALSE;
       }
     }
     catch (Exception $e) {
       // The database table may not exist because Drupal is not yet installed,
-      // or the database might be down. We have a fallback for this case so we
-      // hide the error completely.
+      // the database might be down, or we may have done a non-database cache
+      // flush while $conf['page_cache_without_database'] = TRUE and
+      // $conf['page_cache_invoke_hooks'] = TRUE. We have a fallback for these
+      // cases so we hide the error completely.
     }
-    // Fallback to searching the filesystem if the database could not find the
-    // file or the file returned by the database is not found.
+    // Fall back to searching the filesystem if the database could not find the
+    // file or the file does not exist at the path returned by the database.
     if (!isset($files[$type][$name])) {
-      // We have a consistent directory naming: modules, themes...
-      $dir = $type . 's';
-      if ($type == 'theme_engine') {
-        $dir = 'themes/engines';
-        $extension = 'engine';
-      }
-      elseif ($type == 'theme') {
-        $extension = 'info';
-      }
-      else {
-        $extension = $type;
-      }
-
-      if (!isset($dirs[$dir][$extension])) {
-        $dirs[$dir][$extension] = TRUE;
-        if (!function_exists('drupal_system_listing')) {
-          require_once DRUPAL_ROOT . '/includes/common.inc';
-        }
-        // Scan the appropriate directories for all files with the requested
-        // extension, not just the file we are currently looking for. This
-        // prevents unnecessary scans from being repeated when this function is
-        // called more than once in the same page request.
-        $matches = drupal_system_listing("/^" . DRUPAL_PHP_FUNCTION_PATTERN . "\.$extension$/", $dir, 'name', 0);
-        foreach ($matches as $matched_name => $file) {
-          $files[$type][$matched_name] = $file->uri;
-        }
-      }
+      $files[$type][$name] = _drupal_get_filename_fallback($type, $name, $trigger_error, $database_unavailable);
     }
   }
 
   if (isset($files[$type][$name])) {
     return $files[$type][$name];
+  }
+}
+
+/**
+ * Performs a cached file system scan as a fallback when searching for a file.
+ *
+ * This function looks for the requested file by triggering a file scan,
+ * caching the new location if the file has moved and caching the miss
+ * if the file is missing. If a file had been marked as missing in a previous
+ * file scan, or if it has been marked as moved and is still in the last known
+ * location, no new file scan will be performed.
+ *
+ * @param string $type
+ *   The type of the item (theme, theme_engine, module, profile).
+ * @param string $name
+ *   The name of the item for which the filename is requested.
+ * @param bool $trigger_error
+ *   Whether to trigger an error when a file is missing or has unexpectedly
+ *   moved.
+ * @param bool $database_unavailable
+ *   Whether this function is being called because the Drupal database could
+ *   not be queried for the file's location.
+ *
+ * @return
+ *   The filename of the requested item or NULL if the item is not found.
+ *
+ * @see drupal_get_filename()
+ */
+function _drupal_get_filename_fallback($type, $name, $trigger_error, $database_unavailable) {
+  $file_scans = &_drupal_file_scan_cache();
+  $filename = NULL;
+
+  // If the cache indicates that the item is missing, or we can verify that the
+  // item exists in the location the cache says it exists in, use that.
+  if (isset($file_scans[$type][$name]) && ($file_scans[$type][$name] === FALSE || file_exists($file_scans[$type][$name]))) {
+    $filename = $file_scans[$type][$name];
+  }
+  // Otherwise, perform a new file scan to find the item.
+  else {
+    $filename = _drupal_get_filename_perform_file_scan($type, $name);
+    // Update the static cache, and mark the persistent cache for updating at
+    // the end of the page request. See drupal_file_scan_write_cache().
+    $file_scans[$type][$name] = $filename;
+    $file_scans['#write_cache'] = TRUE;
+  }
+
+  // If requested, trigger a user-level warning about the missing or
+  // unexpectedly moved file. If the database was unavailable, do not trigger a
+  // warning in the latter case, though, since if the {system} table could not
+  // be queried there is no way to know if the location found here was
+  // "unexpected" or not.
+  if ($trigger_error) {
+    $error_type = $filename === FALSE ? 'missing' : 'moved';
+    if ($error_type == 'missing' || !$database_unavailable) {
+      _drupal_get_filename_fallback_trigger_error($type, $name, $error_type);
+    }
+  }
+
+  // The cache stores FALSE for files that aren't found (to be able to
+  // distinguish them from files that have not yet been searched for), but
+  // drupal_get_filename() expects NULL for these instead, so convert to NULL
+  // before returning.
+  if ($filename === FALSE) {
+    $filename = NULL;
+  }
+  return $filename;
+}
+
+/**
+ * Returns the current list of cached file system scan results.
+ *
+ * @return
+ *   An associative array tracking the most recent file scan results for all
+ *   files that have had scans performed. The keys are the type and name of the
+ *   item that was searched for, and the values can be either:
+ *   - Boolean FALSE if the item was not found in the file system.
+ *   - A string pointing to the location where the item was found.
+ */
+function &_drupal_file_scan_cache() {
+  $file_scans = &drupal_static(__FUNCTION__, array());
+
+  // The file scan results are stored in a persistent cache (in addition to the
+  // static cache) but because this function can be called before the
+  // persistent cache is available, we must merge any items that were found
+  // earlier in the page request into the results from the persistent cache.
+  if (!isset($file_scans['#cache_merge_done'])) {
+    try {
+      if (function_exists('cache_get')) {
+        $cache = cache_get('_drupal_file_scan_cache', 'cache_bootstrap');
+        if (!empty($cache->data)) {
+          // File scan results from the current request should take precedence
+          // over the results from the persistent cache, since they are newer.
+          $file_scans = drupal_array_merge_deep($cache->data, $file_scans);
+        }
+        // Set a flag to indicate that the persistent cache does not need to be
+        // merged again.
+        $file_scans['#cache_merge_done'] = TRUE;
+      }
+    }
+    catch (Exception $e) {
+      // Hide the error.
+    }
+  }
+
+  return $file_scans;
+}
+
+/**
+ * Performs a file system scan to search for a system resource.
+ *
+ * @param $type
+ *   The type of the item (theme, theme_engine, module, profile).
+ * @param $name
+ *   The name of the item for which the filename is requested.
+ *
+ * @return
+ *   The filename of the requested item or FALSE if the item is not found.
+ *
+ * @see drupal_get_filename()
+ * @see _drupal_get_filename_fallback()
+ */
+function _drupal_get_filename_perform_file_scan($type, $name) {
+  // The location of files will not change during the request, so do not use
+  // drupal_static().
+  static $dirs = array(), $files = array();
+
+  // We have a consistent directory naming: modules, themes...
+  $dir = $type . 's';
+  if ($type == 'theme_engine') {
+    $dir = 'themes/engines';
+    $extension = 'engine';
+  }
+  elseif ($type == 'theme') {
+    $extension = 'info';
+  }
+  else {
+    $extension = $type;
+  }
+
+  // Check if we had already scanned this directory/extension combination.
+  if (!isset($dirs[$dir][$extension])) {
+    // Log that we have now scanned this directory/extension combination
+    // into a static variable so as to prevent unnecessary file scans.
+    $dirs[$dir][$extension] = TRUE;
+    if (!function_exists('drupal_system_listing')) {
+      require_once DRUPAL_ROOT . '/includes/common.inc';
+    }
+    // Scan the appropriate directories for all files with the requested
+    // extension, not just the file we are currently looking for. This
+    // prevents unnecessary scans from being repeated when this function is
+    // called more than once in the same page request.
+    $matches = drupal_system_listing("/^" . DRUPAL_PHP_FUNCTION_PATTERN . "\.$extension$/", $dir, 'name', 0);
+    foreach ($matches as $matched_name => $file) {
+      // Log the locations found in the file scan into a static variable.
+      $files[$type][$matched_name] = $file->uri;
+    }
+  }
+
+  // Return the results of the file system scan, or FALSE to indicate the file
+  // was not found.
+  return isset($files[$type][$name]) ? $files[$type][$name] : FALSE;
+}
+
+/**
+ * Triggers a user-level warning for missing or unexpectedly moved files.
+ *
+ * @param $type
+ *   The type of the item (theme, theme_engine, module, profile).
+ * @param $name
+ *   The name of the item for which the filename is requested.
+ * @param $error_type
+ *   The type of the error ('missing' or 'moved').
+ *
+ * @see drupal_get_filename()
+ * @see _drupal_get_filename_fallback()
+ */
+function _drupal_get_filename_fallback_trigger_error($type, $name, $error_type) {
+  // Hide messages due to known bugs that will appear on a lot of sites.
+  // @todo Remove this in https://www.drupal.org/node/2383823
+  if (empty($name)) {
+    return;
+  }
+
+  // Make sure we only show any missing or moved file errors only once per
+  // request.
+  static $errors_triggered = array();
+  if (empty($errors_triggered[$type][$name][$error_type])) {
+    // Use _drupal_trigger_error_with_delayed_logging() here since these are
+    // triggered during low-level operations that cannot necessarily be
+    // interrupted by a watchdog() call.
+    if ($error_type == 'missing') {
+      _drupal_trigger_error_with_delayed_logging(format_string('The following @type is missing from the file system: %name. For information about how to fix this, see <a href="@documentation">the documentation page</a>.', array('@type' => $type, '%name' => $name, '@documentation' => 'https://www.drupal.org/node/2487215')), E_USER_WARNING);
+    }
+    elseif ($error_type == 'moved') {
+      _drupal_trigger_error_with_delayed_logging(format_string('The following @type has moved within the file system: %name. In order to fix this, clear caches or put the @type back in its original location. For more information, see <a href="@documentation">the documentation page</a>.', array('@type' => $type, '%name' => $name, '@documentation' => 'https://www.drupal.org/node/2487215')), E_USER_WARNING);
+    }
+    $errors_triggered[$type][$name][$error_type] = TRUE;
+  }
+}
+
+/**
+ * Invokes trigger_error() with logging delayed until the end of the request.
+ *
+ * This is an alternative to PHP's trigger_error() function which can be used
+ * during low-level Drupal core operations that need to avoid being interrupted
+ * by a watchdog() call.
+ *
+ * Normally, Drupal's error handler calls watchdog() in response to a
+ * trigger_error() call. However, this invokes hook_watchdog() which can run
+ * arbitrary code. If the trigger_error() happens in the middle of an
+ * operation such as a rebuild operation which should not be interrupted by
+ * arbitrary code, that could potentially break or trigger the rebuild again.
+ * This function protects against that by delaying the watchdog() call until
+ * the end of the current page request.
+ *
+ * This is an internal function which should only be called by low-level Drupal
+ * core functions. It may be removed in a future Drupal 7 release.
+ *
+ * @param string $error_msg
+ *   The error message to trigger. As with trigger_error() itself, this is
+ *   limited to 1024 bytes; additional characters beyond that will be removed.
+ * @param int $error_type
+ *   (optional) The type of error. This should be one of the E_USER family of
+ *   constants. As with trigger_error() itself, this defaults to E_USER_NOTICE
+ *   if not provided.
+ *
+ * @see _drupal_log_error()
+ */
+function _drupal_trigger_error_with_delayed_logging($error_msg, $error_type = E_USER_NOTICE) {
+  $delay_logging = &drupal_static(__FUNCTION__, FALSE);
+  $delay_logging = TRUE;
+  trigger_error($error_msg, $error_type);
+  $delay_logging = FALSE;
+}
+
+/**
+ * Invoke trigger_error() using a fatal error that will terminate the request.
+ *
+ * Normally, Drupal's error handler does not terminate script execution on
+ * user-level errors, even if the error is of type E_USER_ERROR. This function
+ * triggers an error of type E_USER_ERROR that is explicitly forced to be a
+ * fatal error which terminates script execution.
+ *
+ * @param string $error_msg
+ *   The error message to trigger. As with trigger_error() itself, this is
+ *   limited to 1024 bytes; additional characters beyond that will be removed.
+ *
+ * @see _drupal_error_handler_real()
+ */
+function drupal_trigger_fatal_error($error_msg) {
+  $fatal_error = &drupal_static(__FUNCTION__, FALSE);
+  $fatal_error = TRUE;
+  trigger_error($error_msg, E_USER_ERROR);
+  $fatal_error = FALSE;
+  // The standard Drupal error handler should have treated this as a fatal
+  // error and already ended the page request. But in case another error
+  // handler is being used, terminate execution explicitly here also.
+  exit;
+}
+
+/**
+ * Writes the file scan cache to the persistent cache.
+ *
+ * This cache stores all files marked as missing or moved after a file scan
+ * to prevent unnecessary file scans in subsequent requests. This cache is
+ * cleared in system_list_reset() (i.e. after a module/theme rebuild).
+ */
+function drupal_file_scan_write_cache() {
+  // Only write to the persistent cache if requested, and if we know that any
+  // data previously in the cache was successfully loaded and merged in by
+  // _drupal_file_scan_cache().
+  $file_scans = &_drupal_file_scan_cache();
+  if (isset($file_scans['#write_cache']) && isset($file_scans['#cache_merge_done'])) {
+    unset($file_scans['#write_cache']);
+    cache_set('_drupal_file_scan_cache', $file_scans, 'cache_bootstrap');
   }
 }
 
@@ -922,19 +1242,29 @@ function variable_initialize($conf = array()) {
     $variables = $cached->data;
   }
   else {
-    // Cache miss. Avoid a stampede.
+    // The variable cache was not available. It might mean that we are running
+    // on an empty database. In that case, just redirect the user to install.php,
+    // unless we've already been there.
+    if (!db_table_exists('variable') && !drupal_installation_attempted()) {
+      include_once DRUPAL_ROOT . '/includes/install.inc';
+      install_goto('install.php');
+    }
+
+    // Cache miss. Avoid a stampede by acquiring a lock. If the lock fails to
+    // acquire, optionally just continue with uncached processing.
     $name = 'variable_init';
-    if (!lock_acquire($name, 1)) {
-      // Another request is building the variable cache.
-      // Wait, then re-run this function.
+    $lock_acquired = lock_acquire($name, 1);
+    if (!$lock_acquired && variable_get('variable_initialize_wait_for_lock', FALSE)) {
       lock_wait($name);
       return variable_initialize($conf);
     }
     else {
-      // Proceed with variable rebuild.
+      // Load the variables from the table.
       $variables = array_map('unserialize', db_query('SELECT name, value FROM {variable}')->fetchAllKeyed());
-      cache_set('variables', $variables, 'cache_bootstrap');
-      lock_release($name);
+      if ($lock_acquired) {
+        cache_set('variables', $variables, 'cache_bootstrap');
+        lock_release($name);
+      }
     }
   }
 
@@ -1261,7 +1591,7 @@ function drupal_page_header() {
 
   $default_headers = array(
     'Expires' => 'Sun, 19 Nov 1978 05:00:00 GMT',
-    'Cache-Control' => 'no-cache, must-revalidate, post-check=0, pre-check=0',
+    'Cache-Control' => 'no-cache, must-revalidate',
     // Prevent browsers from sniffing a response and picking a MIME type
     // different from the declared content-type, since that can lead to
     // XSS and other vulnerabilities.
@@ -1283,7 +1613,7 @@ function drupal_page_header() {
  */
 function drupal_serve_page_from_cache(stdClass $cache) {
   // Negotiate whether to use compression.
-  $page_compression = !empty($cache->data['page_compressed']);
+  $page_compression = !empty($cache->data['page_compressed']) && !empty($cache->data['body']);
   $return_compressed = $page_compression && isset($_SERVER['HTTP_ACCEPT_ENCODING']) && strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== FALSE;
 
   // Get headers set in hook_boot(). Keys are lower-case.
@@ -1439,6 +1769,23 @@ function drupal_unpack($obj, $field = 'data') {
  * available to code that needs localization. See st() and get_t() for
  * alternatives.
  *
+ * @section sec_context String context
+ * Matching source strings are normally only translated once, and the same
+ * translation is used everywhere that has a matching string. However, in some
+ * cases, a certain English source string needs to have multiple translations.
+ * One example of this is the string "May", which could be used as either a
+ * full month name or a 3-letter abbreviated month. In other languages where
+ * the month name for May has more than 3 letters, you would need to provide
+ * two different translations (one for the full name and one abbreviated), and
+ * the correct form would need to be chosen, depending on how "May" is being
+ * used. To facilitate this, the "May" string should be provided with two
+ * different contexts in the $options parameter when calling t(). For example:
+ * @code
+ * t('May', array(), array('context' => 'Long month name')
+ * t('May', array(), array('context' => 'Abbreviated month name')
+ * @endcode
+ * See https://localize.drupal.org/node/2109 for more information.
+ *
  * @param $string
  *   A string containing the English string to translate.
  * @param $args
@@ -1449,8 +1796,9 @@ function drupal_unpack($obj, $field = 'data') {
  *   An associative array of additional options, with the following elements:
  *   - 'langcode' (defaults to the current language): The language code to
  *     translate to a language other than what is used to display the page.
- *   - 'context' (defaults to the empty context): The context the source string
- *     belongs to.
+ *   - 'context' (defaults to the empty context): A string giving the context
+ *     that the source string belongs to. See @ref sec_context above for more
+ *     information.
  *
  * @return
  *   The translated string.
@@ -1568,7 +1916,7 @@ function format_string($string, array $args = array()) {
  * @ingroup sanitization
  */
 function check_plain($text) {
-  return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+  return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
 }
 
 /**
@@ -1596,7 +1944,7 @@ function check_plain($text) {
  *   TRUE if the text is valid UTF-8, FALSE if not.
  */
 function drupal_validate_utf8($text) {
-  if (strlen($text) == 0) {
+  if (strlen((string) $text) == 0) {
     return TRUE;
   }
   // With the PCRE_UTF8 modifier 'u', preg_match() fails silently on strings
@@ -1702,6 +2050,8 @@ function watchdog_exception($type, Exception $exception, $message = NULL, $varia
  *   - WATCHDOG_DEBUG: Debug-level messages.
  * @param $link
  *   A link to associate with the message.
+ *   SECURITY NOTE: Make sure your link is properly sanitized.
+ *   Use the l() function to generate secure links.
  *
  * @see watchdog_severity_levels()
  * @see hook_watchdog()
@@ -1713,7 +2063,7 @@ function watchdog($type, $message, $variables = array(), $severity = WATCHDOG_NO
 
   // It is possible that the error handling will itself trigger an error. In that case, we could
   // end up in an infinite loop. To avoid that, we implement a simple static semaphore.
-  if (!$in_error_state && function_exists('module_implements')) {
+  if (!$in_error_state && function_exists('module_invoke_all')) {
     $in_error_state = TRUE;
 
     // The user object may not exist in all conditions, so 0 is substituted if needed.
@@ -1736,9 +2086,7 @@ function watchdog($type, $message, $variables = array(), $severity = WATCHDOG_NO
     );
 
     // Call the logging hooks to log/process the message
-    foreach (module_implements('watchdog') as $module) {
-      module_invoke($module, 'watchdog', $log_entry);
-    }
+    module_invoke_all('watchdog', $log_entry);
 
     // It is critical that the semaphore is only cleared here, in the parent
     // watchdog() call (not outside the loop), to prevent recursive execution.
@@ -1945,7 +2293,8 @@ function drupal_block_denied($ip) {
  *   The number of random bytes to fetch and base64 encode.
  *
  * @return string
- *   The base64 encoded result will have a length of up to 4 * $byte_count.
+ *   A base-64 encoded string, with + replaced with -, / with _ and any =
+ *   padding characters removed.
  */
 function drupal_random_key($byte_count = 32) {
   return drupal_base64_encode(drupal_random_bytes($byte_count));
@@ -1968,19 +2317,34 @@ function drupal_base64_encode($string) {
 /**
  * Returns a string of highly randomized bytes (over the full 8-bit range).
  *
- * This function is better than simply calling mt_rand() or any other built-in
- * PHP function because it can return a long string of bytes (compared to < 4
- * bytes normally from mt_rand()) and uses the best available pseudo-random
- * source.
+ * On PHP 7 and later, this function is a wrapper around the built-in PHP
+ * function random_bytes(). If that function does not exist or cannot find an
+ * appropriate source of randomness, this function is better than simply calling
+ * mt_rand() or any other built-in PHP function because it can return a long
+ * string of bytes (compared to < 4 bytes normally from mt_rand()) and uses the
+ * best available pseudo-random source.
  *
- * @param $count
+ * @param int $count
  *   The number of characters (bytes) to return in the string.
+ *
+ * @return string
+ *   A randomly generated string.
  */
 function drupal_random_bytes($count)  {
+  if (function_exists('random_bytes')) {
+    try {
+      return random_bytes($count);
+    }
+    catch (Exception $e) {
+      // An appropriate source of randomness could not be found. Fall back to a
+      // less secure implementation.
+    }
+  }
+
   // $random_state does not use drupal_static as it stores random bytes.
   static $random_state, $bytes, $has_openssl;
 
-  $missing_bytes = $count - strlen($bytes);
+  $missing_bytes = $count - strlen((string) $bytes);
 
   if ($missing_bytes > 0) {
     // PHP versions prior 5.3.4 experienced openssl_random_pseudo_bytes()
@@ -2013,7 +2377,7 @@ function drupal_random_bytes($count)  {
     // the microtime() - is prepended rather than appended. This is to avoid
     // directly leaking $random_state via the $output stream, which could
     // allow for trivial prediction of further "random" numbers.
-    if (strlen($bytes) < $count) {
+    if (strlen((string) $bytes) < $count) {
       // Initialize on the first call. The contents of $_SERVER includes a mix of
       // user-specific and system information that varies a little with each page.
       if (!isset($random_state)) {
@@ -2233,6 +2597,7 @@ function drupal_bootstrap($phase = NULL, $new_phase = TRUE) {
 
       switch ($current_phase) {
         case DRUPAL_BOOTSTRAP_CONFIGURATION:
+          require_once DRUPAL_ROOT . '/includes/request-sanitizer.inc';
           _drupal_bootstrap_configuration();
           break;
 
@@ -2310,13 +2675,10 @@ function drupal_get_hash_salt() {
  *   The filename that the error was raised in.
  * @param $line
  *   The line number the error was raised at.
- * @param $context
- *   An array that points to the active symbol table at the point the error
- *   occurred.
  */
-function _drupal_error_handler($error_level, $message, $filename, $line, $context) {
+function _drupal_error_handler($error_level, $message, $filename, $line) {
   require_once DRUPAL_ROOT . '/includes/errors.inc';
-  _drupal_error_handler_real($error_level, $message, $filename, $line, $context);
+  _drupal_error_handler_real($error_level, $message, $filename, $line);
 }
 
 /**
@@ -2337,6 +2699,10 @@ function _drupal_exception_handler($exception) {
     _drupal_log_error(_drupal_decode_exception($exception), TRUE);
   }
   catch (Exception $exception2) {
+    // Add a 500 status code in case an exception was thrown before the 500
+    // status could be set (e.g. while loading a maintenance theme from cache).
+    drupal_add_http_header('Status', '500 Internal Server Error');
+
     // Another uncaught exception was thrown while handling the first one.
     // If we are displaying errors, then do so with no possibility of a further uncaught exception being thrown.
     if (error_displayable()) {
@@ -2360,6 +2726,21 @@ function _drupal_bootstrap_configuration() {
   timer_start('page');
   // Initialize the configuration, including variables from settings.php.
   drupal_settings_initialize();
+
+  // Check trusted HTTP Host headers to protect against header attacks.
+  if (PHP_SAPI !== 'cli') {
+    $host_patterns = variable_get('trusted_host_patterns', array());
+    if (!empty($host_patterns)) {
+      if (!drupal_check_trusted_hosts($_SERVER['HTTP_HOST'], $host_patterns)) {
+        header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request');
+        print 'The provided host name is not valid for this server.';
+        exit;
+      }
+    }
+  }
+
+  // Sanitize unsafe keys from the request.
+  DrupalRequestSanitizer::sanitize();
 }
 
 /**
@@ -2501,6 +2882,11 @@ function _drupal_bootstrap_variables() {
     if (isset($_GET['destination']) && url_is_external($_GET['destination'])) {
       unset($_GET['destination']);
       unset($_REQUEST['destination']);
+    }
+    // Use the DrupalRequestSanitizer to ensure that the destination's query
+    // parameters are not dangerous.
+    if (isset($_GET['destination'])) {
+      DrupalRequestSanitizer::cleanDestination();
     }
     // If there's still something in $_REQUEST['destination'] that didn't come
     // from $_GET, check it too.
@@ -2786,10 +3172,14 @@ function language_list($field = 'language') {
 }
 
 /**
- * Returns the default language used on the site
+ * Returns the default language, as an object, or one of its properties.
  *
  * @param $property
- *   Optional property of the language object to return
+ *   (optional) The property of the language object to return.
+ *
+ * @return
+ *   Either the language object for the default language used on the site,
+ *   or the property of that object named in the $property parameter.
  */
 function language_default($property = NULL) {
   $language = variable_get('language_default', (object) array('language' => 'en', 'name' => 'English', 'native' => 'English', 'direction' => 0, 'enabled' => 1, 'plurals' => 0, 'formula' => '', 'domain' => '', 'prefix' => '', 'weight' => 0, 'javascript' => ''));
@@ -2941,8 +3331,15 @@ function ip_address() {
         // Eliminate all trusted IPs.
         $untrusted = array_diff($forwarded, $reverse_proxy_addresses);
 
-        // The right-most IP is the most specific we can trust.
-        $ip_address = array_pop($untrusted);
+        if (!empty($untrusted)) {
+          // The right-most IP is the most specific we can trust.
+          $ip_address = array_pop($untrusted);
+        }
+        else {
+          // All IP addresses in the forwarded array are configured proxy IPs
+          // (and thus trusted). We take the leftmost IP.
+          $ip_address = array_shift($forwarded);
+        }
       }
     }
   }
@@ -3183,7 +3580,7 @@ function _registry_check_code($type, $name = NULL) {
   $cache_key = $type[0] . $name;
   if (isset($lookup_cache[$cache_key])) {
     if ($lookup_cache[$cache_key]) {
-      require_once DRUPAL_ROOT . '/' . $lookup_cache[$cache_key];
+      include_once DRUPAL_ROOT . '/' . $lookup_cache[$cache_key];
     }
     return (bool) $lookup_cache[$cache_key];
   }
@@ -3208,7 +3605,7 @@ function _registry_check_code($type, $name = NULL) {
   $lookup_cache[$cache_key] = $file;
 
   if ($file) {
-    require_once DRUPAL_ROOT . '/' . $file;
+    include_once DRUPAL_ROOT . '/' . $file;
     return TRUE;
   }
   else {
@@ -3493,8 +3890,12 @@ function _drupal_shutdown_function() {
   chdir(DRUPAL_ROOT);
 
   try {
-    while (list($key, $callback) = each($callbacks)) {
+    // Manually iterate over the array instead of using a foreach loop.
+    // A foreach operates on a copy of the array, so any shutdown functions that
+    // were added from other shutdown functions would never be called.
+    while ($callback = current($callbacks)) {
       call_user_func_array($callback['callback'], $callback['arguments']);
+      next($callbacks);
     }
   }
   catch (Exception $exception) {
@@ -3565,4 +3966,124 @@ function drupal_clear_opcode_cache($filepath) {
     // @see http://php.net/apc-delete-file
     @apc_delete_file($filepath);
   }
+}
+
+/**
+ * Checks trusted HTTP Host headers to protect against header injection attacks.
+ *
+ * @param string|null $host
+ *   The host name.
+ * @param array $host_patterns
+ *   The array of trusted host patterns.
+ *
+ * @return bool
+ *   TRUE if the host is trusted, FALSE otherwise.
+ */
+function drupal_check_trusted_hosts($host, array $host_patterns) {
+  if (!empty($host) && !empty($host_patterns)) {
+    // Trim and remove the port number from host; host is lowercase as per
+    // RFC 952/2181.
+    $host = strtolower(preg_replace('/:\d+$/', '', trim($host)));
+
+    foreach ($host_patterns as $pattern) {
+      $pattern = sprintf('{%s}i', $pattern);
+      if (preg_match($pattern, $host)) {
+        return TRUE;
+      }
+    }
+
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+ * Drupal's wrapper around PHP's setcookie() function.
+ *
+ * This allows the cookie's $value and $options to be altered.
+ *
+ * @param $name
+ *   The name of the cookie.
+ * @param $value
+ *   The value of the cookie.
+ * @param $options
+ *   An associative array which may have any of the keys expires, path, domain,
+ *   secure, httponly, samesite.
+ *
+ * @see setcookie()
+ * @ingroup php_wrappers
+ */
+function drupal_setcookie($name, $value, $options) {
+  $options = _drupal_cookie_params($options);
+  if (\PHP_VERSION_ID >= 70300) {
+    setcookie($name, $value, $options);
+  }
+  else {
+    $defaults = array(
+      'expires' => 0,
+      'path' => '',
+      'domain' => '',
+      'secure' => FALSE,
+      'httponly' => FALSE,
+    );
+    $options += $defaults;
+    setcookie($name, $value, $options['expires'], $options['path'], $options['domain'], $options['secure'], $options['httponly']);
+  }
+}
+
+/**
+ * Process the params for cookies. This emulates support for the SameSite
+ * attribute in earlier versions of PHP, and allows the value of that attribute
+ * to be overridden.
+ *
+ * @param $options
+ *   An associative array which may have any of the keys expires, path, domain,
+ *   secure, httponly, samesite.
+ *
+ * @return
+ *   An associative array which may have any of the keys expires, path, domain,
+ *   secure, httponly, and samesite.
+ */
+function _drupal_cookie_params($options) {
+  $options['samesite'] = _drupal_samesite_cookie($options);
+  if (\PHP_VERSION_ID < 70300) {
+    // Emulate SameSite support in older PHP versions.
+    if (!empty($options['samesite'])) {
+      // Ensure the SameSite attribute is only added once.
+      if (!preg_match('/SameSite=/i', $options['path'])) {
+        $options['path'] .= '; SameSite=' . $options['samesite'];
+      }
+    }
+  }
+  return $options;
+}
+
+/**
+ * Determine the value for the samesite cookie attribute, in the following order
+ * of precedence:
+ *
+ * 1) A value explicitly passed to drupal_setcookie()
+ * 2) A value set in $conf['samesite_cookie_value']
+ * 3) The setting from php ini
+ * 4) The default of None, or FALSE (no attribute) if the cookie is not Secure
+ *
+ * @param $options
+ *   An associative array as passed to drupal_setcookie().
+ * @return
+ *   The value for the samesite cookie attribute.
+ */
+function _drupal_samesite_cookie($options) {
+  if (isset($options['samesite'])) {
+    return $options['samesite'];
+  }
+  $override = variable_get('samesite_cookie_value', NULL);
+  if ($override !== NULL) {
+    return $override;
+  }
+  $ini_options = session_get_cookie_params();
+  if (isset($ini_options['samesite'])) {
+    return $ini_options['samesite'];
+  }
+  return empty($options['secure']) ? FALSE : 'None';
 }

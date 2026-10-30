@@ -1,0 +1,2396 @@
+<?php
+/**
+ * @file
+ * Code for the OpenAtrium Core feature.
+ */
+
+include_once 'oa_core.features.inc';
+include_once 'includes/oa_core.cache.inc';
+include_once 'includes/oa_core.util.inc';
+include_once 'includes/oa_core.access.inc';
+include_once 'includes/oa_core.context.inc';
+include_once 'includes/oa_core.login.inc';
+include_once 'includes/oa_core.theme.inc';
+include_once 'includes/oa_core.fields.inc';
+
+/**
+ * Name of default OpenAtrium Space content type.
+ */
+define('OA_SPACE_TYPE', 'oa_space');
+/**
+ * Name of OpenAtrium Section content type.
+ */
+define('OA_SECTION_TYPE', 'oa_section');
+/**
+ * Name of OpenAtrium Group content type.
+ */
+define('OA_GROUP_TYPE', 'oa_group');
+/**
+ * Name of OpenAtrium Team content type.
+ */
+define('OA_TEAM_TYPE', 'oa_team');
+/**
+ * Name of default OpenAtrium Section field (for Organic Groups Fields UI).
+ */
+define('OA_SECTION_FIELD', 'oa_section_ref');
+/**
+ * Name of default OpenAtrium Group field (for Organic Groups Fields UI).
+ */
+define('OA_SPACE_FIELD', 'og_group_ref');
+/**
+ * The access realm of space member.
+ */
+define('OA_ACCESS_REALM', 'oa_access');
+/**
+ * The access realm of unpublished content.
+ */
+define('OA_UNPUBLISHED_REALM', 'oa_unpublished');
+/**
+ * The access realm of unpublished content.
+ */
+define('OA_SPACE_CURRENT', 'CURRENT');
+/**
+ * The old default file extension list.
+ */
+define('OA_OLD_FILE_EXTENSIONS_DEFAULT', 'jpg jpeg gif png txt doc docx xls xlsx pdf ppt pptx pps ppsx odt ods odp mp3 mov mp4 m4a m4v mpeg avi ogg oga ogv weba webp webm');
+/**
+ * The new default file extension list.
+ */
+define('OA_FILE_EXTENSIONS_DEFAULT', 'jpg jpeg gif png txt doc docx xls xlsx pdf ppt pptx pps ppsx odt ods odp mp3 mov mp4 m4a m4v mpeg avi ogg oga ogv weba webp webm zip tgz gz key dotx');
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function oa_core_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'ctools') {
+    return 'plugins/' . $plugin_type;
+  }
+  elseif ($owner == 'entityreference') {
+    return "plugins/entityreference/$plugin_type";
+  }
+  return '';
+}
+
+/**
+ * Implements hook_init();
+ */
+function oa_core_init() {
+  // prevent og-menu-single from participating in Drupal breadcrumb creation
+  // otherwise it will load every space node on the site
+  menu_tree_set_path('og-menu-single', '');
+
+  // Panopoly Widgets adds the Seven theme css to Media Browser, which fixes
+  // many style issues.  But we need some tweaks with Bootstrap to improve it
+  if (arg(0) == 'media' && arg(1) == 'browser') {
+    drupal_add_css(drupal_get_path('module', 'oa_core') . '/css/oa_core.media.css',
+      array('group' => CSS_THEME, 'weight' => -1));
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function oa_core_menu() {
+  // Add an administration page for Open Atrium
+  $items['admin/openatrium'] = array(
+    'title' => 'Open Atrium',
+    'description' => 'Administer Open Atrium.',
+    'weight' => 0,
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('administer site configuration'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  );
+  $items['admin/openatrium/section-templates'] = array(
+    'title' => 'Section Templates',
+    'description' => 'Configure panelizer section templates',
+    'weight' => 0,
+    'access arguments' => array('administer site configuration'),
+    'page callback' => 'oa_core_section_template',
+  );
+  $items['admin/openatrium/space-templates'] = array(
+    'title' => 'Space Templates',
+    'description' => 'Configure panelizer space templates',
+    'weight' => 0,
+    'access arguments' => array('administer site configuration'),
+    'page callback' => 'oa_core_space_template',
+  );
+  $items['admin/openatrium/setting'] = array(
+    //changing from /settings since Drupal not refreshing parent of existing items
+    'title' => 'Config',
+    'description' => 'Configuration settings related to Open Atrium',
+    'weight' => -1,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('oa_core_configure_form'),
+    'access arguments' => array('administer site configuration'),
+  );
+  $items['admin/openatrium/groups'] = array(
+    'title' => 'Groups',
+    'description' => 'Configure Open Atrium Groups',
+    'weight' => 0,
+    'access arguments' => array('administer site configuration'),
+    'page callback' => 'oa_core_show_groups',
+  );
+  $items['group/%/%/remove/%/%'] = array(
+    'title' => 'Remove member',
+    'type' => MENU_CALLBACK,
+    'page callback' => 'oa_core_remove_member',
+    'page arguments' => array(1, 2, 4, 5),
+    'access callback' => 'og_ui_user_access_group',
+    'access arguments' => array('manage members', 1, 2),
+  );
+  $items['group/%/%/block/%'] = array(
+    'title' => 'Block member',
+    'type' => MENU_CALLBACK,
+    'page callback' => 'oa_core_block_member',
+    'page arguments' => array(1, 2, 4),
+    'access callback' => 'og_ui_user_access_group',
+    'access arguments' => array('manage members', 1, 2),
+  );
+  $items['group/%/%/add-member/%'] = array(
+    'title' => 'Add member',
+    'type' => MENU_CALLBACK,
+    'page callback' => 'oa_core_add_member',
+    'page arguments' => array(1, 2, 4),
+    'access callback' => 'user_is_logged_in',
+  );
+  $items['group/%/%/add-admin/%'] = array(
+    'title' => 'Add Admin',
+    'type' => MENU_CALLBACK,
+    'page callback' => 'oa_core_add_admin',
+    'page arguments' => array(1, 2, 4),
+    'access callback' => 'og_ui_user_access_group',
+    'access arguments' => array('manage members', 1, 2),
+  );
+  $items['group/%/%/remove-admin/%'] = array(
+    'title' => 'Add Admin',
+    'type' => MENU_CALLBACK,
+    'page callback' => 'oa_core_remove_admin',
+    'page arguments' => array(1, 2, 4),
+    'access callback' => 'og_ui_user_access_group',
+    'access arguments' => array('manage members', 1, 2),
+  );
+  $items['node/add/oa-space/%'] = array(
+    'title' => 'Create Space',
+    'page callback' => 'oa_core_create_space_page_callback',
+    'page arguments' => array(OA_SPACE_TYPE, 3),
+    'access callback' => 'oa_core_create_space_access',
+    'access arguments' => array(3),
+    'type' => MENU_CALLBACK,
+  );
+
+  if (module_exists('devel')) {
+    $items['oa-core/system-elements'] = array(
+      'access arguments' => array('access devel information'),
+      'page callback' => 'oa_core_element_test_page',
+      'type' => MENU_CALLBACK,
+      'file' => 'oa_core.fields.inc',
+      'file path' => drupal_get_path('module', 'oa_core') . '/includes',
+    );
+  }
+  // Two ajax path to return group options for select2widget.
+  // One for pane (with Current Group) option and one for just exposed.
+  $items['oacoreselect2widget/ajax/%/%/%/%'] = array(
+    'title' => 'Ajax callback',
+    'page callback' => 'oa_core_select2widget_ajax_callback',
+    'page arguments' => array(FALSE, 2, 3, 4, 5),
+    'access callback' => 'select2widget_autocomplete_access',
+    'access arguments' => array(2, 3, 4, 5),
+    'type' => MENU_CALLBACK,
+  );
+  $items['oacoreselect2widgetpanes/ajax/%/%/%/%'] = array(
+    'title' => 'Ajax callback',
+    'page callback' => 'oa_core_select2widget_ajax_callback',
+    'page arguments' => array(TRUE, 2, 3, 4, 5),
+    'access callback' => 'select2widget_autocomplete_access',
+    'access arguments' => array(2, 3, 4, 5),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Copy of select2widget_ajax_callback to add in All/current space.
+ */
+function oa_core_select2widget_ajax_callback($add_current_option, $field_name, $entity_type, $bundle_name, $entity_id = '') {
+  $string = '';
+
+  if (isset($_GET['search_string']) && !empty($_GET['search_string'])) {
+    $string = $_GET['search_string'];
+  }
+
+  $field = field_info_field('og_group_ref');
+  $instance = field_info_instance($entity_type, $field_name, $bundle_name);
+
+  $matches = array();
+  $options = array();
+
+  $entity = NULL;
+  if ($entity_id !== 'NULL') {
+    $entity = entity_load_single($entity_type, $entity_id);
+    if (!$entity || !entity_access('view', $entity_type, $entity)) {
+      return MENU_ACCESS_DENIED;
+    }
+  }
+  // We pass in "all", which doesn't mean anything to og but skips the "default"
+  // and "admin" functionality that restricts based on user or not user groups.
+  $instance['field_mode'] = 'all';
+  // Just use default settings for selection criteria.
+  $settings = $instance['settings']['behaviors']['og_widget']['default']['widget_settings']['select2widgetajax'];
+
+  $handler = entityreference_get_selection_handler($field, $instance, $entity_type, $entity);
+  $entity_labels = $handler->getReferencableEntities($string, $settings['match_operator'], 20);
+  $matches = array();
+
+  // Current for the pane config so current isn't hard coded (for cloning).
+  if ($add_current_option) {
+    $matches[] = array(
+      'id' => OA_SPACE_CURRENT,
+      'title' => _oa_core_select2widget_current_label(),
+      'data' => '<div class="reference-select2widget">' . _oa_core_select2widget_current_label() . '</div>',
+    );
+  }
+
+  // Add in an all option so users can see all content.
+  $matches[] = array(
+    'id' => 'All',
+    'title' => _oa_core_select2widget_all_label(),
+    'data' => '<div class="reference-select2widget">' . _oa_core_select2widget_all_label() . '</div>',
+  );
+
+  $matches = array_merge($matches, select2widget_render_modes($entity_labels, $settings['view_mode'], $field['settings']['target_type']));
+
+  drupal_json_output($matches);
+}
+
+/**
+ * Return translated Any option.
+ */
+function _oa_core_select2widget_all_label() {
+  return t('- Any -');
+}
+
+/**
+ * Return translated Active option.
+ */
+function _oa_core_select2widget_current_label() {
+  return t('- Active Space -');
+}
+
+/**
+ * Page callback for the 'Create space' page.
+ *
+ * This a copy of 'page_manager_node_add' but with the title using the
+ * space_type name rather than just the content type name.
+ *
+ * @param string $type
+ *   The node content type name (ie. oa_space, oa_section).
+ * @param integer $space_tid
+ *   The taxonomy term ID of the space_type or section_type.
+ *
+ * @see page_manager_node_add
+ */
+function oa_core_create_space_page_callback($type, $space_tid) {
+  global $user;
+
+  if ($space_type = taxonomy_term_load($space_tid)) {
+    // Initialize settings:
+    $node = (object) array(
+      'uid' => $user->uid,
+      'name' => (isset($user->name) ? $user->name : ''),
+      'type' => $type,
+      'language' => LANGUAGE_NONE,
+      'is_new' => TRUE,
+    );
+
+    $title = t('Create @name', array('@name' => $space_type->name));
+    $pattern = '';
+    if ($type == OA_SPACE_TYPE) {
+      $pattern = '/space/i';
+    }
+    elseif ($type == OA_SECTION_TYPE) {
+      $pattern = '/section/i';
+    }
+    // if Taxonomy term name doesn't contain the type of page, then add it
+    if (!empty($pattern) && (preg_match($pattern, $title) == 0)) {
+      $types = node_type_get_types();
+      $title = t('Create @name @type', array(
+        '@name' => $space_type->name,
+        '@type' => $types[$type]->name,
+      ));
+    }
+    drupal_set_title($title);
+
+    // Load the file with page_manager_node_edit().
+    module_load_include('inc', 'ctools', 'page_manager/plugins/tasks/node_edit');
+    return page_manager_node_edit($node);
+  }
+
+  return MENU_NOT_FOUND;
+}
+
+/**
+ * Menu access callback for creating space types
+ * @param $tid
+ */
+function oa_core_create_space_access($tid) {
+  $gid = oa_core_get_space_context(TRUE);
+  $tids = oa_core_get_allowed_space_terms($gid);
+  return !isset($tids) || empty($tids) || isset($tids[$tid]);
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+function oa_core_menu_alter(&$items) {
+  if (!empty($items['node/%/group'])) {
+    $items['node/%/group']['title'] = 'Config';
+  }
+}
+
+/**
+ * Implements hook_preprocess_html().
+ */
+function oa_core_preprocess_html(&$vars) {
+  $classes = oa_core_body_classes();
+  if (!empty($GLOBALS['oa_hide_page_title'])) {
+    $classes[] = 'oa-no-page-title';
+  }
+  if (!empty($classes)) {
+    $vars['classes_array'] = empty($vars['classes_array']) ? $classes : array_merge($vars['classes_array'], $classes);
+  }
+}
+
+/**
+ * Configuration Form for Open Atrium
+ */
+function oa_core_configure_form($form, &$form_state) {
+  // blank for for now.  Other modules can alter this to add stuff
+  $form = array();
+
+  drupal_add_js("misc/collapse.js");
+  drupal_add_js("misc/vertical-tabs.js");
+
+  $form['oa_settings'] = array(
+    '#type' => 'vertical_tabs',
+    '#weight' => 99,
+    '#prefix' => '<div class="oa-vertical-tabs">',
+    '#suffix' => '</div>',
+  );
+
+  $hook = 'oa_settings_form';
+  foreach (module_implements($hook) as $module) {
+    $function = $module . '_' . $hook;
+    if (function_exists($function)) {
+      $child_forms = call_user_func_array($function, array(&$form_state));
+      foreach ($child_forms as $key => $child_form) {
+        if (!isset($form[$child_form['caption']])) {
+          $form[$child_form['caption']] = array(
+            '#type' => 'fieldset',
+            '#title' => $child_form['caption'],
+            '#group' => 'oa_settings',
+            '#attributes' => array('class' => array('collapsible')),
+          );
+        }
+        $form[$child_form['caption']][] = $child_form['form'];
+        if (!empty($child_form['submit'])) {
+          $form['#submit'][] = $child_form['submit'];
+        }
+      }
+    }
+  }
+
+  return system_settings_form($form);
+}
+
+/**
+ * Creates a configure form for the current app.
+ */
+function oa_core_app_configure_form($form, &$form_state) {
+  // blank for for now.  Other modules can alter this to add stuff
+  $form = array();
+
+  if (($app_name = arg(3)) && ($function = $app_name . '_oa_settings_form') && function_exists($function)) {
+    $child_forms = call_user_func_array($function, array(&$form_state));
+
+    // Add child forms as vertical tabs if exist.
+    if (count($child_forms) > 1) {
+      drupal_add_js("misc/collapse.js");
+      drupal_add_js("misc/vertical-tabs.js");
+      $form['oa_settings'] = array(
+        '#type' => 'vertical_tabs',
+        '#weight' => 99,
+        '#prefix' => '<div class="oa-vertical-tabs">',
+        '#suffix' => '</div>',
+      );
+      foreach ($child_forms as $key => $child_form) {
+        $form[$child_form['caption']] = array(
+          '#type' => 'fieldset',
+          '#title' => $child_form['caption'],
+          '#group' => 'oa_settings',
+          '#attributes' => array('class' => array('collapsible')),
+        );
+        $form[$child_form['caption']][] = $child_form['form'];
+        if (!empty($child_form['submit'])) {
+          $form['#submit'][] = $child_form['submit'];
+        }
+      }
+    }
+    // Set up a header and add form if only one child form.
+    elseif (count($child_forms)) {
+      $child_form = reset($child_forms);
+      $form['title']['#markup'] = '<h2>' . $child_form['caption'] . '</h2>';
+      $form += $child_form['form'];
+      if (!empty($child_form['submit'])) {
+        $form['#submit'][] = $child_form['submit'];
+      }
+    }
+  }
+
+  return $form ? system_settings_form($form) : array(
+    '#markup' => t('Unable to generate form'),
+  );
+}
+
+/**
+ * Implements hook_og_fields_info().
+ */
+function oa_core_og_fields_info() {
+  $items[OA_SECTION_FIELD] = array(
+    'no ui' => TRUE,
+    'type' => array('group content'),
+    'description' => t('Determine to which Open Atrium section this space content is assigned to.'),
+    'field' => array(
+      'field_name' => OA_SECTION_FIELD,
+      'type' => 'entityreference',
+      'cardinality' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'handler' => 'base',
+        'handler_settings' => array(
+          'behaviors' => array(
+            'views-select-list' => array(
+              'status' => 0,
+            ),
+          ),
+          'sort' => array(
+            'type' => 'none',
+          ),
+          'target_bundles' => array(
+            OA_SECTION_TYPE => OA_SECTION_TYPE,
+          ),
+        ),
+        'target_type' => 'node',
+      ),
+      'translatable' => '0',
+    ),
+    'instance' => array(
+      'label' => t('Open Atrium Section'),
+      'options_limit' => 1,
+      'options_limit_empty_behaviour' => 1,
+      'options_limit_fields' => array(
+        'body' => 0,
+        'oa_section_ref' => 0,
+        'og_group_ref' => 'og_group_ref',
+      ),
+      'options_optomize_entityreferences' => 1,
+      'widget' => array(
+        'active' => 0,
+        'module' => 'options',
+        'settings' => array(
+          'match_operator' => 'CONTAINS',
+          'path' => '',
+          'size' => 60,
+        ),
+        'type' => 'options_select',
+        'weight' => '7',
+      ),
+    ),
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_og_fields_info().
+ */
+function oa_core_og_fields_info_alter(&$return) {
+  if (isset($return['og_group_ref'])) {
+    $return['og_group_ref']['instance']['settings'] = array(
+      'behaviors' => array(
+        'og_widget' => array(
+          'access_override' => 1,
+          'admin' => array(
+            'widget_settings' => array(
+              'select2widgetajax' => array(
+                'match_operator' => 'CONTAINS',
+                'min_char' => 1,
+                'view_mode' => 'teaser',
+                'width' => '100%',
+              ),
+            ),
+            'widget_type' => 'select2widgetajax',
+          ),
+          'default' => array(
+            'widget_settings' => array(
+              'select2widgetajax' => array(
+                'match_operator' => 'CONTAINS',
+                'min_char' => 1,
+                'view_mode' => 'teaser',
+                'width' => '100%',
+              ),
+            ),
+            'widget_type' => 'select2widgetajax',
+          ),
+          'status' => TRUE,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    );
+  }
+}
+
+
+/**
+ * Implements hook_form_FORM_ID_alter() node_form.
+ */
+function oa_core_form_node_form_alter(&$form, &$form_state, $form_id) {
+  // Modify label on Panelizer layout field.
+  if (isset($form['panelizer'])) {
+    $form['panelizer']['page_manager']['name']['#title'] = t('Select Layout');
+  }
+  // This is a workaround for og not defaulting based on subgroups, only user direct groups.
+  // Handling this for both normal users and admin users.
+  $fields = array(OA_SPACE_FIELD);
+  if (empty($form['#node']->clone_from_original_nid)) {
+    $fields[] = OA_PARENT_SPACE;
+  }
+  foreach ($fields as $field_name) {
+    if (!empty($form['#node']->{$field_name}[LANGUAGE_NONE][0]['target_id'])
+      && isset($form[$field_name][LANGUAGE_NONE][0]['default'])
+      && empty($form[$field_name][LANGUAGE_NONE][0]['default']['#default_value'])
+      && ($group = node_load($form['#node']->{$field_name}[LANGUAGE_NONE][0]['target_id']))
+      && (!isset($form[$field_name][LANGUAGE_NONE][0]['admin']['#default_value'])
+        || (strpos($form[$field_name][LANGUAGE_NONE][0]['admin']['#default_value'], $group->title . ' (' . $group->nid . ')') !== FALSE
+        // This will return both user groups and subspaces, is cached.
+        && in_array($group->nid, oa_core_get_groups_by_user(NULL, 'node'))))
+      ) {
+      $form[$field_name][LANGUAGE_NONE][0]['default']['#default_value'] = $group->title . ' (' . $group->nid . ')';
+      $form[$field_name][LANGUAGE_NONE][0]['default']['#init'][$group->nid] = $form[$field_name][LANGUAGE_NONE][0]['default']['#default_value'];
+      if (isset($form[$field_name][LANGUAGE_NONE][0]['admin'])) {
+        $form[$field_name][LANGUAGE_NONE][0]['admin']['#default_value'] = '';
+        $form[$field_name][LANGUAGE_NONE][0]['admin']['#init'] = array();
+      }
+    }
+  }
+
+  if (isset($form['field_oa_space_type']) && !isset($form['#node']->nid)) {
+    // Creating a new space node, so limit space types
+    $options = oa_core_get_allowed_space_terms();
+    if (isset($options)) {
+      $form['field_oa_space_type'][LANGUAGE_NONE]['#options'] = $options;
+    }
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function oa_core_form_node_delete_confirm_alter(&$form, $form_state) {
+  $form['#submit'][] = 'oa_core_node_delete_redirect';
+  /**
+   * Organic group itself has some functionality for how to handle content on
+   * group deletion.
+   *
+   * By default, it'll delete the og_membership table entries for that group.
+   *
+   * If variable og_use_queue is configured to true:
+   * * It'll delete the membership via a queue job.
+   * * It'll delete the content of the group if $entity->og_orphans['delete'] is
+   *   TRUE or variable og_orphans_delete is set to true
+   * * It'll move the content of the group if $entity->og_orphans['move'] is set
+   * to  an array containing group_type and gid of the group to move to.
+   *
+   * Use og_use_queue and og_orphans_delete are configurable via the OG UI.
+   *
+   * All it's deletion logic can be bypassed via setting:
+   * $entity->skip_og_membership_delete_by_group = TRUE
+   */
+  if (variable_get('og_use_queue', FALSE) && ($orphans = oa_core_get_orphans('node', $form['#node']->nid))) {
+    $form['oa_core_orphans'] = array(
+      '#title' => t('Orphan Content'),
+      '#description' => t('How to handle orphan content (content that is a member of this group but no others)'),
+      '#type' => 'radios',
+      '#options' => array(
+        'nothing' => t('Orphan (remove membership but otherwise leave content alone)'),
+        'delete' => t('Delete'),
+        'move' => t('Move'),
+      ),
+      '#default_value' => 'nothing',
+    );
+    $form['oa_core_orphans_og_group_ref'] = array(
+      '#type' => 'og_group_ref',
+      '#title' => t('Space'),
+      '#default_value' => array(),
+      '#states' => array(
+        'visible' => array(
+          ':input[name="oa_core_orphans"]' => array('value' => 'move'),
+        ),
+      ),
+    );
+    $form['#validate'][] = 'oa_core_form_node_delete_confirm_validate';
+  }
+}
+
+/**
+ * Validate the function and set a variable for checking later to set og_orphan
+ */
+function oa_core_form_node_delete_confirm_validate($form, &$form_state) {
+  $node = $form['#node'];
+  if ($form_state['values']['oa_core_orphans'] == 'move') {
+    $gid = $form_state['values']['oa_core_orphans_og_group_ref'];
+    if (empty($gid) || !is_numeric($gid) || !($group = node_load($gid))) {
+      form_set_error('oa_core_orphans', t('Please select a space to move the content to.'));
+    }
+    elseif ($gid === $node->nid) {
+      form_set_error('oa_core_orphans', t('Please select a space that is not the current space to move the content to.'));
+    }
+    elseif (!node_access('update', $group)) {
+      form_set_error('oa_core_orphans', t('Please choice a group where have more access to.'));
+    }
+    else {
+      oa_core_store_orphan_settings($node, array('og_orphans' => array('move' => array('group_type' => 'node', 'gid' => $gid))));
+    }
+  }
+  else {
+    // Set whether should be left alone or deleted.
+    oa_core_store_orphan_settings($node, array('og_orphans' => array('delete' => $form_state['values']['oa_core_orphans'] == 'delete')));
+  }
+}
+
+/**
+ * Since there is no way to directly send anything to node_delete, store info.
+ *
+ * @param $node
+ *   A node that will be deleted.
+ * @param $settings
+ *   Settings for that node being deleted.
+ */
+function oa_core_store_orphan_settings($node, $settings = NULL) {
+  $data = &drupal_static(__FUNCTION__, array());
+  if ($settings) {
+    $data[$node->nid] = $settings + (isset($data[$node->nid]) ? $data[$node->nid] : array());
+  }
+  return isset($data[$node->nid]) ? $data[$node->nid] : array();
+}
+
+/**
+ * Implements hook_node_delete().
+ */
+function oa_core_node_delete($node) {
+  if ($settings = oa_core_store_orphan_settings($node)) {
+    foreach($settings as $key => $value) {
+      $node->{$key} = $value;
+    }
+  }
+  _oa_core_node_delete($node);
+}
+
+/**
+ * Find if any orphans.
+ */
+function oa_core_get_orphans($group_type, $gid, $max = 1) {
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->entityCondition('entity_type', 'og_membership')
+    ->propertyCondition('group_type', $group_type, '=')
+    ->propertyCondition('gid', $gid, '=')
+    ->propertyCondition('entity_type', 'user', '!=')
+    ->propertyOrderBy('id')
+    ->range(0, $max)
+    ->execute();
+  return !empty($result['og_membership']) ? og_membership_load_multiple(array_keys($result['og_membership'])) : array();
+}
+
+
+/**
+ * Implements hook_node_prepare().
+ *
+ * Default the GId to current GID
+ */
+function oa_core_node_prepare($node) {
+  if (empty($node->nid) && field_info_instance('node', OA_SPACE_FIELD, $node->type)) {
+    if (!empty($_GET['og_group_ref'])) {
+      $gid = $_GET['og_group_ref'];
+    }
+    else {
+      $gid = oa_core_get_space_context();
+    }
+    if ($gid && og_user_access('node', $gid, "create {$node->type} content")) {
+      $node->{OA_SPACE_FIELD}[LANGUAGE_NONE][0]['target_id'] = $gid;
+    }
+  }
+}
+
+/**
+ * Implements hook_views_pre_render().
+ */
+function oa_core_views_pre_render(&$view) {
+  if ($view->name == 'oa_core_space_types') {
+    if (count($view->result) == 1) {
+      // If there is only one Space Blueprint, then we jump to it automatically.
+      $args = $_GET;
+      unset($args['q']);
+      drupal_goto('node/add/oa-space/' . $view->result[0]->tid, array('query' => $args));
+    }
+    elseif (user_access('administer taxonomy')) {
+      $view->attachment_before = '<p>' . t('Manage existing <em>Space Blueprints</em> or add new ones by <a href="!url">administrating the taxonomy</a>.', array('!url' => url('admin/structure/taxonomy/space_type'))) . '</p>';
+    }
+  }
+}
+
+/**
+ * Implements hook_views_pre_build().
+ */
+function oa_core_views_pre_build(&$view) {
+  if ($view->name == 'oa_recent_activity') {
+    // Set the override path to the current page. This will redirect the back view to
+    // the current page when submitted in case AJAX fails.
+    $view->override_path = $_GET['q'];
+  }
+}
+
+/**
+ * Implements hook_preprocess_views_view_fields().
+ *
+ * Perform field-level replacement/processing here.
+ */
+function oa_core_preprocess_views_view_fields(&$vars) {
+  $vars['index'] = $vars['view']->row_index;
+  $vars['display'] = $vars['view']->current_display;
+  $vars['count'] = count($vars['view']->result);
+  foreach ($vars['fields'] as $id => $field) {
+    $vars[$id] = $field->content;
+    switch ($id) {
+      case 'timestamp':
+        $vars[$id . '_raw'] = $field->raw;
+        break;
+
+      // Views for these fields are: oa_comment_topics, oa_comment_media.
+      case 'field_user_picture':
+      case 'picture':
+        // Check for a missing user image in the view.
+        if (!strip_tags($field->content, '<img>')) {
+          // Add the user placeholder image.
+          $vars[$id] = oa_core_get_user_picture_for_views_fields($field);
+          // Also provide image to default views templates
+          $vars['fields'][$id]->content = $vars[$id];
+        }
+        break;
+    }
+  }
+}
+
+/**
+ * Helper function to find the correct image style depending on the field.
+ *
+ * @todo: Figure out why we have two different User:picture fields being used.
+ *
+ * @param object $field
+ *   The field being rendered in the view.
+ *
+ * @return string
+ */
+function oa_core_get_user_picture_for_views_fields($field) {
+  // Set a default image style.
+  $image_style = 'oa_small_thumbnail';
+  // Allow the image style setting to overwrite the default.
+  if (isset($field->handler->options['settings']['image_style'])) {
+    $image_style = $field->handler->options['settings']['image_style'];
+  }
+  if (isset($field->handler->options['image_style'])) {
+    $image_style = $field->handler->options['image_style'];
+  }
+  // Add the user placeholder image.
+  return oa_users_picture(NULL, $image_style);
+}
+
+/**
+ * Return a user's profile image.
+ */
+function oa_users_picture($account = NULL, $image_style = 'oa_small_thumbnail', $url = FALSE) {
+  $pictures = module_invoke_all('oa_users_picture', $account, $image_style, $url);
+  return $pictures ? reset($pictures) : NULL;
+}
+
+/**
+ * Replace "group" term in OG with "space"
+ */
+function oa_core_replace_group(&$field, $context) {
+  if (isset($field)) {
+    if (isset($context['entity']->type) && ($context['entity']->type == OA_SPACE_TYPE)) {
+      $field = str_replace(t('group'), t('space'), $field);
+      $field = str_replace(t('Group'), t('Space'), $field);
+    }
+  }
+}
+
+/**
+ * Implements hook_field_attach_view_alter
+ */
+function oa_core_field_attach_view_alter(&$output, $context) {
+  if ($context['entity_type'] == 'node') {
+    if (!empty($output['group_group'][0]['#title'])) {
+      oa_core_replace_group($output['group_group'][0]['#title'], $context);
+    }
+    if (!empty($output['group_group'][0]['#markup'])) {
+      oa_core_replace_group($output['group_group'][0]['#markup'], $context);
+    }
+  }
+}
+
+/**
+ * Menu callback for Section Templates
+ */
+function oa_core_section_template() {
+  ctools_include('export-ui');
+  $handler = panelizer_entity_plugin_get_handler('node');
+  return panelizer_export_ui_switcher_page($handler, OA_SECTION_TYPE . '.page_manager', 'panelizer_defaults', 'list');
+}
+
+/**
+ * Menu callback for Section Templates
+ */
+function oa_core_space_template() {
+  ctools_include('export-ui');
+  $handler = panelizer_entity_plugin_get_handler('node');
+  return panelizer_export_ui_switcher_page($handler, OA_SPACE_TYPE . '.page_manager', 'panelizer_defaults', 'list');
+}
+
+/**
+ * Menu callback for Groups
+ */
+function oa_core_show_groups() {
+  drupal_goto('groups');
+}
+
+/**
+ * Helper function to add a user to a group
+ * @param  [type]  $group_type [description]
+ * @param  [type]  $gid        [description]
+ * @param  [type]  $uid        [description]
+ * @param  [type]  $override  if TRUE, add pending members to space
+ * @return [type]              [description]
+ */
+function oa_core_add_member_api($group_type, $gid, $uid, $override = FALSE) {
+  $account = user_load($uid);
+  $group = entity_load_single($group_type, $gid);
+  $label = entity_label($group_type, $group);
+  $entity_type = 'node';
+
+  $message = '';
+  $params = array();
+  $params['@user'] = format_username($account);
+  // Show the group name only if user has access to it.
+  $params['@group'] = entity_access('view', $entity_type, $group) ?  entity_label($entity_type, $group) : t('Private group');
+
+  if (!$uid) {
+    // Anonymous user can't request membership.
+    $dest = drupal_get_destination();
+    if (variable_get('user_register', 1)) {
+      $message = t('In order to join any group, you must <a href="!login">login</a>. After you have successfully done so, you will need to request membership again.', array('!login' => url("user/login", array('query' => $dest))));
+    }
+    else {
+      $message = t('In order to join any group, you must <a href="!login">login</a> or <a href="!register">register</a> a new account. After you have successfully done so, you will need to request membership again.', array('!register' => url("user/register", array('query' => $dest)), '!login' => url("user/login", array('query' => $dest))));
+    }
+  }
+  elseif (!$override && og_is_member($entity_type, $gid, 'user', $account, array(OG_STATE_BLOCKED))) {
+    // User is blocked, access denied.
+    $message = t('@user is blocked and cannot be addded.', $params);
+  }
+  elseif (!$override && og_is_member($entity_type, $gid, 'user', $account, array(OG_STATE_PENDING))) {
+    // User is pending, return them back.
+    $message = t('@user already has a pending membership for the  the group @group.', $params);
+  }
+  elseif (og_is_member($entity_type, $gid, 'user', $account, array(OG_STATE_ACTIVE))) {
+    // User is already a member, return them back.
+    $message = t('@user is already a member of the group @group.', $params);
+  }
+
+  if (empty($message)) {
+    // Ungroup user, in case they were already registered.
+    og_ungroup('node', $group->nid, 'user', $account);
+    // add user to group
+    og_group('node', $group->nid, array('entity' => $account));
+
+    $message = t('%user has been added to the space %title.', array('%user' => format_username($account), '%title' => $label));
+  }
+
+  drupal_set_message($message);
+
+  return $message;
+}
+
+/**
+ * Menu callback to add user to group
+ * Mostly taken from og_ui_subscribe in og_ui_pages.inc
+ * @param  $group_type
+ * @param  $gid
+ * @param  $uid
+ */
+function oa_core_add_member($group_type, $gid, $uid, $field_name = NULL, $type = 'nojs') {
+  global $user;
+
+  if (!isset($_GET['token']) || !drupal_valid_token($_GET['token'], $group_type . '_' . $gid . '_' . $uid)) {
+    return MENU_ACCESS_DENIED;
+  }
+
+  $account = user_load($uid);
+
+  $is_user = ($user->uid == $account->uid) && ($user->uid != 1);
+
+  if (module_exists('og_ui') && ($type != 'ajax') && $is_user) {
+    module_load_include('inc', 'og_ui', 'og_ui.pages');
+    // user is requesting their own membership, so show the confirmation form
+    if (og_user_access('node', $gid, 'subscribe', $account) || og_user_access('node', $gid, 'subscribe without approval', $account)) {
+      // Show the user a subscription confirmation.
+      return drupal_get_form('og_ui_confirm_subscribe', 'node', $gid, $account, $field_name);
+    }
+    drupal_access_denied();
+  }
+
+  oa_core_add_member_api($group_type, $gid, $uid, !$is_user);
+
+  if ($type != 'ajax') {
+    drupal_goto();
+  }
+  else {
+    $commands = array();
+    $commands[] = ajax_command_append('#oa-core-messages', theme('status_messages'));
+    $page = array('#type' => 'ajax', '#commands' => $commands);
+    ajax_deliver($page);
+  }
+  return NULL;
+}
+
+/**
+ * Menu callback to remove user from group
+ * @param  $group_type
+ * @param  $gid
+ * @param  $uid
+ */
+function oa_core_remove_member($group_type, $gid, $from_children, $uid, $type = 'nojs') {
+  if (!isset($_GET['token']) || !drupal_valid_token($_GET['token'], $group_type . '_' . $gid . '_' . $uid)) {
+    return MENU_ACCESS_DENIED;
+  }
+  $account = user_load($uid);
+  $group = entity_load_single($group_type, $gid);
+  $label = entity_label($group_type, $group);
+  $username = format_username($account);
+  og_ungroup('node', $group->nid, 'user', $account);
+  if ($from_children == 'all' && module_exists('oa_subspaces') && og_user_access('node', $group->nid, 'administer group') && ($children = og_subgroups_children_load('node', $group->nid)) && ($user_groups = og_get_entity_groups('user', $account))) {
+    if ($remove = og_subgroups_intersect_groups($children, $user_groups)) {
+      foreach ($remove as $entity_type => $ids) {
+        foreach ($ids as $id) {
+          $child_group = entity_load_single($entity_type, $id);
+          og_ungroup($entity_type, $id, 'user', $account);
+          $child_label = entity_label($entity_type, $child_group);
+          drupal_set_message(t('%user has been removed from child @type %title.', array('@type' => drupal_strtolower(node_type_get_name($child_group->type)), '%user' => $username, '%title' => $child_label)));
+        }
+      }
+    }
+  }
+
+  drupal_set_message(t('%user has been removed from the @type %title.', array('@type' => drupal_strtolower(node_type_get_name($group->type)), '%user' => $username, '%title' => $label)));
+  if ($type != 'ajax') {
+    drupal_goto();
+  }
+  else {
+    $commands = array();
+    $commands[] = ajax_command_append('#oa-core-messages', theme('status_messages'));
+    $page = array('#type' => 'ajax', '#commands' => $commands);
+    ajax_deliver($page);
+  }
+  return NULL;
+}
+
+/**
+ * Menu callback to block a user from group
+ * @param  $group_type
+ * @param  $gid
+ * @param  $uid
+ */
+function oa_core_block_member($group_type, $gid, $uid, $type = 'nojs') {
+  if (!isset($_GET['token']) || !drupal_valid_token($_GET['token'], $group_type . '_' . $gid . '_' . $uid)) {
+    return MENU_ACCESS_DENIED;
+  }
+  $account = user_load($uid);
+  $group = entity_load_single($group_type, $gid);
+  $label = entity_label($group_type, $group);
+  og_ungroup('node', $group->nid, 'user', $account);
+  // add user to group
+  og_group('node', $group->nid, array('entity' => $account, 'state' => OG_STATE_BLOCKED));
+
+  drupal_set_message(t('%user has been blocked.', array('%user' => format_username($account), '%title' => $label)));
+
+  if ($type != 'ajax') {
+    drupal_goto();
+  }
+  else {
+    $commands = array();
+    $commands[] = ajax_command_append('#oa-core-messages', theme('status_messages'));
+    $page = array('#type' => 'ajax', '#commands' => $commands);
+    ajax_deliver($page);
+  }
+  return NULL;
+}
+
+/**
+ * Menu callback to make user an admin
+ * @param  $group_type
+ * @param  $gid
+ * @param  $uid
+ */
+function oa_core_add_admin($group_type, $gid, $uid, $type = 'nojs') {
+  if (!isset($_GET['token']) || !drupal_valid_token($_GET['token'], $group_type . '_' . $gid . '_' . $uid)) {
+    return MENU_ACCESS_DENIED;
+  }
+  $account = user_load($uid);
+  $group = entity_load_single($group_type, $gid);
+  $label = entity_label($group_type, $group);
+
+  $og_roles = og_roles($group_type, $group->type, $gid, FALSE, FALSE);
+  $rid = array_search(OG_ADMINISTRATOR_ROLE, $og_roles);
+  if ($rid > 0) {
+    og_role_grant($group_type, $gid, $uid, $rid);
+    og_invalidate_cache();
+
+    drupal_set_message(t('%user has been added as an Admin to the space %title.', array('%user' => format_username($account), '%title' => $label)));
+  }
+  if ($type != 'ajax') {
+    drupal_goto();
+  }
+  else {
+    $commands = array();
+    $commands[] = ajax_command_append('#oa-core-messages', theme('status_messages'));
+    $page = array('#type' => 'ajax', '#commands' => $commands);
+    ajax_deliver($page);
+  }
+  return NULL;
+}
+
+/**
+ * Menu callback to remove user as admin
+ * @param  $group_type
+ * @param  $gid
+ * @param  $uid
+ */
+function oa_core_remove_admin($group_type, $gid, $uid, $type = 'nojs') {
+  if (!isset($_GET['token']) || !drupal_valid_token($_GET['token'], $group_type . '_' . $gid . '_' . $uid)) {
+    return MENU_ACCESS_DENIED;
+  }
+  $account = user_load($uid);
+  $group = entity_load_single($group_type, $gid);
+  $label = entity_label($group_type, $group);
+
+  $og_roles = og_roles($group_type, $group->type, $gid, FALSE, FALSE);
+  $rid = array_search(OG_ADMINISTRATOR_ROLE, $og_roles);
+  if ($rid > 0) {
+    og_role_revoke($group_type, $gid, $uid, $rid);
+    og_invalidate_cache();
+
+    drupal_set_message(t('%user has been removed as Admin of space %title.', array('%user' => format_username($account), '%title' => $label)));
+  }
+  if ($type != 'ajax') {
+    drupal_goto();
+  }
+  else {
+    $commands = array();
+    $commands[] = ajax_command_append('#oa-core-messages', theme('status_messages'));
+    $page = array('#type' => 'ajax', '#commands' => $commands);
+    ajax_deliver($page);
+  }
+  return NULL;
+}
+
+/**
+ * Copies GET arguments to the end of a link on a view.
+ *
+ * Should be used in hook_views_pre_view().
+ *
+ * @param object &$view
+ *   Views object to modify.
+ * @param string $display_name
+ *   (Optional) The Views display to modify.
+ * @param string $field_name
+ *   (Optional) The Views field name to modify.
+ *
+ * @see hook_views_pre_view()
+ */
+function oa_core_views_copy_get_arguments_to_link(&$view, $display_name = 'default', $field_name = 'name') {
+  // Get the GET arguments from the current page.
+  $args = $_GET;
+  unset($args['q']);
+  if (count($args) > 0) {
+    $query = http_build_query($args);
+
+    if (!empty($view->display[$display_name]->handler->options['fields'][$field_name]['alter']['path'])) {
+      $view->display[$display_name]->handler->options['fields'][$field_name]['alter']['path'] .= '?' . $query;
+    }
+  }
+}
+
+/**
+ * Implements hook_views_pre_view().
+ */
+function oa_core_views_pre_view(&$view) {
+  // Use page_1 display's style option so it allows sorting by table headers.
+  if ($view->name == 'open_atrium_content' && !empty($view->display_handler->options['pane_conf']['view_settings']) &&$view->display_handler->options['pane_conf']['view_settings'] == 'table') {
+    $view->display_handler->options['defaults']['style_options'] = FALSE;
+    $view->display_handler->options['style_options'] = $view->display['page_1']->display_options['style_options'];
+  }
+  elseif ($view->name == 'oa_core_space_types') {
+    oa_core_views_copy_get_arguments_to_link($view);
+  }
+  if (!empty($view->display_handler->options['pane_conf']['exposed']['oa_core_default_to_current_user'])) {
+    global $user;
+    // @todo There has to be a way to make this more elegant.
+    $exposed = $view->get_exposed_input();
+    if (!isset($_GET['uid']) && empty($exposed['uid'])) {
+      $exposed['uid'] = $user->name;
+    }
+    $view->set_exposed_input($exposed);
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function oa_core_form_views_content_views_panes_content_type_edit_form_alter(&$form, &$form_state, $form_id) {
+  $conf = $form_state['conf'];
+  $pane = $form_state['pane'];
+  // Add in the Active options
+  // @todo be a bit smarter on this, check type of field.
+  $group = oa_core_get_space_context();
+  if (isset($form['exposed']['filter-oa_parent_space_target_id']['oa_parent_space_target_id'])) {
+    $form['exposed']['filter-oa_parent_space_target_id']['oa_parent_space_target_id']['#options'] =
+      array('' => t('- Active Group -')) + $form['exposed']['filter-oa_parent_space_target_id']['oa_parent_space_target_id']['#options'];
+    if (!isset($pane->configuration['exposed']['oa_parent_space_target_id'])) {
+      $pane->configuration['exposed']['oa_parent_space_target_id'] = '';
+    }
+  }
+  if (isset($form['exposed']['filter-og_group_ref_target_id']['og_group_ref_target_id'])) {
+    if (!isset($pane->configuration['exposed']['og_group_ref_target_id'])) {
+      $pane->configuration['exposed']['og_group_ref_target_id'] = '';
+    }
+    $form['exposed']['filter-og_group_ref_target_id']['og_group_ref_target_id_mine'] = array(
+      '#title' => t('Limit to groups of current user'),
+      '#type' => 'checkbox',
+      '#default_value' => !empty($conf['exposed']['og_group_ref_target_id_mine']),
+      '#parents' => array('exposed', 'og_group_ref_target_id_mine'),
+    );
+    // Replace autocomplete path to one that returns Current Space as an option.
+    if (isset($form['exposed']['filter-og_group_ref_target_id']['og_group_ref_target_id']['#autocomplete_path'])) {
+      $form['exposed']['filter-og_group_ref_target_id']['og_group_ref_target_id']['#autocomplete_path'] = str_replace('oacoreselect2widget', 'oacoreselect2widgetpanes', $form['exposed']['filter-og_group_ref_target_id']['og_group_ref_target_id']['#autocomplete_path']);
+      $form['exposed']['filter-og_group_ref_target_id']['og_group_ref_target_id']['#oa_core_in_pane_config'] = TRUE;
+    }
+    $form['exposed']['filter-og_group_ref_target_id']['og_group_ref_target_id']['#states'] = array(
+      'visible' => array(
+        ':input[name="exposed[og_group_ref_target_id_mine]"]' => array('checked' => FALSE),
+      ),
+    );
+    $form['exposed']['filter-og_group_ref_target_id']['og_group_ref_target_id']['#after_build'][] = 'oa_core_adjust_og_group_ref_for_select2';
+  }
+  if (isset($form['exposed']['filter-oa_section_ref_target_id']['oa_section_ref_target_id'])) {
+    // Add a process that change ajax path so can return multiple changes.
+    if (isset($form['exposed']['filter-og_group_ref_target_id']['og_group_ref_target_id'])) {
+      $form['buttons']['#process'] = array('oa_core_form_views_content_views_panes_content_type_edit_process', 'form_process_actions', 'form_process_container');
+    }
+
+    // Refresh the sections with currently selected group if not currently active group but not empty.
+    if (!empty($pane->configuration['exposed']['og_group_ref_target_id']) &&
+        !isset($_POST['exposed']['og_group_ref_target_id']) &&
+        $pane->configuration['exposed']['og_group_ref_target_id'] != $group &&
+        is_numeric($pane->configuration['exposed']['og_group_ref_target_id'])) {
+      _oa_sections_get_current_selected_space(NULL, $pane->configuration['exposed']['og_group_ref_target_id']);
+    }
+    $form['exposed']['filter-oa_section_ref_target_id']['oa_section_ref_target_id']['#after_build'][] = 'oa_core_refresh_section_values';
+
+    $form['exposed']['filter-oa_section_ref_target_id']['oa_section_ref_target_id']['#options'] =
+      array('' => t('- Active Section -')) + $form['exposed']['filter-oa_section_ref_target_id']['oa_section_ref_target_id']['#options'];
+    if (!isset($pane->configuration['exposed']['oa_section_ref_target_id'])) {
+      $pane->configuration['exposed']['oa_section_ref_target_id'] = '';
+    }
+  }
+  if (!empty($form['exposed']['filter-uid'])) {
+    $form['exposed']['filter-uid']['oa_core_default_to_current_user'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Default to current user'),
+      '#parents' => array('exposed', 'oa_core_default_to_current_user'),
+      '#default_value' => !empty($conf['exposed']['oa_core_default_to_current_user']),
+    );
+    $form['exposed']['filter-uid']['uid']['#states'] = array(
+      'visible' => array(
+        ':input[name="exposed[oa_core_default_to_current_user]"]' => array('checked' => FALSE),
+      ),
+    );
+
+  }
+  // Set exposed form to be disabled at first.
+  if (isset($form['show_exposed_form'])) {
+    $form['show_exposed_form']['#default_value'] = isset($form_state['conf']['show_exposed_form']) ? $form_state['conf']['show_exposed_form'] : FALSE;
+    $form['display_settings']['show_exposed_form'] = $form['show_exposed_form'];
+    $form['display_settings']['show_exposed_form']['#weight'] = 10;
+    unset($form['show_exposed_form']);
+    if (!isset($pane->configuration['show_exposed_form'])) {
+      $pane->configuration['show_exposed_form'] = FALSE;
+    }
+  }
+}
+
+/**
+ * Adjust element so select2 works.
+ */
+function oa_core_adjust_og_group_ref_for_select2($element) {
+  $form_state = array();
+  // Because how panes extract fields from exposed forms, this is not correct.
+  oa_core_select2widget_entity_validate_field($element, $form_state, array());
+  // Remove the autosubmit exclude that panopoly adds cause field is autocomplete.
+  if (isset($element['#attributes']['class'])) {
+    foreach ($element['#attributes']['class'] as $key => $value) {
+      $element['#attributes']['class'][$key] = str_replace($value, 'ctools-auto-submit-exclude', '');
+    }
+  }
+  return $element;
+}
+
+/**
+ * Update the section values in a way that skips cache, etc.
+ */
+function oa_core_refresh_section_values($element) {
+  $element['#options'] = array_intersect_key($element['#options'], array(NULL => '', 'All' => ''));
+  $values = entityreference_get_selection_handler(field_info_field('oa_section_ref'))->getReferencableEntities();
+  if ($values) {
+    $element['#options'] += current($values);
+  }
+  if ($element['#value'] && !array_key_exists($element['#value'], $element['#options'])) {
+    $element['#value'] = 'All';
+  }
+  return $element;
+}
+
+/**
+ * Only way I figured out to change the #ajax of this w/o changing the weight.
+ * Can't hook_form_alter cause go before panopoly_magic and panopoly_magic does
+ * module implements alter and puts itself last. Argh!
+ */
+function oa_core_form_views_content_views_panes_content_type_edit_process($element, &$form_state) {
+  if (isset($form_state['complete form']['content_settings']['view_mode']['#default_value']) &&
+    !in_array($form_state['complete form']['content_settings']['view_mode']['#default_value'], array_keys($form_state['complete form']['content_settings']['view_mode']['#options']))) {
+    // In Recent Activity view, Message entities do not have a "teaser" view, which is the
+    // default view_mode.  So set the view_mode to the first available option (full)
+    // to avoid "Illegal choice" errors
+    $form_state['complete form']['content_settings']['view_mode']['#default_value'] = current(array_keys($form_state['complete form']['content_settings']['view_mode']['#options']));
+
+  }
+  if (isset($element['preview']['#ajax'])) {
+    $element['preview']['#ajax']['callback'] = 'oa_core_refresh_oa_section_ref_target_id';
+  }
+  return $element;
+}
+
+/**
+ * Replaces any changed elements on the form on ajax.
+ */
+function oa_core_refresh_oa_section_ref_target_id($form, $form_state) {
+  $messages = theme('status_messages');
+  $messages = $messages ? $messages : '';
+  $return = array(
+    '#type' => 'ajax',
+    '#commands' => array(),
+  );
+  $return['#commands'][] = ajax_command_replace('#panopoly-form-widget-preview', $messages . panopoly_magic_ajax_update_preview($form, $form_state));
+  if (isset($form['exposed']['filter-oa_section_ref_target_id']['oa_section_ref_target_id'])) {
+    $form['exposed']['filter-oa_section_ref_target_id']['oa_section_ref_target_id']['#theme_wrappers'] = array();
+    $form['exposed']['filter-oa_section_ref_target_id']['oa_section_ref_target_id']['#attributes']['id'] = 'edit-exposed-oa-section-ref-target-id';
+    $return['#commands'][] = ajax_command_replace('#edit-exposed-oa-section-ref-target-id', drupal_render($form['exposed']['filter-oa_section_ref_target_id']['oa_section_ref_target_id']));
+  }
+
+  return $return;
+}
+
+/**
+ * See which views to setthe default value for exposed filters.
+ */
+function _oa_core_set_default_value_for_view($name) {
+  return in_array($name, array('open_atrium_content', 'oa_recent_activity'));
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function oa_core_form_views_exposed_form_alter(&$form, &$form_state) {
+  if (_oa_core_set_default_value_for_view($form_state['view']->name) && $form_state['view']->display_handler->get_url() != $_GET['q']) {
+    // Change exposed form to submit to given page instead of redirecting to
+    // view all.
+    $form['#action'] = url($_GET['q']);
+  }
+  if (!empty($form['og_group_ref_target_id'])) {
+    $form['#after_build'][] = 'oa_core_views_exposed_form_rearrange';
+  }
+  // If a Space was chosen, and we have a Section selector - then we need to
+  // change the available options to be the Sections in that Space (rather
+  // than the current Space). This is necessary to make the customizations
+  // work that were done in:
+  //   oa_core_form_views_content_views_panes_content_type_edit_form_alter()
+  // Otherwise you'll get the 'An illegal choice has been detected.' message
+  // when selecting a Section in another Space.
+  if (!empty($form_state['input']['og_group_ref_target_id']) && !empty($form['oa_section_ref_target_id'])) {
+    $view = $form_state['view'];
+    $exposed_form_overrides = $view->display_handler->get_option('exposed_form_overrides');
+    $pane_conf = $view->display_handler->get_option('pane_conf');
+    $bypass_access = FALSE;
+    if (isset($exposed_form_overrides['filters']['oa_section_ref_target_id'])) {
+      // filter is available on panel pane config form
+      if (empty($exposed_form_overrides['filters']['oa_section_ref_target_id']) ||
+        (isset($pane_conf['show_exposed_form']) && empty($pane_conf['show_exposed_form']))) {
+        // if field is not exposed, then bypass access so pane config
+        // options do not cause "Illegal choice" error on page
+        // when displaying widgets from private sections
+        $bypass_access = TRUE;
+      }
+    }
+
+    $space_id = str_replace(OA_SPACE_CURRENT, oa_core_get_space_context(), $form_state['input']['og_group_ref_target_id']);
+    $include_archived = user_access('view trash content') ||
+      (is_numeric($space_id) && og_user_access('node', $space_id, 'view trash content', NULL, FALSE, TRUE));
+
+    // reload section option list with sections from given space id
+    $sections = array(
+      ''    => t('- Active Section -'),
+      'All' => t('- Any -')
+    );
+    if (is_numeric($space_id)) {
+      $sections += oa_core_space_sections($space_id, NULL, $bypass_access, array(), $include_archived);
+    }
+    $form['oa_section_ref_target_id']['#options'] = $sections;
+  }
+}
+
+/**
+ * Helper function to unset fields we do not need
+ */
+function oa_core_views_exposed_form_rearrange($form) {
+  if (!empty($form['og_group_ref_target_id_mine']) || !empty($form['og_subspaces_view_all'])) {
+    $form['og_group_ref_target_id'] = array(
+      'og_group_ref_target_id' => $form['og_group_ref_target_id'],
+    );
+    if (!empty($form['og_group_ref_target_id_mine'])) {
+      $form['og_group_ref_target_id']['og_group_ref_target_id_mine'] = $form['og_group_ref_target_id_mine'];
+      unset($form['og_group_ref_target_id_mine']);
+    }
+    if (!empty($form['og_subspaces_view_all'])) {
+      $form['og_group_ref_target_id']['og_subspaces_view_all'] = $form['og_subspaces_view_all'];
+      unset($form['og_subspaces_view_all']);
+    }
+    if (!empty($form['og_subspaces_view_parent'])) {
+      $form['og_group_ref_target_id']['og_subspaces_view_parent'] = $form['og_subspaces_view_parent'];
+      unset($form['og_subspaces_view_parent']);
+    }
+  }
+  return $form;
+}
+
+/**
+ * Implements hook_token_info().
+ */
+function oa_core_token_info() {
+  $node['group-or-section-alias'] = array(
+    'name' => t("URL"),
+    'description' => t("The alias to the section (or group if no section of given content.)"),
+  );
+  return array(
+    'tokens' => array('node' => $node),
+  );
+}
+
+/**
+ * Return what the defined alias will eventually be for $nid
+ */
+function oa_core_get_alias($nid) {
+  $cache = &drupal_static('oa_core_alias', array());
+
+  if (isset($cache[$nid])) {
+    return $cache[$nid];
+  }
+
+  if ($node = node_load($nid)) {
+    $uri = entity_uri('node', $node);
+    $path = drupal_get_path_alias($uri['path']);
+    if (!isset($node->path['pathauto'])) {
+      module_load_include('inc', 'pathauto');
+      // return what the proper alias for this node will eventually be
+      // don't use 'update' yet since the drupal_get_path_alias() will still be cached
+      $path = pathauto_create_alias('node', 'return', $uri['path'], array('node' => $node), $node->type, $node->language);
+    }
+    $cache[$nid] = $path;
+  }
+  else {
+    $cache[$nid] = FALSE;
+  }
+  return $path;
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function oa_core_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $replacements = array();
+  if ($type == 'node' && !empty($data['node']) && isset($tokens['group-or-section-alias'])) {
+    $node = $data['node'];
+    $original = $tokens['group-or-section-alias'];
+    $section = field_get_items('node', $node, OA_SECTION_FIELD);
+    $space = field_get_items('node', $node, OA_SPACE_FIELD);
+    $section_id = !empty($section[0]['target_id']) ? $section[0]['target_id'] : 0;
+    $space_id = !empty($space[0]['target_id']) ? $space[0]['target_id'] : 0;
+    $default_path_alias = variable_get('oa_default_path_alias', 'content');
+    if ($section_id && node_load($section_id)) {
+      $path = drupal_get_path_alias('node/' . $section_id);
+      if (module_exists('pathauto') && preg_match('#^node/(\d+)#', $path)) {
+        // section alias not defined yet, so define it
+        $path = oa_core_get_alias($section_id);
+      }
+      if (!empty($path)) {
+        $replacements[$original] = $path;
+      }
+    }
+    elseif ($space_id && node_load($space_id)) {
+      $path = drupal_get_path_alias('node/' . $space_id);
+      if (module_exists('pathauto') && preg_match('#^node/(\d+)#', $path)) {
+        // space alias not defined yet, so define it
+        $path = oa_core_get_alias($space_id);
+      }
+      if (!empty($path)) {
+        $replacements[$original] = $path;
+        if ($node->type != OA_SECTION_TYPE) {
+          $replacements[$original] .= "/{$default_path_alias}";
+        }
+      }
+    }
+    else {
+      $replacements[$original] = $default_path_alias;
+    }
+  }
+  return $replacements;
+}
+
+/**
+ * Implements hook_preprocess_views_exposed_form().
+ */
+function oa_core_preprocess_views_exposed_form(&$vars) {
+  // Add options from a filters to the variables for use in our template.
+  $vars['collapsed_filter'] = empty($vars['form']['#collapsed_filter']) ? FALSE : TRUE;
+}
+
+/**
+ * Allowed values callback for using particular space types.
+ *
+ * @param array $field
+ *   Field instance array for the given field.
+ *
+ * @return array
+ *   Associative array keyed by Taxonomy term id containing the term names.
+ */
+function oa_core_get_allowed_space_types($field) {
+  $options = array();
+  $gid = oa_core_get_space_context();
+  // If no gid, may be using this as a filter or such.
+  // @see oa_subspaces_form_node_form_alter().
+  if (!$gid || !module_exists('oa_subspaces') || user_access('administer group') || user_access('create oa_space content') || og_user_access('node', $gid, 'use any oa button space_type')) {
+    return taxonomy_allowed_values($field);
+  }
+  if ($gid) {
+    foreach ($field['settings']['allowed_values'] as $tree) {
+      $options = $options + oa_core_get_allowed_space_terms($gid, $tree['vocabulary']);
+    }
+  }
+  return $options;
+}
+
+/**
+ * Helper function to return list of space blueprint term ids allowed to be created.
+ * @param int $gid (optional)
+ * @return array of tids ($tid => $term->name).  If NULL, all tids are allowed.
+ */
+function oa_core_get_allowed_space_terms($gid = NULL, $vocab_name = 'space_type') {
+  global $user;
+
+  $gid = isset($gid) ? $gid : oa_core_get_space_context();
+  $tids = array();
+
+  // When checking OG Permission, don't let Admin Group override this since all
+  // Space admins typically have Admin Group but we want to limit types of subspaces
+  // to be created.
+  if (!$gid || !module_exists('oa_subspaces')
+    || user_access('administer group') || user_access('create oa_space content')
+    || og_user_access('node', $gid, 'use any oa button space_type', NULL, FALSE, TRUE)) {
+    return NULL;
+  }
+  if ($gid && $user->uid) {
+    if ($vocabulary = oa_core_taxonomy_vocabulary($vocab_name)) {
+      if ($terms = taxonomy_get_tree($vocabulary->vid)) {
+        foreach ($terms as $term) {
+          if (oa_core_get_taxonomy_term_access($term->tid, $gid, $vocab_name)) {
+            $tids[$term->tid] = str_repeat('-', $term->depth) . $term->name;
+          }
+        }
+      }
+    }
+  }
+  return $tids;
+}
+
+/**
+ * Gets all the options for space_type or section_type.
+ *
+ * @param string $vocab_name
+ *   (Optional) The name of the vocabulary (ex. space_type, section_type).
+ */
+function oa_core_get_space_type_options($vocab_name = 'space_type') {
+  // Load all the terms for this vocabulary.
+  $query = db_select('taxonomy_term_data', 'td');
+  $query->join('taxonomy_vocabulary', 'v', 'v.vid = td.vid');
+  $query
+    ->fields('td', array('tid'))
+    ->condition('v.machine_name', $vocab_name);
+  $terms = taxonomy_term_load_multiple($query->execute()->fetchCol());
+
+  $options = array();
+  foreach ($terms as $term) {
+    $options[$term->tid] = module_invoke_all('oa_core_space_type_options', $term, $vocab_name);
+  }
+
+  drupal_alter('oa_core_space_type_options', $options, $vocab_name);
+
+  return $options;
+}
+
+/**
+ * Implements hook_oa_core_space_type_options().
+ */
+function oa_core_oa_core_space_type_options($term, $vocab_name) {
+  $layout = field_get_items('taxonomy_term', $term, 'field_oa_section_layout', LANGUAGE_NONE);
+
+  return array(
+    'layout' => $layout[0]['value'],
+  );
+}
+
+/**
+ * Alters a node edit form to hide comment settings.
+ */
+function _oa_core_hide_comment_settings(&$form) {
+  $node = $form['#node'];
+  if (isset($form['comment_settings'])
+    && (empty($node->type) || variable_get('comment_' . $node->type, COMMENT_NODE_OPEN) == COMMENT_NODE_HIDDEN)
+    && (empty($node->nid)
+      || ($node->comment == COMMENT_NODE_HIDDEN)
+      || ($node->comment == COMMENT_NODE_CLOSED && empty($node->comment_count))
+    )) {
+    $form['comment_settings']['#access'] = FALSE;
+  }
+}
+
+/**
+ * Implements hook_panelizer_pre_render_alter().
+ */
+function oa_core_panelizer_pre_render_alter(&$panelizer, $display, $entity) {
+  // Hide comments when set to be hidden.
+  // @see https://www.drupal.org/node/2505395
+  if (module_exists('comment')) {
+    if (isset($entity->comment) && $entity->comment == COMMENT_NODE_HIDDEN) {
+      foreach ($panelizer->display->content as $key => $display) {
+        if ($display->type == 'node_comment_wrapper') {
+          unset($panelizer->display->content[$key]);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Alters a node edit form to setup the space_type/section_type functionality.
+ *
+ * @param array &$form
+ *   The Form API array that we are altering.
+ * @param string $space_type
+ *   (Optional) The name of the taxonomy which contains the types.
+ * @param string $field_name
+ *   (Optional) The field on the node which represents the current type.
+ */
+function _oa_core_setup_node_space_type(&$form, $type = 'space_type', $field_name = 'field_oa_space_type') {
+  $selector = 'select[name="' . $field_name . '[und]"]';
+  $space_type = !empty($form[$field_name]['und']['#default_value']) ? $form[$field_name]['und']['#default_value'][0] : NULL;
+
+  $form['panelizer']['#states'] = array(
+    'visible' => array(
+      ':input[name="field_oa_section_override[und]"]' => array('checked' => TRUE),
+    ),
+    'invisible' => array(
+      ':input[name="field_oa_section_override[und]"]' => array('checked' => FALSE),
+    ),
+  );
+  $form['panelizer']['#access'] = TRUE;
+
+  $options = oa_core_get_space_type_options($type);
+  // Need to change array to string key for javascript
+  $js_options = array();
+  foreach ($options as $tid => $item) {
+    $js_options['tid' . $tid] = $item;
+  }
+
+  $form['#attached']['js'][] = array(
+    'data' => array(
+      'oaCoreSpaceTypeOptions' => $js_options,
+      'oaCoreSpaceTypeSelector' => $selector,
+      'oaCoreSpaceType' => $space_type,
+    ),
+    'type' => 'setting',
+  );
+  $form['#attached']['js'][] = array(
+    'data' => drupal_get_path('module', 'oa_core') . '/js/oa_core_space_type.js',
+    'type' => 'file',
+  );
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function oa_core_form_oa_space_node_form_alter(&$form, &$form_state, &$form_id) {
+  // If we are on the node add form that is specific to this Space Blueprint, we
+  // take the 'Space Blueprint' from the URL and hide the field.
+  if (arg(0) == 'node' && arg(1) == 'add' && arg(2) == 'oa-space' && ($space_tid = arg(3)) && !empty($space_tid)) {
+    $form['field_oa_space_type']['und']['#default_value'] = array($space_tid);
+    $form['field_oa_space_type']['#access'] = FALSE;
+  }
+
+  _oa_core_hide_comment_settings($form);
+  _oa_core_setup_node_space_type($form);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function oa_core_form_oa_group_node_form_alter(&$form, &$form_state, &$form_id) {
+  _oa_core_hide_comment_settings($form);
+}
+
+/**
+ * Build a list of section layouts based on oa_section panelizer displays.
+ *
+ * @param string $bundle
+ *   The name of the bundle of layouts to scan.
+ *
+ * @return array
+ *   An associative array keyed by the display name and containing a human
+ *   readable display name.
+ */
+function oa_core_get_space_type_layout_options($bundle) {
+  $plugins = panelizer_get_entity_plugins();
+  $node_plugin = panelizer_entity_plugin_get_handler($plugins['node']);
+  $options = array();
+  foreach ($node_plugin->plugin['view modes'] as $view_mode => $view_mode_info) {
+    $view_bundle = $bundle . '.' . $view_mode;
+
+    // Ignore view modes that don't have a choice or already have their
+    // own custom panel set up.
+    if (!$node_plugin->has_panel_choice($view_bundle)) {
+      continue;
+    }
+
+    $panelizers = $node_plugin->get_default_panelizer_objects($view_bundle);
+
+    foreach ($panelizers as $name => $panelizer) {
+      if (empty($panelizer->disabled)) {
+        $options[$name] = $panelizer->title ? $panelizer->title : t('Default');
+        if (!empty($panelizer->title)) {
+          $thisarray = explode(':', $name);
+          if (!empty($thisarray[3])) {
+            $options[$name] = ucfirst($thisarray[3]) . ':' . $options[$name];
+          }
+        }
+      }
+    }
+
+    if (!$node_plugin->has_default_panel($view_bundle)) {
+      $options = array('' => t('-- No panel --')) + $options;
+    }
+  }
+
+  return $options;
+}
+
+/**
+ * Alters a taxonomy edit form to setup the 'Space Blueprint' functionality.
+ *
+ * @param string $layout_bundle
+ *   The name of the bundle to get the layout options for.
+ */
+function _oa_core_setup_taxonomy_space_type(&$form, $layout_bundle = 'oa_space') {
+  $term = (object)$form['#term'];
+  $layout = field_get_items('taxonomy_term', $term, 'field_oa_section_layout', LANGUAGE_NONE);
+
+  $layout_defaults = array();
+  if (!empty($layout[0]['value'])) {
+    $layout_defaults[] = $layout[0]['value'];
+  }
+
+  // Provide section layout options.
+  $section_layouts = oa_core_get_space_type_layout_options($layout_bundle);
+  if (isset($form['field_oa_section_layout'])) {
+    $form['field_oa_section_layout'][$form['field_oa_section_layout']['#language']]['#options'] = $section_layouts;
+    $form['field_oa_section_layout'][$form['field_oa_section_layout']['#language']]['#default_value'] = $layout_defaults;
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function oa_core_form_taxonomy_form_term_alter(&$form, &$form_state, $form_id) {
+  if ($form['#vocabulary']->machine_name == 'space_type') {
+    _oa_core_setup_taxonomy_space_type($form);
+  }
+}
+
+/**
+ * Helper to redirect to proper landing page after content deletion
+ */
+function oa_core_node_delete_redirect($form, &$form_state) {
+  $id = oa_core_get_section_context();
+  if (empty($id)) {
+    $id = oa_core_get_space_context();
+  }
+  if (!empty($form['#node'])) {
+    if (in_array($form['#node']->type, array(OA_SPACE_TYPE, OA_GROUP_TYPE)) && module_exists('oa_subspaces') && !empty($form['#node']->{OA_PARENT_SPACE}[LANGUAGE_NONE][0]['target_id'])) {
+      // redirect to parent space when deleting subspace
+      $id = $form['#node']->{OA_PARENT_SPACE}[LANGUAGE_NONE][0]['target_id'];
+    }
+    elseif ($form['#node']->type == OA_SECTION_TYPE) {
+      $id = oa_core_get_space_context();
+    }
+    if ($id == $form['#node']->nid) {
+      $id = NULL;  // don't redirect back to deleted node ever
+    }
+  }
+  if (!empty($id)) {
+    $form_state['redirect'] = 'node/' . $id;
+  }
+}
+
+/**
+ * Modify the views query where condition for the specified columns to include the $ids
+ * @param $query
+ * @param $columns
+ * @param $ids
+ */
+function oa_core_view_query_modify_condition(&$query, $columns, $ids) {
+  if (empty($ids)) {
+    return;
+  }
+  if (!is_array($columns)) {
+    $columns = array($columns);
+  }
+  // Loop over all conditions in all 'where groups'.
+  foreach (array_keys($query->where) as $where_group) {
+    foreach ($query->where[$where_group]['conditions'] as $key => &$condition) {
+      // If it matches the column or an alias.
+      foreach ($columns as $column) {
+        oa_core_view_query_modify_condition_object($condition, $column, $ids);
+      }
+    }
+    // free referenced object
+    unset($condition);
+  }
+}
+
+function oa_core_view_query_modify_condition_object(&$condition, $column, $ids) {
+  if (is_object($condition['field']) && is_a($condition['field'], 'DatabaseCondition')) {
+    $conditions = $condition['field']->conditions();
+    // cannot modify conditions directly in a DatabaseCondition object
+    // so we need to create a new one.
+    $new_subquery = new DatabaseCondition($conditions['#conjunction']);
+    foreach ($conditions as $key => $inner_condition) {
+      if (is_numeric($key)) {
+       oa_core_view_query_modify_condition_object($inner_condition, $column, $ids);
+        $new_subquery->condition($inner_condition['field'], $inner_condition['value'], $inner_condition['operator']);
+      }
+    }
+    $condition['field'] = $new_subquery;
+  }
+  elseif ($condition['field'] === $column ||
+    (is_string($condition['field']) && substr($condition['field'], -strlen($column)-2) === "__{$column}")) {
+    $value = $condition['value'];
+    if (!is_array($value)) {
+      $value = array($value);
+      $condition['operator'] = 'IN';
+    }
+    $condition['value'] = array_merge($value, $ids);
+  }
+}
+
+/**
+ * Implements hook_views_query_alter().
+ */
+function oa_core_views_query_alter(&$view, &$query) {
+  // only show space types allowed to create.
+  if ($view->name == 'oa_core_space_types') {
+    $tids = oa_core_get_allowed_space_terms();
+    if (isset($tids)) {
+      $tids = array_keys($tids);
+      $query->add_where(1, 'taxonomy_term_data.tid', $tids, 'IN');
+    }
+  }
+
+  // We only modify views that have 'og_group_ref_target_id' as an exposed
+  // filter and only when that filter has a value. We are adding support for
+  // the 'Visible in other Spaces' (oa_other_spaces_ref) field.
+  if (!empty($view->exposed_input['og_group_ref_target_id'])
+    && is_numeric($view->exposed_input['og_group_ref_target_id'])
+    && !empty($view->filter['og_group_ref_target_id']->options['exposed'])) {
+    // Ensure that we've joined against 'field_data_oa_other_spaces_ref' table.
+    $join = new views_join();
+    $join->construct('field_data_oa_other_spaces_ref', 'node', 'nid', 'entity_id', array(
+      array('field' => 'entity_type', 'value' => 'node'),
+      array('field' => 'deleted', 'value' => 0, 'numeric' => TRUE),
+    ));
+    $alias = $query->ensure_table('field_data_oa_other_spaces_ref', 'node', $join);
+    if ($alias) {
+      // Only change the query if the join to node table worked
+      //
+      // Add a new 'where group' which is an OR and move 'og_group_ref_target_id'
+      // to it (and grab it's value).
+      $extra_groups = array();
+      $group = $query->set_where_group('OR');
+      foreach ($query->where[1]['conditions'] as $key => $condition) {
+        // If the field is 'og_membership.gid' or an alias for the same column.
+        $column = 'og_membership';
+        if (!empty($condition['field'])
+          && is_string($condition['field'])
+          && ($condition['field'] === $column
+            || $condition['field'] === $column . ".gid"
+            || substr($condition['field'], -strlen($column)-2) === "__{$column}")) {
+          // Move the condition to our new where group.
+          // Also need to modify the condition to only match the og_membership.gid field
+          // if the "other_spaces" field is empty, or has a delta of zero
+          // This prevents duplicate entries when the node is visible in multiple
+          // other spaces and is faster than making the query distinct.
+          $sub_condition = db_or()
+            ->condition("{$alias}.delta", NULL, 'IS NULL')
+            ->condition("{$alias}.delta", 0);
+          $new_condition = db_and()
+            ->condition($condition['field'], $condition['value'], $condition['operator'])
+            ->condition($sub_condition);
+          $query->add_where($group, $new_condition);
+          $extra_groups[] = $condition['value'];
+          unset($query->where[1]['conditions'][$key]);
+          break;
+        }
+      }
+
+      // Finally, we filter against 'field_data_oa_other_spaces_ref' with the
+      // same value as was given to 'oa_group_ref_target_id'.
+      if (!empty($extra_groups)) {
+        $query->add_where($group, "{$alias}.oa_other_spaces_ref_target_id", $extra_groups, 'IN');
+
+        // Next, check if the section filter condition needs to be updated
+        if (module_exists('oa_subspaces')
+          && !empty($view->exposed_input['oa_section_ref_target_id'])
+          && is_numeric($view->exposed_input['oa_section_ref_target_id'])
+          && !empty($view->filter['oa_section_ref_target_id']->options['exposed'])) {
+          $columns = array('field_data_oa_section_ref.oa_section_ref_target_id');
+          // get a list of matching section names in the other spaces
+          $extra_sections = oa_subspaces_matching_sections($view->exposed_input['oa_section_ref_target_id'], array(), $extra_groups);
+          oa_core_view_query_modify_condition($query, $columns, $extra_sections);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_oa_related_allowed_default().
+ */
+function oa_core_oa_related_allowed_default() {
+  return array(OA_SECTION_TYPE, OA_SPACE_TYPE);
+}
+
+/**
+ * Helper function for Views handlers to process the exposed input
+ * @param $filter views_handler_filter_in_operator object
+ * @return bool TRUE if successful, FALSE if errors
+ *
+ * This function processed the exposed filter for og_group_ref.
+ * It converts OA_SPACE_CURRENT to the current space context
+ * It also supports the "My Spaces" checkbox to restrict to user's groups
+ * All logic can be bypassed by setting options['expose']['oa_core_no_auto']
+ */
+function oa_core_process_exposed_group_input($filter) {
+  $options_exposed = !empty($filter->options['expose']) ? array_filter($filter->options['expose']) : array();
+  if (empty($options_exposed['oa_core_no_auto'])) {
+    $exposed = $filter->view->get_exposed_input();
+    $id = !empty($options_exposed['identifier']) ? $options_exposed['identifier'] : 'og_group_ref';
+
+    // Replace current space value if filter is empty or OA_SPACE_CURRENT.
+    if (isset($exposed[$id]) && (empty($exposed[$id]) || $exposed[$id] == OA_SPACE_CURRENT)) {
+      if ($group = oa_core_get_space_context()) {
+        $exposed[$id] = $group;
+      }
+      else {
+        unset($exposed[$id]);
+      }
+    }
+
+    // Pane doesn't allow unrelated exposed input, so bring it back.
+    if (!empty($_GET[$id . '_mine'])) {
+      $exposed[$id . '_mine'] = 1;
+    }
+
+    // Form API considers a Value of 0 to be CHECKED!!!!!
+    // So if the value is zero, we set it to FALSE so it is properly UnChecked.
+    if (isset($exposed[$id . '_mine']) && empty($exposed[$id . '_mine'])) {
+      $exposed[$id . '_mine'] = FALSE;
+    }
+
+    // If "My Spaces" is checked, restrict to user's groups
+    global $user;
+    if (!empty($exposed[$id . '_mine'])) {
+      $groups = oa_core_get_groups_by_user($user, 'node');
+      if ($groups && ($gids = array_intersect_key($groups, $filter->get_value_options()))) {
+        $exposed[$id] = $gids;
+        $filter->options['expose']['multiple'] = TRUE;
+      }
+      else {
+        // If restricting to My Spaces but the user has no spaces, fail the build
+        return FALSE;
+      }
+    } // If was multiple from mine setting, clear it out.
+    elseif (empty($options_exposed['multiple']) && isset($exposed[$id]) && is_array($exposed[$id])) {
+      unset($exposed[$id]);
+    }
+    $filter->view->set_exposed_input($exposed);
+  }
+  return TRUE;
+}
+
+/**
+ * Implements hook_panelizer_defaults_override_alter().
+ */
+function oa_core_panelizer_defaults_override_alter(&$data) {
+  drupal_alter('oa_core_layout', $data);
+  // Add any custom widgets coming from Atrium plugins
+  $info = module_invoke_all('oa_core_add_panes');
+  foreach ($info as $panelizer => $panes) {
+    if (isset($data[$panelizer]->display)) {
+      foreach ($panes as $uuid => $pane) {
+        $pid = 'new-' . $uuid;
+        if (empty($pane)) {
+          if (isset($data[$panelizer]->display->content[$pid])) {
+            unset($data[$panelizer]->display->content[$pid]);
+          }
+        }
+        else {
+          $pane = $pane + array(
+            'shown' => TRUE,
+            'access' => array(),
+            'configuration' => array(),
+            'cache' => array(),
+            'style' => array(
+              'settings' => NULL,
+            ),
+            'css' => array(),
+            'extras' => array(),
+            'position' => 9,
+            'locks' => array(),
+            'uuid' => $uuid,
+            'pid' => $pid,
+          );
+          if (isset($data[$panelizer])) {
+            $data[$panelizer]->display->content[$pid] = (object) $pane;
+          }
+        }
+      }
+    }
+  }
+  _oa_core_panelizer_sort($data);
+}
+
+/**
+ * Implements hook_default_page_manager_handlers_alter().
+ * $data['node_edit_panel_context']->conf['display']->content
+ */
+function oa_core_default_page_manager_handlers_alter(&$data) {
+  drupal_alter('oa_core_layout', $data);
+  $info = module_invoke_all('oa_core_add_panes');
+  foreach ($info as $panelizer => $panes) {
+    if (isset($data[$panelizer]->conf['display'])) {
+      foreach ($panes as $uuid => $pane) {
+        $pid = 'new-' . $uuid;
+        if (empty($pane)) {
+          if (isset($data[$panelizer]->conf['display']->content[$pid])) {
+            unset($data[$panelizer]->conf['display']->content[$pid]);
+          }
+        }
+        else {
+          $pane = $pane + array(
+            'shown' => TRUE,
+            'access' => array(),
+            'configuration' => array(),
+            'cache' => array(),
+            'style' => array(
+              'settings' => NULL,
+            ),
+            'css' => array(),
+            'extras' => array(),
+            'position' => 9,
+            'locks' => array(),
+            'uuid' => $uuid,
+            'pid' => $pid,
+          );
+          if (isset($data[$panelizer])) {
+            $data[$panelizer]->conf['display']->content[$pid] = (object) $pane;
+          }
+        }
+      }
+    }
+  }
+  _oa_core_panels_sort($data);
+}
+
+/**
+ * Implements hook_default_panels_mini_alter().
+ * $data['node_edit_panel_context']->conf['display']->content
+ */
+function oa_core_default_panels_mini_alter(&$data) {
+  drupal_alter('oa_core_layout', $data);
+  $info = module_invoke_all('oa_core_add_panes');
+  foreach ($info as $panelizer => $panes) {
+    if (isset($data[$panelizer]->display)) {
+      foreach ($panes as $uuid => $pane) {
+        $pid = 'new-' . $uuid;
+        if (empty($pane)) {
+          if (isset($data[$panelizer]->display->content[$pid])) {
+            unset($data[$panelizer]->display->content[$pid]);
+          }
+        }
+        else {
+          $pane = $pane + array(
+              'shown' => TRUE,
+              'access' => array(),
+              'configuration' => array(),
+              'cache' => array(),
+              'style' => array(
+                'settings' => NULL,
+              ),
+              'css' => array(),
+              'extras' => array(),
+              'position' => 9,
+              'locks' => array(),
+              'uuid' => $uuid,
+              'pid' => $pid,
+            );
+          if (isset($data[$panelizer])) {
+            $data[$panelizer]->display->content[$pid] = (object) $pane;
+          }
+        }
+      }
+    }
+  }
+  _oa_core_panelizer_sort($data);
+}
+
+/**
+ * Helper function to put panes in correct order using the position property
+ * For Panelizer objects
+ * @param $data
+ */
+function _oa_core_panelizer_sort(&$data) {
+  foreach ($data as $key => $panel) {
+    $regions = array();
+    // Group panes by region
+    if (isset($panel->display)) {
+      foreach ($panel->display->content as $pid => $pane) {
+        $regions[$pane->panel][$pid] = $pane->position;
+      }
+      // Sort each region by position
+      $data[$key]->display->panels = array();
+      foreach ($regions as $region => $panels) {
+        asort($panels);
+        $data[$key]->display->panels[$region] = array_keys($panels);
+        foreach ($data[$key]->display->panels[$region] as $index => $pid) {
+          $data[$key]->display->content[$pid]->position = $index;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Helper function to put panes in correct order using the position property
+ * For Page Manager/Panels objects
+ * @param $data
+ */
+function _oa_core_panels_sort(&$data) {
+  foreach ($data as $key => $panel) {
+    $regions = array();
+    // Group panes by region
+    if (isset($panel->conf['display'])) {
+      foreach ($panel->conf['display']->content as $pid => $pane) {
+        $regions[$pane->panel][$pid] = $pane->position;
+      }
+      // Sort each region by position
+      $data[$key]->conf['display']->panels = array();
+      foreach ($regions as $region => $panels) {
+        asort($panels);
+        $data[$key]->conf['display']->panels[$region] = array_keys($panels);
+        foreach ($data[$key]->conf['display']->panels[$region] as $index => $pid) {
+          $data[$key]->conf['display']->content[$pid]->position = $index;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Helper function to change the layout of a panel
+ * @param $data
+ * @param $key string specifying index into $data
+ * @param $new_layout string new layout machine name
+ * @param $default_region string default region name to assign existing panes
+ * @param array $region_map array mapping of old regions to new regions
+ */
+function _oa_core_change_panel_layout(&$data, $key, $new_layout, $default_region, $region_map = array()) {
+  if (!empty($data[$key])) {
+    $data[$key]->display->layout = $new_layout;
+    foreach ($data[$key]->display->panels as $region => $panels) {
+      $new_region = isset($region_map[$region]) ? $region_map[$region] : $default_region;
+      $data[$key]->display->panels[$new_region] = $panels;
+      unset($data[$key]->display->panels[$region]);
+    }
+    foreach ($data[$key]->display->content as $pid => $pane) {
+      $new_region = isset($region_map[$pane->panel]) ? $region_map[$pane->panel] : $default_region;
+      $data[$key]->display->content[$pid]->panel = $new_region;
+    }
+    if (!empty($data[$key]->display->panel_settings['style_settings'])) {
+      foreach ($data[$key]->display->panel_settings['style_settings'] as $region => $settings) {
+        $new_region = isset($region_map[$region]) ? $region_map[$region] : $default_region;
+        $data[$key]->display->panel_settings['style_settings'][$new_region] = $settings;
+        unset($data[$key]->display->panel_settings['style_settings'][$region]);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_display_alter().
+ */
+function oa_core_field_display_alter(&$display, $context) {
+  if ($display['type'] == 'og_vocab') {
+    $display['label'] = 'hidden';
+  }
+}
+
+/**
+ * Determine if an exposed filter form should be collapsed
+ * Called from views-exposed-form.tpl.php in oa_radix
+ * Needs to determine if arguments are passed to change the filter that
+ * should cause the filter to remain expanded
+ * @param $form
+ * @return bool
+ */
+function oa_core_collapse_filter($form) {
+  // The views template used to use (count($_GET) < 2) to determine if filter
+  // is auto-collapsed.  But this causes filter to remain open when any other
+  // GET arguments are passed, such as Tours.
+  // So we need to actually compare passed arguments with form fields
+  $result = TRUE;
+  if (!empty($_GET)) {
+    foreach ($_GET as $key => $value) {
+      if (isset($form[$key]['#type'])) {
+        // Passing a valid form field, so keep filter expanded
+        $result = FALSE;
+        break;
+      }
+    }
+  }
+  return $result;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function oa_core_form_file_entity_settings_form_alter(&$form, &$form_state) {
+  $form['#submit'][] = 'oa_core_file_entity_settings_form_submit';
+}
+
+/**
+ * Submit handler for file_entity_settings_form.
+ * @param $form
+ * @param $form_state
+ */
+function oa_core_file_entity_settings_form_submit($form, $form_state) {
+  if ($form_state['values']['file_entity_default_allowed_extensions'] != $form['file_entity_default_allowed_extensions']['#default_value']) {
+    variable_set('file_entity_default_allowed_extensions', $form_state['values']['file_entity_default_allowed_extensions']);
+    // Update field instances when default file entity extensions is changed.
+    oa_core_update_field_instances($form['file_entity_default_allowed_extensions']['#default_value']);
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function oa_core_form_field_ui_field_edit_form_alter(&$form, &$form_state) {
+  // Make allowed extensions optional and add additional helper text.
+  $field = $form['#field'];
+  $file_fields = array(
+    'fieldable_panels_pane-basic_file-field_basic_file_file',
+    'field_oa_media');
+  if (isset($form['instance']['settings']['file_extensions']) && in_array($field['field_name'], $file_fields)) {
+    $file_extensions = variable_get('file_entity_default_allowed_extensions', OA_FILE_EXTENSIONS_DEFAULT);
+    $form['instance']['settings']['file_extensions']['#description'] .=
+      '<br>Leave blank for default: ' . $file_extensions;
+    $form['instance']['settings']['file_extensions']['#required'] = FALSE;
+    $form['#validate'][] = 'oa_core_field_ui_field_edit_form_validate';
+  }
+}
+
+/**
+ * Submit handler for file_entity_settings_form.
+ * @param $form
+ * @param $form_state
+ */
+function oa_core_field_ui_field_edit_form_validate($form, &$form_state) {
+  if (isset($form_state['values']['instance']['settings']['file_extensions'])) {
+    if (empty($form_state['values']['instance']['settings']['file_extensions'])) {
+      $form_state['values']['instance']['settings']['file_extensions'] = variable_get('file_entity_default_allowed_extensions', OA_FILE_EXTENSIONS_DEFAULT);
+    }
+  }
+}
+
+/**
+ * Helper function to determine if the $extensions match the defaults
+ */
+function _oa_core_is_default_allowed_extensions($extensions) {
+  static $media_extensions = '';
+
+  if (empty($media_extensions)) {
+    // First, compute the normal default file extensions for Media module
+    // See media_update_7213()
+    $media_file_extensions = explode(' ', variable_get('media__file_extensions'));
+    $file_entity_file_extensions = explode(' ', variable_get('file_entity_default_allowed_extensions', 'jpg jpeg gif png txt doc docx xls xlsx pdf ppt pptx pps ppsx odt ods odp mp3 mov mp4 m4a m4v mpeg avi ogg oga ogv weba webp webm'));
+    $combined_file_extensions = array_unique(array_merge($file_entity_file_extensions, $media_file_extensions));
+    $media_extensions = implode(' ', $combined_file_extensions);
+  }
+
+  return (empty($extensions) || ($extensions == $media_extensions) ||
+    ($extensions == PANOPOLY_WIDGETS_FILE_EXTENSIONS_DEFAULT) ||
+    ($extensions == OA_OLD_FILE_EXTENSIONS_DEFAULT));
+}
+
+/**
+ * Implements hook_field_default_field_instances_alter().
+ *
+ * Hook into field_instance_alter to prevent Features from being overridden
+ * by new default file extensions.
+ */
+function oa_core_field_default_field_instances_alter(&$instances) {
+  // Set the default allowed file extensions for file fields.
+  $file_fields = array(
+    'fieldable_panels_pane-basic_file-field_basic_file_file',
+    'field_oa_media');
+  foreach ($instances as $key => $instance) {
+    list($entity_type, $bundle, $fieldname) = explode('-', $key);
+    if (in_array($fieldname, $file_fields)) {
+      $current_extensions = $instance['settings']['file_extensions'];
+      $file_extensions = variable_get('file_entity_default_allowed_extensions', OA_FILE_EXTENSIONS_DEFAULT);
+      if (_oa_core_is_default_allowed_extensions($file_extensions)) {
+        $file_extensions = OA_FILE_EXTENSIONS_DEFAULT;
+      }
+      if (_oa_core_is_default_allowed_extensions($current_extensions)) {
+        $instances[$key]['settings']['file_extensions'] = $file_extensions;
+      }
+    }
+  }
+}
+
+/**
+ * Update file field instances when allowed file extensions variable is changed.
+ *
+ * @param $old_extensions string list of previous default extensions to update
+ */
+function oa_core_update_field_instances($old_extensions = '') {
+  $instances = field_info_instances();
+
+  $file_fields = array(
+    'fieldable_panels_pane-basic_file-field_basic_file_file',
+    'field_oa_media');
+  foreach ($instances as $field_instance) {
+    foreach ($field_instance as $bundle) {
+      foreach ($bundle as $fieldname => $instance) {
+        if (in_array($fieldname, $file_fields)) {
+          $current_extensions = $instance['settings']['file_extensions'];
+          $file_extensions = variable_get('file_entity_default_allowed_extensions', OA_FILE_EXTENSIONS_DEFAULT);
+          if (_oa_core_is_default_allowed_extensions($file_extensions)) {
+            $file_extensions = OA_FILE_EXTENSIONS_DEFAULT;
+          }
+          if (($current_extensions == $old_extensions) || _oa_core_is_default_allowed_extensions($current_extensions)) {
+            $instance['settings']['file_extensions'] = $file_extensions;
+            field_update_instance($instance);
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Helper function to rewrite the bootstrap_library Javascript.
+ *
+ * Adds a group and weight to put the Bootstrap Javascript after jQuery but
+ * before jQuery UI.
+ */
+function _oa_core_bootstrap_library_javascript_alter(&$js, $weight) {
+  foreach ($js as $js_file => $options) {
+    // Handle the case where a single file name was used, rather than giving
+    // the file as the key and the options as the value.
+    if (!is_array($options)) {
+      unset($js[$js_file]);
+      $js_file = $options;
+      $options = array();
+    }
+
+    // Make our changes and overwrite.
+    $options['group'] = JS_LIBRARY;
+    $options['weight'] = $weight;
+    $js[$js_file] = $options;
+  }
+}
+
+/**
+ * Implements hook_libraries_info_alter().
+ */
+function oa_core_libraries_info_alter(&$libraries) {
+  if (isset($libraries['bootstrap'])) {
+    // Prevent duplicate bootstrap css since it's already
+    // compiled into our screen.css from compass_bootstrap via oa_basetheme theme.
+    unset($libraries['bootstrap']['files']['css']);
+
+    // Figure out the weight relative to jquery.ui.
+    $jquery_ui_library = drupal_get_library('system', 'ui');
+    $jquery_ui_js = reset($jquery_ui_library['js']);
+    $weight = $jquery_ui_js['weight'] - 1;
+
+    // Adjust the group and weight of Bootstrap's Javascript.
+    _oa_core_bootstrap_library_javascript_alter($libraries['bootstrap']['files']['js'], $weight);
+    _oa_core_bootstrap_library_javascript_alter($libraries['bootstrap']['variants']['js']['files']['js'], $weight);
+  }
+}

@@ -1,0 +1,29 @@
+name = Date iCal
+description = Enables export of iCal feeds using Views, and import of iCal feeds using Feeds.
+package = Date/Time
+php = 5.3
+core = 7.x
+dependencies[] = views (>=7.x-3.5)
+dependencies[] = date_views
+dependencies[] = entity
+dependencies[] = libraries (>=7.x-2.0)
+dependencies[] = date
+dependencies[] = date_api
+
+; Date iCal doesn't actually depend on Feeds, but its iCal import functionality won't be usable without it.
+;dependencies[] = feeds
+
+; Includes for iCal feed export using Views
+files[] = includes/date_ical_plugin_row_ical_entity.inc
+files[] = includes/date_ical_plugin_row_ical_fields.inc
+files[] = includes/date_ical_plugin_style_ical_feed.inc
+
+; Includes for iCal feed import using Feeds
+files[] = includes/DateiCalFeedsParser.inc
+
+; Information added by Drupal.org packaging script on 2016-04-25
+version = "7.x-3.9"
+core = "7.x"
+project = "date_ical"
+datestamp = "1461609737"
+

@@ -1,0 +1,25 @@
+From 4bfb657e809b528990f5ee69982aba66a5301369 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Tue, 25 Apr 2023 16:39:15 -0700
+Subject: [PATCH] Remove another default argument
+
+---
+ fe_block.module | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fe_block.module b/fe_block.module
+index 4674b834..ee378f76 100644
+--- a/fe_block.module
++++ b/fe_block.module
+@@ -781,7 +781,7 @@ function fe_block_boxes_features_export($data, &$export, $module_name = '') {
+ /**
+  * Implements hook_features_export_render().
+  */
+-function fe_block_boxes_features_export_render($module_name = '', $data) {
++function fe_block_boxes_features_export_render($module_name, $data) {
+   ctools_include('export');
+   $component = 'fe_block_boxes';
+   $schema = ctools_export_get_schema($component);
+-- 
+2.34.1
+

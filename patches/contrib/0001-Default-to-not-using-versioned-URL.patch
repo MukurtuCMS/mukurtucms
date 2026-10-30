@@ -1,0 +1,25 @@
+From f5048f1be141590da8320a465f3f833372af57b2 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Fri, 23 Apr 2021 09:28:47 -0700
+Subject: [PATCH] Default to not using versioned URL
+
+---
+ .../scald_soundcloud/php-soundcloud/Services/Soundcloud.php     | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/php-soundcloud/Services/Soundcloud.php b/php-soundcloud/Services/Soundcloud.php
+index f85bdfea..399adbf6 100755
+--- a/php-soundcloud/Services/Soundcloud.php
++++ b/php-soundcloud/Services/Soundcloud.php
+@@ -774,7 +774,7 @@ class Services_Soundcloud
+      *
+      * @access protected
+      */
+-    protected function _buildUrl($path, $params = array(), $includeVersion = true)
++    protected function _buildUrl($path, $params = array(), $includeVersion = false)
+     {
+         if (!$this->_accessToken) {
+             $params['consumer_key'] = $this->_clientId;
+--
+2.19.0.windows.1
+

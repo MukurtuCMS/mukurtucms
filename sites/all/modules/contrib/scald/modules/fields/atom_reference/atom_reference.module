@@ -16,9 +16,12 @@ function atom_reference_library() {
     'version' => '1.x',
     'js' => array(
       $path . '/atom_reference.js' => array(),
+      drupal_get_path('module', 'ctools') . '/js/dropbutton.js' => array(),
     ),
     'css' => array(
       $path . '/atom_reference.css' => array(),
+      drupal_get_path('module', 'ctools') . '/css/dropbutton.css' => array(),
+      drupal_get_path('module', 'ctools') . '/css/button.css' => array(),
     ),
   );
 
@@ -36,7 +39,7 @@ function atom_reference_field_info() {
       'instance_settings' => array(
         'referencable_types' => array(),
       ),
-      'default_widget' => 'textfield',
+      'default_widget' => 'atom_reference_textfield',
       'default_formatter' => 'title',
       'property_type' => 'scald_atom',
     )
@@ -58,7 +61,14 @@ function atom_reference_field_instance_settings_form($field, $instance) {
     '#title' => t('Atom types that can be referenced'),
     '#multiple' => TRUE,
     '#options' => $options,
-    '#default_value' => $instance['settings']['referencable_types']
+    '#default_value' => $instance['settings']['referencable_types'],
+  );
+
+  $allow_override = isset($instance['settings']['allow_override']) ? $instance['settings']['allow_override'] : FALSE;
+  $form['allow_override'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Allow context override'),
+    '#default_value' => $allow_override,
   );
 
   return $form;
@@ -70,6 +80,7 @@ function atom_reference_field_instance_settings_form($field, $instance) {
 function atom_reference_field_views_data($field) {
   $data = field_views_field_default_views_data($field);
   $current_table = _field_sql_storage_tablename($field);
+  $revision_table = _field_sql_storage_revision_tablename($field);
   $column = _field_sql_storage_columnname($field['field_name'], 'sid');
 
   // Relationship: add a relationship for related atom.
@@ -78,6 +89,15 @@ function atom_reference_field_views_data($field) {
     'field' => $column,
     'handler' => 'views_handler_relationship',
     'label' => $data[$current_table][$field['field_name']]['title'],
+    'field_name' => $field['field_name'],
+  );
+
+  // Relationship: add a relationship for revisions.
+  $data[$revision_table][$column]['relationship'] = array(
+    'base' => 'scald_atoms',
+    'field' => $column,
+    'handler' => 'views_handler_relationship',
+    'label' => t('Atom reference item revision from !field_name', array('!field_name' => $field['field_name'])),
     'field_name' => $field['field_name'],
   );
 
@@ -106,6 +126,35 @@ function atom_reference_field_validate($entity_type, $entity, $field, $instance,
 }
 
 /**
+ * Implements hook_field_presave().
+ */
+function atom_reference_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  foreach ($items as $delta => $item) {
+    if (empty($item['sid'])) {
+      continue;
+    }
+
+    $options = array();
+    if (!empty($item['options'])) {
+      $options = unserialize($item['options']);
+    }
+
+    foreach($item as $name => $option) {
+      if ($name == 'sid' || $name == 'options') {
+        continue;
+      }
+      if (!empty($item[$name])) {
+        $options[$name] = $option;
+      }
+      else {
+        unset($options[$name]);
+      }
+    }
+    $items[$delta]['options'] = serialize($options);
+  }
+}
+
+/**
  * Implements hook_field_is_empty().
  */
 function atom_reference_field_is_empty($item, $field) {
@@ -118,15 +167,13 @@ function atom_reference_field_is_empty($item, $field) {
 function atom_reference_field_formatter_info() {
   // Expose all the Scald Contexts as formatters for the Atom Reference field.
   $formatters = array();
-  $contexts = scald_contexts();
+  $contexts = scald_contexts_public();
   foreach ($contexts as $name => $context) {
-    if (empty($context['hidden'])) {
-      $formatters[$name] = array(
-        'label' => $context['title'],
-        'field types' => array('atom_reference'),
-        'settings' => array('link' => 0),
-      );
-    }
+    $formatters[$name] = array(
+      'label' => $context['title'],
+      'field types' => array('atom_reference'),
+      'settings' => array('link' => 0, 'override' => 0),
+    );
   }
 
   return $formatters;
@@ -147,6 +194,14 @@ function atom_reference_field_formatter_settings_form($field, $instance, $view_m
     '#options' => array('no', 'yes'),
   );
 
+  if (isset($instance['settings']['allow_override']) && $instance['settings']['allow_override']) {
+    $element['override'] = array(
+      '#title' => t('Allow context override'),
+      '#type' => 'checkbox',
+      '#default_value' => $settings['override'],
+     );
+  }
+
   return $element;
 }
 
@@ -163,21 +218,13 @@ function atom_reference_field_formatter_settings_summary($field, $instance, $vie
   return $summary;
 }
 
-
 /**
  * Implements hook_field_formatter_view.
  */
-// Patched by Shiraz:
-// For Search Results and Related Items views,
-// 1. Return the first *image* in a scald node, falling back to first video or audio if no image.
-// 2. Show thumbnails instead of player for non-image atoms if exists, otherwise use our default thumbnails according to atom type
 function atom_reference_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
-
   $render_context = $display['type'];
   $contexts = scald_contexts();
   $element = array();
-  $priority_elements = array();
-  $regular_elements = array();
 
   $uri = false;
 
@@ -188,56 +235,24 @@ function atom_reference_field_formatter_view($entity_type, $entity, $field, $ins
 
   if (!empty($contexts[$render_context])) {
     foreach ($items as $delta => $item) {
-      $sid = $item['sid'];
-      $atom = scald_is_registered($sid);
       $options = array();
+      if (!empty($item['options'])) {
+        $options += unserialize($item['options']);
+      }
+      $context = $render_context;
+      if (isset($display['settings']['override']) && $display['settings']['override']
+        && !empty($options['context']) && $options['context'] !== 'use_the_default') {
+        $context = $options['context'];
+      }
+      $sid = $item['sid'];
       if ($uri) {
         $options['link'] = $uri['path'];
       }
-
-      if ($display['type'] <> 'ma_scald_search_results' && $display['type'] <> 'mukurtu_scald_related_items') {
-        $priority_elements[$delta] = array('#markup' => scald_render($sid, $render_context, drupal_json_encode($options)));
-      }
-
-      // Show thumbnails instead of player for non-image atoms if exists, otherwise use our default thumbnails according to atom type
-      else {
-
-        // Scald Atom is Image
-        if ($atom->type == 'image') {
-          $priority_elements[] = array('#markup' => scald_render($sid, $render_context, drupal_json_encode($options)));
-        }
-
-        // Scald Atom is not an image
-        else {
-
-          // Use the atom thumbnail if there is one
-          if (isset($atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'])) {
-            $image_styles = array (
-              'ma_scald_search_results' => 'medium',
-              'mukurtu_scald_related_items' => 'related_items_teaser'
-            );
-            $thumbnail_image = theme_image_style (array (
-              'style_name' => $image_styles[$display['type']],
-              'path' => $atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'],
-            ));
-          }
-          // If no atom thumbnail, use our default thumbnails
-          else {
-            $image_widths = array (
-              'ma_scald_search_results' => '220',
-              'mukurtu_scald_related_items' => '280'
-            );
-            $thumbnail_image = '<img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/default_' . $atom->type . '_thumbnail_' . $image_widths[$display['type']] . '.jpg">';
-          }
-          $regular_elements[] = array('#markup' => l($thumbnail_image, 'node/' . $entity->nid, array('html' => TRUE)));
-        }
-      }
+      $element[$delta] = array('#markup' => scald_render($sid, $context, drupal_json_encode($options)));
     }
   }
 
-  $element = array_merge($priority_elements, $regular_elements);
   return $element;
-
 }
 
 /**
@@ -259,18 +274,25 @@ function atom_reference_field_widget_info() {
  * Implements hook_field_widget_settings_form.
  */
 function atom_reference_field_widget_settings_form($field, $instance) {
-  $context_options = array();
-  foreach (scald_contexts() as $name => $context) {
-    $context_options[$name] = $context['title'];
-  }
-
+  $preview_context = isset($instance['widget']['settings']['context'])
+    ? $instance['widget']['settings']['context'] : variable_get('dnd_context_default', 'sdl_editor_representation');
   $form['context'] = array(
     '#type' => 'select',
-    '#title' => t('Scald context'),
-    '#description' => t('Context used in the field widget. It is not the context used in field display, which is configured separately.'),
-    '#default_value' => $instance['widget']['settings']['context'],
-    '#options' => $context_options,
+    '#title' => t('Preview context'),
+    '#options' => array(),
+    '#default_value' => $preview_context,
+    '#description' => t('Scald preview context to be displayed in the edit form.'),
   );
+
+  $contexts = scald_contexts_public();
+  foreach ($contexts as $name => $context) {
+    // TODO: Atom reference shouldn't need the context to be parsable, there's
+    // nothing converting back and forth between the SAS and the rendered
+    // representation.
+    if (!empty($context['parseable'])) {
+      $form['context']['#options'][$name] = $context['title'];
+    }
+  }
 
   return $form;
 }
@@ -305,7 +327,39 @@ function atom_reference_field_widget_form(&$form, &$form_state, $field, $instanc
   $element['#process'][] = 'atom_reference_field_widget_form_process';
   $element['#attached'] = array('library' => array(array('atom_reference', 'library')));
 
-  return array('sid' => $element);
+  $options = array();
+  if (!empty($items[$delta]['options'])) {
+    $options = unserialize($items[$delta]['options']);
+  }
+
+  $return = array('sid' => $element);
+
+  if (isset($instance['settings']['allow_override']) && $instance['settings']['allow_override']) {
+    $rendering_context = 'use_the_default';
+    if (!empty($options['context'])) {
+      $rendering_context = $options['context'];
+    }
+    $context_element = array(
+      '#type' => 'select',
+      '#title' => t('Representation context'),
+      '#attributes' => array('class' => array('context-select')),
+      '#options' => array(),
+      '#default_value' => $rendering_context,
+      '#description' => t('Scald rendering context used in field display.'),
+    );
+    $context_element['#weight'] = 20;
+
+    $contexts = scald_contexts_public();
+    $context_element['#options']['use_the_default'] = t('Use the default');
+    foreach ($contexts as $name => $context) {
+      if ($name !== 'sdl_library_item') {
+        $context_element['#options'][$name] = $context['title'];
+      }
+    }
+    $return['context'] = $context_element;
+  }
+
+  return $return;
 }
 
 /**
@@ -330,18 +384,29 @@ function atom_reference_field_referenceable_types($instance) {
  * on the fly, depending on the field being filled.
  */
 function atom_reference_field_widget_form_process(&$element) {
-  // Get the default value, and format the placeholder accordingly.
+  // Get the default value, rendering context and format the placeholder accordingly.
+  $preview_context = variable_get('dnd_context_default', 'sdl_editor_representation');
+  if (isset($element['#preview_context'])) {
+    $preview_context = $element['#preview_context'];
+  }
+
   $default = $element['#value'];
   if ($default) {
-    $prefix = '<div class="atom_reference_drop_zone">' . scald_render($default, $element['#preview_context']) .'</div>';
+    $prefix = '<div class="atom_reference_drop_zone" data-rendering-context="' . $preview_context . '">' . scald_render($default, $preview_context) . '</div>';
   }
   else {
     $placeholder = t('Drop a resource from Scald media library here.');
-    $prefix = '<div class="atom_reference_drop_zone"><em>' . $placeholder . '</em></div>';
+    $prefix = '<div class="atom_reference_drop_zone" data-rendering-context="' . $preview_context . '"><em>' . $placeholder . '</em></div>';
   }
   $element['#field_prefix'] = $prefix;
-  return $element;
 
+  if (isset($element['#entity_type']) && module_exists('i18n_field')) {
+    $instance = field_info_instance($element['#entity_type'], $element['#field_name'], $element['#bundle']);
+    $translated_label = i18n_field_translate_property($instance, 'label');
+    $element['#title'] = $translated_label;
+  }
+
+  return $element;
 }
 
 /**
@@ -350,4 +415,104 @@ function atom_reference_field_widget_form_process(&$element) {
 function atom_reference_field_widget_error($element, $error, $form, &$form_state) {
   $name = implode('][', $element['sid']['#array_parents']);
   form_set_error($name, $error['message']);
+}
+
+/**
+ * Provide default field comparison options.
+ */
+function atom_reference_field_diff_default_options($field_type) {
+  return array(
+    'show_id' => 0,
+    'show_type' => 1,
+    'entity_title' => 'Atom',
+  );
+}
+
+/**
+ * Provide a form for setting the field comparison options.
+ */
+function atom_reference_field_diff_options_form($field_type, $settings) {
+  $options_form = array();
+  $options_form['show_id'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show atom id'),
+    '#default_value' => $settings['show_id'],
+  );
+
+  $options_form['show_type'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show atom type'),
+    '#default_value' => $settings['show_type'],
+  );
+
+  $options_form['entity_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('The title to use for the atom entity'),
+    '#default_value' => $settings['entity_title'],
+    '#description' => t('This can be useful if you call Atoms differently on your website, such as Resources.')
+  );
+
+  return $options_form;
+}
+
+/**
+ * Diff field callback for preloading the scald atom entities.
+ */
+function atom_reference_field_diff_view_prepare(&$old_items, &$new_items, $context) {
+  $sids = array();
+  foreach (array_merge_recursive($old_items, $new_items) as $info) {
+    $sids[$info['sid']] = $info['sid'];
+  }
+  $atoms = scald_atom_load_multiple($sids);
+
+  foreach ($old_items as $delta => $info) {
+    $old_items[$delta]['atom'] = isset($atoms[$info['sid']]) ? $atoms[$info['sid']] : NULL;
+  }
+  foreach ($new_items as $delta => $info) {
+    $new_items[$delta]['atom'] = isset($atoms[$info['sid']]) ? $atoms[$info['sid']] : NULL;
+  }
+}
+
+/**
+ * Diff field callback for parsing atom_reference field comparative values.
+ */
+function atom_reference_field_diff_view($items, $context) {
+  $instance = $context['instance'];
+  $settings = $context['settings'];
+
+  $diff_items = array();
+  foreach ($items as $delta => $item) {
+    if (!isset($item['atom'])) {
+      continue;
+    }
+
+    $diff_items[$delta] = $item['atom']->title;
+
+    if ($settings['show_id'] || $settings['show_type']) {
+      $diff_items[$delta] .= ' (';
+    }
+
+    if ($settings['show_type']) {
+      $diff_items[$delta] .= t('!type', array('!type' => ucfirst($item['atom']->type)));
+    }
+
+    if ($settings['show_id']) {
+      if ($settings['show_type']) {
+        $diff_items[$delta] .= ', ';
+      }
+      $diff_items[$delta] .= t(
+        '@entity_name ID: !id',
+        array(
+          '@entity_name' => $settings['entity_title'],
+          '!id' => $item['atom']->sid
+        )
+      );
+    }
+
+    if ($settings['show_id'] || $settings['show_type']) {
+      $diff_items[$delta] .= ')';
+    }
+  }
+
+  return $diff_items;
 }

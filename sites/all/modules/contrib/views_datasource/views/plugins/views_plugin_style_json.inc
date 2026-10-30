@@ -13,31 +13,91 @@ class views_plugin_style_json extends views_plugin_style {
    */
   function option_definition() {
     $options = parent::option_definition();
-    $options['root_object'] = array('default' => 'nodes', 'translatable' => FALSE);
-    $options['top_child_object'] = array('default' => 'node', 'translatable' => FALSE);
-    $options['field_output'] = array('default' => 'normal', 'translatable' => FALSE);
-    $options['plaintext_output'] = array('default' => TRUE, 'translatable' => FALSE);
-    $options['remove_newlines'] = array('default' => NULL, 'translatable' => FALSE);
+    $options['root_object'] = array(
+      'default' => 'nodes',
+      'translatable' => FALSE
+    );
+    $options['top_child_object'] = array(
+      'default' => 'node',
+      'translatable' => FALSE
+    );
+    $options['field_output'] = array(
+      'default' => 'normal',
+      'translatable' => FALSE
+    );
+    $options['plaintext_output'] = array(
+      'default' => TRUE,
+      'translatable' => FALSE
+    );
+    $options['remove_newlines'] = array(
+      'default' => NULL,
+      'translatable' => FALSE
+    );
     $options['format'] = array('default' => 'simple', 'translatable' => FALSE);
-    $options['jsonp_prefix'] = array('default' => NULL, 'translatable' => FALSE);
-    $options['content_type'] = array('default' => 'default', 'translatable' => FALSE);
-    $options['using_views_api_mode'] = array('default' => TRUE, 'translatable' => FALSE);
-    
+    $options['jsonp_prefix'] = array(
+      'default' => NULL,
+      'translatable' => FALSE
+    );
+    $options['content_type'] = array(
+      'default' => 'default',
+      'translatable' => FALSE
+    );
+    $options['using_views_api_mode'] = array(
+      'default' => FALSE,
+      'translatable' => FALSE
+    );
+    $options['translate_labels'] = array(
+      'default' => FALSE,
+      'translatable' => FALSE
+    );
+
     // Encoding options, to be used by json_encode().
-    $options['encoding'] = array('contains' => array(
-      'object_arrays' => array('default' => NULL, 'translatable' => FALSE, 'bitmask' => 'JSON_FORCE_OBJECT'),
-      'numeric_strings' => array('default' => NULL, 'translatable' => FALSE, 'bitmask' => 'JSON_NUMERIC_CHECK'),
-      'bigint_string' =>array('default' => NULL, 'translatable' => FALSE, 'bitmask' => 'JSON_BIGINT_AS_STRING'),
-      'pretty_print' =>array('default' => NULL, 'translatable' => FALSE, 'bitmask' => 'JSON_PRETTY_PRINT'),
-      'unescaped_slashes' => array('default' => NULL, 'translatable' => FALSE, 'bitmask' => 'JSON_UNESCAPED_SLASHES'),
-      'unescaped_unicode' => array('default' => NULL, 'translatable' => FALSE, 'bitmask' => 'JSON_UNESCAPED_UNICODE'),
-      'char_encoding' => array('default' => NULL, 'translatable' => FALSE, 'bitmasks' => array(
-          'JSON_HEX_TAG' => 'JSON_HEX_TAG', 'JSON_HEX_APOS' => 'JSON_HEX_APOS', 'JSON_HEX_QUOT' => 'JSON_HEX_QUOT', 'JSON_HEX_AMP' => 'JSON_HEX_AMP'
-        )
-      ),
-    ));
+    $options['encoding'] = array(
+      'contains' => array(
+        'object_arrays' => array(
+          'default' => NULL,
+          'translatable' => FALSE,
+          'bitmask' => 'JSON_FORCE_OBJECT'
+        ),
+        'numeric_strings' => array(
+          'default' => NULL,
+          'translatable' => FALSE,
+          'bitmask' => 'JSON_NUMERIC_CHECK'
+        ),
+        'bigint_string' => array(
+          'default' => NULL,
+          'translatable' => FALSE,
+          'bitmask' => 'JSON_BIGINT_AS_STRING'
+        ),
+        'pretty_print' => array(
+          'default' => NULL,
+          'translatable' => FALSE,
+          'bitmask' => 'JSON_PRETTY_PRINT'
+        ),
+        'unescaped_slashes' => array(
+          'default' => NULL,
+          'translatable' => FALSE,
+          'bitmask' => 'JSON_UNESCAPED_SLASHES'
+        ),
+        'unescaped_unicode' => array(
+          'default' => NULL,
+          'translatable' => FALSE,
+          'bitmask' => 'JSON_UNESCAPED_UNICODE'
+        ),
+        'char_encoding' => array(
+          'default' => NULL,
+          'translatable' => FALSE,
+          'bitmasks' => array(
+            'JSON_HEX_TAG' => 'JSON_HEX_TAG',
+            'JSON_HEX_APOS' => 'JSON_HEX_APOS',
+            'JSON_HEX_QUOT' => 'JSON_HEX_QUOT',
+            'JSON_HEX_AMP' => 'JSON_HEX_AMP'
+          )
+        ),
+      )
+    );
     // Provide Views a flatted copy of 'encoding' in a format it knows how to save and retrieve user data to.
-    foreach($options['encoding']['contains'] as $key => $encoding_option) {
+    foreach ($options['encoding']['contains'] as $key => $encoding_option) {
       $options[$key] = $encoding_option;
     }
     return $options;
@@ -47,11 +107,38 @@ class views_plugin_style_json extends views_plugin_style {
    * Provide a form for setting options.
    */
   function options_form(&$form, &$form_state) {
+    // Grouping options
+    $options = array('' => t('- None -'));
+    $field_labels = $this->display->handler->get_field_labels(TRUE);
+    $options += $field_labels;
+    // If there are no fields, we can't group on them.
+    if (count($options) > 1) {
+      // This is for backward compability, when there was just a single select form.
+      if (is_string($this->options['grouping'])) {
+        $grouping = $this->options['grouping'];
+        $this->options['grouping'] = array();
+        $this->options['grouping'][0]['field'] = $grouping;
+      }
+      if (isset($this->options['group_rendered']) && is_string($this->options['group_rendered'])) {
+        $this->options['grouping'][0]['rendered'] = $this->options['group_rendered'];
+        unset($this->options['group_rendered']);
+      }
+      $i = 0;
+      $grouping = !empty($this->options['grouping'][$i]) ? $this->options['grouping'][$i] : array();
+      $grouping += array('field' => '', 'rendered' => TRUE, 'rendered_strip' => FALSE);
+      $form['grouping'][$i]['field'] = array(
+        '#type' => 'select',
+        '#title' => t('Grouping field'),
+        '#options' => $options,
+        '#default_value' => $grouping['field'],
+        '#description' => t('You may optionally specify a field by which to group the records. Leave blank to not group.'),
+      );
+    }
     $form['root_object'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Root object name'),
-    '#default_value' => $this->options['root_object'],
-    '#description' => t('The name of the root object in the JSON document. e.g nodes or users or forum_posts'),
+      '#type' => 'textfield',
+      '#title' => t('Root object name'),
+      '#default_value' => $this->options['root_object'],
+      '#description' => t('The name of the root object in the JSON document. e.g nodes or users or forum_posts'),
       //'#process' => array('views_process_dependency'),
       //'#dependency' => array('radios:schema' => array('raw')),
     );
@@ -61,7 +148,7 @@ class views_plugin_style_json extends views_plugin_style {
       '#default_value' => $this->options['top_child_object'],
       '#description' => t('The name of each top-level child object in the JSON document. e.g node or user or forum_post'),
     );
-    $form['field_output']  = array(
+    $form['field_output'] = array(
       '#type' => 'radios',
       '#title' => t('Field output'),
       '#description' => t('For each row in the view, fields can be output as either the field rendered by Views, or by the raw content of the field.'),
@@ -87,6 +174,14 @@ class views_plugin_style_json extends views_plugin_style {
       '#default_value' => $this->options['format'],
       '#description' => t('What object format will be used for JSON output.'),
     );
+
+    // Hide "simple_object" option when view returns more than one row.
+    $pager = $this->view->display_handler->get_option('pager');
+    if ($pager['options']['items_per_page'] != 1) {
+      unset($form['format']['#options']['simple_object']);
+      $form['format']['#default_value'] = 'simple';
+    }
+
     $form['jsonp_prefix'] = array(
       '#type' => 'textfield',
       '#title' => t('JSONP prefix'),
@@ -100,6 +195,7 @@ class views_plugin_style_json extends views_plugin_style {
       '#options' => array(
         'default' => t('Default: application/json'),
         'text/json' => t('text/json'),
+        'application/javascript' => t('application/javascript'),
       ),
       '#default_value' => $this->options['content_type'],
       '#description' => t('The Content-Type header that will be sent with the JSON output.')
@@ -108,9 +204,16 @@ class views_plugin_style_json extends views_plugin_style {
       '#type' => 'checkbox',
       '#title' => t('Views API mode'),
       '#default_value' => $this->options['using_views_api_mode'],
-      '#description' => t('Not using View API mode means the JSON gets output directly and the server ceases normal page processing.  Using it means the server does not cease processing after outputting the JSON.  This allows the Views API to be used with the view without having to prematurely terminate page processing.'),
+      '#description' => t('With Views API mode the JSON will embedded as normal content so normal page processing is used. Leave it unchecked when JSON should be printed directly to the client.'),
     );
-    
+
+    $form['translate_labels'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Translate labels'),
+      '#default_value' => $this->options['translate_labels'],
+      '#description' => t('Allow labels to be translated'),
+    );
+
     // JSON encoding options.
     $form['object_arrays'] = array(
       '#type' => 'checkbox',
@@ -158,14 +261,19 @@ class views_plugin_style_json extends views_plugin_style {
         'JSON_HEX_AMP' => t('Encode ampersand'),
       ),
       '#multiple' => TRUE,
-      '#default_value' => $this->options['json_char_encoding'],
+      '#default_value' => $this->options['char_encoding'],
       '#description' => t('You can combine multiple options.'),
     );
-    
+
     // Only enable options supported by the current PHP version.
-    if(!(PHP_MAJOR_VERSION >= 5 && PHP_MINOR_VERSION >= 4)) {
-      $php5_4_ops = array('bigint_string', 'pretty_print', 'unescaped_slashes', 'unescaped_unicode');
-      foreach($php5_4_ops as $op) {
+    if (!(PHP_MAJOR_VERSION >= 5 && PHP_MINOR_VERSION >= 4)) {
+      $php5_4_ops = array(
+        'bigint_string',
+        'pretty_print',
+        'unescaped_slashes',
+        'unescaped_unicode'
+      );
+      foreach ($php5_4_ops as $op) {
         $form[$op]['#disabled'] = TRUE;
         $form[$op]['#description'] .= ' <b>Requires PHP 5.4 or greater</b>.';
       }
@@ -202,10 +310,17 @@ class views_plugin_style_json extends views_plugin_style {
     $rows = array();
     foreach ($view->result as $count => $row) {
       $view->row_index = $count;
-      $rows[] = _views_json_render_fields($view, $row);
+
+      $field_output = _views_json_render_fields($view, $row);
+      drupal_alter('views_json_render_row', $field_output, $view, $row);
+      $rows[] = $field_output;
     }
     unset($view->row_index);
 
-    return theme($this->theme_functions(), array('view' => $view, 'options' => $options, 'rows' => $rows));
+    return theme($this->theme_functions(), array(
+        'view' => $view,
+        'options' => $options,
+        'rows' => $rows
+      ));
   }
 }

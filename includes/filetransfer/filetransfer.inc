@@ -9,11 +9,13 @@
  * the password should always be asked from the user and never stored. For
  * safety, all methods operate only inside a "jail", by default the Drupal root.
  */
+#[AllowDynamicProperties]
 abstract class FileTransfer {
   protected $username;
   protected $password;
   protected $hostname = 'localhost';
   protected $port;
+  protected $jail;
 
   /**
    * The constructor for the UpdateConnection class. This method is also called
@@ -301,7 +303,7 @@ abstract class FileTransfer {
     $parts = explode('/', $path);
     $chroot = '';
     while (count($parts)) {
-      $check = implode($parts, '/');
+      $check = implode('/', $parts);
       if ($this->isFile($check . '/' . drupal_basename(__FILE__))) {
         // Remove the trailing slash.
         return substr($chroot, 0, -1);
@@ -364,7 +366,7 @@ class FileTransferException extends Exception {
   public $arguments;
 
   function __construct($message, $code = 0, $arguments = array()) {
-    parent::__construct($message, $code);
+    parent::__construct($message, (int) $code);
     $this->arguments = $arguments;
   }
 }
@@ -409,11 +411,13 @@ class SkipDotsRecursiveDirectoryIterator extends RecursiveDirectoryIterator {
     $this->skipdots();
   }
 
+  #[\ReturnTypeWillChange]
   function rewind() {
     parent::rewind();
     $this->skipdots();
   }
 
+  #[\ReturnTypeWillChange]
   function next() {
     parent::next();
     $this->skipdots();

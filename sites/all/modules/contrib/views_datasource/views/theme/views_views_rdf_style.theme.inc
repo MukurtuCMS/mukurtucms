@@ -30,9 +30,9 @@ function template_preprocess_views_views_rdf_style_foaf(&$vars) {
   $root = "feed";
   $plaintext_output = $options["plaintext_output"];
   $vars["content_type"] = ($options['content_type'] == 'default') ? 'application/atom+rdf' : $options['content_type'];
-  $header  = $options["header"];
+  $header = $options["header"];
   if (empty($vars["header"]) || !$vars["header"]) {
-    $vars["title"] = check_plain(($view->get_title() ? $view->get_title(): $view->name));
+    $vars["title"] = check_plain(($view->get_title() ? $view->get_title() : $view->name));
     $vars["id"] = check_url($view->get_url());
     $vars["updated"] = format_date(time(), 'custom', DATE_ATOM);
     $vars["author"] = _views_rdf_format_author($options["author"]);
@@ -58,7 +58,9 @@ function template_preprocess_views_views_rdf_style_foaf(&$vars) {
         }
         else {
           $content = array();
-          foreach ($field->content as $n => $oc) $content[$n] = $plaintext_output ? check_plain(html_entity_decode(strip_tags($oc))) : $oc;
+          foreach ($field->content as $n => $oc) {
+            $content[$n] = $plaintext_output ? check_plain(html_entity_decode(strip_tags($oc))) : $oc;
+          }
           $content = implode(" ", $content);
         }
       }
@@ -69,7 +71,9 @@ function template_preprocess_views_views_rdf_style_foaf(&$vars) {
         }
         else {
           $content = array();
-          foreach ($field->raw as $n => $oc) $content[$n] = $plaintext_output ? check_plain(html_entity_decode(strip_tags($oc))) : $oc;
+          foreach ($field->raw as $n => $oc) {
+            $content[$n] = $plaintext_output ? check_plain(html_entity_decode(strip_tags($oc))) : $oc;
+          }
           $content = implode(" ", $content);
         }
       }
@@ -181,9 +185,9 @@ function template_preprocess_views_views_rdf_style_sioc(&$vars) {
   $base = $view->base_table;
   $plaintext_output = $options["plaintext_output"];
   $vars["content_type"] = ($options['content_type'] == 'default') ? 'application/atom+rdf' : $options['content_type'];
-  $header  = $options["header"];
+  $header = $options["header"];
   if (!$vars["header"]) {
-    $vars["title"] = check_plain(($view->get_title() ? $view->get_title(): $view->name));
+    $vars["title"] = check_plain(($view->get_title() ? $view->get_title() : $view->name));
     $vars["id"] = check_url($view->get_url());
     $vars["updated"] = format_date(time(), 'custom', DATE_ATOM);
     $vars["author"] = _views_rdf_format_author($options["author"]);
@@ -205,11 +209,14 @@ function template_preprocess_views_views_rdf_style_sioc(&$vars) {
           else {
             $label = $plaintext_output ? check_plain(html_entity_decode(strip_tags($field->id))) : $field->id;
           }
-          if (!$field->is_multiple)
+          if (!$field->is_multiple) {
             $content = $plaintext_output ? check_plain(html_entity_decode(strip_tags($field->content))) : $field->content;
+          }
           else {
             $content = array();
-            foreach ($field->content as $n => $oc) $content[$n] = $plaintext_output ? check_plain(html_entity_decode(strip_tags($oc))) : $oc;
+            foreach ($field->content as $n => $oc) {
+              $content[$n] = $plaintext_output ? check_plain(html_entity_decode(strip_tags($oc))) : $oc;
+            }
             $content = implode(" ", $content);
           }
         }
@@ -220,7 +227,9 @@ function template_preprocess_views_views_rdf_style_sioc(&$vars) {
           }
           else {
             $content = array();
-            foreach ($field->raw as $n => $oc) $content[$n] = $plaintext_output ? check_plain(html_entity_decode(strip_tags($oc))) : $oc;
+            foreach ($field->raw as $n => $oc) {
+              $content[$n] = $plaintext_output ? check_plain(html_entity_decode(strip_tags($oc))) : $oc;
+            }
             $content = implode(" ", $content);
           }
         }
@@ -232,7 +241,7 @@ function template_preprocess_views_views_rdf_style_sioc(&$vars) {
           $user["name"] = $content;
           continue;
         }
-        if ((drupal_strtolower($label) == 'mail') ||(drupal_strtolower($label) == 'email') || (drupal_strtolower($label) == 'users_mail') && (!array_key_exists("email", $user))) {
+        if ((drupal_strtolower($label) == 'mail') || (drupal_strtolower($label) == 'email') || (drupal_strtolower($label) == 'users_mail') && (!array_key_exists("email", $user))) {
           $user["mail"] = $content;
           continue;
         }
@@ -311,16 +320,16 @@ function template_preprocess_views_views_rdf_style_sioc(&$vars) {
         }
 
         /* use updatedcommented if no changed*/
-          if (!array_key_exists("changed", $node)) {
-            if ((drupal_strtolower($label) == "updated/commented date")) {
+        if (!array_key_exists("changed", $node)) {
+          if ((drupal_strtolower($label) == "updated/commented date")) {
             $node["changed"] = $content;
             continue;
           }
         }
 
         /* use node_changed if no changed*/
-          if (!array_key_exists("changed", $node)) {
-            if ((drupal_strtolower($label) == "node_changed")) {
+        if (!array_key_exists("changed", $node)) {
+          if ((drupal_strtolower($label) == "node_changed")) {
             $node["changed"] = $content;
             continue;
           }
@@ -389,10 +398,10 @@ function template_preprocess_views_views_rdf_style_sioc(&$vars) {
         }
       }
       if (array_key_exists("uid", $node)) {
-          $user_obj = user_load($node["uid"]);
-          $user["uid"] = $user_obj->uid;
-          $user["name"] = $user_obj->name;
-          $user["mail"] = $user_obj->mail;
+        $user_obj = user_load($node["uid"]);
+        $user["uid"] = $user_obj->uid;
+        $user["name"] = $user_obj->name;
+        $user["mail"] = $user_obj->mail;
       }
       if ($node["id"]) {
         $nodes[$node["id"]] = $node;
@@ -410,6 +419,7 @@ function template_preprocess_views_views_rdf_style_sioc(&$vars) {
   //_views_rdf_debug_stop($users);
 
 }
+
 function _views_rdf_sioc_xml_user_render($user) {
   $xml = "<foaf:Person rdf:about=\"" . url('user/' . $user["uid"], array('absolute' => TRUE)) . "\">\n";
   $xml .= "  <foaf:name>" . $user["name"] . "</foaf:name>\n";
@@ -422,12 +432,15 @@ function _views_rdf_sioc_xml_user_render($user) {
   $xml .= "      <sioc:link rdf:resource=\"" . url('user/' . $user["uid"], array('absolute' => TRUE)) . "\" rdfs:label=\"" . $user["name"] . "\"/>\n";
   $roles = array();
   $roles_query = db_query("SELECT r.name AS name, r.rid AS rid FROM {users_roles} ur, {role} r WHERE ur.uid = %d AND ur.rid = r.rid", $user["uid"]);
-  while ($role = db_fetch_object($roles_query)) $roles[$role->rid] = $role->name;
+  while ($role = db_fetch_object($roles_query)) {
+    $roles[$role->rid] = $role->name;
+  }
   if (count($roles) > 0) {
-    $xml .="      <sioc:has_function>\n";
-    foreach ($roles as $rid => $name)
-    $xml .="        <sioc:Role><rdfs:label><![CDATA[$name]]></rdfs:label></sioc:Role>\n";
-    $xml .="      </sioc:has_function>\n";
+    $xml .= "      <sioc:has_function>\n";
+    foreach ($roles as $rid => $name) {
+      $xml .= "        <sioc:Role><rdfs:label><![CDATA[$name]]></rdfs:label></sioc:Role>\n";
+    }
+    $xml .= "      </sioc:has_function>\n";
   }
   $xml .= "    </sioc:User>\n";
   $xml .= "  </foaf:holdsAccount>\n";
@@ -490,14 +503,18 @@ function _views_rdf_sioc_xml_story_render($nid, $title, $type, $created, $change
 //  }
     $comments .= "  <sioc:has_reply>\n";
     $comments .= "    <sioc:Post rdf:about=\"$node_url#comment-$comment->cid\">\n";
-    if ($comment->subject) $comments .= "      <dc:title>$comment->subject</dc:title>\n";
-    if ($comment->timestamp) $comments .= "      <dc:created>" . format_date($comment->timestamp, 'custom', DATE_ISO8601) . "</dc:created>\n";
+    if ($comment->subject) {
+      $comments .= "      <dc:title>$comment->subject</dc:title>\n";
+    }
+    if ($comment->timestamp) {
+      $comments .= "      <dc:created>" . format_date($comment->timestamp, 'custom', DATE_ISO8601) . "</dc:created>\n";
+    }
     if ($comment->uid) {
       $comments .= "    <sioc:has_creator>\n";
       $comments .= "      <sioc:User>\n";
       $comments .= "        <sioc:name>$comment->registered_name</sioc:name>\n";
       $comments .= "        <sioc:email rdf:resource=\"mailto:$comment->mail\"/>\n";
-      $comments .="         <sioc:link rdf:resource=\"" . url('user/' . $comment->uid, array('absolute' => TRUE)) . "\" rdfs:label=\"$comment->registered_name\"/>\n";
+      $comments .= "         <sioc:link rdf:resource=\"" . url('user/' . $comment->uid, array('absolute' => TRUE)) . "\" rdfs:label=\"$comment->registered_name\"/>\n";
       $comments .= "      </sioc:User>\n";
       $comments .= "    </sioc:has_creator>\n";
     }
@@ -529,9 +546,9 @@ function template_preprocess_views_views_rdf_style_doap(&$vars) {
   $root = "feed";
   $plaintext_output = $options["plaintext_output"];
   $vars["content_type"] = ($options['content_type'] == 'default') ? 'application/atomrdf' : $options['content_type'];
-  $header  = $options["header"];
+  $header = $options["header"];
   if (!$vars["header"]) {
-    $vars["title"] = check_plain(($view->get_title() ? $view->get_title(): $view->name));
+    $vars["title"] = check_plain(($view->get_title() ? $view->get_title() : $view->name));
     $vars["id"] = check_url($view->get_url());
     $vars["updated"] = format_date(time(), 'custom', DATE_ATOM);
     $vars["author"] = _views_rdf_format_author($options["author"]);

@@ -1,0 +1,18 @@
+name = Custom add another translation
+description = Provides i18n field integration for Custom add another module
+package = Multilingual - Internationalization
+core = 7.x
+
+dependencies[] = custom_add_another
+dependencies[] = i18n_field
+
+; Ensure that the i18n module is around for tests.
+test_dependencies[] = i18n
+
+files[] = i18n_custom_add_another.test
+
+; Information added by Drupal.org packaging script on 2021-02-12
+version = "7.x-1.1"
+core = "7.x"
+project = "custom_add_another"
+datestamp = "1613148309"

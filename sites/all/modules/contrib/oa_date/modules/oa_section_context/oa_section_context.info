@@ -1,0 +1,13 @@
+name = Section Session Context
+description = Prepopulate section references from session variable.
+package = Open Atrium
+core = 7.x
+php = 5.1
+
+dependencies[] = oa_core
+
+; Information added by Drupal.org packaging script on 2018-10-18
+version = "7.x-2.91"
+core = "7.x"
+project = "oa_core"
+datestamp = "1539884795"

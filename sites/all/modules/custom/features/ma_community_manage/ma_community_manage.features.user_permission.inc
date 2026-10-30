@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_community_manage.features.user_permission.inc

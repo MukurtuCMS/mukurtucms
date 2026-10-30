@@ -7,9 +7,8 @@ package = Testing
 dependencies[] = geocoder
 dependencies[] = geofield
 
-; Information added by Drupal.org packaging script on 2014-09-21
-version = "7.x-2.3"
+; Information added by Drupal.org packaging script on 2018-10-24
+version = "7.x-2.4"
 core = "7.x"
 project = "geofield"
-datestamp = "1411337638"
-
+datestamp = "1540417984"

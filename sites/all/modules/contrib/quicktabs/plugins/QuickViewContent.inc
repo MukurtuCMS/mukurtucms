@@ -130,7 +130,7 @@ class QuickViewContent extends QuickContent {
           elseif (!$hide_empty) {
             $output['#markup'] = theme('quicktabs_tab_access_denied', array('tab' => $item));
           }
-          if($this->settings['use_title']){
+          if(isset($this->settings['use_title']) && $this->settings['use_title'] > 0){
             $this->title=$view->get_title();
           }
           $view->destroy();

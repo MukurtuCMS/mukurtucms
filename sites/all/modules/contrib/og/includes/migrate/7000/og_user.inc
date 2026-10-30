@@ -7,8 +7,8 @@
 
 class OgMigrateUser extends Migration {
 
-  public function __construct() {
-    parent::__construct();
+  public function __construct($arguments = array()) {
+    parent::__construct($arguments);
 
     $this->description = t('Create user relation to group.');
 

@@ -34,6 +34,18 @@ function feeds_tests_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
+  $items['testing/feeds/nodes.csv'] = array(
+    'page callback' => 'feeds_tests_nodes',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  if (module_exists('rules')) {
+    $items['testing/feeds/trigger-rules-event'] = array(
+      'page callback' => 'feeds_tests_trigger_rules_event',
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+    );
+  }
   return $items;
 }
 
@@ -58,6 +70,109 @@ function feeds_tests_theme() {
       'template' => 'feeds-tests-files-empty',
     ),
   );
+}
+
+/**
+ * Implements hook_node_load().
+ */
+function feeds_tests_node_load($nodes) {
+  // Eventually keep track of nodes that get loaded.
+  if (variable_get('feeds_track_node_loads', FALSE)) {
+    $loads = variable_get('feeds_loaded_nodes', array());
+    $loads = array_merge($loads, array_keys($nodes));
+    variable_set('feeds_loaded_nodes', $loads);
+  }
+}
+
+/**
+ * Implements hook_cron_queue_alter().
+ *
+ * Changes runtime limit for feeds_source_import queue.
+ *
+ * @see FeedsFileFetcherTestCase::testRemoveFileAfterImportInBackground()
+ * @see FeedsFileHTTPTestCase::testImportSourceWithMultipleCronRuns()
+ */
+function feeds_tests_cron_queue_info_alter(&$queues) {
+  $feeds_source_import_queue_time = variable_get('feeds_tests_feeds_source_import_queue_time', FALSE);
+  if ($feeds_source_import_queue_time && isset($queues['feeds_source_import'])) {
+    $queues['feeds_source_import']['time'] = $feeds_source_import_queue_time;
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for form feedsimporter_feeds_form().
+ *
+ * Adds an extra checkbox setting.
+ *
+ * @see feeds_tests_config_defaults()
+ */
+function feeds_tests_form_feedsimporter_feeds_form_alter(&$form, &$form_state) {
+  if (variable_get('feeds_tests_hook_config_defaults', FALSE)) {
+    $config = $form['#configurable']->getConfig();
+
+    $form['feeds_tests_extra_setting'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Extra setting'),
+      '#default_value' => $config['feeds_tests_extra_setting'],
+    );
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for form feedshttpfetcher_feeds_form().
+ *
+ * Adds an extra checkbox setting.
+ *
+ * @see feeds_tests_fetcher_config_defaults()
+ */
+function feeds_tests_form_feedshttpfetcher_feeds_form_alter(&$form, &$form_state) {
+  if (variable_get('feeds_tests_hook_config_defaults', FALSE)) {
+    $config = $form['#configurable']->getConfig();
+
+    $form['feeds_tests_fetcher_extra_setting'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Extra setting'),
+      '#default_value' => $config['feeds_tests_fetcher_extra_setting'],
+    );
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for form feedscsvparser_feeds_form().
+ *
+ * Adds an extra checkbox setting.
+ *
+ * @see feeds_tests_parser_config_defaults()
+ */
+function feeds_tests_form_feedscsvparser_feeds_form_alter(&$form, &$form_state) {
+  if (variable_get('feeds_tests_hook_config_defaults', FALSE)) {
+    $config = $form['#configurable']->getConfig();
+
+    $form['feeds_tests_parser_extra_setting'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Extra setting'),
+      '#default_value' => $config['feeds_tests_parser_extra_setting'],
+    );
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for form feedsnodeprocessor_feeds_form().
+ *
+ * Adds an extra custom setting.
+ *
+ * @see feeds_tests_processor_config_defaults()
+ */
+function feeds_tests_form_feedsnodeprocessor_feeds_form_alter(&$form, &$form_state) {
+  if (variable_get('feeds_tests_hook_config_defaults', FALSE)) {
+    $config = $form['#configurable']->getConfig();
+
+    $form['feeds_tests_processor_extra_setting'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Extra setting'),
+      '#default_value' => $config['feeds_tests_processor_extra_setting'],
+    );
+  }
 }
 
 /**
@@ -152,6 +267,101 @@ function feeds_tests_files_empty() {
   );
   drupal_add_http_header('Content-Type', 'text/plain; charset=utf-8');
   print theme('feeds_tests_files_empty', array('files' => $images));
+}
+
+/**
+ * Page callback. Generates a test feed and simulates last-modified.
+ *
+ * This is used to test the following:
+ * - Ensure that the source is not refetched on a second import when the
+ *   source did not change.
+ * - Ensure that the source *is* refetched on a second import when the
+ *   source *did* change.
+ *
+ * @see FeedsFileHTTPTestCase::testHttpRequestUsingFileCache()
+ * @see FeedsFileHTTPTestCase::testSourceCaching()
+ * @see FeedsFileHTTPTestCase::testChangedSource()
+ * @see FeedsFileHTTPTestCase::testImportSourceWithMultipleCronRuns()
+ */
+function feeds_tests_nodes() {
+  if (variable_get('feeds_tests_nodes_changed', FALSE)) {
+    $file = 'nodes_changes2.csv';
+    $last_modified = strtotime('Sun, 30 Mar 2016 10:19:55 GMT');
+  }
+  else {
+    $file = 'nodes.csv';
+    $last_modified = strtotime('Sun, 19 Nov 1978 05:00:00 GMT');
+  }
+
+  $if_modified_since = isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) ? strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) : FALSE;
+  $if_none_match = isset($_SERVER['HTTP_IF_NONE_MATCH']) ? stripslashes($_SERVER['HTTP_IF_NONE_MATCH']) : FALSE;
+
+  // Set header with last modified date.
+  drupal_add_http_header('Last-Modified', gmdate(DATE_RFC7231, $last_modified));
+
+  // Return 304 not modified if last modified.
+  if ($last_modified == $if_modified_since) {
+    drupal_add_http_header('Status', '304 Not Modified');
+    return;
+  }
+
+  // The following headers force validation of cache:
+  drupal_add_http_header('Expires', $last_modified);
+  drupal_add_http_header('Cache-Control', 'must-revalidate');
+  drupal_add_http_header('Content-Type', 'text/plain; charset=utf-8');
+
+  // Read actual feed from file.
+  $csv = file_get_contents(drupal_get_path('module', 'feeds') . '/tests/feeds/' . $file);
+
+  print $csv;
+}
+
+/**
+ * Implements hook_query_TAG_alter() for tag 'term_access'.
+ */
+function feeds_tests_query_term_access_alter(QueryAlterableInterface $query) {
+  global $user;
+
+  $allowed_user = variable_get('feeds_tests_term_reference_allowed_user', NULL);
+  if (is_null($allowed_user)) {
+    // No allowed user set. Abort.
+    return;
+  }
+
+  // Read meta-data from query, if provided.
+  if (!$account = $query->getMetaData('account')) {
+    $account = $user;
+  }
+
+  // If the current active user is the set user, abort.
+  if ($account->uid == $allowed_user) {
+    return;
+  }
+
+  // If $account can bypass node access, or there are no node access
+  // modules, we don't need to alter the query.
+  if (user_access('bypass node access', $account)) {
+    return;
+  }
+
+  // Disallow any terms.
+  $tables = $query->getTables();
+  foreach ($tables as $talias => $tableinfo) {
+    $table = $tableinfo['table'];
+    if (!($table instanceof SelectQueryInterface) && $table == 'taxonomy_term_data') {
+      $query->condition("$talias.tid", 0);
+    }
+  }
+}
+
+/**
+ * Page callback. Triggers the rules event 'feeds_tests_rules_event'.
+ */
+function feeds_tests_trigger_rules_event() {
+  rules_invoke_event('feeds_tests_rules_event');
+  return array(
+    '#markup' => 'Rules event "feeds_tests_rules_event" triggered.',
+  );
 }
 
 /**
@@ -352,19 +562,70 @@ function feeds_tests_mapper_unique(FeedsSource $source, $entity_type, $bundle, $
 
 /**
  * Implements hook_feeds_after_parse().
- *
- * Empties the list of items to import in case the test says that there are
- * items in there with encoding issues. These items can not be processed during
- * tests without having a test failure because in < PHP 5.4 that would produce
- * the following warning:
- *   htmlspecialchars(): Invalid multibyte sequence in argument
- *
- * @see FeedsCSVParserTestCase::testMbstringExtensionDisabled()
  */
 function feeds_tests_feeds_after_parse(FeedsSource $source, FeedsParserResult $result) {
+  // Empties the list of items to import in case the test says that there are
+  // items in there with encoding issues. These items can not be processed
+  // during tests without having a test failure because in < PHP 5.4 that would
+  // produce the following warning:
+  // > htmlspecialchars(): Invalid multibyte sequence in argument.
+  // @see FeedsCSVParserTestCase::testMbstringExtensionDisabled()
   if (variable_get('feeds_tests_feeds_after_parse_empty_items', FALSE)) {
     // Remove all items. No items will be processed.
     $result->items = array();
+  }
+
+  if ($source->id == 'user_import') {
+    foreach ($result->items as &$item) {
+      if (!empty($item['roles']) && strpos($item['roles'], '|')) {
+        // Convert roles value to multiple values.
+        // @see FeedsCSVtoUsersTest::testRoleTargetWithoutRoleCreation()
+        // @see FeedsCSVtoUsersTest::testRoleTargetWithRoleCreation()
+        // @see FeedsCSVtoUsersTest::testRoleTargetWithAllowedRoles()
+        $item['roles'] = explode('|', $item['roles']);
+      }
+      if (!empty($item['rids']) && strpos($item['rids'], '|')) {
+        // Convert roles value to multiple values.
+        // @see FeedsCSVtoUsersTest::testRoleTargetRids()
+        $item['rids'] = explode('|', $item['rids']);
+      }
+    }
+  }
+
+  // Casts the 'uid' value to a float to ensure float values don't result into
+  // array_flip() warnings when using the value to load an user.
+  // @see FeedsRSStoNodesTest::testUidTargetWithFloat()
+  if (variable_get('feeds_tests_feeds_after_parse_uid_float_value', FALSE)) {
+    foreach ($result->items as &$item) {
+      $item['uid'] = (float) $item['uid'];
+    }
+  }
+
+  // Conditionally set the 'uid' value to the current user.
+  // @see FeedsAccountSwitcherTest
+  if (variable_get('feeds_tests_set_uid_current_user', FALSE)) {
+    foreach ($result->items as &$item) {
+      $item['uid'] = $GLOBALS['user']->uid;
+    }
+  }
+
+  // Conditionally abort the import abruptly.
+  // @see FeedsAccountSwitcherTest
+  if (variable_get('feeds_tests_trigger_import_disruption', FALSE)) {
+    die();
+  }
+}
+
+/**
+ * Implements hook_feeds_after_save().
+ *
+ * @see FeedsFileFetcherTestCase::testRemoveFileAfterImportInBackground()
+ * @see FeedsFileHTTPTestCase::testImportSourceWithMultipleCronRuns()
+ */
+function feeds_tests_feeds_after_save() {
+  $sleep = variable_get('feeds_tests_feeds_after_save_sleep', FALSE);
+  if ($sleep) {
+    sleep($sleep);
   }
 }
 
@@ -373,11 +634,11 @@ function feeds_tests_feeds_after_parse(FeedsSource $source, FeedsParserResult $r
  */
 class FeedsTestsPreprocess {
 
-/**
- * Preprocess callback for test_target.
- *
- * @see feeds_tests_feeds_processor_targets()
- */
+  /**
+   * Preprocess callback for test_target.
+   *
+   * @see feeds_tests_feeds_processor_targets()
+   */
   public static function callback(array $target, array &$mapping) {
     $mapping['required_value'] = TRUE;
   }

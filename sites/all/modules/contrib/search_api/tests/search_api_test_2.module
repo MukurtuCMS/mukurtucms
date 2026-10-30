@@ -1,0 +1,136 @@
+<?php
+
+/**
+ * @file
+ * Provides a second test service and server for testing Search API.
+ */
+
+/**
+ * Implements hook_search_api_service_info().
+ */
+function search_api_test_2_search_api_service_info() {
+  $name = 'search_api_test_service_2';
+  $services[$name] = array(
+    'name' => $name,
+    'description' => 'search_api_test_service_2 description',
+    'class' => 'SearchApiDummyService',
+  );
+  return $services;
+}
+
+/**
+ * Implements hook_default_search_api_server().
+ */
+function search_api_test_2_default_search_api_server() {
+  $id = 'test_server_2';
+  $items[$id] = entity_create('search_api_server', array(
+    'name' => 'Search API test server 2',
+    'machine_name' => $id,
+    'enabled' => 1,
+    'description' => 'A server used for testing.',
+    'class' => 'search_api_test_service_2',
+  ));
+  return $items;
+}
+
+/**
+ * Dummy service for testing.
+ */
+class SearchApiDummyService implements SearchApiServiceInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(\SearchApiServer $server) {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public function configurationForm(array $form, array &$form_state) {
+    return array();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function configurationFormValidate(array $form, array &$values, array &$form_state) {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public function configurationFormSubmit(array $form, array &$values, array &$form_state) {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public function supportsFeature($feature) {
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function viewSettings() {
+    return array();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postCreate() {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postUpdate() {
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preDelete() {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addIndex(SearchApiIndex $index) {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldsUpdated(SearchApiIndex $index) {
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removeIndex($index) {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public function indexItems(SearchApiIndex $index, array $items) {
+    return array();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function deleteItems($ids = 'all', SearchApiIndex $index = NULL) {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public function query(SearchApiIndex $index, $options = array()) {
+    throw new SearchApiException("The dummy service doesn't support queries");
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function search(SearchApiQueryInterface $query) {
+    return array();
+  }
+}

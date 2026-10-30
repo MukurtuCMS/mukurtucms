@@ -10,8 +10,8 @@ class OgMigrateOgur extends Migration {
   /**
    * Override constructor from Migration class.
    */
-  public function __construct() {
-    parent::__construct();
+  public function __construct($arguments = array()) {
+    parent::__construct($arguments);
 
     $this->description = t('Migrate OGUR content from 6 to 7.x-2.x.');
 

@@ -63,7 +63,7 @@ function admin_menu_theme() {
 function admin_menu_menu() {
   // AJAX callback.
   // @see http://drupal.org/project/js
-  $items['js/admin_menu/cache'] = array(
+  $items['js/admin_menu/cache/%'] = array(
     'page callback' => 'admin_menu_js_cache',
     'delivery callback' => 'admin_menu_deliver',
     'access arguments' => array('access administration menu'),
@@ -78,7 +78,7 @@ function admin_menu_menu() {
     'file' => 'system.admin.inc',
     'file path' => drupal_get_path('module', 'system'),
   );
-  $items['admin/config/administration/admin_menu'] = array(
+  $items['admin/config/administration/admin-menu'] = array(
     'title' => 'Administration menu',
     'description' => 'Adjust administration menu settings.',
     'page callback' => 'drupal_get_form',
@@ -87,12 +87,6 @@ function admin_menu_menu() {
     'file' => 'admin_menu.inc',
   );
   // Menu link callbacks.
-  $items['admin_menu/toggle-modules'] = array(
-    'page callback' => 'admin_menu_toggle_modules',
-    'access arguments' => array('administer modules'),
-    'type' => MENU_CALLBACK,
-    'file' => 'admin_menu.inc',
-  );
   $items['admin_menu/flush-cache'] = array(
     'page callback' => 'admin_menu_flush_cache',
     'access arguments' => array('flush caches'),
@@ -217,7 +211,7 @@ function admin_menu_page_build(&$page) {
     // @todo Drupal.behaviors.adminMenuMarginTop is obsolete, but
     //   hook_page_build() does not allow to set a CSS class on the body yet.
     // @see http://drupal.org/node/1473548, http://drupal.org/node/1194528
-    //$page['#attributes']['class'][] = 'admin-menu';
+    // $page['#attributes']['class'][] = 'admin-menu';
   }
   if ($setting = variable_get('admin_menu_position_fixed', 1)) {
     $settings['position_fixed'] = $setting;
@@ -236,7 +230,7 @@ function admin_menu_page_build(&$page) {
   if ($_GET['q'] == 'admin/modules' || strpos($_GET['q'], 'admin/modules/list') === 0) {
     $settings['tweak_modules'] = variable_get('admin_menu_tweak_modules', 0);
   }
-  if ($_GET['q'] == 'admin/people/permissions' || $_GET['q'] == 'admin/people/permissions/list') {
+  if (strpos($_GET['q'], 'admin/people/permissions') === 0) {
     $settings['tweak_permissions'] = variable_get('admin_menu_tweak_permissions', 0);
   }
 
@@ -508,7 +502,6 @@ function admin_menu_output($complete = FALSE) {
 
     // @todo Move the below callbacks into hook_admin_menu_build()
     //   implementations (and $module.admin_menu.inc).
-
     // Add administration menu.
     if (!empty($components['admin_menu.menu']) || $complete) {
       $content['menu'] = admin_menu_links_menu(admin_menu_tree('management'));
@@ -554,7 +547,10 @@ function admin_menu_output($complete = FALSE) {
 
   // Store the new hash for this user.
   if (!empty($_COOKIE['has_js']) && !$complete) {
-    admin_menu_cache_set($cid, md5($content));
+    $cache = cache_get($cid, 'cache_admin_menu');
+    if (!$cache || !isset($cache->data)) {
+      admin_menu_cache_set($cid, md5($content));
+    }
   }
 
   return $content;
@@ -609,11 +605,13 @@ function admin_menu_admin_menu_output_build(&$content) {
  * Implements hook_admin_menu_output_alter().
  */
 function admin_menu_admin_menu_output_alter(&$content) {
-  foreach ($content['menu'] as $key => $link) {
-    // Move local tasks on 'admin' into icon menu.
-    if ($key == 'admin/tasks' || $key == 'admin/index') {
-      $content['icon']['icon'][$key] = $link;
-      unset($content['menu'][$key]);
+  if (!empty($content['menu'])) {
+    foreach ($content['menu'] as $key => $link) {
+      // Move local tasks on 'admin' into icon menu.
+      if ($key == 'admin/tasks' || $key == 'admin/index') {
+        $content['icon']['icon'][$key] = $link;
+        unset($content['menu'][$key]);
+      }
     }
   }
 }
@@ -681,6 +679,13 @@ function theme_admin_menu_links($variables) {
       if (isset($elements[$path]['#options']['query']['destination']) && $elements[$path]['#options']['query']['destination'] == $destination) {
         unset($elements[$path]['#options']['query']['destination']);
         $elements[$path]['#options']['attributes']['class'][] = 'admin-menu-destination';
+      }
+
+      // If the path has an alias replace the href with the alias.
+      if (module_exists('path')) {
+        if ($alias = drupal_get_path_alias($elements[$path]['#href'])) {
+          $elements[$path]['#href'] = $alias;
+        }
       }
 
       $link = l($elements[$path]['#title'], $elements[$path]['#href'], $elements[$path]['#options']);
@@ -757,7 +762,7 @@ function admin_menu_translated_menu_link_alter(&$item, $map) {
     }
   }
 
-  // Don't waste cycles altering items that are not visible
+  // Don't waste cycles altering items that are not visible.
   if (!$item['access']) {
     return;
   }
@@ -801,8 +806,8 @@ function admin_menu_flush_caches($uid = NULL) {
   cache_clear_all($cid, 'cache_menu', TRUE);
   // Flush client-side cache hashes.
   drupal_static_reset('admin_menu_cache_get');
-  // db_table_exists() required for SimpleTest.
-  if (db_table_exists('cache_admin_menu')) {
+  // If cache_admin_menu is not empty, flush it.
+  if (!cache_is_empty('cache_admin_menu')) {
     cache_clear_all(isset($uid) ? $cid : '*', 'cache_admin_menu', TRUE);
   }
 }

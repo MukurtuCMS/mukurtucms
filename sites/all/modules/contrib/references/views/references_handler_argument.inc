@@ -4,12 +4,21 @@
  * @file
  * Provide handler to replace reference with title.
  */
+
+/**
+ * Default class for handler argument.
+ *
+ * @codingStandardsIgnoreStart
+ */
 class references_handler_argument extends views_handler_argument_numeric {
 
   /**
-   *  Use entity title for % placeholders in argument titles.
+   * Use entity title for % placeholders in argument titles.
+   *
+   * @codingStandardsIgnoreStart
    */
-  function title_query() {
+  public function title_query() {
+    // @codingStandardsIgnoreEnd
     // Use the same table and field than those used for summary lists
     // ('name table', 'name field').
     $table_data = views_fetch_data($this->name_table);
@@ -36,4 +45,5 @@ class references_handler_argument extends views_handler_argument_numeric {
 
     return $titles;
   }
+
 }

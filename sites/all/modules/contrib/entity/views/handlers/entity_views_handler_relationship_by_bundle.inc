@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Contains the entity_views_handler_relationship_by_bundle class.
@@ -14,10 +15,12 @@
  * profile type.
  *
  * @see entity_crud_hook_entity_info()
+ *
  * @ingroup views_field_handlers
  */
 class entity_views_handler_relationship_by_bundle extends views_handler_relationship {
-  function option_definition() {
+
+  public function option_definition() {
     $options = parent::option_definition();
     $options['bundle_types'] = array('default' => array());
 
@@ -27,7 +30,7 @@ class entity_views_handler_relationship_by_bundle extends views_handler_relation
   /**
    * Add an entity type option.
    */
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
 
     // Get the entity type and info from the table data for the base on the
@@ -62,7 +65,7 @@ class entity_views_handler_relationship_by_bundle extends views_handler_relation
   /**
    * Make sure only checked bundle types are left.
    */
-  function options_submit(&$form, &$form_state) {
+  public function options_submit(&$form, &$form_state) {
     $form_state['values']['options']['bundle_types'] = array_filter($form_state['values']['options']['bundle_types']);
     parent::options_submit($form, $form_state);
   }
@@ -73,7 +76,7 @@ class entity_views_handler_relationship_by_bundle extends views_handler_relation
    * Mostly the same as the parent method, except we add an extra clause to
    * the join.
    */
-  function query() {
+  public function query() {
     $table_data = views_fetch_data($this->definition['base']);
     $base_field = empty($this->definition['base field']) ? $table_data['table']['base']['field'] : $this->definition['base field'];
     $this->ensure_my_table();
@@ -114,4 +117,5 @@ class entity_views_handler_relationship_by_bundle extends views_handler_relation
     $alias = $def['table'] . '_' . $this->table;
     $this->alias = $this->query->add_relationship($alias, $join, $this->definition['base'], $this->relationship);
   }
+
 }

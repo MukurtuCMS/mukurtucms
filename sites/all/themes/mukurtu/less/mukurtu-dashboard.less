@@ -1,0 +1,55 @@
+#homebox.homebox-mukurtu_dashboard {
+    .portlet-header {
+        .primary-color-link-container;
+
+        .portlet-title {
+            .mukurtu-pane-label;
+            background-image: url(@mukurtu-panel-chevron-down-path);
+            background-repeat: no-repeat;
+            background-position: 95% 50%;
+            background-size: 20px;
+        }
+    }
+
+    .portlet-content {
+        padding: 20px;
+
+        dd {
+            padding-bottom: 20px;
+        }
+    }
+
+    // Basic responsive handling for the dashboard. Doesn't work well, homebox does too much itself client side
+    .homebox-column-wrapper-2,
+    .homebox-column-wrapper-3,
+    .homebox-column-wrapper-4 {
+        width: 100% !important;
+
+        // Display on tablet or above
+        @media (min-width: @screen-sm-min) {
+            width: 50% !important;
+        }
+
+        // Display on tablet or above
+        @media (min-width: @screen-md-min) {
+            width: 33% !important;
+        }
+    }
+}
+
+// Getting Started Guide.
+.mukurtu-getting-started {
+    li {
+        a {
+            font-size: 14px;
+        }
+    }
+	a {
+        .mukurtu-standard-link;
+    }
+}
+
+#block-mukurtu-splash-mukurtu-wizard {
+    padding-top: 20px;
+    margin-bottom: 20px;
+}

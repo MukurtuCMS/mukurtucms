@@ -1,0 +1,13 @@
+name = Views base url
+description = Global views field that provides site's base url
+core = 7.x
+dependencies[] = views
+files[] = includes/views/handlers/views_base_url_handler_base_url.inc
+files[] = tests/views_base_url.test
+
+; Information added by Drupal.org packaging script on 2015-08-08
+version = "7.x-1.2"
+core = "7.x"
+project = "views_base_url"
+datestamp = "1439063940"
+

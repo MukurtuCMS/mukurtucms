@@ -9,6 +9,7 @@ function og_membership_delete_action_info() {
   return array('og_membership_delete_action' => array(
     'type' => 'og_membership',
     'label' => t('Remove from group'),
+    'behavior' => array('deletes_property'),
     'configurable' => FALSE,
   ));
 }

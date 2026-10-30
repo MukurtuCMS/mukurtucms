@@ -57,7 +57,7 @@ function hook_oembedprovider_formats_alter(&$formats) {
  * @return string
  *   Rendered oEmbed response.
  */
-function oembedinline_oembed_resolve_link($url, $options = array()) {
+function hook_oembed_resolve_link($url, $options = array()) {
 
   // If file_entity module is enabled, treat the URL as an uploaded file.
   // Inline is used to defer the rendering of the embedded content until the
@@ -71,7 +71,7 @@ function oembedinline_oembed_resolve_link($url, $options = array()) {
 
   $url = decode_entities($url);
 
-  $element = array();
+  $return = '';
 
   $file = oembed_url_to_file($url);
   $file->override = $options;
@@ -81,10 +81,8 @@ function oembedinline_oembed_resolve_link($url, $options = array()) {
     $macro_params[] = 'type=file';
     $macro_params[] = 'id=' . $file->fid;
     $macro_params[] = 'view_mode=' . $view_mode;
-    $element = array('#markup' => "\r\n" . '[' . implode('|', $macro_params) . ']' . "\r\n");
+    $return = '[' . implode('|', $macro_params) . ']';
   }
-
-  $return = drupal_render($element);
 
   if (empty($return)) {
     $return = $url;

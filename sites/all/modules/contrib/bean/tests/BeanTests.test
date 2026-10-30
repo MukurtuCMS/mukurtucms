@@ -1,0 +1,126 @@
+<?php
+
+/**
+ * @file
+ * Misc tests.
+ */
+
+/**
+ * Basic tests.
+ */
+class BeanTests extends BeanSetup {
+
+  /**
+   * Define this test.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Bean functionality',
+      'description' => 'Test the bean API.',
+      'group' => 'Bean',
+    );
+  }
+
+  /**
+   * Test the bean API.
+   */
+  public function testBeanAPI() {
+    $values = array(
+      'delta' => 'test_bean',
+      'label' => t('Test Bean'),
+      'title' => t('Test Bean'),
+      'type' => $this->plugin_name,
+      'view_mode' => 'default',
+      'data' => array(
+        'test_boolean' => FALSE,
+        'test_string' => t('New String'),
+        'test_array' => array(
+          'test_array_1' => 'new_value',
+        ),
+      ),
+    );
+
+    $bean = bean_create($values);
+    $this->assertTrue(bean_save($bean), t('Bean was saved'));
+
+    $values['label'] = $values['title'] = t('Test Bean 2');
+    $values['delta'] = 'test_bean2';
+    $bean = bean_create($values);
+    $this->assertTrue(bean_save($bean), t('Bean was saved'));
+
+    $beans = array_values(bean_load_multiple(FALSE, array('type' => $this->plugin_name)));
+    $this->assertEqual($beans[0]->label, t('Test Bean'), 'Created and loaded bean.');
+    $this->assertEqual($beans[1]->label, t('Test Bean 2'), 'Created and loaded bean.');
+
+    // Delete the first bean.
+    $delete_id = $beans[0]->bid;
+    bean_delete($beans[0]);
+
+    $bean = $beans[1];
+
+    // Try to load deleted bean.
+    $delete_bean = bean_load($delete_id, TRUE);
+    $this->assertFalse($delete_bean, t('Bean Deleted'));
+
+    // Load by delta.
+    $delta_bean = bean_load_delta('test_bean2', TRUE);
+    $this->assertEqual($delta_bean->identifier(), $bean->identifier(), t('Bean loaded by delta'));
+
+    // Test devel pages.
+    if (module_exists('devel')) {
+      $this->drupalGet("block/{$bean->identifier()}/devel");
+      $this->assertResponse(200, t('Devel load page is viewable'));
+      $this->assertText($bean->label(), t('Devel load page is viewable'));
+
+      $this->drupalGet("block/{$bean->identifier()}/devel/render");
+      $this->assertResponse(200, t('Devel render page is viewable'));
+      $this->assertText($bean->label(), t('Devel render page is viewable'));
+    }
+
+    // Test a bean with an invalid plugin.
+    $values['type'] = 'fake_plugin';
+    $values['delta'] = 'fake_bean_plugin';
+    $bean = bean_create($values);
+    $this->assertTrue(bean_save($bean), t('Bean with invalid type was saved'));
+    $this->assertTrue(bean_load_delta('fake_bean_plugin'), t('Bean with an invalid plugin is loaded'));
+
+    // Test a bean with a plugin with an invalid class.
+    $values['delta'] = 'missing_class';
+    $values['type'] = 'test_no_bean';
+    $bean = bean_create($values);
+    $this->assertTrue(bean_save($bean), t('Bean with a plugin that has an invalid class is saved'));
+    $this->assertTrue(bean_load_delta('missing_class'), t('Bean with a plugin that has an invalid class is loaded'));
+  }
+
+  /**
+   * Tests viewing beans.
+   */
+  function testRendering() {
+    $values = array(
+      'delta' => 'test_bean',
+      'label' => t('Test Bean'),
+      'title' => t('Test Bean'),
+      'type' => $this->plugin_name,
+      'view_mode' => 'default',
+      'data' => array(
+        'test_boolean' => FALSE,
+        'test_string' => t('New String'),
+        'test_array' => array(
+          'test_array_1' => 'new_value',
+        ),
+      ),
+    );
+
+    $bean = bean_create($values);
+    bean_save($bean);
+
+    $this->drupalGet($bean->url());
+    $this->assertResponse(200, t('Bean Page is viewable'));
+    $this->assertText($bean->label(), t('Bean Page is viewable'));
+
+    $this->drupalGet("block/{$bean->identifier()}");
+    $this->assertResponse(200, t('Legacy Bean Page is viewable'));
+    $this->assertText($bean->label(), t('Legacy Bean Page is viewable'));
+  }
+
+}

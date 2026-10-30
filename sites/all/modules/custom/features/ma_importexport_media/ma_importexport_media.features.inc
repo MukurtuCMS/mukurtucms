@@ -7,8 +7,7 @@
 /**
  * Implements hook_ctools_plugin_api().
  */
-function ma_importexport_media_ctools_plugin_api() {
-  list($module, $api) = func_get_args();
+function ma_importexport_media_ctools_plugin_api($module = NULL, $api = NULL) {
   if ($module == "feeds" && $api == "feeds_importer_default") {
     return array("version" => "1");
   }
@@ -17,6 +16,6 @@ function ma_importexport_media_ctools_plugin_api() {
 /**
  * Implements hook_views_api().
  */
-function ma_importexport_media_views_api() {
-  return array("version" => "3.0");
+function ma_importexport_media_views_api($module = NULL, $api = NULL) {
+  return array("api" => "3.0");
 }

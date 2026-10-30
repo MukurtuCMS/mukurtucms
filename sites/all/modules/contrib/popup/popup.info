@@ -11,9 +11,8 @@ files[] = includes/popup.util.inc
 
 configure = admin/config/user-interface/popup
 
-; Information added by Drupal.org packaging script on 2014-07-06
-version = "7.x-1.4"
+; Information added by Drupal.org packaging script on 2019-10-14
+version = "7.x-1.4+6-dev"
 core = "7.x"
 project = "popup"
-datestamp = "1404659328"
-
+datestamp = "1571057587"

@@ -1,0 +1,6 @@
+name = Services field collection
+description = Provides API for Field collection entity
+package = Services
+core = 7.x
+files[] = services_field_collection.inc
+dependencies[] = "services"

@@ -26,7 +26,11 @@
 L.TileLayerQuad = L.TileLayer.extend({
 
   getTileUrl: function(tilePoint) {
-    this._adjustTilePoint(tilePoint);
+
+    if (this._adjustTilePoint) {
+      // For Leaflet 0.7.x
+      this._adjustTilePoint(tilePoint);
+    }
 
     return L.Util.template(this._url, L.extend({
       s: this._getSubdomain(tilePoint),

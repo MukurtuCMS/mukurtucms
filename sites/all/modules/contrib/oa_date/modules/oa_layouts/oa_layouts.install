@@ -1,0 +1,46 @@
+<?php
+/**
+ * @file
+ * Code for install of Open Atrium Layouts feature.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function oa_layouts_install() {
+  oa_layouts_add_variables();
+}
+
+function oa_layouts_add_variables() {
+  $variables = variable_get('variable_realm_list_og', array());
+  if (!in_array('oa_layouts_minipanel_header', $variables)) {
+    $variables[] = 'oa_layouts_minipanel_header';
+  }
+  if (!in_array('oa_layouts_minipanel_footer', $variables)) {
+    $variables[] = 'oa_layouts_minipanel_footer';
+  }
+  variable_set('variable_realm_list_og', $variables);
+}
+
+function oa_layouts_add_variables_site() {
+  $variables = variable_get('variable_realm_list_og', array());
+  if (!in_array('oa_layouts_layout_name', $variables)) {
+    $variables[] = 'oa_layouts_layout_name';
+  }
+  variable_set('variable_realm_list_og', $variables);
+}
+
+/**
+ * Add OG variables for page layout mini panels.
+ */
+function oa_layouts_update_7201() {
+  oa_layouts_add_variables();
+}
+
+/**
+ * Add OG variables for site page layout.
+ */
+function oa_layouts_update_7202() {
+  oa_layouts_add_variables_site();
+}
+

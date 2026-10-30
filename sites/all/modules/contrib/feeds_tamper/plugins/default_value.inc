@@ -33,7 +33,7 @@ function feeds_tamper_default_value_form($importer, $element_key, $settings) {
   return $form;
 }
 
-function feeds_tamper_default_value_callback($source, $item_key, $element_key, &$field, $settings, $source) {
+function feeds_tamper_default_value_callback($result, $item_key, $element_key, &$field, $settings, $source) {
   // Setting a default value.
   if (!empty($settings['only_if_empty']) && !$field) {
     $field = $settings['default_value'];

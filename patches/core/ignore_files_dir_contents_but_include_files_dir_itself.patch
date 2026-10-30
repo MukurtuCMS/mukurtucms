@@ -1,0 +1,11 @@
+diff --git a/.gitignore b/.gitignore
+index baff153..da96836 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -2,5 +2,5 @@
+ sites/*/settings*.php
+
+ # Ignore paths that contain user-generated content.
+-sites/*/files
++# sites/*/files # Mukurtu patch -- we *want* sites/default/files in the rep so the end-user does not need to create it. Instead, we add the files dir into the rep, and add a .gitignore within there so that files within it are ignored but the directory is included.
+ sites/*/private

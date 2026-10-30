@@ -164,6 +164,21 @@ class PagerDefault extends SelectQueryExtender {
     }
     return $this;
   }
+
+  /**
+   * Gets the element ID for this pager query.
+   *
+   * The element is used to differentiate different pager queries on the same
+   * page so that they may be operated independently.
+   *
+   * @return
+   *   Element ID that is used to differentiate between different pager
+   *   queries.
+   */
+  public function getElement() {
+    $this->ensureElement();
+    return $this->element;
+  }
 }
 
 /**
@@ -321,8 +336,18 @@ function theme_pager($variables) {
   $tags = $variables['tags'];
   $element = $variables['element'];
   $parameters = $variables['parameters'];
-  $quantity = $variables['quantity'];
+  $quantity = empty($variables['quantity']) ? 0 : $variables['quantity'];
   global $pager_page_array, $pager_total;
+
+  // Nothing to do if there is no pager.
+  if (!isset($pager_page_array[$element]) || !isset($pager_total[$element])) {
+    return;
+  }
+
+  // Nothing to do if there is only one page.
+  if ($pager_total[$element] <= 1) {
+    return;
+  }
 
   // Calculate various markers within this pager piece:
   // Middle is used to "center" pages around the current page.
@@ -455,6 +480,11 @@ function theme_pager_first($variables) {
   global $pager_page_array;
   $output = '';
 
+  // Nothing to do if there is no pager.
+  if (!isset($pager_page_array[$element])) {
+    return;
+  }
+
   // If we are anywhere but the first page
   if ($pager_page_array[$element] > 0) {
     $output = theme('pager_link', array('text' => $text, 'page_new' => pager_load_array(0, $element, $pager_page_array), 'element' => $element, 'parameters' => $parameters));
@@ -484,6 +514,11 @@ function theme_pager_previous($variables) {
   $parameters = $variables['parameters'];
   global $pager_page_array;
   $output = '';
+
+  // Nothing to do if there is no pager.
+  if (!isset($pager_page_array[$element])) {
+    return;
+  }
 
   // If we are anywhere but the first page
   if ($pager_page_array[$element] > 0) {
@@ -524,6 +559,11 @@ function theme_pager_next($variables) {
   global $pager_page_array, $pager_total;
   $output = '';
 
+  // Nothing to do if there is no pager.
+  if (!isset($pager_page_array[$element]) || !isset($pager_total[$element])) {
+    return;
+  }
+
   // If we are anywhere but the last page
   if ($pager_page_array[$element] < ($pager_total[$element] - 1)) {
     $page_new = pager_load_array($pager_page_array[$element] + $interval, $element, $pager_page_array);
@@ -559,6 +599,11 @@ function theme_pager_last($variables) {
   $parameters = $variables['parameters'];
   global $pager_page_array, $pager_total;
   $output = '';
+
+  // Nothing to do if there is no pager.
+  if (!isset($pager_page_array[$element]) || !isset($pager_total[$element])) {
+    return;
+  }
 
   // If we are anywhere but the last page
   if ($pager_page_array[$element] < ($pager_total[$element] - 1)) {

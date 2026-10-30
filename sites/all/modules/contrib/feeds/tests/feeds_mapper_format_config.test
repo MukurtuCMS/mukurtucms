@@ -10,6 +10,9 @@
  */
 class FeedsMapperFormatConfig extends FeedsMapperTestCase {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Mapper: Text format mapping configuration',
@@ -18,6 +21,9 @@ class FeedsMapperFormatConfig extends FeedsMapperTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp(array('list', 'taxonomy'));
   }

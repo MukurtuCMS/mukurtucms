@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * @file
+ * Scald SoundCloud Installation
+ */
+
+
+
+/**
+ * Implements hook_install().
+ */
+function scald_soundcloud_install() {
+  scald_add_type('audio', 'Audio', 'Audio');
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function scald_soundcloud_uninstall() {
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function scald_soundcloud_requirements($phase) {
+  $requirements = array();
+  if ($phase == 'runtime') {
+    $ok = extension_loaded('curl');
+    $t = get_t();
+    $severity = $ok ? REQUIREMENT_OK : REQUIREMENT_ERROR;
+    $value = $ok ? $t('Enabled') : $t('Disabled');
+    $requirements['scald_soundcloud_curl'] = array(
+      'title' => $t('PHP curl extension'),
+      'value' => $value,
+      'description' => 'SoundCloud PHP library relies on the php curl extension to retrieve data',
+      'severity' => $severity,
+    );
+  }
+
+  return $requirements;
+}
+
+/**
+ * Now that we support SoundCloud sets (playlist)
+ * We need to fix tracks id imported before this change
+ */
+function scald_soundcloud_update_7001() {
+  // Fetch all records with pure numeric IDs and add 'tracks/' in front of the ID
+  db_query("UPDATE {scald_atoms} SET base_id = CONCAT('tracks/', base_id) WHERE provider = 'scald_soundcloud' AND base_id REGEXP '^[0-9]+$'");
+}

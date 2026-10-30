@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * @file
+ * Google Map widget for geofield. For now allow to use a
+ * google map v3 map to input a location. A quick text
+ * input + geocode allow you to specify an address.
+ * You can drag and drop the marker to narrow the position.
+ */
 
 /**
  * Implements hook_menu().
@@ -17,20 +24,21 @@ function geofield_gmap_menu() {
   return $items;
 }
 
-
 /**
- * Implements hook_field_widget_info_alter().
+ * Implements hook_field_widget_info().
  */
-function geofield_gmap_field_widget_info_alter(&$info) {
-  $info['geofield_gmap'] = array(
-    'label' => t('Google Map'),
-    'field types' => array('geofield'),
-    'settings' => array(
-      'map_type' => 'ROADMAP',
-      'confirm_center_marker' => FALSE,
-      'click_to_place_marker' => FALSE,
+function geofield_gmap_field_widget_info() {
+  return array(
+    'geofield_gmap' => array(
+      'label' => t('Google Map'),
+      'field types' => array('geofield'),
+      'settings' => array(
+        'map_type' => 'ROADMAP',
+        'confirm_center_marker' => FALSE,
+        'click_to_place_marker' => FALSE,
+      ),
+      'module' => 'geofield_gmap',
     ),
-    'module' => 'geofield_gmap',
   );
 }
 
@@ -54,8 +62,6 @@ function geofield_gmap_field_widget_form(&$form, &$form_state, $field, $instance
       $settings['click_to_place_marker'] = FALSE;
     }
 
-    drupal_add_library('system', 'ui.autocomplete');
-
     $latlon_value = array(
       'lat' => '',
       'lon' => '',
@@ -66,15 +72,27 @@ function geofield_gmap_field_widget_form(&$form, &$form_state, $field, $instance
     if (isset($items[$delta]['lon'])) {
       $latlon_value['lon'] = floatval($items[$delta]['lon']);
     }
-
+    // Try to fetch data from form state if lon/lat is empty.
+    if (isset($form_state['input'][$field['field_name']][$langcode][$delta]['geom'])) {
+      $latlon_value = $form_state['input'][$field['field_name']][$langcode][$delta]['geom'];
+    }
+    // If we still have empty lat and long, use the field's default values.
+    if (!$latlon_value['lat'] || !$latlon_value['lon']) {
+      if ($default_field_value = field_get_default_value($base['#entity_type'], $base['#bundle'], $field, $instance, $langcode)) {
+        if ($default_geom_value = $default_field_value[0]['geom']) {
+          $latlon_value = $default_geom_value;
+        }
+      }
+    }
     $element['geom'] = array(
       '#type' => 'geofield_latlon',
       '#title' => check_plain($instance['label']),
-      '#description' => check_plain($instance['description']),
+      '#description' => field_filter_xss($instance['description']),
       '#default_value' => $latlon_value,
       '#required' => $instance['required'],
       '#geolocation' => (!empty($settings['html5_geolocation'])) ? $settings['html5_geolocation'] : FALSE,
       '#geofield_gmap_geolocation_override' => (!empty($settings['html5_geolocation'])) ? $settings['html5_geolocation'] : FALSE,
+      '#zoom_level' => (!empty($settings['zoom_level'])) ? $settings['zoom_level'] : 1,
     );
 
     // $element['input_format'] is not a db field, but we use it determine how
@@ -92,12 +110,6 @@ function geofield_gmap_field_widget_form(&$form, &$form_state, $field, $instance
     $element['#gmap_confirm_center_marker'] = $settings['confirm_center_marker'];
     $element['#gmap_click_to_place_marker'] = $settings['click_to_place_marker'];
     $element['#after_build'] = array('geofield_gmap_widget_gmap_afterbuild');
-
-    drupal_add_js('//maps.googleapis.com/maps/api/js?sensor=false', array(
-      'type' => 'external',
-      'preprocess' => FALSE,
-    ));
-
   }
 
   return $element;
@@ -108,9 +120,20 @@ function geofield_gmap_field_widget_form(&$form, &$form_state, $field, $instance
  */
 function geofield_gmap_widget_gmap_afterbuild($element, &$form_state) {
 
+  // Retrieve the Google API Key, if there is one.
+  $api_key = variable_get('geofield_gmap_google_api_key');
+  $api_key_query_param = !empty($api_key) ? '?key=' . $api_key : '';
+
+  // Attach GMAP API and autocomplete library.
+  $element['#attached']['library'][] = array('system', 'ui.autocomplete');
+  $element['#attached']['js'][] = array(
+    'data' => '//maps.googleapis.com/maps/api/js' . $api_key_query_param,
+    'type' => 'external',
+    'preprocess' => FALSE,
+  );
+
   $id = $element['#gmap_id'];
   $gmapid = 'gmap-' . $id;
-
   $element['geom']['lat']['#prefix'] = '<div class="form-item">';
   $element['geom']['lat']['#prefix'] .= '<label>' . t("Geocode address") . '</label><input size="64" id="search-' . $id . '" class="form-text form-autocomplete geofield-gmap-search" type="text"/>';
   $element['geom']['lat']['#prefix'] .= '<div id="' . $gmapid . '" class="geofield-gmap-cnt"></div>';
@@ -121,49 +144,44 @@ function geofield_gmap_widget_gmap_afterbuild($element, &$form_state) {
   $element['geom']['lat']['#prefix'] .= '</div>';
   $element['geom']['lat']['#prefix'] .= '</div>';
 
-  $js = 'geofield_gmap_initialize({';
-  $js .= 'lat: ' . floatval($element['geom']['lat']['#default_value']) . ', ';
-  $js .= 'lng: ' . floatval($element['geom']['lon']['#default_value']) . ', ';
-  $js .= 'latid: "' . $element['geom']['lat']['#id'] . '", ';
-  $js .= 'lngid: "' . $element['geom']['lon']['#id'] . '", ';
-  $js .= 'searchid: "search-' . $id . '", ';
-  $js .= 'mapid: "' . $gmapid . '", ';
-  $js .= 'widget: true, ';
-  $js .= 'map_type: "' . $element['#gmap_map_type'] . '", ';
-  $js .= 'confirm_center_marker: ' . ($element['#gmap_confirm_center_marker'] ? 'true' : 'false') . ', ';
-  $js .= 'click_to_place_marker: ' . ($element['#gmap_click_to_place_marker'] ? 'true' : 'false') . ', ';
-  $js .= '});';
-
-  // $js = 'jQuery(document).ready(function() { ' . $js . ' });';
-  // drupal_add_js($js, array('type' => 'inline', 'scope'=>'footer'));
-  // drupal_add_js does not work.
-  $element['#attached']['js'] = array(
-    $js => array(
-      'type' => 'inline',
-      'scope' => 'footer',
-      'preprocess' => FALSE,
-    ),
+  // Attach JS settings.
+  $element['#attached']['js'][] = array(
+    'data' => array('geofield_gmap' => array(
+      $gmapid => array(
+        'lat' => floatval($element['geom']['lat']['#default_value']),
+        'lng' => floatval($element['geom']['lon']['#default_value']),
+        'zoom' => intval($element['geom']['#zoom_level']),
+        'latid' => $element['geom']['lat']['#id'],
+        'lngid' => $element['geom']['lon']['#id'],
+        'searchid' => 'search-' . $id,
+        'mapid' => $gmapid,
+        'widget' => TRUE,
+        'map_type' => $element['#gmap_map_type'],
+        'confirm_center_marker' => (bool) $element['#gmap_confirm_center_marker'],
+        'click_to_place_marker' => (bool) $element['#gmap_click_to_place_marker'],
+      ),
+    )),
+    'type' => 'setting',
   );
 
   if (isset($element['geom']['#geofield_gmap_geolocation_override']) && $element['geom']['#geofield_gmap_geolocation_override']) {
     // Add override behavior.
-    $element['geom']['#attached']['js'][] = drupal_get_path('module', 'geofield_gmap') . '/geofield_gmap_geolocation_override.js';
-    // Add the map id setting.
-    drupal_add_js(array('geofield_gmap' => array('mapid' => $gmapid)), 'setting');
+    $element['#attached']['js'][] = drupal_get_path('module', 'geofield_gmap') . '/geofield_gmap_geolocation_override.js';
   }
 
   return $element;
 }
 
-function geofield_gmap_widget_gmap_ajax_callback($element, &$form_state) {
-
-}
-
+/**
+ * Helper function: Generate a unique id for the map element.
+ */
 function geofield_gmap_get_id($element, $type = 'id') {
-  switch ($type) {
-    default:
-      return strtr($element['#field_name'] . '-' . $element['#language'] . '-' . $element['#delta'], '_', '-');
-  }
+  $id = array_merge($element['#field_parents'], array(
+    $element['#field_name'],
+    $element['#language'],
+    $element['#delta'],
+  ));
+  return strtr(implode('-', $id), '_', '-');
 }
 
 /**
@@ -195,18 +213,22 @@ function geofield_gmap_field_widget_settings_form($field, $instance) {
       '#default_value' => $settings['map_type'],
       '#options' => array(
         'ROADMAP' => t('Roadmap'),
-        'SATELITE' => t('Satelite'),
+        'SATELLITE' => t('Satellite'),
         'HYBRID' => t('Hybrid'),
         'TERRAIN' => t('Terrain'),
       ),
     );
-
+    $form['zoom_level'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Default zoom level'),
+      '#default_value' => (!empty($settings['zoom_level'])) ? $settings['zoom_level'] : 1,
+      '#required' => FALSE,
+    );
     $form['confirm_center_marker'] = array(
       '#type' => 'checkbox',
       '#title' => t('Confirm center marker'),
       '#default_value' => $settings['confirm_center_marker'],
     );
-
     $form['click_to_place_marker'] = array(
       '#type' => 'checkbox',
       '#title' => t('Click to place marker'),

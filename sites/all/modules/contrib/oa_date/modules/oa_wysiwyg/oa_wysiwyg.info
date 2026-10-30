@@ -1,0 +1,23 @@
+name = Open Atrium WYSIWYG
+description = WYSIWYG configuration variables
+core = 7.x
+package = Open Atrium
+dependencies[] = features_override
+dependencies[] = panopoly_wysiwyg
+features[features_api][] = api:2
+features[features_override_items][] = filter.panopoly_wysiwyg_text
+features[features_override_items][] = wysiwyg.panopoly_wysiwyg_text
+features[features_overrides][] = filter.panopoly_wysiwyg_text.filters|wysiwyg|settings|style_border-1|border
+features[features_overrides][] = filter.panopoly_wysiwyg_text.filters|wysiwyg|settings|style_border-2|border-color
+features[features_overrides][] = filter.panopoly_wysiwyg_text.filters|wysiwyg|settings|style_border-2|border-style
+features[features_overrides][] = filter.panopoly_wysiwyg_text.filters|wysiwyg|settings|style_color|background-color
+features[features_overrides][] = filter.panopoly_wysiwyg_text.filters|wysiwyg|settings|style_list|list-style-type
+features[features_overrides][] = filter.panopoly_wysiwyg_text.filters|wysiwyg|settings|valid_elements
+features[features_overrides][] = wysiwyg.panopoly_wysiwyg_text.settings|buttons|advlist
+features[features_overrides][] = wysiwyg.panopoly_wysiwyg_text.settings|buttons|table
+
+; Information added by Drupal.org packaging script on 2018-10-18
+version = "7.x-2.91"
+core = "7.x"
+project = "oa_core"
+datestamp = "1539884795"

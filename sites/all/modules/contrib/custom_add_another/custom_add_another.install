@@ -1,0 +1,32 @@
+<?php
+
+/**
+ * @file
+ * Contains update functions for Custom add another.
+ */
+
+/**
+ * Update placement of settings in $instance array for i18n_field integration
+ */
+function custom_add_another_update_7101() {
+  $all_instances = field_info_instances();
+  foreach($all_instances as $entity_type => $bundle) {
+    foreach ($bundle as $name => $instances) {
+      foreach ($instances as $instance) {
+        if (isset($instance['settings']['custom_add_another'])) {
+          $instance['custom_add_another'] = $instance['settings']['custom_add_another'];
+          unset($instance['settings']['custom_add_another']);
+          field_update_instance($instance);
+        }
+        if (isset($instance['settings']['custom_remove'])) {
+          $instance['custom_remove'] = $instance['settings']['custom_remove'];
+          unset($instance['settings']['custom_remove']);
+          field_update_instance($instance);
+        }
+      }
+    }
+  }
+
+  return t('Custom add another maintenance tasks finished');
+}
+

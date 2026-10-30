@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_frontpage.views_default.inc
@@ -323,7 +324,6 @@ function ma_frontpage_views_default_views() {
     t('Sort by'),
     t('Asc'),
     t('Desc'),
-    t('Select any filter and click on Apply to see results'),
     t('No results'),
     t('No results found'),
     t('OG membership from node'),

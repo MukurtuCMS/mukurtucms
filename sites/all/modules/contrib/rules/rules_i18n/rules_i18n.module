@@ -5,7 +5,6 @@
  * Rules i18n integration.
  */
 
-
 /**
  * Implements hook_menu().
  */
@@ -17,9 +16,8 @@ function rules_i18n_rules_ui_menu_alter(&$items, $base_path, $base_count) {
     'weight' => -100,
   );
 
-  // For reaction-rules i18n generates the menu items, for the others we provide
-  // further i18n menu items for all other base paths.
-
+  // I18n generates the menu items for reaction rules. For the others,
+  // we provide further i18n menu items for all other base paths.
   if ($base_path != 'admin/config/workflow/rules/reaction') {
 
     $items[$base_path . '/manage/%rules_config/translate'] = array(
@@ -111,7 +109,10 @@ function rules_i18n_rules_config_update($rules_config, $original = NULL) {
  * Implements hook_rules_config_delete().
  */
 function rules_i18n_rules_config_delete($rules_config) {
-  i18n_string_object_remove('rules_config', $rules_config);
+  // Only react on real delete, not revert.
+  if (!$rules_config->hasStatus(ENTITY_IN_CODE)) {
+    i18n_string_object_remove('rules_config', $rules_config);
+  }
 }
 
 /**

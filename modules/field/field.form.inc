@@ -30,7 +30,7 @@
  *   or an empty array to use default values.
  * @param $form
  *   An array representing the form that the editing element will be attached
- *   to. 
+ *   to.
  * @param $form_state
  *   An array containing the current state of the form.
  * @param $get_delta
@@ -82,7 +82,7 @@ function field_default_form($entity_type, $entity, $field, $instance, $langcode,
   }
 
   // If field module handles multiple values for this form element, and we are
-  // displaying an individual element, process the multiple value form.
+  // not displaying an individual element, process the multiple value form.
   if (!isset($get_delta) && field_behaviors_widget('multiple values', $instance) == FIELD_BEHAVIOR_DEFAULT) {
     // Store the entity in the form.
     $form['#entity'] = $entity;
@@ -213,14 +213,25 @@ function field_multiple_value_form($field, $instance, $langcode, $items, &$form,
         '#language' => $langcode,
         '#field_parents' => $parents,
         '#columns' => array_keys($field['columns']),
-        // For multiple fields, title and description are handled by the wrapping table.
-        '#title' => $multiple ? '' : $title,
-        '#description' => $multiple ? '' : $description,
+        '#title' => $title,
+        '#description' => $description,
         // Only the first widget should be required.
         '#required' => $delta == 0 && $instance['required'],
         '#delta' => $delta,
         '#weight' => $delta,
       );
+      // For multiple fields, title and description are handled by the wrapping
+      // table.
+      if ($multiple) {
+        if ($delta == 0) {
+          $element['#title'] = $title;
+        }
+        else {
+          $element['#title'] = t('!title (value @number)', array('@number' => $delta + 1, '!title' => $title));
+        }
+        $element['#title_display'] = 'invisible';
+        $element['#description'] = '';
+      }
       if ($element = $function($form, $form_state, $field, $instance, $langcode, $items, $delta, $element)) {
         // Input field for the delta (drag-n-drop reordering).
         if ($multiple) {

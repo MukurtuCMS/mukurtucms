@@ -1,0 +1,17 @@
+name = Mail Comment Notifications
+description = Integrates Mail Comment and Notifications
+package = "Mail Comment"
+dependencies[] = mailcomment
+dependencies[] = notifications
+core = 7.x
+
+files[] = mailcomment_notifications.module
+files[] = tests/mailcomment_notifications.test
+
+
+; Information added by drupal.org packaging script on 2013-09-20
+version = "7.x-2.4"
+core = "7.x"
+project = "mailcomment"
+datestamp = "1379694483"
+

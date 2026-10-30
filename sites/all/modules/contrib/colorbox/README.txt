@@ -1,13 +1,24 @@
-Drupal colorbox module:
-------------------------
-Maintainers:
-  Fredrik Jonsson (http://drupal.org/user/5546)
-Requires - Drupal 7
-License - GPL (see LICENSE)
+CONTENTS OF THIS FILE
+---------------------
+   
+ * Introduction
+ * Features
+ * Requirements
+ * Installation
+ * Configuration
+ * Use the Views Colorbox Trigger field
+ * Add a custom Colorbox style to your theme
+ * Load images from custom links in a Colorbox
+ * Load content in a Colorbox
+ * Load inline content in a Colorbox
+ * Drush
+ * Image in Colorbox not displayed in Internet Explorer 8
+ * Maintainers
 
 
-Overview:
---------
+INTRODUCTION
+------------
+
 Colorbox is a light-weight, customizable lightbox plugin for jQuery 1.4.3+.
 This module allows for integration of Colorbox into Drupal.
 The jQuery library is a part of Drupal since version 5+.
@@ -19,10 +30,10 @@ overlay above the current page.
 * Colorbox - http://www.jacklmoore.com/colorbox/
 
 
-Features:
+FEATURES:
 ---------
 
-The Colorbox module:
+The Colorbox:
 
 * Excellent integration with Image field and Image styles
 * Choose between a default style and 5 example styles that are included.
@@ -42,39 +53,61 @@ The Colorbox plugin:
 * Released under the MIT License.
 
 
-Installation:
+REQUIREMENTS
 ------------
-1. Download and unpack the Libraries module directory in your modules folder
-   (this will usually be "sites/all/modules/").
-   Link: http://drupal.org/project/libraries
-2. Download and unpack the Colorbox module directory in your modules folder
-   (this will usually be "sites/all/modules/").
-3. Download and unpack the Colorbox plugin in "sites/all/libraries".
+
+This module requires the following modules:
+
+ * Libraries API (https://www.drupal.org/project/libraries)
+
+
+INSTALLATION
+------------
+
+ 1. Download and unpack the Libraries module directory in your modules folder
+    (this will usually be "sites/all/modules/").
+    Link: http://drupal.org/project/libraries
+
+ 2. Download and unpack the Colorbox module directory in your modules folder
+    (this will usually be "sites/all/modules/").
+
+ 3. Download and unpack the Colorbox plugin in "sites/all/libraries".
     Make sure the path to the plugin file becomes:
     "sites/all/libraries/colorbox/jquery.colorbox-min.js"
-   Link: https://github.com/jackmoore/colorbox/archive/1.x.zip
-   Drush users can use the command "drush colorbox-plugin".
-4. Go to "Administer" -> "Modules" and enable the Colorbox module.
+    Link: https://github.com/jackmoore/colorbox/archive/1.x.zip
+    Drush users can use the command "drush colorbox-plugin".
+
+ 4. Go to "Administer" -> "Modules" and enable the Colorbox.
+
+    Install as you would normally install a contributed Drupal module. See:
+    https://drupal.org/documentation/install/modules-themes/modules-7 for
+    further information.
+
+    Note:
+    If you download the Colorbox plugin using the makefile included you should 
+    assurance that unzip command is available on your host.
 
 
-Configuration:
+CONFIGURATION
 -------------
-Go to "Configuration" -> "Media" -> "Colorbox" to find
-all the configuration options.
+
+ * Go to "Configuration" » "Media" » "Colorbox" to find all the configuration
+   options.
 
 
-Use the Views Colorbox Trigger field:
+USE THE VIEWS COLORBOX TRIGGER FIELD
 ------------------------------------
 TODO
 
 
-Add a custom Colorbox style to your theme:
+ADD A CUSTOM COLORBOX STYLE TO YOUR THEME
 ----------------------------------------
 The easiest way is to start with either the default style or one of the
-example styles included in the Colorbox JS library download. Simply copy the entire
-style folder to your theme and rename it to something logical like "mycolorbox".
-Inside that folder are both a .css and .js file, rename both of those as well to match
-your folder name: i.e. "colorbox_mycolorbox.css" and "colorbox_mycolorbox.js"
+example styles included in the Colorbox JS library download. Simply copy the
+entire style folder to your theme and rename it to something logical like
+"mycolorbox". Inside that folder are both a .css and .js file, rename both of
+those as well to  match your folder name: i.e. "colorbox_mycolorbox.css" and
+"colorbox_mycolorbox.js"
 
 Add entries in your theme's .info file for the Colorbox CSS/JS files:
 
@@ -86,14 +119,14 @@ Go to "Configuration" -> "Media" -> "Colorbox" and select "None" under
 Make any CSS adjustments to your "colorbox_mycolorbox.css" file.
 
 
-Load images from custom links in a Colorbox:
+LOAD IMAGES FROM CUSTOM LINKS IN A COLORBOX
 --------------------------------------------
 
 Add the class "colorbox" to the link and point its href attribute to the image
 you want to display in the Colorbox.
 
 
-Load content in a Colorbox:
+LOAD CONTENT IN A COLORBOX
 ---------------------------
 Check the "Enable Colorbox load" option in Colorbox settings.
 
@@ -105,7 +138,7 @@ or "[path]?width=500&height=500" if you don't want an iframe.
 Other modules may activate this for easy Colorbox integration.
 
 
-Load inline content in a Colorbox:
+LOAD INLINE CONTENT IN A COLORBOX
 ----------------------------------
 Check the "Enable Colorbox inline"  option in Colorbox settings.
 
@@ -118,16 +151,20 @@ this "?width=500&height=500&inline=true#id-of-content".
 
 It could e.g. look like this.
 
-<a class="colorbox-inline" href="?width=500&height=500&inline=true#id-of-content">Link to click</a>
+<a class="colorbox-inline" href="?width=500&height=500&inline=true#id-of-content">
+  Link to click
+</a>
 
 <div style="display: none;">
-<div id="id-of-content">What ever content you want to display in a Colorbox.</div>
+  <div id="id-of-content">
+    What ever content you want to display in a Colorbox.
+  </div>
 </div>
 
 Other modules may activate this for easy Colorbox integration.
 
 
-Drush:
+DRUSH
 ------
 A Drush command is provides for easy installation of the Colorbox
 plugin itself.
@@ -139,7 +176,7 @@ It is possible to add another path as an option to the command, but not
 recommended unless you know what you are doing.
 
 
-Image in Colorbox not displayed in Internet Explorer 8:
+IMAGE IN COLORBOX NOT DISPLAYED IN INTERNET EXPLORER 8
 -------------------------------------------------------
 
 If your theme has CSS like this (popular in responsive design):
@@ -155,3 +192,14 @@ The fix is to add this to the theme CSS:
   max-width: none;
 }
 
+
+MAINTAINERS
+-----------
+
+Current maintainers:
+ * Fredrik Jonsson (frjo) - https://www.drupal.org/user/5546
+ * Joe Wheaton (jdwfly) - https://www.drupal.org/user/298179
+ * Renato Gonçalves (RenatoG) - https://www.drupal.org/user/3326031
+ * Sam Becker (Sam152) - https://www.drupal.org/user/1485048
+ * rsmylski - https://www.drupal.org/user/1324348
+ * lsolesen - https://www.drupal.org/user/527206

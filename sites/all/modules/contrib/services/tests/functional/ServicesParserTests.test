@@ -17,14 +17,11 @@ class ServicesParserTests extends ServicesWebTestCase {
   protected $endpoint = NULL;
 
   /**
-   * Implementation of setUp().
+   * {@inheritdoc}
    */
-  public function setUp() {
-    parent::setUp(
-      'ctools',
-      'services',
-      'rest_server'
-    );
+  public function setUp(array $modules = array()) {
+    parent::setUp($modules);
+
     // Set up endpoint with disabled 'application/x-www-form-urlencoded' parser.
     $edit = $this->populateEndpointFAPI() ;
     $endpoint = new stdClass;
@@ -77,6 +74,9 @@ class ServicesParserTests extends ServicesWebTestCase {
       'name' => 'Parser',
       'description' => 'Test the Parser functionality.',
       'group' => 'Services',
+      // The libraries module is required by rest_service, which is used by
+      // ServicesEndpointTests.
+      'dependencies' => array('ctools', 'libraries'),
     );
   }
 

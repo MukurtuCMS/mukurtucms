@@ -6,6 +6,8 @@
 function oembedembedly_admin() {
   $providers = oembedembedly_providers();
   $selections = oembedembedly_default_selected();
+  $types = array();
+  $form = array();
   $form['oembedembedly_providers'] = array(
     '#type' => 'fieldset',
     '#title' => 'Providers',

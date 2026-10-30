@@ -1,0 +1,115 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function ma_scald_schema() {
+  $schema['mukurtu_protocol_map'] = [
+    'description' => 'Mukurtu Protocol Map',
+    'fields' => [
+      'protocol_set_id' => [
+        'description' => 'The ID of the protocol set.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'protocol_set' => [
+        'description' => 'The set of protocols',
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'big',
+      ],
+    ],
+    'primary key' => [
+      'protocol_set_id',
+    ],
+  ];
+
+  $schema['scald_protocol_access'] = [
+    'description' => 'Scald Protocol Access',
+    'fields' => [
+      'sid' => [
+        'description' => 'The ID of the scald atom.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'protocol_set_id' => [
+        'description' => 'The ID of the protocol set',
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ],
+    ],
+  ];
+
+  return $schema;
+}
+
+
+/**
+ * Create the new protocol set database tables.
+ */
+function ma_scald_update_7001(&$sandbox) {
+  $schema = ma_scald_schema();
+  if (!db_table_exists('mukurtu_protocol_map')) {
+    db_create_table('mukurtu_protocol_map', $schema['mukurtu_protocol_map']);
+  }
+
+  if (!db_table_exists('scald_protocol_access')) {
+    db_create_table('scald_protocol_access', $schema['scald_protocol_access']);
+  }
+}
+
+/**
+ * Revert Mukurtu Scald feature.
+ */
+function ma_scald_update_7002(&$sandbox) {
+  // Revert ma_scald so that the new sharing setting fields will be available
+  // to all our scald atom bundles.
+  features_revert_module('ma_scald');
+}
+
+/**
+ * Update all Scald atoms for new protocol system.
+ */
+function ma_scald_update_7003(&$sandbox) {
+  if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['current_sid'] = 0;
+    $sandbox['max'] = db_query('SELECT COUNT(DISTINCT sid) FROM {scald_atoms}')->fetchField();
+  }
+
+  $result = db_select('scald_atoms', 'sa')
+    ->fields('sa', array('sid'))
+    ->condition('sid', $sandbox['current_sid'], '>')
+    ->range(0, 10)
+    ->orderBy('sid', 'ASC')
+    ->execute()->fetchAllAssoc('sid');
+
+  $sids = array_keys($result);
+
+  $atoms = scald_atom_load_multiple($sids);
+  foreach ($atoms as $sid => $atom) {
+    $sandbox['progress']++;
+    $sandbox['current_sid'] = $sid;
+    if (!$atom) {
+      continue;
+    }
+    $entity = entity_metadata_wrapper('scald_atom', $atom);
+
+    // Prior to this update, scald atoms were hardcoded to 'any' implicitly
+    // because we did not include the privacy setting field. Now that we are
+    // adding that field for atoms, set that value explicitly now for all
+    // existing atoms.
+    $entity->field_item_privacy_setting->set('any');
+    try {
+      scald_atom_save($atom);
+    } catch (Exception $e) {
+      drupal_set_message(t('Could not set sharing settings for scald atom @sid', ['@sid' => $atom->sid]));
+    }
+  }
+
+  $sandbox['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
+}

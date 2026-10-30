@@ -6,56 +6,64 @@
  */
 
 /**
- * Implements hook_feeds_processor_targets_alter().
+ * Implements hook_feeds_prevalidate().
  *
- * @see FeedsNodeProcessor::getMappingTargets().
+ * Set the field mode of og reference fields to 'admin' when the 'authorize'
+ * option is not checked.
  */
-function og_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
-  foreach (field_info_instances($entity_type, $bundle_name) as $name => $instance) {
-    $info = field_info_field($name);
-    if ($info['type'] == 'group') {    // Groups audience field
-      $targets[$name] = array(
-        'name' => check_plain($instance['label']),
-        'callback' => 'og_feeds_set_target',
-        'description' => t('The @label field of the node.', array('@label' => $instance['label'])),
-      );
-    }
-  }
-}
-
-/**
- * Callback for mapping. Here is where the actual mapping happens.
- *
- * When the callback is invoked, $target contains the name of the field the
- * user has decided to map to and $value contains the value of the feed item
- * element the user has picked as a source.
- */
-function og_feeds_set_target($source, $entity, $target, $value) {
-  if (empty($value)) {
+function og_feeds_prevalidate(FeedsSource $source, $entity, $item, $entity_id) {
+  // Check if 'authorize' is enabled.
+  $processor_config = $source->importer->processor->getConfig();
+  if (!empty($processor_config['authorize'])) {
+    // Authorize is enabled, so we will not set the 'field_mode'.
     return;
   }
 
-  // Handle non-multiple value fields.
-  if (!is_array($value)) {
-    $value = is_string($value) ? drupal_explode_tags($value) : array($value);
+  $entity_type = $entity->feeds_item->entity_type;
+
+  // Not a real entity.
+  if (!entity_get_info($entity_type)) {
+    return;
   }
 
-  $info = field_info_field($target);
+  // Gather the fields that Feeds is mapping to.
+  $feeds_fields = array();
+  foreach ($source->importer()->processor->getMappings() as $mapping) {
+    list($field) = explode(':', $mapping['target']);
+    $feeds_fields[$field] = TRUE;
+  }
 
-  // Iterate over all values.
-  $i = 0;
-  $field = isset($entity->$target) ? $entity->$target : array();
-  foreach ($value as $v) {
-    if (!is_array($v) && !is_object($v)) {
-      if ($groups = og_field_audience_potential_groups($v, 'equals', NULL, 1)) {
-        $gid = key($groups);
-        $field[LANGUAGE_NONE][$i]['gid'] = $gid;
+  list(, , $bundle) = entity_extract_ids($entity_type, $entity);
+
+  foreach (field_info_instances($entity_type, $bundle) as $instance) {
+    $field_name = $instance['field_name'];
+
+    // Skip fields that Feeds isn't mapping to, and empty fields.
+    if (!isset($feeds_fields[$field_name]) || empty($entity->$field_name) || !is_array($entity->$field_name)) {
+      continue;
+    }
+
+    $info = field_info_field($field_name);
+
+    // Check if the field is an entityreference field.
+    if ($info['type'] != 'entityreference') {
+      // Not an entityreference field. Continue to the next field.
+      continue;
+    }
+
+    // Check if the field is controlled by og.
+    if (empty($info['settings']['handler']) || $info['settings']['handler'] != 'og') {
+      // Not an og reference field. Continue to the next field.
+      continue;
+    }
+
+    // Set 'field_mode' of this og reference to 'admin'.
+    foreach ($entity->$field_name as $language => &$values) {
+      foreach ($values as &$value) {
+        $value['field_mode'] = 'admin';
       }
     }
-    if ($info['cardinality'] == 1) {
-      break;
-    }
-    $i++;
+
   }
-  $entity->{$target} = $field;
+
 }

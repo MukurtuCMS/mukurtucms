@@ -1,0 +1,271 @@
+<?php
+
+function mukurtu_theme_blocks_block_info() {
+    $blocks['mukurtu_theme_footer'] = array(
+        'info' => t('Mukurtu Theme Default Footer'),
+    );
+    $blocks['mukurtu_theme_frontpage_hero'] = array(
+        'info' => t('Mukurtu Theme Frontpage Hero Image'),
+    );
+
+    return $blocks;
+}
+
+function mukurtu_theme_blocks_block_view($delta = '') {
+    switch($delta) {
+    case 'mukurtu_theme_footer':
+        return _mukurtu_theme_blocks_footer();
+    case 'mukurtu_theme_frontpage_hero':
+        return _mukurtu_theme_blocks_hero();
+    }
+}
+
+function mukurtu_theme_blocks_block_configure($delta = '') {
+    $form = array();
+
+    switch($delta) {
+    case 'mukurtu_theme_footer':
+        break;
+    case 'mukurtu_theme_frontpage_hero':
+        // Layout
+        $form['mukurtu_theme_block_frontpage_layout'] = array(
+            '#type' => 'radios',
+            '#title' => t('Layout'),
+            '#default_value' => variable_get('mukurtu_theme_block_frontpage_layout', 'large-hero'),
+            '#options' => array('large-hero' => 'Large hero image with welcome message, underneath', 'hero-side-by-side' => 'Smaller hero image with welcome message, side by side')
+        );
+
+        // Image
+        $form['mukurtu_theme_block_frontpage_hero_image'] = array(
+            '#title' => t('Hero Image'),
+            '#type' => 'managed_file',
+            '#description' => t('Select an image for the frontpage.'),
+            '#default_value' => variable_get('mukurtu_theme_block_frontpage_hero_image'),
+            '#upload_location' => 'public://mukurtu/',
+            '#upload_validators' => array(
+                'file_validate_extensions' => array('png jpg jpeg'),
+            ),
+        );
+
+        // Title
+        $form['mukurtu_theme_block_frontpage_title'] = array(
+            '#type' => 'textfield',
+            '#title' => t('Title'),
+            '#default_value' => variable_get('mukurtu_theme_block_frontpage_title', variable_get('site_slogan', '')),
+            '#description'   => t("The site title for the hero image/welcome message."),
+        );
+
+        // Welcome text
+        $form['mukurtu_theme_block_frontpage_welcome'] = array(
+            '#type' => 'textarea',
+            '#title' => t('Welcome Message'),
+            '#default_value' => variable_get('mukurtu_theme_block_frontpage_welcome', ''),
+            '#description'   => t("The text for the welcome message."),
+        );
+
+        $form['mukurtu_theme_block_frontpage_media'] = array(
+            '#type' => 'atom_reference',
+            '#title' => t('Welcome Media'),
+            '#default_value' => variable_get('mukurtu_theme_block_frontpage_media', ''),
+            '#description'   => t("An audio or video file for the welcome message."),
+        );
+        break;
+    }
+    return $form;
+}
+
+function mukurtu_theme_blocks_block_save($delta = '', $edit = array()) {
+    switch($delta) {
+    case 'mukurtu_theme_footer':
+        break;
+    case 'mukurtu_theme_frontpage_hero':
+        // Layout
+        variable_set('mukurtu_theme_block_frontpage_layout', $edit['mukurtu_theme_block_frontpage_layout']);
+
+        // Image
+        $block = block_load('mukurtu_theme_blocks', $delta);
+
+        // Remove reference to old file
+        $old_image = variable_get('mukurtu_theme_block_frontpage_hero_image');
+        $file = file_load($old_image);
+        if($file) {
+            file_usage_delete($file, 'mukurtu_theme_blocks', 'block', $block->bid);
+        }
+
+        if($edit['mukurtu_theme_block_frontpage_hero_image'] != 0) {
+            // Add reference to new file
+            $file = file_load($edit['mukurtu_theme_block_frontpage_hero_image']);
+            $file->status = FILE_STATUS_PERMANENT;
+            file_save($file);
+            file_usage_add($file, 'mukurtu_theme_blocks', 'block', $block->bid);
+
+            // Set new image value
+            variable_set('mukurtu_theme_block_frontpage_hero_image', $file->fid);
+        } else {
+            // File was removed
+            variable_set('mukurtu_theme_block_frontpage_hero_image', '');
+        }
+
+        // Title
+        variable_set('mukurtu_theme_block_frontpage_title', $edit['mukurtu_theme_block_frontpage_title']);
+
+        // Welcome
+        variable_set('mukurtu_theme_block_frontpage_welcome', $edit['mukurtu_theme_block_frontpage_welcome']);
+        break;
+    }
+}
+
+function _mukurtu_theme_blocks_footer() {
+    $block['content'] = '<div class="contact">';
+
+    // Email contact
+    $email_us_text = t(theme_get_setting('mukurtu_theme_email_us_message'));
+    $email_contact_address = theme_get_setting('mukurtu_theme_contact_email');
+    if ($email_contact_address == '') {
+        $email_contact_address = variable_get('site_mail', '');
+    }
+    if($email_contact_address != '') {
+        $email_contact_address = l($email_contact_address, 'mailto:' . $email_contact_address);
+        if($email_us_text != '') {
+            $block['content'] .= "<div class='contactus col-md-4 col-md-push-4 col-sm-6 col-xs-12'><span class='emailicon'>$email_us_text $email_contact_address</span></div>";
+        }
+    }
+
+    // Twitter
+    $twitter_message = theme_get_setting('mukurtu_theme_twitter_message');
+    $twitter1 = theme_get_setting('mukurtu_theme_twitter1');
+    $twitter2 = theme_get_setting('mukurtu_theme_twitter2');
+    $twitter_url = 'https://twitter.com/';
+
+    $first_twitter = TRUE;
+    foreach(array($twitter1, $twitter2) as $twitter) {
+        if($twitter != '') {
+            // Create wrapper div
+            if($first_twitter) {
+                $first_twitter = FALSE;
+                $block['content'] .= '<div class="twitter-wrapper col-md-4 col-md-push-4 col-sm-6 col-xs-12">';
+                $firstclass =  " twittericon";
+            } else {
+                $firstclass = "";
+                $twitter_message = "";
+            }
+            $twitter_link = l('@' . $twitter, $twitter_url . $twitter);
+            $block['content'] .= "<div class='twitter$firstclass'>$twitter_message $twitter_link</div>";
+        }
+    }
+
+    // If not using twitter, keep the div structure so we don't need different CSS.
+    if ($twitter1 == '' && $twitter2 == '') {
+        $block['content'] .= '<div class="twitter-wrapper col-md-4 col-md-push-4 col-sm-6 col-xs-12"></div>';
+    }
+
+    // Close twitter div
+    if(!$first_twitter) {
+        $block['content'] .= '</div>';
+    }
+
+    // Close contact div
+    $block['content'] .= "</div>";
+
+    // Copyright
+    $year = date("Y");
+    $copyright = theme_get_setting('mukurtu_theme_copyright');
+    if ($copyright == '') {
+        $copyright = '© [year] ' . variable_get('site_name', '');
+    }
+    $copyright = str_replace('[year]', $year, $copyright);
+
+    if($copyright != '') {
+        $block['content'] .= "<div class='copyright col-md-pull-8 col-md-4 col-xs-12'>$copyright</div>";
+    }
+
+    return $block;
+}
+
+function _mukurtu_theme_blocks_hero() {
+    // Layout
+    $layout = variable_get('mukurtu_theme_block_frontpage_layout', 'large-hero');
+
+    // Title
+    $slogan = variable_get('mukurtu_theme_block_frontpage_title', variable_get('site_slogan', ''));
+
+    // Welcome
+    $welcome = variable_get('mukurtu_theme_block_frontpage_welcome', '');
+
+    // Default image
+    $image_url = drupal_get_path('theme', 'mukurtu') . '/images/frontpage-hero.png';
+
+    // Load custom image, if specified
+    $hero_image_fid = variable_get('mukurtu_theme_block_frontpage_hero_image');
+
+    if($hero_image_fid) {
+        $hero_image = file_load($hero_image_fid);
+        if(isset($hero_image->uri)) {
+            $image_url = file_create_url($hero_image->uri);
+        }
+    }
+
+    // Build markup
+    $image_markup = theme_image(array(
+        'path' => $image_url,
+        'alt' => t('Front Page Hero Image'),
+        'attributes' => array('class' => array('img-responsive')),
+    ));
+
+    $hero_image = array(
+        '#prefix' => '<div class="hero-image">',
+        '#suffix' => '</div>',
+        'hero-image' => array(
+            '#type' => 'markup',
+            '#markup' => $image_markup
+        ),
+    );
+
+    $hero_title = array(
+        '#prefix' => '<div class="hero-text">',
+        '#suffix' => '</div>',
+        '#type' => 'markup',
+        '#markup' => $slogan,
+    );
+
+    $welcome = array(
+        '#prefix' => '<div class="hero-welcome">',
+        '#suffix' => '</div>',
+        '#type' => 'markup',
+        '#markup' => $welcome,
+    );
+
+    $block = array();
+
+    switch($layout) {
+    case 'hero-side-by-side':
+        $block['content'] = array(
+            '#prefix' => '<div class="' . $layout . '">',
+            '#suffix' => '</div>',
+        );
+        $block['content']['left'] = array(
+            '#prefix' => '<div class="hero-left col-sm-6">',
+            '#suffix' => '</div>',
+            'hero-image' => $hero_image,
+        );
+        $block['content']['right'] = array(
+             '#prefix' => '<div class="hero-right col-sm-6">',
+             '#suffix' => '</div>',
+             'hero-title' => $hero_title,
+             'welcome' => $welcome,
+        );
+        break;
+    case 'large-hero':
+        $block['content'] = array(
+            '#prefix' => '<div class="' . $layout . '">',
+            '#suffix' => '</div>',
+             'hero-image' => $hero_image,
+             'hero-title' => $hero_title,
+             'hero-welcome' => $welcome,
+        );
+
+        break;
+    }
+
+    return $block;
+}

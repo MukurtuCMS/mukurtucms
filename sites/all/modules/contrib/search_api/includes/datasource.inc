@@ -22,7 +22,7 @@
 interface SearchApiDataSourceControllerInterface {
 
   /**
-   * Constructs a new data source controller.
+   * Constructs an SearchApiDataSourceControllerInterface object.
    *
    * @param string $type
    *   The item type for which this controller is created.
@@ -47,7 +47,7 @@ interface SearchApiDataSourceControllerInterface {
    * Loads items of the type of this data source controller.
    *
    * @param array $ids
-   *   The IDs of the items to laod.
+   *   The IDs of the items to load.
    *
    * @return array
    *   The loaded items, keyed by ID.
@@ -158,6 +158,10 @@ interface SearchApiDataSourceControllerInterface {
    * @param SearchApiIndex[] $indexes
    *   The indexes for which items should be tracked.
    *
+   * @return SearchApiIndex[]|null
+   *   All indexes for which any items were added; or NULL if items were added
+   *   for all of them.
+   *
    * @throws SearchApiDataSourceException
    *   If any error state was encountered.
    */
@@ -178,6 +182,10 @@ interface SearchApiDataSourceControllerInterface {
    *   (deprecated) If set to TRUE, also change the status of queued items.
    *   The concept of queued items will be removed in the Drupal 8 version of
    *   this module.
+   *
+   * @return SearchApiIndex[]|null
+   *   All indexes for which any items were updated; or NULL if items were
+   *   updated for all of them.
    *
    * @throws SearchApiDataSourceException
    *   If any error state was encountered.
@@ -226,6 +234,10 @@ interface SearchApiDataSourceControllerInterface {
    *   The IDs of the removed items.
    * @param SearchApiIndex[] $indexes
    *   The indexes for which the deletions should be tracked.
+   *
+   * @return SearchApiIndex[]|null
+   *   All indexes for which any items were deleted; or NULL if items were
+   *   deleted for all of them.
    *
    * @throws SearchApiDataSourceException
    *   If any error state was encountered.
@@ -280,6 +292,69 @@ interface SearchApiDataSourceControllerInterface {
    *   If any error state was encountered.
    */
   public function getEntityType();
+
+  /**
+   * Form constructor for configuring the datasource for a given index.
+   *
+   * @param array $form
+   *   The form returned by configurationForm().
+   * @param array $form_state
+   *   The form state. $form_state['index'] will contain the edited index. If
+   *   this key is empty, then a new index is being created. In case of an edit,
+   *   $form_state['index']->options['datasource'] contains the previous
+   *   settings for the datasource.
+   *
+   * @return array|false
+   *   A form array for configuring this callback, or FALSE if no configuration
+   *   is possible.
+   */
+  public function configurationForm(array $form, array &$form_state);
+
+  /**
+   * Validation callback for the form returned by configurationForm().
+   *
+   * This method will only be called if that form was non-empty.
+   *
+   * @param array $form
+   *   The form returned by configurationForm().
+   * @param array $values
+   *   The part of the $form_state['values'] array corresponding to this form.
+   * @param array $form_state
+   *   The complete form state.
+   */
+  public function configurationFormValidate(array $form, array &$values, array &$form_state);
+
+  /**
+   * Submit callback for the form returned by configurationForm().
+   *
+   * This method will only be called if that form was non-empty.
+   *
+   * Any necessary changes to the submitted values should be made, afterwards
+   * they will automatically be stored as the index's "datasource" options. The
+   * method can also be used by the datasource controller to react to the
+   * possible change in its settings.
+   *
+   * @param array $form
+   *   The form returned by configurationForm().
+   * @param array $values
+   *   The part of the $form_state['values'] array corresponding to this form.
+   * @param array $form_state
+   *   The complete form state.
+   */
+  public function configurationFormSubmit(array $form, array &$values, array &$form_state);
+
+  /**
+   * Returns a summary of an index's current datasource configuration.
+   *
+   * @param SearchApiIndex $index
+   *   The index whose datasource configuration should be summarized.
+   *
+   * @return string|null
+   *   A translated string describing the index's current datasource
+   *   configuration. Or NULL, if there is no configuration (or no description
+   *   is available).
+   */
+  public function getConfigurationSummary(SearchApiIndex $index);
 
 }
 
@@ -517,8 +592,12 @@ abstract class SearchApiAbstractDataSourceController implements SearchApiDataSou
    * {@inheritdoc}
    */
   public function trackItemInsert(array $item_ids, array $indexes) {
-    if (!$this->table) {
+    if (!$this->table || $item_ids === array()) {
       return;
+    }
+
+    foreach ($indexes as $index) {
+      $this->checkIndex($index);
     }
 
     // Since large amounts of items can overstrain the database, only add items
@@ -526,9 +605,22 @@ abstract class SearchApiAbstractDataSourceController implements SearchApiDataSou
     foreach (array_chunk($item_ids, 1000) as $chunk) {
       $insert = db_insert($this->table)
         ->fields(array($this->itemIdColumn, $this->indexIdColumn, $this->changedColumn));
-      foreach ($chunk as $item_id) {
-        foreach ($indexes as $index) {
-          $this->checkIndex($index);
+
+      foreach ($indexes as $index) {
+        // We have to make sure we don't try to insert duplicate items.
+        $select = db_select($this->table, 't');
+        $select->addField('t', $this->itemIdColumn);
+        $select->condition($this->indexIdColumn, $index->id);
+        $select->condition($this->itemIdColumn, $chunk, 'IN');
+        $existing = $select
+          ->execute()
+          ->fetchCol();
+        $existing = array_flip($existing);
+
+        foreach ($chunk as $item_id) {
+          if (isset($existing[$item_id])) {
+            continue;
+          }
           $insert->values(array(
             $this->itemIdColumn => $item_id,
             $this->indexIdColumn => $index->id,
@@ -536,7 +628,22 @@ abstract class SearchApiAbstractDataSourceController implements SearchApiDataSou
           ));
         }
       }
-      $insert->execute();
+      try {
+        $insert->execute();
+      }
+      catch (Exception $e) {
+        $tmp = array_slice($item_ids, 0, 10);
+        $item_ids_string = '"' . implode('", "', $tmp) . '"';
+        $index_names = array();
+        foreach ($indexes as $index) {
+          $index_names[] = $index->name;
+        }
+        $vars = array(
+          '%indexes' => implode(', ', $index_names),
+          '@item_ids' => $item_ids_string,
+        );
+        watchdog_exception('search_api', $e, '%type while tracking item inserts (IDs: @item_ids) on index(es) %indexes: !message in %function (line %line of %file).', $vars);
+      }
     }
   }
 
@@ -544,24 +651,58 @@ abstract class SearchApiAbstractDataSourceController implements SearchApiDataSou
    * {@inheritdoc}
    */
   public function trackItemChange($item_ids, array $indexes, $dequeue = FALSE) {
-    if (!$this->table) {
-      return;
+    if (!$this->table || $item_ids === array()) {
+      return NULL;
     }
-    $index_ids = array();
+
+    $indexes_by_id = array();
     foreach ($indexes as $index) {
       $this->checkIndex($index);
-      $index_ids[] = $index->id;
+      $update = db_update($this->table)
+        ->fields(array(
+          $this->changedColumn => REQUEST_TIME,
+        ))
+        ->condition($this->indexIdColumn, $index->id)
+        ->condition($this->changedColumn, 0, $dequeue ? '<=' : '=');
+      if ($item_ids !== FALSE) {
+        $update->condition($this->itemIdColumn, $item_ids, 'IN');
+      }
+      try {
+        $update->execute();
+        $indexes_by_id[$index->id] = $index;
+      }
+      catch (Exception $e) {
+        if ($item_ids === FALSE) {
+          $item_ids_string = t('all');
+        }
+        else {
+          $tmp = array_slice($item_ids, 0, 10);
+          $item_ids_string = '"' . implode('", "', $tmp) . '"';
+        }
+        $vars = array(
+          '%index' => $index->name,
+          '@item_ids' => $item_ids_string,
+        );
+        watchdog_exception('search_api', $e, '%type while tracking item updates (IDs: @item_ids) on index %index: !message in %function (line %line of %file).', $vars);
+      }
     }
-    $update = db_update($this->table)
-      ->fields(array(
-        $this->changedColumn => REQUEST_TIME,
-      ))
-      ->condition($this->indexIdColumn, $index_ids, 'IN')
-      ->condition($this->changedColumn, 0, $dequeue ? '<=' : '=');
+
+    // Determine and return the indexes with any changed items. If $item_ids is
+    // FALSE, all items are marked as changed and, thus, all indexes will be
+    // affected (unless they don't have any items, but no real point in treating
+    // that special case).
     if ($item_ids !== FALSE) {
-      $update->condition($this->itemIdColumn, $item_ids, 'IN');
+      $indexes_with_items = db_select($this->table, 't')
+        ->fields('t', array($this->indexIdColumn))
+        ->distinct()
+        ->condition($this->indexIdColumn, array_keys($indexes_by_id), 'IN')
+        ->condition($this->itemIdColumn, $item_ids, 'IN')
+        ->execute()
+        ->fetchCol();
+      return array_intersect_key($indexes_by_id, array_flip($indexes_with_items));
     }
-    $update->execute();
+
+    return NULL;
   }
 
   /**
@@ -569,7 +710,7 @@ abstract class SearchApiAbstractDataSourceController implements SearchApiDataSou
    */
   public function trackItemQueued($item_ids, SearchApiIndex $index) {
     $this->checkIndex($index);
-    if (!$this->table) {
+    if (!$this->table || $item_ids === array()) {
       return;
     }
     $update = db_update($this->table)
@@ -587,35 +728,62 @@ abstract class SearchApiAbstractDataSourceController implements SearchApiDataSou
    * {@inheritdoc}
    */
   public function trackItemIndexed(array $item_ids, SearchApiIndex $index) {
-    if (!$this->table) {
+    if (!$this->table || $item_ids === array()) {
       return;
     }
     $this->checkIndex($index);
-    db_update($this->table)
-      ->fields(array(
-        $this->changedColumn => 0,
-      ))
-      ->condition($this->itemIdColumn, $item_ids, 'IN')
-      ->condition($this->indexIdColumn, $index->id)
-      ->execute();
+    try {
+      db_update($this->table)
+        ->fields(array(
+          $this->changedColumn => 0,
+        ))
+        ->condition($this->itemIdColumn, $item_ids, 'IN')
+        ->condition($this->indexIdColumn, $index->id)
+        ->execute();
+    }
+    catch (Exception $e) {
+      $tmp = array_slice($item_ids, 0, 10);
+      $item_ids_string = '"' . implode('", "', $tmp) . '"';
+      $vars = array(
+        '%index' => $index->name,
+        '@item_ids' => $item_ids_string,
+      );
+      watchdog_exception('search_api', $e, '%type while tracking indexed items (IDs: @item_ids) on index %index: !message in %function (line %line of %file).', $vars);
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function trackItemDelete(array $item_ids, array $indexes) {
-    if (!$this->table) {
-      return;
+    if (!$this->table || $item_ids === array()) {
+      return NULL;
     }
-    $index_ids = array();
+
+    $ret = array();
+
     foreach ($indexes as $index) {
       $this->checkIndex($index);
-      $index_ids[] = $index->id;
+      $delete = db_delete($this->table)
+        ->condition($this->indexIdColumn, $index->id)
+        ->condition($this->itemIdColumn, $item_ids, 'IN');
+      try {
+        if ($delete->execute()) {
+          $ret[] = $index;
+        }
+      }
+      catch (Exception $e) {
+        $tmp = array_slice($item_ids, 0, 10);
+        $item_ids_string = '"' . implode('", "', $tmp) . '"';
+        $vars = array(
+          '%index' => $index->name,
+          '@item_ids' => $item_ids_string,
+        );
+        watchdog_exception('search_api', $e, '%type while tracking deleted items (IDs: @item_ids) on index %index: !message in %function (line %line of %file).', $vars);
+      }
     }
-    db_delete($this->table)
-      ->condition($this->itemIdColumn, $item_ids, 'IN')
-      ->condition($this->indexIdColumn, $index_ids, 'IN')
-      ->execute();
+
+    return $ret;
   }
 
   /**
@@ -627,7 +795,7 @@ abstract class SearchApiAbstractDataSourceController implements SearchApiDataSou
     }
     $this->checkIndex($index);
     $select = db_select($this->table, 't');
-    $select->addField('t', 'item_id');
+    $select->addField('t', $this->itemIdColumn);
     $select->condition($this->indexIdColumn, $index->id);
     $select->condition($this->changedColumn, 0, '>');
     $select->orderBy($this->changedColumn, 'ASC');
@@ -657,6 +825,32 @@ abstract class SearchApiAbstractDataSourceController implements SearchApiDataSou
       ->execute()
       ->fetchField();
     return array('indexed' => $indexed, 'total' => $total);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function configurationForm(array $form, array &$form_state) {
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function configurationFormValidate(array $form, array &$values, array &$form_state) {
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function configurationFormSubmit(array $form, array &$values, array &$form_state) {
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConfigurationSummary(SearchApiIndex $index) {
+    return NULL;
   }
 
   /**

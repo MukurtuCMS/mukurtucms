@@ -11,9 +11,8 @@ files[] = popup_menu.module
 files[] = includes/popup_menu.util.inc
 files[] = includes/popup_menu.features.inc
 
-; Information added by Drupal.org packaging script on 2014-07-06
-version = "7.x-1.4"
+; Information added by Drupal.org packaging script on 2019-10-14
+version = "7.x-1.4+6-dev"
 core = "7.x"
 project = "popup"
-datestamp = "1404659328"
-
+datestamp = "1571057587"

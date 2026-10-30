@@ -1,0 +1,6 @@
+name = Mukurtu Image Carousel Formatter
+description = Provides an image carousel display
+package = Mukurtu
+core = 7.x
+dependencies[] = owlcarousel
+files[] = mukurtu_display_formatters_image_carousel.module

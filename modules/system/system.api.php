@@ -1797,6 +1797,8 @@ function hook_form_BASE_FORM_ID_alter(&$form, &$form_state, $form_id) {
  * the $form_id input matched your module's format for dynamically-generated
  * form IDs, and if so, act appropriately.
  *
+ * Third, forms defined in classes can be defined this way.
+ *
  * @param $form_id
  *   The unique string identifying the desired form.
  * @param $args
@@ -1807,19 +1809,22 @@ function hook_form_BASE_FORM_ID_alter(&$form, &$form_state, $form_id) {
  * @return
  *   An associative array whose keys define form_ids and whose values are an
  *   associative array defining the following keys:
- *   - callback: The name of the form builder function to invoke. This will be
- *     used for the base form ID, for example, to target a base form using
- *     hook_form_BASE_FORM_ID_alter().
+ *   - callback: The callable returning the form array. If it is the name of
+ *     the form builder function then this will be used for the base
+ *     form ID, for example, to target a base form using
+ *     hook_form_BASE_FORM_ID_alter(). Otherwise use the base_form_id key to
+ *     define the base form ID.
  *   - callback arguments: (optional) Additional arguments to pass to the
  *     function defined in 'callback', which are prepended to $args.
- *   - wrapper_callback: (optional) The name of a form builder function to
- *     invoke before the form builder defined in 'callback' is invoked. This
- *     wrapper callback may prepopulate the $form array with form elements,
- *     which will then be already contained in the $form that is passed on to
- *     the form builder defined in 'callback'. For example, a wrapper callback
- *     could setup wizard-alike form buttons that are the same for a variety of
- *     forms that belong to the wizard, which all share the same wrapper
- *     callback.
+ *   - base_form_id: The base form ID can be specified explicitly. This is
+ *     required when callback is not the name of a function.
+ *   - wrapper_callback: (optional) Any callable to invoke before the form
+ *     builder defined in 'callback' is invoked. This wrapper callback may
+ *     prepopulate the $form array with form elements, which will then be
+ *     already contained in the $form that is passed on to the form builder
+ *     defined in 'callback'. For example, a wrapper callback could setup
+ *     wizard-like form buttons that are the same for a variety of forms that
+ *     belong to the wizard, which all share the same wrapper callback.
  */
 function hook_forms($form_id, $args) {
   // Simply reroute the (non-existing) $form_id 'mymodule_first_form' to
@@ -1841,6 +1846,15 @@ function hook_forms($form_id, $args) {
   $forms['mymodule_wrapped_form'] = array(
     'callback' => 'mymodule_main_form',
     'wrapper_callback' => 'mymodule_main_form_wrapper',
+  );
+
+  // Build a form with a static class callback.
+  $forms['mymodule_class_generated_form'] = array(
+    // This will call: MyClass::generateMainForm().
+    'callback' => array('MyClass', 'generateMainForm'),
+    // The base_form_id is required when the callback is a static function in
+    // a class. This can also be used to keep newer code backwards compatible.
+    'base_form_id' => 'mymodule_main_form',
   );
 
   return $forms;
@@ -1874,8 +1888,8 @@ function hook_boot() {
  *
  * This hook is not run on cached pages.
  *
- * To add CSS or JS that should be present on all pages, modules should not
- * implement this hook, but declare these files in their .info file.
+ * To add CSS or JS files that should be present on all pages, modules should
+ * not implement this hook, but declare these files in their .info file.
  *
  * @see hook_boot()
  */
@@ -2034,6 +2048,22 @@ function hook_module_implements_alter(&$implementations, $hook) {
 function hook_system_theme_info() {
   $themes['mymodule_test_theme'] = drupal_get_path('module', 'mymodule') . '/mymodule_test_theme/mymodule_test_theme.info';
   return $themes;
+}
+
+/**
+ * Return additional theme engines provided by modules.
+ *
+ * This hook is invoked from _system_rebuild_theme_data() and allows modules to
+ * register additional theme engines outside of the regular 'themes/engines'
+ * directories of a Drupal installation.
+ *
+ * @return
+ *   An associative array. Each key is the system name of a theme engine and
+ *   each value is the corresponding path to the theme engine's .engine file.
+ */
+function hook_system_theme_engine_info() {
+  $theme_engines['izumi'] = drupal_get_path('module', 'mymodule') . '/izumi/izumi.engine';
+  return $theme_engines;
 }
 
 /**
@@ -2897,7 +2927,7 @@ function hook_file_update($file) {
     $file->filename = $file_user->name . '_' . $file->filename;
     $file->save();
 
-    watchdog('file', t('%source has been renamed to %destination', array('%source' => $old_filename, '%destination' => $file->filename)));
+    watchdog('file', '%source has been renamed to %destination', array('%source' => $old_filename, '%destination' => $file->filename));
   }
 }
 
@@ -2918,7 +2948,7 @@ function hook_file_copy($file, $source) {
     $file->filename = $file_user->name . '_' . $file->filename;
     $file->save();
 
-    watchdog('file', t('Copied file %source has been renamed to %destination', array('%source' => $source->filename, '%destination' => $file->filename)));
+    watchdog('file', 'Copied file %source has been renamed to %destination', array('%source' => $source->filename, '%destination' => $file->filename));
   }
 }
 
@@ -2939,7 +2969,7 @@ function hook_file_move($file, $source) {
     $file->filename = $file_user->name . '_' . $file->filename;
     $file->save();
 
-    watchdog('file', t('Moved file %source has been renamed to %destination', array('%source' => $source->filename, '%destination' => $file->filename)));
+    watchdog('file', 'Moved file %source has been renamed to %destination', array('%source' => $source->filename, '%destination' => $file->filename));
   }
 }
 
@@ -3145,7 +3175,7 @@ function hook_requirements($phase) {
       );
     }
 
-    $requirements['cron']['description'] .= ' ' . $t('You can <a href="@cron">run cron manually</a>.', array('@cron' => url('admin/reports/status/run-cron')));
+    $requirements['cron']['description'] .= ' ' . $t('You can <a href="@cron">run cron manually</a>.', array('@cron' => url('admin/reports/status/run-cron', array('query' => array('token' => drupal_get_token('run-cron'))))));
 
     $requirements['cron']['title'] = $t('Cron maintenance tasks');
   }
@@ -4785,6 +4815,33 @@ function hook_filetransfer_info_alter(&$filetransfer_info) {
     // Make sure the SSH option is listed first.
     $filetransfer_info['ssh']['weight'] = -10;
   }
+}
+
+/**
+ * Alter core e-mail validation.
+ *
+ * This hook is called immediately after core e-mail validation takes place and
+ * gives other modules a chance to override it. This is useful in cases where
+ * you want to have stricter or looser validation standards than that provided
+ * by Drupal core.
+ *
+ * @param $valid
+ *   Boolean value referencing the validation result.
+ *
+ * @param $mail
+ *   E-mail address being validated.
+ *
+ * @see valid_email_address()
+ */
+function hook_valid_email_address_alter(&$valid, $mail) {
+  if (preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $mail)) {
+    list($username, $domain) = explode('@', $mail);
+    // Check DNS records.
+    if (checkdnsrr($domain, 'MX')) {
+      $valid = TRUE;
+    }
+  }
+  $valid = FALSE;
 }
 
 /**

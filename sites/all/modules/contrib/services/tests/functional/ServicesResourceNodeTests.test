@@ -21,15 +21,12 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
   protected $endpoint = NULL;
 
   /**
-   * Implementation of setUp().
+   * {@inheritdoc}
    */
-  public function setUp() {
-    parent::setUp(
-      'ctools',
-      'services',
-      'rest_server',
-      'comment'
-    );
+  public function setUp(array $modules = array()) {
+    $modules[] = 'comment';
+    parent::setUp($modules);
+
     // Set up endpoint.
     $this->endpoint =  $this->saveNewEndpoint();
   }
@@ -42,6 +39,9 @@ class ServicesResourceNodetests extends ServicesWebTestCase {
       'name' => 'Resource Node',
       'description' => 'Test the resource Node methods and actions.',
       'group' => 'Services',
+      // The libraries module is required by rest_service, which is used by
+      // ServicesEndpointTests.
+      'dependencies' => array('ctools', 'libraries'),
     );
   }
 
@@ -496,19 +496,18 @@ class ServicesResourceNodeTaxonomytests extends ServicesWebTestCase {
       'name' => 'Resource Node - taxonomy',
       'description' => 'Test the resource Node taxonomy methods and actions.',
       'group' => 'Services',
+      // The libraries module is required by rest_service, which is used by
+      // ServicesEndpointTests.
+      'dependencies' => array('ctools', 'libraries'),
     );
   }
 
   /**
-   * Implementation of setUp().
+   * {@inheritdoc}
    */
-  public function setUp() {
-    parent::setUp(
-      'ctools',
-      'services',
-      'rest_server',
-      'taxonomy'
-    );
+  public function setUp(array $modules = array()) {
+    $modules[] = 'taxonomy';
+    parent::setUp($modules);
 
     $this->admin_user = $this->drupalCreateUser(array('administer taxonomy', 'bypass node access', 'administer services'));
     $this->drupalLogin($this->admin_user);

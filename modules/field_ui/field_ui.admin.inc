@@ -795,6 +795,14 @@ function field_ui_field_overview_form_submit($form, &$form_state) {
 
   $destinations = array();
 
+  // Check if the target entity uses a non numeric ID.
+  $entity_info = entity_get_info($entity_type);
+  if (!empty($entity_info['entity_id_type']) && $entity_info['entity_id_type'] === 'string') {
+    $entity_id_type = 'string';
+  } else {
+    $entity_id_type = NULL;
+  }
+
   // Create new field.
   $field = array();
   if (!empty($form_values['_add_new_field']['field_name'])) {
@@ -804,6 +812,7 @@ function field_ui_field_overview_form_submit($form, &$form_state) {
       'field_name' => $values['field_name'],
       'type' => $values['type'],
       'translatable' => $values['translatable'],
+      'entity_id_type' => $entity_id_type,
     );
     $instance = array(
       'field_name' => $field['field_name'],
@@ -1026,6 +1035,10 @@ function field_ui_display_overview_form($form, &$form_state, $entity_type, $bund
 
     $instance['display'][$view_mode]['type'] = $formatter_type;
     $formatter = field_info_formatter_types($formatter_type);
+    // For hidden fields, $formatter will be NULL, but we expect an array later.
+    // To maintain BC, but avoid PHP 7.4 Notices, ensure $formatter is an array
+    // with a 'module' element.
+    $formatter['module'] = isset($formatter['module']) ? $formatter['module'] : '';
     $instance['display'][$view_mode]['module'] = $formatter['module'];
     $instance['display'][$view_mode]['settings'] = $settings;
 

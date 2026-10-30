@@ -8,6 +8,18 @@
 include_once 'ma_scald.features.inc';
 
 /**
+ * Implements hook_boot().
+ */
+function ma_scald_boot() {
+  global $conf;
+  // The default scald deletion message doesn't make sense because we hide the fetch checkbox, so we remove that message.
+  $scald_message = array(
+   '<p>Note that unchecking the Fetch checkbox in the "<em>Openly available actions</em>" field of this atom <a href="!url">edit form</a> makes the atom disappear for everyone but Scald administrators, and is usually a better idea.</p><p>This action cannot be undone.</p>'      => '<p>This action cannot be undone.</p>',
+   );
+  $conf['locale_custom_strings_en'][''] = array_merge($conf['locale_custom_strings_en'][''], $scald_message);
+}
+
+/**
  * Implements hook_ds_fields_info().
  */
 function ma_scald_ds_fields_info($entity_type) {
@@ -25,6 +37,229 @@ function ma_scald_ds_fields_info($entity_type) {
 }
 
 /**
+ * Implements hook_scald_atom_access().
+ */
+function ma_scald_scald_atom_access($atom, $action, $account = NULL) {
+  switch ($action) {
+
+    // When viewing atoms, respect its protocols.
+    // This is usually left blank, but if set, if user has access to ANY of the CPs, then they get scald view access.
+    // DENY if groups are set but they have access to none of them.
+    case 'view':
+      $group_wrapper = entity_metadata_wrapper('scald_atom', $atom);
+      $field_item_privacy_setting_info = field_info_instance('scald_atom', 'field_item_privacy_setting', $group_wrapper->getBundle());
+      if (!isset($group_wrapper->field_scald_protocol)) {
+        return SCALD_ATOM_ACCESS_ALLOW;
+      } else {
+        // Check for set but empty.
+        $scald_protocols = $group_wrapper->field_scald_protocol->value();
+        if (empty($scald_protocols)) {
+          return SCALD_ATOM_ACCESS_ALLOW;
+        }
+      }
+
+      if ($groups = $group_wrapper->field_scald_protocol->value()) {
+        $sharing_setting = $field_item_privacy_setting_info ? ($group_wrapper->field_item_privacy_setting->value() ?? 'any') : 'any';
+        if ($sharing_setting === 'any') {
+          foreach ($groups as $group) {
+            if (node_access('view', $group, $account)) {
+              return SCALD_ATOM_ACCESS_ALLOW;
+            }
+          }
+        }
+
+        if ($sharing_setting === 'all') {
+          foreach ($groups as $group) {
+            if (!node_access('view', $group, $account)) {
+              return SCALD_ATOM_ACCESS_DENY;
+            }
+          }
+          return SCALD_ATOM_ACCESS_ALLOW;
+        }
+
+        return SCALD_ATOM_ACCESS_DENY;
+      }
+      return SCALD_ATOM_ACCESS_IGNORE;
+    case 'update':
+      // For some reason Scald uses edit instead of update?
+      // Call entity access on edit, otherwise VBOs won't work as expected.
+      return entity_access('edit', 'scald_atom', $atom, $account);
+
+    // Handle very specific scald delete access cases
+    case 'delete':
+      global $user;
+      // Let users delete their own atoms if they aren't being used somewhere.
+      if (user_access('delete any atom') || (user_access('delete own atom') && $atom->publisher == $user->uid)) {
+        $references = ma_scald_get_atom_references($atom);
+
+        if (empty($references)) {
+          return SCALD_ATOM_ACCESS_ALLOW;
+        } else {
+          return SCALD_ATOM_ACCESS_DENY;
+        }
+      }
+      return SCALD_ATOM_ACCESS_DENY;
+  }
+
+  return SCALD_ATOM_ACCESS_IGNORE;
+}
+
+/**
+ * Implements hook_file_download().
+ *
+ * Scald images get checked at scald_file_download_access(), but the other atom types
+ * do not (presumably do their render configuration), so for direct access
+ * via file/{file_id} or filepath, check the against the file's atom's protocol perms here,
+ * returning -1 if the user should not be allowed to access directly.
+ */
+function ma_scald_file_download($uri, $field_type = 'file') {
+  $query = db_select('file_usage', 'fu');
+  $query->addField('fu', 'id');
+  $query->join('file_managed', 'fm', 'fm.fid = fu.fid');
+  $query->condition('fm.uri', $uri, '=');
+  $query->condition('fu.type', 'scald_atom', '=');
+  $result= $query->execute();
+
+  foreach($result as $record) { // TODO: confirm there is only ever one record (one atom per file)
+    if (ma_scald_scald_atom_access($record->id, 'view') === false) {
+      return -1;
+    }
+  }
+}
+
+/**
+ * Remove any references to scald atoms the user does not have access to.
+ */
+function ma_scald_atom_reference_field_filter($entity, $field_name, $account = NULL) {
+  // Exit if the entity doesn't exist, the field doesn't exist, or the field is empty.
+  if (!$entity || !isset($entity->{$field_name}) || empty($entity->{$field_name}[LANGUAGE_NONE])) {
+    return;
+  }
+
+  // Check access for each atom.
+  foreach ($entity->{$field_name}[LANGUAGE_NONE] as $delta => $atom_ref) {
+    if (isset($atom_ref['sid']) && is_null(ma_scald_atom_load($atom_ref['sid'], $account))) {
+      // Unset if user has no access.
+      unset($entity->{$field_name}[LANGUAGE_NONE][$delta]);
+    }
+  }
+
+  // Reorder keys from 0.
+  $entity->{$field_name}[LANGUAGE_NONE] = array_values($entity->{$field_name}[LANGUAGE_NONE]);
+
+  // Remove completely if empty.
+  if (empty($entity->{$field_name}[LANGUAGE_NONE])) {
+    $entity->{$field_name} = array();
+  }
+}
+
+/**
+ * Load scald atom with access check.
+ */
+function ma_scald_atom_load($sid, $account = NULL) {
+  global $user;
+
+  $user_account = $account;
+  if ($user_account == NULL) {
+    $user_account = $user;
+  }
+
+  $atom = scald_atom_load($sid);
+  if ($atom) {
+    if (scald_invoke_atom_access($atom, 'view', $user_account)) {
+      return $atom;
+    }
+  }
+
+  return NULL;
+}
+
+// Return an array of content where the given atom is referenced
+// TODO: This can be an expensive function. We might be able to extend the scald_index module to catch the
+// elements it misses.
+function ma_scald_get_atom_references($atom, $include_embeds = TRUE) {
+  if (is_string($atom) && is_numeric($atom)) {
+    $atom = scald_atom_load($atom);
+  }
+
+  if (!isset($atom->sid)) {
+    return [];
+  }
+
+  // Get all atom reference field names
+  $fields = field_info_fields();
+  foreach ($fields as $key => $field) {
+    if ($field['type'] != 'atom_reference') {
+      unset($fields[$key]);
+    }
+  }
+  $field_names = array_keys($fields);
+
+  // For each atom reference field, check if this particular atom is being referenced
+  $references = [];
+  foreach ($field_names as $field_name) {
+    $query = new EntityFieldQuery();
+    $query->fieldCondition($field_name, 'sid', $atom->sid, "=")
+      ->addMetaData('account', user_load(1));
+    $result = $query->execute();
+
+    if (!empty($result)) {
+      foreach ($result as $entity_type_name => $entity_type) {
+        $references[$entity_type_name] = array_merge(isset($references[$entity_type_name]) ? $references[$entity_type_name] : [], array_keys($entity_type));
+      }
+    }
+  }
+
+  // Atoms can also be references in DnD fields, check those now
+  if ($include_embeds) {
+    $scald_dnd_fields = ma_scald_get_dnd_enabled_scald_fields();
+
+    foreach ($scald_dnd_fields as $entity_type_name => $entity_type) {
+      foreach ($entity_type as $bundle_name => $bundle) {
+        foreach ($bundle as $field_name) {
+          $query = new EntityFieldQuery();
+          $query->entityCondition('entity_type', $entity_type_name)
+            ->entityCondition('bundle', $bundle_name)
+            ->fieldCondition($field_name, 'value', "%[scald={$atom->sid}:%", 'like')
+            ->addMetaData('account', user_load(1));
+          $result = $query->execute();
+          if (!empty($result)) {
+            foreach ($result as $entity_type_name => $entity_type) {
+              $references[$entity_type_name] = array_merge(isset($references[$entity_type_name]) ? $references[$entity_type_name] : [], array_keys($entity_type));
+            }
+          }
+        }
+      }
+    }
+  }
+
+  foreach ($references as $entity_type_name => $entity_type) {
+    $references[$entity_type_name] = array_unique($references[$entity_type_name]);
+  }
+
+  return $references;
+}
+
+
+// Return an array of fields where scald drag 'n drop is enabled
+function ma_scald_get_dnd_enabled_scald_fields() {
+    $enabled_fields = array();
+    $fields = field_info_instances();
+
+    foreach($fields as $entity_type_name => $entity_type) {
+        foreach($entity_type as $bundle_name => $bundle) {
+            foreach($bundle as $field_name => $field) {
+                if(isset($field['settings']['dnd_enabled']) && $field['settings']['dnd_enabled'] == 1) {
+                    $enabled_fields[$entity_type_name][$bundle_name][] = $field['field_name'];
+                }
+            }
+        }
+    }
+
+    return $enabled_fields;
+}
+
+/**
  * Render the atom Download link
  */
 function ma_scald_atom_download_link($field) {
@@ -39,7 +274,10 @@ function ma_scald_atom_download_link($field) {
   if ($field['bundle'] == 'video' AND $entity->provider <> 'scald_video') {
     return;
   }
-  return l('Download', file_create_url ($entity->file_source));
+
+  // 'Download' was determined to be unpalatable, switching to 'Access'
+  $download_link_text = 'Access' . ((empty($entity->type)) ? '' : ' ' . $entity->type);
+  return l($download_link_text, file_create_url ($entity->file_source));
 }
 
 /**
@@ -59,6 +297,11 @@ function ma_scald_form_scald_atom_add_form_add_alter(&$form, &$form_state) {
   $form['scald_authors']['#access'] = FALSE;
   $form['scald_tags']['#access'] = FALSE;
 
+  // Add m4a to allowed list of extensions for audio atoms
+  $type = $form_state['scald']['type']->type;
+  if ($type == 'audio') {
+    $form['file']['#upload_validators']['file_validate_extensions'] = array('wav ogg mp3 m4a');
+  }
 }
 
 /**
@@ -72,7 +315,13 @@ function ma_scald_field_group_pre_render (&$element, $group, &$form) {
     // Order the fields according to their weight
     $ordered_fields = array();
     foreach ($element as $field_name => $field) {
-      $ordered_fields[$field['#weight']] = $field_name;
+      if (is_null($field)) {
+        continue;
+      }
+
+      if (isset($field['#weight'])) {
+        $ordered_fields[$field['#weight']] = $field_name;
+      }
     }
     ksort ($ordered_fields);
 
@@ -100,7 +349,7 @@ function ma_scald_field_group_pre_render (&$element, $group, &$form) {
 function ma_scald_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'scald_atom_add_form_options') {
     $atom_index = 0;
-    
+
     // Add a custom validation handler so that the user cannot unset a CP if they are not allowed to post to it
     $form['#validate'][] = 'ma_scald_prevent_unsetting_cp_when_no_permission';
     $cp_options = ma_cultural_protocol_get_cps_user_can_post_to ();
@@ -111,13 +360,13 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
       $default_values = $form['atom' . $atom_index]['field_scald_protocol'][LANGUAGE_NONE]['#default_value'];
       $initial_options = $form['atom' . $atom_index]['field_scald_protocol'][LANGUAGE_NONE]['#options'];
       foreach ($initial_options as $gid => $cp_title) {
-        if (!array_key_exists ($gid, $cp_options) && !in_array($gid, $default_values)) {
+        if ($cp_options && !array_key_exists ($gid, $cp_options) && !in_array($gid, $default_values)) {
           unset ($form['atom' . $atom_index]['field_scald_protocol'][LANGUAGE_NONE]['#options'][$gid]);
         }
       }
 
       // Provide a description that's NOT a popup for the protocol field
-      $form['atom' . $atom_index]['field_scald_protocol']['#suffix'] = '<div class = "atom-protocol-desc">' . t("Atoms are open by default. The Protocol field lets you restrict who sees the atom, and who can re-use the atom in their own Digital Heritage items. This permission is independent of the Digital Heritage's Cultural Protocol. In general it is best to leave this open. If you select multiple Protocols, users with access to ANY of the Protocols will be able to see this item.") . '</div>';
+      $form['atom' . $atom_index]['field_scald_protocol']['#suffix'] = '<div class = "atom-protocol-desc">' . t("Atoms are open by default. The Protocol field lets you restrict who sees the atom, and who can re-use the atom in their own Digital Heritage items. This permission is independent of the Digital Heritage's Cultural Protocol. In general, it is best to apply the same protocol to each media asset that will be applied to the digital heritage item, dictionary word, or other content where that media asset will be used. See <a href=\"@scald-protocols\">this document</a> for more information. If you select multiple Protocols, users with access to ANY of the Protocols will be able to see this item.", array('@scald-protocols' => 'https://mukurtu.org/support/media-asset-metadata')) . '</div>';
       // Hide the old protocol field
       $form['atom' . $atom_index]['og_group_ref']['#access'] = FALSE;
 
@@ -129,7 +378,7 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
       if(isset($entity->base_id)) {
 	$file = file_load($entity->base_id);
       }
-      
+
       $language = $entity->language;
 
       if (!isset($entity->created)) {
@@ -157,7 +406,7 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
             //'field_gps_latitude' => '',
             //'field_gps_longitude' => '',
           );
-	  
+
           foreach ($field_assocs as $exif_field => $scald_field) {
             if (isset($file->{$exif_field}[$language][0]['value']) && $form['atom' . $atom_index][$scald_field][$language][0]['value']['#default_value'] == NULL) {
               $form['atom' . $atom_index][$scald_field][$language][0]['value']['#default_value'] = $file->{$exif_field}[$language][0]['value'];
@@ -215,5 +464,805 @@ function ma_scald_prevent_unsetting_cp_when_no_permission(&$form, &$form_state) 
       }
     }
     $atom_index++;
+  }
+}
+
+/**
+ * Implements hook_views_default_views_alter
+ */
+function ma_scald_views_default_views_alter(&$views)
+{
+    if(isset($views['scald_atoms'])) {
+        $views['scald_atoms']->display['default']->display_options['access']['type'] = 'php';
+        $views['scald_atoms']->display['default']->display_options['access']['php_access'] = '$admin = user_role_load_by_name(\'administrator\');
+$mukurtuadmin = user_role_load_by_name(\'Mukurtu Administrator\');
+
+if(user_has_role($admin->rid) || user_has_role($mukurtuadmin->rid)) {
+     return TRUE;
+}
+return FALSE;';
+    }
+}
+
+/**
+ * Delete all records in our custom protocol access table for a given atom.
+ */
+function ma_scald_clear_protocol_access($atom) {
+  if ($sid = $atom->sid ?? NULL) {
+    db_delete('scald_protocol_access')->condition('sid', $sid)->execute();
+  }
+}
+
+/**
+ * Given an array of protocol IDs (nids), return the corresponding
+ * protocol set ID.
+ */
+function ma_scald_get_protocol_set_id(array $protocol_ids) {
+  $protocol_set = ma_scald_format_protocol_ids($protocol_ids);
+
+  // Check if the protocol set exists.
+  $result = db_select('mukurtu_protocol_map', 'mpm')
+    ->fields('mpm', ['protocol_set_id'])
+    ->condition('protocol_set', $protocol_set, '=')
+    ->execute()->fetchAssoc();
+
+  if (!empty($result)) {
+    return $result['protocol_set_id'];
+  }
+
+  // It doesn't exist, we need to insert it.
+  return db_insert('mukurtu_protocol_map')
+    ->fields(['protocol_set' => $protocol_set])
+    ->execute();
+}
+
+/**
+  * Get a list of all compound protocol sets in use on the site.
+  */
+function ma_scald_get_compound_protocols() {
+  $compoundProtocols = [];
+
+  $query = db_select('mukurtu_protocol_map', 'mpm')
+  ->fields('mpm', ['protocol_set_id', 'protocol_set']);
+  $result = $query->execute()->fetchAll();
+  foreach ($result as $ps) {
+    if (mb_strpos($ps->protocol_set, '|') !== false) {
+      $compoundProtocols[$ps->protocol_set_id] = explode('|', $ps->protocol_set);
+    }
+  }
+
+  return $compoundProtocols;
+}
+
+/**
+ * Return an array of protocol set IDs the current user has access to.
+ */
+function ma_scald_get_current_user_protocol_sets() {
+  $protocol_sets = [];
+
+  // No protocols protocol set.
+  $no_protocols_set = (int) ma_scald_get_protocol_set_id([]);
+  $protocol_sets[$no_protocols_set] = $no_protocols_set;
+
+  // User has access to all open protocols.
+  $open_protocol_ids = ma_cultural_protocol_get_open_protocol_ids();
+  foreach ($open_protocol_ids as $pid) {
+    $protocol_sets[$pid] = (int) ma_scald_get_protocol_set_id([$pid]);
+  }
+
+  // User has access to each single protocol they are a member of.
+  $protocol_memberships = [];
+  $protocol_memberships = ma_cultural_protocol_get_cps_for_user(['member']);
+  $protocol_memberships_ids = array_keys($protocol_memberships);
+  foreach ($protocol_memberships_ids as $pid) {
+    $protocol_sets[$pid] = (int) ma_scald_get_protocol_set_id([$pid]);
+  }
+
+  // Search the entire protocol table for combinations of protocols
+  // that the user is a member of. This is potentially slow, but it's faster
+  // than computing the super set of user protocols.
+  $all_protocol_ids_with_view_access = array_merge($open_protocol_ids, $protocol_memberships_ids);
+  foreach (ma_scald_get_compound_protocols() as $set_id => $set_protocol_ids) {
+    $in_all = TRUE;
+    foreach ($set_protocol_ids as $set_protocol_id) {
+      if (!in_array($set_protocol_id, $all_protocol_ids_with_view_access)) {
+        $in_all = FALSE;
+        break;
+      }
+    }
+
+    if ($in_all) {
+      $protocol_sets[$set_id] = (int) $set_id;
+    }
+  }
+
+  return $protocol_sets;
+}
+
+/**
+ * For a given atom, update our custom protocol access table based on the atom's
+ * protocols and sharing setting.
+ */
+function ma_scald_insert_protocol_access($atom) {
+  $entity = entity_metadata_wrapper('scald_atom', $atom);
+  $field_item_privacy_setting_info = field_info_instance('scald_atom', 'field_item_privacy_setting', $entity->getBundle());
+  $sharing_setting = $field_item_privacy_setting_info ? ($entity->field_item_privacy_setting->value() ?? 'any') : 'any';
+  $protocol_ids = $entity->field_scald_protocol->raw() ?? [];
+
+  $permitted_protocol_sets = [];
+
+  if ($sharing_setting === 'all') {
+    // Find the protocol set ID that represents the set of all required
+    // protocols.
+    if ($set_id = ma_scald_get_protocol_set_id($protocol_ids)) {
+      $permitted_protocol_sets[] = $set_id;
+    }
+  }
+
+  if ($sharing_setting === 'any') {
+    // In the case of 'any', each singular protocol will map to an individual
+    // protocol set. If the user has any of them, that is sufficent.
+    foreach ($protocol_ids as $protocol_id) {
+      if ($set_id = ma_scald_get_protocol_set_id([$protocol_id])) {
+        $permitted_protocol_sets[] = $set_id;
+      }
+    }
+  }
+
+  // Empty protocols for scald means open to all. Add the set that represents
+  // that.
+  if (empty($protocol_ids)) {
+    $permitted_protocol_sets[] = ma_scald_get_protocol_set_id([]);
+  }
+
+  // Associate the permitted IDs with the scald atom.
+  foreach ($permitted_protocol_sets as $permitted_protocol_set) {
+    db_insert('scald_protocol_access')
+      ->fields([
+        'sid' => $atom->sid,
+        'protocol_set_id' => $permitted_protocol_set
+        ])
+      ->execute();
+  }
+}
+
+/**
+ * Take an array of group IDs and return a string suitable for DB comnparison.
+ */
+function ma_scald_format_protocol_ids($protocol_ids) {
+  // Let's force them to integers, just to be safe.
+  $protocol_ids = array_map(fn($p) => (int) $p, $protocol_ids);
+
+  // Hardcode no protocols to a "0". No protocols has the same meaning for all
+  // atoms, open access.
+  if (empty($protocol_ids)) {
+    return '0';
+  }
+
+  // Sort them ascending and delimit with '|'. This is critical. Our comparison
+  // in the views query expects this.
+  // @see ma_scald_views_query_alter
+  sort($protocol_ids);
+  return implode( '|', $protocol_ids);
+}
+
+/**
+ * Implements hook_scald_atom_insert().
+ */
+function ma_scald_scald_atom_insert($atom) {
+  ma_scald_clear_protocol_access($atom);
+  ma_scald_insert_protocol_access($atom);
+}
+
+/**
+ * Implements hook_scald_atom_update().
+ */
+function ma_scald_scald_atom_update($atom) {
+  ma_scald_clear_protocol_access($atom);
+  ma_scald_insert_protocol_access($atom);
+}
+
+/**
+ * Implements hook_scald_atom_delete().
+ */
+function ma_scald_scald_atom_delete($atom) {
+  ma_scald_clear_protocol_access($atom);
+}
+
+/**
+ * Implements hook_views_query_alter().
+ */
+function ma_scald_views_query_alter(&$view, &$query) {
+  // For views gathering scald atoms, filter based on protocol access.
+  if ($view->base_table == 'scald_atoms') {;
+    $user_protocol_sets = ma_scald_get_current_user_protocol_sets();
+
+    // Join our custom protocol access table to the scald table on sid.
+    $join = new views_join();
+    $join->construct('scald_protocol_access', 'scald_atoms', 'sid', 'sid');
+    $query->add_relationship('scald_protocol_access', $join, 'scald_atoms');
+
+    $whereUserHasProtocolSet = [
+      'conditions' => [],
+      'args' => [],
+      'type' => 'OR'
+    ];
+
+    // Add an 'or' condition for each protocol set the user can view.
+    foreach ($user_protocol_sets as $protocol_set_id) {
+      $whereUserHasProtocolSet['conditions'][] = [
+        'field' => 'scald_protocol_access.protocol_set_id',
+        'value' => $protocol_set_id,
+        'operator' => '='
+      ];
+    }
+
+    $query->where[] = $whereUserHasProtocolSet;
+
+    // We need distinct here as most scald atoms have multiple valid protocol
+    // sets. We'd get duplicates otherwise.
+    $query->distinct = TRUE;
+  }
+}
+
+/**
+ * Implements hook_scald_player().
+ */
+function ma_scald_scald_player() {
+    return array('mukurtu_default' => array(
+        'name' => 'Mukurtu default player',
+        'description' => 'Mukurtu default player',
+        'type' => array('*'),
+    ));
+}
+
+/**
+ * Implements hook_scald_prerender().
+ */
+function ma_scald_scald_prerender($atom, $context, $options, $mode) {
+    $default_thumbnail_contexts = array('mukurtu_scald_related_items', 'mukurtu_carousel_thumbnail', 'mukurtu_multi_page_carousel');
+
+    if($atom->type == 'audio' && !in_array($context, $default_thumbnail_contexts)) {
+        // Soundcloud already integrates the thumbnail with the display, remove it for rendering so it isn't duplicated
+        if($atom->provider == 'scald_soundcloud') {
+            if(!empty($atom->scald_thumbnail)) {
+                unset($atom->scald_thumbnail);
+            }
+        }
+
+        // Non-soundcloud audio atoms go to the HTML5 provider
+        if($atom->provider != 'scald_soundcloud') {
+            scald_audio_scald_prerender($atom, $context, $options, $mode);
+            return;
+        }
+    }
+
+    // All Soundcloud rendering should be handled by the Soundcloud module
+    if($atom->provider == 'scald_soundcloud') {
+        scald_soundcloud_scald_prerender($atom, $context, $options, $mode);
+    }
+
+    if($mode == 'player') {
+        if($atom->type <> 'image' && in_array($context, $default_thumbnail_contexts)) {
+            // Fetch our default thumbnail if the atom doesn't have one.
+            if (empty($atom->scald_thumbnail[LANGUAGE_NONE])) {
+                $atom->scald_thumbnail[LANGUAGE_NONE][] = _ma_scald_default_thumbnail($atom->type);
+            }
+        }
+    }
+}
+
+function ma_scald_get_first_image_atom_content($atom_content_field) {
+    if(!isset($atom_content_field['#items']) || empty($atom_content_field['#items'])) {
+        return $atom_content_field;
+    }
+
+    $first = TRUE;
+    foreach($atom_content_field['#items'] as $index => $atom_ref) {
+        if(!$first) {
+            unset($atom_content_field['#items'][$index]);
+            unset($atom_content_field[$index]);
+        } else {
+            $first = FALSE;
+        }
+    }
+    return $atom_content_field;
+}
+
+// This is the handler function for the scald atom "Media Source" field
+// during import. Typically this will either be the path to a file, an
+// external content ID (e.g., YouTube), or a URL to the external content.
+// See ma_importexport_set_media_source_target
+// We pair this with the scald provider to call all of the scald form
+// functions to recreate the base atom from scratch.
+function ma_scald_save_atom_source($source, &$entity) {
+    $type = isset($entity->type) ? $entity->type : NULL;
+
+    if($source) {
+        ma_scald_create_basic_atom($source, $entity, $type);
+    }
+    return;
+}
+
+/**
+ * Helper function that takes a media source ($filepath) and a scald provider and
+ * runs through all the scald form functions (source, add, options) for creating the atom.
+ *
+ * This is ideal because it offloads all the details to the scald provider and scald
+ * will still call the relevant hooks.
+ */
+function ma_scald_create_basic_atom($filepath, &$atom, $type = 'video') {
+  ctools_include('object-cache');
+  ctools_include('wizard');
+  // We are going to be making calls to the native Scald form functions,
+  // load those pages.
+  module_load_include('inc', 'scald', 'includes/scald.pages');
+
+  $form_info = array(
+    'id' => 'scald-atom-add',
+    'path' => 'atom/add/' . $type . '/' . 'nojs' . '/%step',
+    'show trail' => TRUE,
+    'show back' => FALSE,
+    'show cancel' => TRUE,
+    'show return' => FALSE,
+    'next callback' => 'scald_atom_add_wizard_next',
+    'finish callback' => 'scald_atom_add_wizard_finish',
+    'cancel callback' => 'scald_atom_add_wizard_cancel',
+    'order' => array(
+      'source' => t('Source'),
+      'add' => t('Add'),
+      'options' => t('Options'),
+    ),
+    'forms' => array(
+      'source' => array(
+        'form id' => 'scald_atom_add_form_source',
+      ),
+      'add' => array(
+        'form id' => 'scald_atom_add_form_add',
+      ),
+      'options' => array(
+        'form id' => 'scald_atom_add_form_options',
+      ),
+    ),
+  );
+
+  // Clear the cache or else we might get stuff from the previous item.
+  ctools_object_cache_clear('scald_atom', 'add');
+  $form_state = array(
+    'ajax' => FALSE,
+    'scald' => ctools_object_cache_get('scald_atom', 'add'),
+  );
+  $form_state['values']['atom0'][] = $atom;
+
+  // Copy initialization from scald_atom_add_page
+  // Start by getting the list of all the modules that said they can provide
+  // this atom type.
+  $scald_types = scald_types();
+  $providers = scald_atom_providers_opt();
+  $sources = $providers[$type];
+  $source = key($sources);
+
+  // Check the Scald provider. We are doing a few things here.
+  // - If no provider is given, try to infer something sane.
+  // - If a provider is given, make sure it's correct.
+  // - If not correct, try to infer something sane.
+  $scald_providers = scald_atom_providers_opt();
+  $type_providers = array();
+  if (isset($scald_providers[$type])) {
+    $type_providers = array_keys($scald_providers[$type]);
+  }
+  if (empty($atom->provider) || !in_array($atom->provider, $type_providers)) {
+    $atom->provider = _ma_scald_guess_provider_from_media_source($type, $atom->file_source);
+  }
+
+  // Grab provider from the atom.
+  if (isset($atom->provider)) {
+    $provider = $atom->provider;
+  } else {
+    // If at this point we have no provider, just exit.
+    // Scald is perfectly happy to write garbage atoms to the
+    // database which cannot be deleted via scald_atom_delete.
+    return;
+  }
+
+  if (isset($form_state['scald']['atoms'][0])) {
+    $form_state['atom'] = $form_state['scald']['atoms'][0];
+  }
+
+  if (empty($form_state['scald'])) {
+    $form_state['scald'] = array(
+      'type' => $scald_types[$type],
+      'source' => $provider,
+      'provider' => $provider,
+    );
+  }
+
+  // Source.
+  $form_state['scald']['step'] = 'source';
+  $source_form = ctools_wizard_multistep_form($form_info, 'source', $form_state);
+  $source_form = scald_atom_add_form_source($source_form, $form_state);
+
+  // Add.
+  $form_state['scald']['step'] = 'add';
+  $add_form = ctools_wizard_multistep_form($form_info, 'add', $form_state);
+  $add_form = scald_atom_add_form_add($add_form, $form_state);
+
+  switch ($provider) {
+    case 'scald_dailymotion':
+    case 'scald_soundcloud':
+    case 'scald_youtube':
+    case 'scald_vimeo':
+      $form_state['values']['identifier'] = $filepath;
+      break;
+
+    default:
+      // Simulate uploading file.
+      $file_object = file_uri_to_object($filepath);
+
+      // Get the default upload location.
+      $directory = $add_form['file']['#upload_location'];
+
+      // We are still hardcoding to private URIs.
+      $directory = str_replace("public://", "private://", $directory);
+
+      // Make sure directory exists.
+      file_prepare_directory($directory);
+
+      // Copy file to permanent location.
+      $location = $directory . $file_object->filename;
+      if ($file = file_copy($file_object, $location, FILE_EXISTS_RENAME)) {
+        $file->status = FILE_STATUS_PERMANENT;
+        file_save($file);
+        $form_state['values']['file'] = $file->fid;
+      }
+  }
+
+  // Options.
+  $form_state['scald']['step'] = 'options';
+  $options_form = array();
+  $options_form = scald_atom_add_form_options($options_form, $form_state);
+
+  if (isset($form_state['scald']['atoms'][0])) {
+    // Quick and dirty scald_youtube tags fix.
+    if ($provider == 'scald_youtube' && !empty($form_state['scald']['atoms'][0]->scald_tags[LANGUAGE_NONE])) {
+      foreach ($form_state['scald']['atoms'][0]->scald_tags[LANGUAGE_NONE] as &$tag) {
+        if (isset($tag['taxonomy_term'])) {
+          $term = ma_taxonomy_term_from_name('scald_tags', $tag['taxonomy_term']->name);
+          if ($term) {
+            $tag['tid'] = $term->tid;
+            unset($tag['taxonomy_term']);
+          }
+        }
+      }
+    }
+
+    $form_state['atom'] = $form_state['scald']['atoms'][0];
+    $form_state['values']['atom0'][] = $form_state['atom'];
+  }
+
+  $provider_atom = _ma_scald_atom_add_form_options_submit($options_form, $form_state);
+  $atom = _ma_scald_merge_provider_atom($atom, $provider_atom);
+}
+
+/**
+ * Nearly wholesale copy of scald_atom_add_form_options_submit, except
+ * we don't want to:
+ * 1. Save the scald atom
+ * 2. Display the atom creation notice
+ *
+ * Instead we return the atom, so that our import functions can integrate
+ * the atom fields that scald/scald provider created.
+ */
+function _ma_scald_atom_add_form_options_submit(&$form, &$form_state) {
+    if (!$atoms = $form_state['scald']['atoms']) {
+      return;
+    }
+
+    $atom_keys = array();
+    foreach(array_keys($atoms) as $delta) {
+      $atom_keys[] = 'atom' . $delta;
+    }
+    $values_excluding_atoms = array_diff_key($form_state['values'], array_flip($atom_keys));
+
+    foreach ($atoms as $delta => $atom) {
+      $index = 'atom' . $delta;
+      $values = &$form_state['values'][$index];
+
+      if (isset($values['scald_actions']) && is_array($values['scald_actions'])) {
+        $bitstream = 0;
+        $actions = scald_actions();
+        foreach ($actions as $name => $action) {
+          if (!empty($values['scald_actions'][$name])) {
+            $bitstream |= $action['bitmask'];
+          }
+        }
+        $values['actions'] = $bitstream;
+      }
+
+      $op = empty($atom->sid) ? t('created') : t('updated');
+
+      // Prepare a form state that is suitable for modules that provide extra fields.
+      $atom_form_state = array('values' => $values + $values_excluding_atoms) + $form_state;
+      // Add back the structure required for fields and maintain a reference to
+      // the original form state values.
+      $atom_form_state['values'][$index] = &$values;
+
+    // This fixes that strange scald taxonomy term issue, that seems to mostly be a soundcloud issue.
+    // Definitely a bit of a hack.
+    $fields_info = field_info_instances('scald_atom', $atom->type);
+    foreach($fields_info as $field_name => $value) {
+        $field_info = field_info_field($field_name);
+        if($field_info['type'] == 'taxonomy_term_reference' && !empty($atom->{$field_name}[LANGUAGE_NONE])) {
+            foreach($atom->{$field_name}[LANGUAGE_NONE] as $delta => $field_value) {
+                $atom->{$field_name}[LANGUAGE_NONE][$delta]['vocabulary_machine_name'] = $field_info['settings']['allowed_values'][0]['vocabulary'];
+            }
+        }
+    }
+
+    if($atom->type == 'file') {
+        $atom->scald_file[LANGUAGE_NONE][0]['display'] = 1;
+        $atom->atom0['scald_thumbnail'][LANGUAGE_NONE][0]['display'] = 1;
+        $atom->atom0['scald_file'][LANGUAGE_NONE][0]['display'] = 1;
+        $atom->scald_thumbnail_default = 1;
+        $atom->data['scald_thumbnail_default'] = 1;
+    }
+      // Let entity add its properties to the atom.
+      entity_form_submit_build_entity('scald_atom', $atom, $form[$index], $atom_form_state);
+
+      // Then return it...
+      return $atom;
+    }
+    return NULL;
+}
+
+/**
+ * Copy the non-empty fields from the provider atom to the feeds atom.
+ * Only copying the first level, this isn't a recursive deep dive.
+ */
+function _ma_scald_merge_provider_atom($feeds_atom, $provider_atom) {
+    $provider_fields = array_keys(get_object_vars($provider_atom));
+    $skip_fields = array('0', '1', 'atom0');
+
+    foreach($provider_fields as $field) {
+        if(in_array($field, $skip_fields)) {
+            continue;
+        }
+
+        if(!empty($provider_atom->{$field})) {
+            if(!is_array($provider_atom->{$field})
+               || (is_array($provider_atom->{$field}) && !empty($provider_atom->{$field}))) {
+                $feeds_atom->{$field} = $provider_atom->{$field};
+            }
+        }
+    }
+
+    return $feeds_atom;
+}
+
+/**
+ * Generate default scald thumbnail for Mukurtu.
+ */
+function _ma_scald_default_thumbnail($type) {
+    $fid = variable_get("mukurtu_scald_default_thumbnail_$type", NULL);
+    $file = file_load($fid);
+    if (!$file) {
+        $filename = drupal_get_path('module', 'ma_digitalheritage') . "/images/default_{$type}_thumbnail_280.jpg";
+        $handle = fopen(drupal_realpath($filename), 'r');
+
+        // Given a type we don't have a stock image for, use generic "no media" image.
+        if(!$handle) {
+            $filename = drupal_get_path('module', 'ma_digitalheritage') . "/images/no_media_available.jpg";
+            $handle = fopen(drupal_realpath($filename), 'r');
+        }
+        $file = file_save_data($handle, "public://atoms/default_thumbnail_{$type}.jpg", FILE_EXISTS_REPLACE);
+        fclose($handle);
+
+        if($file) {
+            variable_set("mukurtu_scald_default_thumbnail_$type", $file->fid);
+        }
+    }
+
+    return (array) $file;
+}
+
+/**
+ * Given a media source (file path, URL, etc...) and a
+ * scald atom type, return the most likely scald provider.
+ */
+function _ma_scald_guess_provider_from_media_source($type, $media_source) {
+  $scald_providers = scald_atom_providers_opt();
+  if (isset($scald_providers[$type])) {
+    $type_providers = array_keys($scald_providers[$type]);
+    // If there is only a single provider for the type, use that.
+    if (count($type_providers) == 1) {
+      return current($type_providers);
+    }
+
+    // Check media sources. These are very much Mukurtu specific
+    // and are not taking into account any user added providers.
+    switch ($type) {
+      case 'audio':
+        // Check Soundcloud (scald_soundcloud).
+        if (function_exists(scald_soundcloud_parse_id)) {
+          if (scald_soundcloud_parse_id($media_source, FALSE)) {
+            return 'scald_soundcloud';
+          }
+        }
+        // Default to standard audio provider.
+        return 'scald_audio';
+
+      case 'video':
+        // Check Dailymotion (scald_dailymotion).
+        if (function_exists(scald_dailymotion_parse_id)) {
+          if (scald_dailymotion_parse_id($media_source)) {
+            return 'scald_dailymotion';
+          }
+        }
+        // Check Vimeo (scald_vimeo).
+        if (function_exists(scald_vimeo_parse_id)) {
+          if (scald_vimeo_parse_id($media_source, FALSE)) {
+            return 'scald_vimeo';
+          }
+        }
+        // Check YouTube (scald_youtube).
+        if (function_exists(scald_youtube_parse_id)) {
+          if (scald_youtube_parse_id($media_source, FALSE)) {
+            return 'scald_youtube';
+          }
+        }
+        // Default to basic video provider.
+        return 'scald_video';
+    }
+    return current($type_providers);
+  }
+  return NULL;
+}
+
+/**
+ * Implementation of hook_node_view().
+ */
+function ma_scald_node_view($node, $view_mode) {
+  if ($view_mode == 'search_result') {
+
+    // If no media items at all for an item the search results, put a placeholder.
+    if (empty($node->field_media_asset)) {
+      $node->content['field_media_asset'][0]['#markup'] = '
+      <div class="field field-name-field-media-asset field-type-atom-reference field-label-hidden">
+        <div class="field-items">
+            <a class = "tooltips image-placeholder" href=" ' . url("node/" . $node->nid) . '"><img class="img-responsive" src = "/' . drupal_get_path('module', 'ma_scald') . '/images/no_media_available.jpg"></a>
+        </div>
+      </div>';
+    }
+
+  }
+
+}
+
+/**
+ * Implements hook_action_info().
+ */
+function ma_scald_action_info() {
+  return [
+    'ma_scald_duplicate_content_protocol_action' => [
+      'type' => 'scald_atom',
+      'label' => t('Duplicate Cultural Protocols from Item'),
+      'configurable' => FALSE,
+      'behavior' => ['views_property', 'changes_property'],
+    ],
+  ];
+}
+
+/**
+ * Action for ma_scald_duplicate_content_protocol_action.
+ */
+function ma_scald_duplicate_content_protocol_action(&$atom, &$context) {
+  $atom_entity = entity_metadata_wrapper('scald_atom', $atom);
+
+  // Get entities referencing the atom.
+  $refs = ma_scald_get_atom_references($atom, FALSE);
+
+  // Remove paragraph references, we don't care about them in this context.
+  if (isset($refs['paragraphs_item'])) {
+    unset($refs['paragraphs_item']);
+  }
+
+  // Filter out communities and protocols, we don't count these for this kind of
+  // reference as they don't have our normal content protocol fields.
+  if (isset($refs['node'])) {
+    $query = db_select('node', 'n')
+      ->fields('n', ['nid'])
+      ->condition('n.nid', $refs['node'], 'IN')
+      ->condition('n.type', ['community', 'protocol'], 'NOT IN');
+    $refs['node'] = $query->execute()->fetchCol();
+  }
+
+  // Fail if there are no node references.
+  $types = array_keys($refs);
+  if (!in_array('node', $types) || empty($refs['node'])) {
+    drupal_set_message(t("@title (@sid): Could not find any valid items referencing this media. You must set the protocol fields manually.", [
+      '@title' => $atom->title,
+      '@sid' => $atom->sid,
+    ]), 'error');
+    return;
+  }
+
+  // Fail if there are multiple nodes and/or multiple types. We have no way of
+  // knowing which we should duplicate from.
+  if (count($refs['node']) > 1 || count($types) > 1) {
+    drupal_set_message(t("@title (@sid): This media is referenced by multiple items. You must set the protocol fields manually.", [
+      '@title' => $atom->title,
+      '@sid' => $atom->sid,
+    ]), 'error');
+    return;
+  }
+
+  $nid = $refs['node'][0] ?? NULL;
+  if ($nid == NULL) {
+    return;
+  }
+  if ($node = node_load($nid)) {
+    // Check if the node has our protocol fields.
+    $instances = field_info_instances('node', $node->type);
+    if (!isset($instances['field_item_privacy_setting']) || !isset($instances['og_group_ref'])) {
+      drupal_set_message(t("@title (@sid): Could not find any valid items referencing this media. You must set the protocol fields manually.", [
+        '@title' => $atom->title,
+        '@sid' => $atom->sid,
+      ]), 'error');
+      return;
+    }
+
+    // Fail if the user can't update the owning node. We don't want them to
+    // deny themselves access to their own media.
+    if (!node_access('update', $node)) {
+      drupal_set_message(t("@title (@sid): You do not have access to the referencing item. You must set the protocol fields manually.", [
+        '@title' => $atom->title,
+        '@sid' => $atom->sid,
+      ]), 'error');
+      return;
+    }
+
+    // Get the node's protocol settings.
+    $containing_content = entity_metadata_wrapper('node', $node);
+    $sharing = $containing_content->field_item_privacy_setting->value() ?? NULL;
+    // Fail if for some reason the content doesn't have a sharing setting set.
+    if (!$sharing) {
+      drupal_set_message(t("@title (@sid): Could not find any valid items referencing this media. You must set the protocol fields manually.", [
+        '@title' => $atom->title,
+        '@sid' => $atom->sid,
+      ]), 'error');
+      return;
+    }
+
+    $protocol_ids = $containing_content->og_group_ref->raw() ?? [];
+
+    // Owning content must have valid protocol settings to duplicate to the
+    // scald atom.
+    if ($sharing !== 'any' && $sharing !== 'all') {
+      drupal_set_message(t("@title (@sid): Item has invalid sharing settings", [
+        '@title' => $atom->title,
+        '@sid' => $atom->sid,
+      ]), 'error');
+      return;
+    }
+
+    if (empty($protocol_ids)) {
+      drupal_set_message(t("@title (@sid): Item does not have any cultural protocols", [
+        '@title' => $atom->title,
+        '@sid' => $atom->sid,
+      ]), 'error');
+      return;
+    }
+
+    // Duplicate the protocol settings.
+    $atom_entity->field_item_privacy_setting->set($sharing);
+    $atom_entity->field_scald_protocol->set($protocol_ids);
+    try {
+      scald_atom_save($atom);
+    } catch (Exception $e) {
+      drupal_set_message(t("@title (@sid): Failed to set cultural protocols", [
+        '@title' => $atom->title,
+        '@sid' => $atom->sid,
+      ]), 'error');
+    }
   }
 }

@@ -1,0 +1,100 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the og_comments_access module.
+ */
+
+/**
+ * Set og_comments_access OG_AUTHENTICATED_ROLE permissions.
+ */
+function og_comments_access_update_7001(&$sandbox) {
+  // Set og_comments_access OG_AUTHENTICATED_ROLE permissions.
+  if (!isset($sandbox['current'])) {
+    $sandbox['count'] = 0;
+    $sandbox['current'] = 1;
+  }
+
+  $query = db_select('og_role', 'ogr')
+    ->fields('ogr', array('rid', 'name'))
+    ->condition('group_type', 'node', '=')
+    ->condition('group_bundle', 'group', '=')
+    ->condition('rid', $sandbox['current'], '>')
+    ->orderBy('rid', 'ASC');
+  $query->condition('name', array(OG_AUTHENTICATED_ROLE));
+
+  // Get the total amount of items to process.
+  if (!isset($sandbox['total'])) {
+    $sandbox['total'] = $query->countQuery()->execute()->fetchField();
+    // If there are no nodes to update, the stop immediately.
+    if (!$sandbox['total']) {
+      $sandbox['#finished'] = 1;
+      return;
+    }
+  }
+
+  $query->range(0, 25);
+  $rids = $query->execute()->fetchAllkeyed();
+  if (!empty($rids)) {
+    foreach ($rids as $rid => $role_name) {
+      og_role_grant_permissions($rid, array('delete own comments', 'post comments'));
+    }
+  }
+
+  $sandbox['count'] += count($rids);
+  $sandbox['current'] = max(array_keys($rids));
+
+  if ($sandbox['count'] != $sandbox['total']) {
+    $sandbox['#finished'] = ($sandbox['count'] >= $sandbox['total']) ? TRUE : ($sandbox['count'] / $sandbox ['total']);
+  }
+}
+
+/**
+ * Set og_comments_access OG_ADMINISTRATOR_ROLE permissions.
+ */
+function og_comments_access_update_7002(&$sandbox) {
+  $og_group_manager_default_rids = variable_get('og_group_manager_default_rids_node_group');
+  if (!empty($og_group_manager_default_rids)) {
+    foreach ($og_group_manager_default_rids as $rid) {
+      og_role_grant_permissions($rid, array('administer comments', 'modify any comments', 'delete own comments', 'post comments'));
+    }
+  }
+  // Set og_comments_access OG_ADMINISTRATOR_ROLE permissions.
+  if (!isset($sandbox['current'])) {
+    $sandbox['count'] = 0;
+    $sandbox['current'] = 1;
+  }
+
+  $query = db_select('og_role', 'ogr')
+    ->fields('ogr', array('rid', 'name'))
+    ->condition('group_type', 'node', '=')
+    ->condition('group_bundle', 'group', '=')
+    ->condition('rid', $sandbox['current'], '>')
+    ->orderBy('rid', 'ASC');
+  $query->condition('name', array(OG_ADMINISTRATOR_ROLE));
+
+  // Get the total amount of items to process.
+  if (!isset($sandbox['total'])) {
+    $sandbox['total'] = $query->countQuery()->execute()->fetchField();
+    // If there are no nodes to update, the stop immediately.
+    if (!$sandbox['total']) {
+      $sandbox['#finished'] = 1;
+      return;
+    }
+  }
+
+  $query->range(0, 25);
+  $rids = $query->execute()->fetchAllkeyed();
+  if (!empty($rids)) {
+    foreach ($rids as $rid => $role_name) {
+      og_role_grant_permissions($rid, array('administer comments', 'modify any comments', 'delete own comments', 'post comments'));
+    }
+  }
+
+  $sandbox['count'] += count($rids);
+  $sandbox['current'] = max(array_keys($rids));
+
+  if ($sandbox['count'] != $sandbox['total']) {
+    $sandbox['#finished'] = ($sandbox['count'] >= $sandbox['total']) ? TRUE : ($sandbox['count'] / $sandbox ['total']);
+  }
+}

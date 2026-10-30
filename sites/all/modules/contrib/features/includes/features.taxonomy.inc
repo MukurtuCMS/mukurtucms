@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Features integration for 'taxonomy' module.
+ */
+
+/**
  * Implements hook_features_api().
  */
 function taxonomy_features_api() {
@@ -8,6 +13,8 @@ function taxonomy_features_api() {
     'taxonomy' => array(
       'name' => t('Taxonomy'),
       'feature_source' => TRUE,
+      /* @see \hook_taxonomy_default_vocabularies() */
+      /* @see \hook_taxonomy_default_vocabularies_alter() */
       'default_hook' => 'taxonomy_default_vocabularies',
       'default_file' => FEATURES_DEFAULTS_INCLUDED,
     ),
@@ -73,7 +80,7 @@ function taxonomy_features_export_render($module, $data) {
       }
     }
   }
-  $code = "  return ". features_var_export($code, '  ') .";";
+  $code = "  return " . features_var_export($code, '  ') . ";";
   return array('taxonomy_default_vocabularies' => $code);
 }
 

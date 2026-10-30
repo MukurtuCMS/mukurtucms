@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_community.features.menu_links.inc
@@ -10,7 +11,7 @@
 function ma_community_menu_default_menu_links() {
   $menu_links = array();
 
-  // Exported menu link: main-menu_-community:node/add/community
+  // Exported menu link: main-menu_-community:node/add/community.
   $menu_links['main-menu_-community:node/add/community'] = array(
     'menu_name' => 'main-menu',
     'link_path' => 'node/add/community',
@@ -31,11 +32,12 @@ function ma_community_menu_default_menu_links() {
     'expanded' => 0,
     'weight' => -47,
     'customized' => 1,
+    'parent_identifier' => 'main-menu_add-content:node/add',
   );
+
   // Translatables
   // Included for use with string extractors like potx.
   t('+ Community');
-
 
   return $menu_links;
 }

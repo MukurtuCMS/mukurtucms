@@ -1,0 +1,95 @@
+// Full width on mobile
+html, body {
+    width: 100%;
+    margin: 0px;
+    padding: 0px;
+    overflow-x: hidden;
+}
+
+header,
+.hero-image {
+	margin-top: 0px !important;
+	border: 0px !important;
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+}
+
+.fullwidth {
+	width: 100vw;
+	position: relative;
+	left: 50%;
+	right: 50%;
+	margin-left: -50vw;
+	margin-right: -50vw;
+}
+
+.not-front .main-container {
+	padding-left: @grid-gutter-width;
+	padding-right: @grid-gutter-width;
+
+	// Desktop
+	@media (min-width: @screen-md-min) {
+		padding-left: @mukurtu-main-container-padding;
+		padding-right: @mukurtu-main-container-padding;
+	}
+}
+
+// Page Headers
+.page-header {
+	.fullwidth;
+	.section-shadow;
+	background-position: bottom;
+	padding-top: 30px;
+	padding-bottom: 30px;
+	margin-bottom: 0px;
+	text-align: center;
+	font-size: 30px;
+	font-family: @font-family-sans-serif-light;
+	border-bottom: none;
+
+	// Desktop
+	@media (min-width: @screen-md-min) {
+		font-size: 44px;
+	}
+}
+
+// Remove popup icons
+.popup-element {
+	.popup-element-title {
+		background: none;
+	}
+}
+
+// Tabbed node views
+.quicktabs-tabpage {
+	padding-top: 10px;
+	clear: both;
+}
+
+// Comments.
+form {
+	&.comment-form {
+		.comment-reply-post-button {
+			bottom: 0px;
+			padding-bottom: 50px;
+		}
+	}
+}
+
+// Tooltips.
+.tooltip-inner {
+	max-width: 1000px;
+	text-align: left;
+}
+
+// Export form.
+#mukurtu-export-form {
+	#edit-download-file-top {
+		margin-bottom: 20px;
+	}
+}
+
+// Hide the honeypot field. The CSS to do this should be generated automatically by honeypot, and it is (in private files), but since it's in private files, it's access denied. The issue should have been addressed, but isn't, in https://www.drupal.org/project/honeypot/issues/2977351.
+.email-textfield {
+	display: none !important;
+}

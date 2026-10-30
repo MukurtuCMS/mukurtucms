@@ -12,9 +12,12 @@
  * Not inheriting from Feeds base class as ParserCSV should be moved out of
  * Feeds at some time.
  */
-class ParserCSVTest extends DrupalWebTestCase  {
+class ParserCSVTest extends DrupalWebTestCase {
   protected $profile = 'testing';
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'CSV Parser unit tests',
@@ -44,8 +47,8 @@ class ParserCSVTest extends DrupalWebTestCase  {
     include $this->absolutePath() . '/tests/feeds/nodes.csv.php';
 
     $delimiters = $this->getDelimiters();
-    foreach($delimiters as $delimiterType => $delimiter) {
-      $file =  $this->absolutePath() . '/tests/feeds/nodes_' . $delimiterType . '.csv';
+    foreach ($delimiters as $delimiterType => $delimiter) {
+      $file = $this->absolutePath() . '/tests/feeds/nodes_' . $delimiterType . '.csv';
       $iterator = new ParserCSVIterator($file);
       $parser = new ParserCSV();
       $parser->setDelimiter($delimiter);
@@ -64,7 +67,7 @@ class ParserCSVTest extends DrupalWebTestCase  {
 
     $encodings = $this->getEncodings();
     foreach ($encodings as $encoding) {
-      $file =  $this->absolutePath() . "/tests/feeds/encoding_{$encoding}.csv";
+      $file = $this->absolutePath() . "/tests/feeds/encoding_{$encoding}.csv";
       $iterator = new ParserCSVIterator($file);
       $parser = new ParserCSV();
       $parser->setDelimiter(',');
@@ -84,7 +87,7 @@ class ParserCSVTest extends DrupalWebTestCase  {
 
     $encodings = $this->getEncodings();
     foreach ($encodings as $encoding) {
-      $file =  $this->absolutePath() . "/tests/feeds/encoding_{$encoding}.csv";
+      $file = $this->absolutePath() . "/tests/feeds/encoding_{$encoding}.csv";
       $iterator = new ParserCSVIterator($file);
       $parser = new ParserCSV();
       $parser->setDelimiter(',');
@@ -104,12 +107,12 @@ class ParserCSVTest extends DrupalWebTestCase  {
    * Test batching.
    */
   protected function _testBatching() {
-    // Pull in the $control_result array
+    // Pull in the $control_result array.
     include $this->absolutePath() . '/tests/feeds/nodes.csv.php';
 
     $delimiters = $this->getDelimiters();
-    foreach($delimiters as $delimiterType => $delimiter) {
-      $file =  $this->absolutePath() . '/tests/feeds/nodes_' . $delimiterType . '.csv';
+    foreach ($delimiters as $delimiterType => $delimiter) {
+      $file = $this->absolutePath() . '/tests/feeds/nodes_' . $delimiterType . '.csv';
       // Set up parser with 2 lines to parse per call.
       $iterator = new ParserCSVIterator($file);
       $parser = new ParserCSV();
@@ -124,8 +127,7 @@ class ParserCSVTest extends DrupalWebTestCase  {
         $rows = array_merge($rows, $parser->parse($iterator));
         $pos = $parser->lastLinePos();
         $this->assertTrue($parser->lastLinePos() || count($rows) == 10, t('Parser reports line limit correctly'));
-      }
-      while ($pos = $parser->lastLinePos());
+      } while ($pos = $parser->lastLinePos());
 
       $this->assertEqual(md5(serialize($rows)), md5(serialize($control_result)), t('Batch parsed result matches control result for delimiter: ') . $delimiterType);
     }
@@ -138,7 +140,10 @@ class ParserCSVTest extends DrupalWebTestCase  {
     return DRUPAL_ROOT . '/' . drupal_get_path('module', 'feeds');
   }
 
-  static function getDelimiters() {
+  /**
+   * {@inheritdoc}
+   */
+  public static function getDelimiters() {
     return array(
       'comma' => ',',
       'pipe' => '|',
@@ -148,10 +153,14 @@ class ParserCSVTest extends DrupalWebTestCase  {
     );
   }
 
-  static function getEncodings() {
+  /**
+   * {@inheritdoc}
+   */
+  public static function getEncodings() {
     return array(
       'SJIS-win',
       'SJIS',
     );
   }
+
 }

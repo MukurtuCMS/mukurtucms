@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Open Atrium Panopoly Users feature.
+ */
+
+include_once 'oa_panopoly_users.features.inc';

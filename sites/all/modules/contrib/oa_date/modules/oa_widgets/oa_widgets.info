@@ -1,0 +1,13 @@
+name = Open Atrium Widgets
+description = A collection of widgets for Open Atrium
+core = 7.x
+stylesheets[all][] = oa_widgets.css
+dependencies[] = ctools
+dependencies[] = oa_core
+dependencies[] = oa_sections
+
+; Information added by Drupal.org packaging script on 2018-10-18
+version = "7.x-2.91"
+core = "7.x"
+project = "oa_core"
+datestamp = "1539884795"

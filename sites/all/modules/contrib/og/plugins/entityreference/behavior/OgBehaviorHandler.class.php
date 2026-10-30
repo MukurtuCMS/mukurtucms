@@ -121,10 +121,12 @@ class OgBehaviorHandler extends EntityReference_BehaviorHandler_Abstract {
     $states = array();
     foreach ($items as $item) {
       $gid = $item['target_id'];
+
       if (empty($item['state']) || !in_array($gid, $diff['insert'])) {
         // State isn't provided, or not an "insert" operation.
         continue;
       }
+
       $states[$gid] = $item['state'];
     }
 
@@ -150,7 +152,7 @@ class OgBehaviorHandler extends EntityReference_BehaviorHandler_Abstract {
    *   Array with all the differences, or an empty array if none found.
    */
   public function groupAudiencegetDiff($entity_type, $entity, $field, $instance, $langcode, $items) {
-    $return = FALSE;
+    $return = [];
 
     $field_name = $field['field_name'];
     $wrapper = entity_metadata_wrapper($entity_type, $entity);
@@ -201,33 +203,30 @@ class OgBehaviorHandler extends EntityReference_BehaviorHandler_Abstract {
       // that this field is attached to.
       foreach ($entity_types as $entity_type) {
         $entity_info = entity_get_info($entity_type);
-        $data['og_membership'] = array(
-          'table' => array(
-            'join' => array(
-              $entity_info['base table'] => array(
-                // Join entity base table on its id field with left_field.
-                'left_field' => $entity_info['entity keys']['id'],
-                'field' => 'etid',
-                'extra' => array(
-                  0 => array(
-                    'field' => 'entity_type',
-                    'value' => $entity_type,
-                  ),
-                ),
-              ),
+        $data['og_membership']['table']['join'][$entity_info['base table']] = array(
+          // Join entity base table on its id field with left_field.
+          'left_field' => $entity_info['entity keys']['id'],
+          'field' => 'etid',
+          'extra' => array(
+            0 => array(
+              'field' => 'entity_type',
+              'value' => $entity_type,
             ),
           ),
-          // Copy the original config from the table definition.
-          $field['field_name'] => $data['field_data_' . $field['field_name']][$field['field_name']],
-          $field['field_name'] . '_target_id' => $data['field_data_' . $field['field_name']][$field['field_name'] . '_target_id'],
         );
+          // Copy the original config from the table definition.
+        $data['og_membership'][$field['field_name']] = $data['field_data_' . $field['field_name']][$field['field_name']];
+        $data['og_membership'][$field['field_name'] . '_target_id'] = $data['field_data_' . $field['field_name']][$field['field_name'] . '_target_id'];
 
         // Change config with settings from og_membership table.
-        foreach (array('filter', 'argument', 'sort') as $op) {
+        foreach (array('filter', 'argument', 'sort', 'relationship') as $op) {
           $data['og_membership'][$field['field_name'] . '_target_id'][$op]['field'] = 'gid';
           $data['og_membership'][$field['field_name'] . '_target_id'][$op]['table'] = 'og_membership';
           unset($data['og_membership'][$field['field_name'] . '_target_id'][$op]['additional fields']);
         }
+
+        // Add gid as the relationship field.
+        $data['og_membership'][$field['field_name'] . '_target_id']['relationship']['field'] = 'gid';
       }
 
       // Get rid of the original table configs.
@@ -275,6 +274,12 @@ class OgBehaviorHandler extends EntityReference_BehaviorHandler_Abstract {
 
       if ($field_mode == 'admin' && !user_access('administer group')) {
         // No need to validate the admin, as the user has no access to it.
+        continue;
+      }
+
+      // Mukurtu patch.
+      // Skip validation if coming from a Mukurtu importer.
+      if ($field_mode == 'mukurtu_import') {
         continue;
       }
 

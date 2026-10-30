@@ -1,0 +1,94 @@
+<?php
+/**
+ * @file
+ * Code for the Mukurtu Person feature.
+ */
+
+include_once 'ma_person.features.inc';
+
+/**
+ * Implements hook_node_view_alter().
+ */
+function ma_person_node_view_alter(&$build) {
+    // Only display the first media item for the Person type, for the "Person Teaser" display mode
+    // Also for the taxonomy record teasers for digital heritage
+    if($build['#entity_type'] == 'node' && (
+        ($build['#bundle'] == 'person' && $build['#view_mode'] == 'person_teaser') ||
+        ($build['#bundle'] == 'digital_heritage' && $build['#view_mode'] == 'taxonomy_record_teaser')
+    )
+    ){
+        if(isset($build['field_media_asset'])) {
+            $count = 0;
+            foreach($build['field_media_asset']['#items'] as $index => $media_item) {
+                if($count > 0) {
+                    if(isset($build['field_media_asset'][$index])) {
+                        unset($build['field_media_asset'][$index]);
+                    }
+                }
+                $count++;
+            }
+        }
+    }
+}
+
+/**
+ * Implements hook_field_widget_form_alter.
+ */
+function ma_person_field_widget_form_alter(&$element, &$form_state, $context) {
+    // Add section title to paragraph section type text
+    if(isset($element['#field_name']) && $element['#field_name'] == 'field_sections') {
+        $n_entries = 0;
+        if(is_numeric($element['#max_delta']) && $element['#max_delta'] > -1) {
+            $n_entries = $element['#max_delta'];
+            foreach(range(0, $n_entries) as $i) {
+                if(isset($element[$i]['#entity']->field_section_title[LANGUAGE_NONE][0]['safe_value'])) {
+                    $section_title = $element[$i]['#entity']->field_section_title[LANGUAGE_NONE][0]['safe_value'];
+                    $paragraph_title = $element[$i]['paragraph_bundle_title']['info']['#markup'];
+                    $element[$i]['paragraph_bundle_title']['info']['#markup'] = "$section_title ($paragraph_title)";
+                }
+            }
+        }
+    }
+}
+
+/*
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function ma_person_form_node_form_alter(&$form, &$form_state, $form_id) {
+    if($form['#id'] == 'person-node-form') {
+        // Auto-populate person title field when creating record from an existing taxonomy term
+        if(empty($form['#node']->title) && isset($form_state['node']) && mukurtu_taxonomy_records_is_record($form_state['node'])) {
+            $action = arg(3);
+            $tid = arg(4);
+            if(isset($action) && isset($tid)) {
+                if($action == 'attach-record') {
+                    $term = taxonomy_term_load($tid);
+                    if($term) {
+                        $form['title']['#default_value'] = $term->name;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Implements hook_suggested_record_terms().
+ */
+function ma_person_suggested_record_terms($entity) {
+    return array();
+}
+
+/**
+ * Implements hook_feeds_processor_targets_alter().
+ */
+function ma_person_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
+    if($entity_type == 'node' && $bundle_name == 'person') {
+        $targets['field_mukurtu_terms:guid_or_tid'] = array(
+            'name' => t('Mukurtu Terms (Entity reference by Feeds GUID, failover to TID)'),
+            'description' => t('The field instance Mukurtu Terms of field_mukurtu_terms matched by Feeds GUID.  If the GUID is not found, it will be used as a TID'),
+            'callback' => 'mukurtu_taxonomy_records_set_target',
+            'real_target' => 'field_mukurtu_terms',
+        );
+    }
+}

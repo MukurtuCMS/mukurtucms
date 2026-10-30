@@ -1,0 +1,25 @@
+From 62fc1791ae04f61347f9b9eb48229a53d35326e8 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Tue, 25 Apr 2023 16:27:53 -0700
+Subject: [PATCH] Remove default parameter value for PHP 8
+
+---
+ fe_block.module | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fe_block.module b/fe_block.module
+index 0ae5204c..4674b834 100644
+--- a/fe_block.module
++++ b/fe_block.module
+@@ -90,7 +90,7 @@ function fe_block_settings_features_export($data, &$export, $module_name = '') {
+ /**
+  * Implements hook_features_export_render().
+  */
+-function fe_block_settings_features_export_render($module_name = '', $data) {
++function fe_block_settings_features_export_render($module_name, $data) {
+   $code = array();
+   $code[] = '  $export = array();';
+   $code[] = '';
+-- 
+2.34.1
+

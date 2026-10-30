@@ -302,12 +302,12 @@ function hook_user_update(&$edit, $account, $category) {
 /**
  * The user just logged in.
  *
- * @param $edit
- *   The array of form values submitted by the user.
+ * @param $form_state
+ *   A keyed array containing the current state of the login form.
  * @param $account
  *   The user object on which the operation was just performed.
  */
-function hook_user_login(&$edit, $account) {
+function hook_user_login(&$form_state, $account) {
   // If the user has a NULL time zone, notify them to set a time zone.
   if (!$account->timezone && variable_get('configurable_timezones', 1) && variable_get('empty_timezone_message', 0)) {
     drupal_set_message(t('Configure your <a href="@user-edit">account time zone setting</a>.', array('@user-edit' => url("user/$account->uid/edit", array('query' => drupal_get_destination(), 'fragment' => 'edit-timezone')))));
@@ -470,6 +470,36 @@ function hook_user_role_delete($role) {
   db_delete('my_module_table')
     ->condition('rid', $role->rid)
     ->execute();
+}
+
+/**
+ * Respond to user flood control events.
+ *
+ * This hook allows you act when an unsuccessful user login has triggered
+ * flood control. This means that either an IP address or a specific user
+ * account has been temporarily blocked from logging in.
+ *
+ * @param $ip
+ *   The IP address that triggered flood control.
+ * @param $username
+ *   The username that has been temporarily blocked.
+ *
+ * @see user_login_final_validate()
+ */
+function hook_user_flood_control($ip, $username = FALSE) {
+  if (!empty($username)) {
+    // Do something with the blocked $username and $ip. For example, send an
+    // e-mail to the user and/or site administrator.
+
+    // Drupal core uses this hook to log the event:
+    watchdog('user', 'Flood control blocked login attempt for %user from %ip.', array('%user' => $username, '%ip' => $ip));
+  }
+  else {
+    // Do something with the blocked $ip. For example, add it to a block-list.
+
+    // Drupal core uses this hook to log the event:
+    watchdog('user', 'Flood control blocked login attempt from %ip.', array('%ip' => $ip));
+  }
 }
 
 /**

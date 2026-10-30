@@ -1,0 +1,844 @@
+<?php
+
+/**
+ * @file
+ * Bundle copy.
+ */
+
+/**
+ * Api function to get the bundle copy info.
+ */
+function bundle_copy_get_info() {
+  static $info = FALSE;
+
+  if (!$info) {
+    return module_invoke_all('bundle_copy_info');
+  }
+
+  return $info;
+}
+
+/**
+ * Implements hook_bundle_copy_info().
+ */
+function bundle_copy_bundle_copy_info() {
+  $info = array();
+
+  $info['node'] = array(
+    'bundle_export_callback' => 'node_type_get_type',
+    'bundle_save_callback' => 'node_type_save',
+    'bundle_clone_name_validate' => 'node_type_load',
+    'bundle_name_validate' => 'node_type_load',
+    'export_menu' => array(
+      'path' => 'admin/structure/types/export',
+      'access arguments' => 'administer content types',
+    ),
+    'import_menu' => array(
+      'path' => 'admin/structure/types/import',
+      'access arguments' => 'administer content types',
+    ),
+    'clone_menu' => array(
+      'path' => 'admin/structure/types/clone',
+      'access arguments' => 'administer content types',
+    ),
+  );
+
+  $info['user'] = array(
+    'bundle_export_callback' => '_bc_bundle_export_ignore',
+    'bundle_save_callback' => '_bc_bundle_save_ignore',
+    'bundle_name_validate' => '',
+    'export_menu' => array(
+      'path' => 'admin/config/people/accounts/export',
+      'access arguments' => 'administer users',
+    ),
+    'import_menu' => array(
+      'path' => 'admin/config/people/accounts/import',
+      'access arguments' => 'administer users',
+    ),
+  );
+
+  if (module_exists('taxonomy')) {
+    $info['taxonomy_term'] = array(
+      'bundle_export_callback' => '_bc_copy_taxonomy_load',
+      'bundle_save_callback' => '_bc_copy_taxonomy_save',
+      'bundle_name_validate' => 'taxonomy_vocabulary_machine_name_load',
+      'export_menu' => array(
+        'path' => 'admin/structure/taxonomy/export',
+        'access arguments' => 'administer taxonomy',
+      ),
+      'import_menu' => array(
+        'path' => 'admin/structure/taxonomy/import',
+        'access arguments' => 'administer taxonomy',
+      ),
+    );
+  }
+
+  return $info;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function bundle_copy_menu() {
+  $items = array();
+
+  $bc_info = bundle_copy_get_info();
+
+  foreach ($bc_info as $entity_type => $info) {
+    $items[$info['export_menu']['path']] = array(
+      'title' => 'Export',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('bundle_copy_export', $entity_type),
+      'access arguments' => array($info['export_menu']['access arguments']),
+      'type' => MENU_LOCAL_TASK,
+    );
+    $items[$info['import_menu']['path']] = array(
+      'title' => 'Import',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('bundle_copy_import', $entity_type),
+      'access callback' => 'bundle_copy_import_access',
+      'access arguments' => array($info['import_menu']['access arguments']),
+      'type' => MENU_LOCAL_TASK,
+    );
+    if (isset($info['clone_menu']['path'])) {
+      $bname_validate = $bc_info[$entity_type]['bundle_clone_name_validate'];
+      $items[$info['clone_menu']['path']] = array(
+        'title' => 'Clone',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('bundle_copy_clone', $entity_type, $bname_validate),
+        'access arguments' => array($info['clone_menu']['access arguments']),
+        'type' => MENU_LOCAL_TASK,
+      );
+    }
+  }
+  return $items;
+}
+
+/**
+ * Bundle copy import access callback.
+ *
+ * Bundle copy imports require an additional access check because they are PHP
+ * code and PHP is more locked down than the general permission.
+ */
+function bundle_copy_import_access($permission) {
+  return user_access($permission) && user_access('use PHP for settings');
+}
+
+/**
+ * Menu callback: present the export page.
+ */
+function bundle_copy_export($form, &$form_state, $entity_type = 'node') {
+
+  if (isset($form_state['step'])) {
+    $step = $form_state['step'];
+  }
+  else {
+    $step = 1;
+    $form_state['step'] = $step;
+  }
+
+  switch ($step) {
+
+    // Select the bundles.
+    case 1:
+      $bundles = _bundle_copy_bundle_info($entity_type, TRUE);
+
+      $form['bundle-info'] = array(
+        '#markup' => t('Select bundles you want to export.'),
+      );
+      $form['bundles'] = array(
+        '#type' => 'tableselect',
+        '#header' => array('label' => t('Bundle')),
+        '#options' => $bundles,
+        '#required' => TRUE,
+        '#empty' => t('No bundles found.'),
+      );
+
+      $form['next'] = array(
+        '#type' => 'submit',
+        '#value' => t('Next'),
+      );
+      break;
+
+    // List the fields / field groups.
+    case 2:
+
+      // Field group.
+      $all_groups = function_exists('field_group_info_groups') ? field_group_info_groups() : array();
+
+      // Fields.
+      $field_options = $instances = array();
+      $selected_bundles = $form_state['page_values'][1]['bundles'];
+      foreach ($selected_bundles as $key => $bundle) {
+        if ($key === $bundle) {
+          $instances += field_info_instances($entity_type, $bundle);
+        }
+      }
+      ksort($instances);
+
+      foreach ($instances as $key => $info) {
+        // Same as $key.
+        $field_options[$key]['field'] = $info['field_name'];
+        $field_options[$key]['label'] = $info['label'];
+      }
+
+      $form['fields-info'] = array(
+        '#markup' => t('Select fields you want to export.'),
+      );
+      $form['fields'] = array(
+        '#type' => 'tableselect',
+        '#header' => array('field' => t('Field name'), 'label' => t('Label')),
+        '#options' => $field_options,
+        '#empty' => t('No fields found.'),
+      );
+
+      // Field group support.
+      if (!empty($all_groups)) {
+        $group_options = $fieldgroups = array();
+        if (isset($all_groups[$entity_type])) {
+          foreach ($selected_bundles as $key => $bundle) {
+            if ($key === $bundle) {
+              if (!isset($all_groups[$entity_type][$key])) {
+                continue;
+              }
+              foreach ($all_groups[$entity_type][$key] as $view_mode => $groups) {
+                foreach ($groups as $field_group) {
+                  $group_options[$field_group->identifier]['fieldgroup'] = $field_group->label . ' (' . $field_group->bundle . ' - ' . $field_group->mode . ')';
+                  $fieldgroups[$field_group->identifier] = $field_group;
+                }
+              }
+            }
+          }
+        }
+        if (!empty($group_options)) {
+          $form['fieldgroups-info'] = array(
+            '#markup' => t('Select field groups you want to export.'),
+          );
+          $form['fieldgroups'] = array(
+            '#type' => 'tableselect',
+            '#header' => array('fieldgroup' => t('Field group name')),
+            '#options' => $group_options,
+          );
+          $form['fieldgroups-full'] = array(
+            '#type' => 'value',
+            '#value' => $fieldgroups,
+          );
+        }
+      }
+
+      $form['actions'] = array('#type' => 'actions');
+      $form['actions']['next'] = array(
+        '#type' => 'submit',
+        '#value' => t('Export'),
+      );
+
+      $bc_info = bundle_copy_get_info();
+      $form['actions']['cancel'] = array(
+        '#markup' => l(t('Cancel'), $bc_info[$entity_type]['export_menu']['path']),
+      );
+
+      break;
+
+    // Export data.
+    case 3:
+
+      $data = _bundle_copy_export_data($entity_type, $form_state['page_values']);
+
+      $form['export'] = array(
+        '#title' => t('Export data'),
+        '#type' => 'textarea',
+        '#cols' => 60,
+        '#value' => $data,
+        '#rows' => 40,
+        '#description' => t('Copy the export text and paste it into another bundle using the import function.'),
+      );
+      break;
+  }
+
+  return $form;
+}
+
+/**
+ * Submit callback: export data.
+ */
+function bundle_copy_export_submit($form, &$form_state) {
+
+  // Save the form state values.
+  $step = $form_state['step'];
+  $form_state['page_values'][$step] = $form_state['values'];
+
+  // Add step and rebuild.
+  $form_state['step'] = $form_state['step'] + 1;
+  $form_state['rebuild'] = TRUE;
+}
+
+/**
+ * Menu callback: present the import page.
+ */
+function bundle_copy_import($form, $form_state, $entity_type = 'node') {
+
+  $form['entity_type'] = array('#type' => 'value', '#value' => $entity_type);
+
+  $form['info'] = array(
+    '#markup' => t('This form will import bundle and field definitions.'),
+  );
+
+  // $form['type_name'] = array(
+  //  '#title' => t('Bundle'),
+  //  '#description' => t('Select the bundle to import these fields into.<br/>Select &lt;Create&gt; to create a new bundle to contain the fields.'),
+  //  '#type' => 'select',
+  //  '#options' => array('<create>' => t('<Create>')) + _bundle_copy_bundle_info($entity_type),
+  // );
+  $form['macro'] = array(
+    '#type' => 'textarea',
+    '#rows' => 10,
+    '#title' => t('Import data'),
+    '#required' => TRUE,
+    '#description' => t('Paste the text created by a bundle export into this field.'),
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Import'),
+  );
+
+  return $form;
+}
+
+/**
+ * Submit callback: import data.
+ */
+function bundle_copy_import_submit($form, &$form_state) {
+
+  // Evaluate data.
+  eval($form_state['values']['macro']);
+
+  if (isset($data) && is_array($data)) {
+    bundle_copy_import_process($data);
+  }
+  else {
+    drupal_set_message(t('The pasted text did not contain any valid export data.'), 'error');
+  }
+}
+
+/**
+ *
+ */
+function bundle_copy_import_process($data) {
+  $modules = module_list();
+  $bc_info = bundle_copy_get_info();
+
+  // Create bundles.
+  foreach ($data['bundles'] as $key => $bundle) {
+    $entity_type = '';
+    if (is_object($bundle)) {
+      $entity_type = $bundle->bc_entity_type;
+    }
+    elseif (is_array($bundle)) {
+      $entity_type = $bundle['bc_entity_type'];
+    }
+    if (!empty($entity_type)) {
+      $existing_bundles = _bundle_copy_bundle_info($entity_type);
+      $bundle_save_callback = $bc_info[$entity_type]['bundle_save_callback'];
+      // Validate a bundle name.
+      $bundle_name_validate = $bc_info[$entity_type]['bundle_name_validate'];
+      $bundle_name = $bundle->type ? $bundle->type : $bundle->machine_name;
+      $content_name = $bundle->name;
+      $is_type_exist = in_array($content_name, $existing_bundles);
+      $machine_name = preg_replace('@[^a-z0-9]+@', '_', strtolower($bundle_name));
+      if ($bundle_name === $machine_name) {
+        if (!isset($existing_bundles[$bundle_name])) {
+          if ($is_type_exist) {
+            drupal_set_message(t('The human-readable name %bundle is already taken', array('%bundle' => $bundle->name)));
+            return;
+          }
+          else {
+            $bundle_info = $bundle_save_callback($bundle);
+            drupal_set_message(t('%bundle bundle has been created.', array('%bundle' => $bundle->name)));
+          }
+        }
+        else {
+          $orignal_name = node_type_load($bundle_name);
+          if ($is_type_exist && $content_name != $orignal_name->name) {
+            drupal_set_message(t('The human-readable name %bundle is already taken', array('%bundle' => $bundle->name)));
+            return;
+          }
+          else {
+            $bundle_info = $bundle_save_callback($bundle);
+            drupal_set_message(t('%bundle bundle has been updated.', array('%bundle' => $bundle->name)));
+          }
+        }
+      }
+      else {
+        drupal_set_message('The machine-readable name must contain only lowercase letters, numbers, and underscores.');
+        return;
+      }
+    }
+  }
+
+  // Create or update fields and their instances.
+  if (isset($data['fields'])) {
+    foreach ($data['fields'] as $key => $field) {
+
+      // Check if the field module exists.
+      $module = $field['module'];
+      if (!isset($modules[$module])) {
+        drupal_set_message(t('%field_name field could not be created because the module %module is disabled or missing.', array('%field_name' => $key, '%module' => $module)), 'error');
+        continue;
+      }
+
+      if (isset($data['instances'][$key])) {
+
+        // Create or update field.
+        $prior_field = field_read_field($field['field_name'], array('include_inactive' => TRUE));
+        if (!$prior_field) {
+          field_create_field($field);
+          drupal_set_message(t('%field_name field has been created.', array('%field_name' => $key)));
+        }
+        else {
+          $field['id'] = $prior_field['id'];
+          field_update_field($field);
+          drupal_set_message(t('%field_name field has been updated.', array('%field_name' => $key)));
+        }
+
+        // Create or update field instances.
+        foreach ($data['instances'][$key] as $ikey => $instance) {
+
+          // Make sure the needed key exists.
+          if (!isset($instance['field_name'])) {
+            continue;
+          }
+
+          $prior_instance = field_read_instance($instance['entity_type'], $instance['field_name'], $instance['bundle']);
+          if (!$prior_instance) {
+            field_create_instance($instance);
+            drupal_set_message(t('%field_name instance has been created for @bundle in @entity_type.', array('%field_name' => $key, '@bundle' => $instance['bundle'], '@entity_type' => $instance['entity_type'])));
+          }
+          else {
+            $instance['id'] = $prior_instance['id'];
+            $instance['field_id'] = $prior_instance['field_id'];
+            field_update_instance($instance);
+            drupal_set_message(t('%field_name instance has been updated for @bundle in @entity_type.', array('%field_name' => $key, '@bundle' => $instance['bundle'], '@entity_type' => $instance['entity_type'])));
+          }
+        }
+      }
+    }
+  }
+
+  // Create / update fieldgroups.
+  if (isset($data['fieldgroups'])) {
+    if (module_exists('field_group')) {
+      ctools_include('export');
+      $existing_field_groups = field_group_info_groups();
+      foreach ($data['fieldgroups'] as $identifier => $fieldgroup) {
+        if (isset($existing_field_groups[$fieldgroup->entity_type][$fieldgroup->bundle][$fieldgroup->mode][$fieldgroup->group_name])) {
+          $existing = $existing_field_groups[$fieldgroup->entity_type][$fieldgroup->bundle][$fieldgroup->mode][$fieldgroup->group_name];
+          $fieldgroup->id = $existing->id;
+          if (!isset($fieldgroup->disabled)) {
+            $fieldgroup->disabled = FALSE;
+          }
+          ctools_export_crud_save('field_group', $fieldgroup);
+          ctools_export_crud_set_status('field_group', $fieldgroup, $fieldgroup->disabled);
+          drupal_set_message(t('%fieldgroup fieldgroup has been updated for @bundle in @entity_type.', array('%fieldgroup' => $fieldgroup->label, '@bundle' => $fieldgroup->bundle, '@entity_type' => $fieldgroup->entity_type)));
+        }
+        else {
+          unset($fieldgroup->id);
+          unset($fieldgroup->export_type);
+          if (!isset($fieldgroup->disabled)) {
+            $fieldgroup->disabled = FALSE;
+          }
+          ctools_export_crud_save('field_group', $fieldgroup);
+          $fieldgroup->export_type = 1;
+          ctools_export_crud_set_status('field_group', $fieldgroup, $fieldgroup->disabled);
+          drupal_set_message(t('%fieldgroup fieldgroup has been saved for @bundle in @entity_type.', array('%fieldgroup' => $fieldgroup->label, '@bundle' => $fieldgroup->bundle, '@entity_type' => $fieldgroup->entity_type)));
+        }
+      }
+    }
+    else {
+      drupal_set_message(t('The fieldgroups could not be saved because the <em>Field group</em> module is disabled or missing.'), 'error');
+    }
+  }
+
+  //Import display Suite configuration.
+  if (isset($data['display_suite'])) {
+    if (module_exists('ds')) {
+      ctools_include('export');
+
+      //publishing_message|new_imported_machine_name|form'
+      foreach($data['display_suite'] as $identifier => $ds_config) {
+
+        $tables = array(
+          'ds_field_settings',
+          'ds_layout_settings',
+        );
+
+        foreach ($tables as $table) {
+          //New imports set to export in code
+          $ds_config->export_type = 2;
+
+          $existing_data = ctools_export_crud_load_all($table);
+          foreach ($existing_data as $id => $existing) {
+            if ($existing->entity_type == $entity_type && $existing->bundle == $ds_config->bundle) {
+              //exiting imports set to export in db
+              $ds_config->export_type = 1;
+              break;
+            }
+          }
+
+          unset($ds_config->export_module);
+
+          // Save the object to DB.
+          ctools_export_crud_save($table, $ds_config);
+          ctools_export_crud_set_status($table, $ds_config, $ds_config->disabled);
+        }
+      }
+    }
+    else {
+      drupal_set_message(t('The Display Suite settings could not be saved because the <em>Display Suite</em> module is disabled or missing.'), 'error');
+    }
+  }
+
+  // Clear caches.
+  field_info_cache_clear();
+  if (module_exists('field_group')) {
+    cache_clear_all('field_groups', 'cache_field');
+  }
+}
+
+/**
+ * Return bundles for a certain entity type.
+ *
+ * @param $entity_type
+ *   The name of the entity type.
+ * @param $table_select
+ *   Whether we're returning for the table select or not.
+ */
+function _bundle_copy_bundle_info($entity_type, $table_select = FALSE) {
+  static $bundles = array();
+
+  if (!isset($bundles[$entity_type])) {
+    $bundles[$entity_type] = array();
+    $entity_info = entity_get_info($entity_type);
+    $entity_bundles = $entity_info['bundles'];
+    ksort($entity_bundles);
+    foreach ($entity_bundles as $key => $info) {
+      $label = isset($info['label']) ? $info['label'] : drupal_ucfirst(str_replace('_', ' ', $key));
+      if ($table_select) {
+        $bundles[$entity_type][$key]['label'] = $label;
+      }
+      else {
+        $bundles[$entity_type][$key] = $label;
+      }
+    }
+  }
+
+  return $bundles[$entity_type];
+}
+
+/**
+ * Creates export data.
+ *
+ * @param $entity_type
+ *   The name of the entity_type
+ * @param $selected_data
+ *   The selected data.
+ */
+function _bundle_copy_export_data($entity_type, $selected_data) {
+
+  ctools_include('export');
+
+  $bc_info = bundle_copy_get_info();
+  $selected_bundles = $selected_data[1]['bundles'];
+  $selected_fields = $selected_data[2]['fields'];
+  $selected_fieldgroups = isset($selected_data[2]['fieldgroups']) ? $selected_data[2]['fieldgroups'] : array();
+  $full_fieldgroups = isset($selected_data[2]['fieldgroups-full']) ? $selected_data[2]['fieldgroups-full'] : array();
+
+  $data = $instances = array();
+  $fields = field_info_fields();
+  foreach ($selected_bundles as $bkey => $binfo) {
+
+    if ($bkey !== $binfo) {
+      continue;
+    }
+
+    $field_instances = field_info_instances($entity_type, $bkey);
+    ksort($field_instances);
+
+    // Bundles export data.
+    $bundle_info_callback = $bc_info[$entity_type]['bundle_export_callback'];
+    $bundle_info = $bundle_info_callback($bkey, $entity_type);
+    if (is_object($bundle_info)) {
+      $bundle_info->bc_entity_type = $entity_type;
+    }
+    elseif (is_array($bundle_info)) {
+      $bundle_info['bc_entity_type'] = $entity_type;
+    }
+    $data['bundles'][$bkey] = $bundle_info;
+
+    // Fields export data.
+    foreach ($selected_fields as $fkey => $finfo) {
+      if ($fkey === $finfo) {
+
+        if (!isset($data['fields'][$fkey])) {
+          unset($fields[$fkey]['id']);
+          $data['fields'][$fkey] = $fields[$fkey];
+        }
+
+        if (isset($field_instances[$fkey])) {
+          unset($field_instances[$fkey]['id']);
+          unset($field_instances[$fkey]['field_id']);
+          $instances[$fkey][] = $field_instances[$fkey];
+        }
+        // Field Collection Export data.
+        if ($fields[$fkey]['type'] == 'field_collection' && $fields[$fkey]['module'] == 'field_collection') {
+          $fc_fields = _bc_copy_field_collection_export($fields, $fields[$fkey]['field_name']);
+          foreach ($fc_fields as $fc_fkey => $fc_finfo) {
+            if (!isset($data['fields'][$fc_fkey])) {
+              unset($fields[$fc_fkey]['id']);
+              $data['fields'][$fc_fkey] = $fields[$fc_fkey];
+            }
+            $instances[$fc_fkey][] = $fc_finfo['instance'];
+          }
+        }
+      }
+    }
+
+    // Export Display Suite configuration.
+    if (module_exists('ds')) {
+
+      $tables = array(
+        'ds_field_settings',
+        'ds_layout_settings',
+      );
+
+      foreach ($tables as $table) {
+        // Load CTools exportable objects for this table.
+        $exportables = ctools_export_crud_load_all($table);
+
+        foreach ($exportables as $id => $export) {
+          if ($export->entity_type == $entity_type && $export->bundle == $bkey) {
+
+            // Modify exported object.
+            $export->id = $entity_type . '|' . $bkey . '|' . $export->view_mode;
+            $export->export_type = 2;
+            if (!isset($export->disabled)) {
+              $export->disabled = FALSE;
+            }
+            $export->bundle = $bkey;
+            unset($export->export_module);
+
+            $data['display_suite'][$export->id] = $export;
+
+          }
+        }
+      }
+    }
+
+  }
+  ksort($instances);
+  $data['instances'] = $instances;
+
+  // Field group export data.
+  if (!empty($selected_fieldgroups)) {
+    foreach ($selected_fieldgroups as $key => $value) {
+      if ($value !== 0) {
+        $data['fieldgroups'][$full_fieldgroups[$key]->identifier] = $full_fieldgroups[$key];
+      }
+    }
+  }
+
+  return '$data = ' . ctools_var_export($data) . ';';
+}
+
+/**
+ * Helper function to load the fields of field collection field.
+ * Also it load recursively if field collection field exists inside a field collection.
+ *
+ * @param $fields
+ *   The info of all fields.
+ * @param $fcfield
+ *   The name of the field Collection field.
+ */
+function _bc_copy_field_collection_export($fields, $fcfield) {
+
+  $fc_fields_data = array();
+  $fc_field_instances = field_info_instances('field_collection_item', $fcfield);
+  foreach ($fc_field_instances as $fc_fkey => $fc_finfo) {
+
+    unset($fc_field_instances[$fc_fkey]['id']);
+    unset($fc_field_instances[$fc_fkey]['field_id']);
+    $fc_fields_data[$fc_fkey]['instance'] = $fc_field_instances[$fc_fkey];
+    if ($fields[$fc_fkey]['type'] == 'field_collection' && $fields[$fc_fkey]['module'] == 'field_collection') {
+
+      $fc_fields_fc_fields_data = _bc_copy_field_collection_export($fields, $fields[$fc_fkey]['field_name']);
+      $fc_fields_data = array_merge($fc_fields_data, $fc_fields_fc_fields_data);
+    }
+  }
+  return $fc_fields_data;
+}
+
+/**
+ * Helper function to load the taxonomy, but remove the vid on the object.
+ *
+ * @param $name
+ *   The name of the bundle.
+ */
+function _bc_copy_taxonomy_load($name) {
+  $bundle = taxonomy_vocabulary_machine_name_load($name);
+  return $bundle;
+}
+
+/**
+ * Helper function to save the taxonomy.
+ */
+function _bc_copy_taxonomy_save($bundle) {
+  if ($bundle->vid) {
+    unset($bundle->vid);
+  }
+  $vid = db_query('SELECT vid FROM {taxonomy_vocabulary} WHERE machine_name = :machine_name', array(':machine_name' => $bundle->machine_name))->fetchField();
+  if ($vid) {
+    $bundle->vid = $vid;
+  }
+  taxonomy_vocabulary_save($bundle);
+}
+
+/**
+ * Helper function to ignore a bundle on export.
+ */
+function _bc_bundle_export_ignore($name) {
+
+}
+
+/**
+ * Helper function to ignore a bundle save.
+ */
+function _bc_bundle_save_ignore($bundle) {
+
+}
+
+
+/**
+ * Menu callback: present the clone page.
+ */
+function bundle_copy_clone($form, &$form_state, $entity_type = 'node', $bname_validate = 'node_type_load') {
+
+  $bundles = _bundle_copy_bundle_info($entity_type, FALSE);
+  $form['bundle'] = array(
+    '#title' => 'Source Bundle',
+    '#type' => 'select',
+    '#options' => $bundles,
+    '#default_value' => '',
+    '#description' => t('Select the <em>%btype</em> which you want to clone.', array('%btype' => ucfirst($entity_type))),
+  );
+  $form['name'] = array(
+    '#title' => t('New Bundle Name'),
+    '#type' => 'textfield',
+    '#description' => t('The human-readable name of this %btype type. This text will be displayed as part of the list on the <em>Add new content</em> page. It is recommended that this name begin with a capital letter and contain only letters, numbers, and spaces. This name must be unique.', array('%btype' => ucfirst($entity_type))),
+    '#required' => TRUE,
+    '#size' => 30,
+  );
+  $form['type'] = array(
+    '#type' => 'machine_name',
+    '#maxlength' => 32,
+    '#machine_name' => array(
+      'exists' => $bname_validate,
+    ),
+    '#description' => t('A unique machine-readable name for this %btype. It must only contain lowercase letters, numbers, and underscores. This name will be used for constructing the URL of the %node-add page, in which underscores will be converted into hyphens.', array('%node-add' => t('Add new content'), '%btype' => ucfirst($entity_type))),
+  );
+  $form['next'] = array(
+    '#type' => 'submit',
+    '#value' => t('Clone'),
+  );
+  $form_state['storage']['entity_type'] = $entity_type;
+  return $form;
+}
+/**
+ * Submit callback: Clone data.
+ */
+function bundle_copy_clone_submit($form, &$form_state) {
+
+  $src_btype = $form_state['values']['bundle'];
+  $new_bname = $form_state['values']['name'];
+  $new_btype = $form_state['values']['type'];
+  $entity_type = $form_state['storage']['entity_type'];
+  $bc_info = bundle_copy_get_info();
+
+  if (isset($bc_info[$entity_type])) {
+    $bundle_export_callback = $bc_info[$entity_type]['bundle_export_callback'];
+    $bundle_save_callback = $bc_info[$entity_type]['bundle_save_callback'];
+
+    $new_bundle = $bundle_export_callback($src_btype, $entity_type);
+
+    $new_bundle->type = $new_bundle->orig_type = $new_btype;
+    $new_bundle->name = $new_bname;
+    $new_bundle->custom = 1;
+
+    $bundle_status = $bundle_save_callback($new_bundle);
+
+    $new_fields = field_info_instances($entity_type, $src_btype);
+    foreach ($new_fields as $key => $value) {
+      $new_fields[$key]['bundle'] = $new_btype;
+      field_create_instance($new_fields[$key]);
+    }
+
+    if (module_exists('field_group')) {
+      $all_field_groups = field_group_info_groups();
+      if (isset($all_field_groups[$entity_type][$src_btype])) {
+        $field_groups = $all_field_groups[$entity_type][$src_btype];
+        ctools_include('export');
+        foreach ($field_groups as $mode => $mode_value) {
+          foreach ($mode_value as $fieldgroup_key => $fieldgroup) {
+            unset($fieldgroup->id);
+            $fieldgroup->bundle = $new_btype;
+            $fieldgroup->identifier = $fieldgroup->group_name . '|' . $entity_type . '|' . $new_btype . '|' . $mode;
+            $fieldgroup->export_type = 0;
+            if (!isset($fieldgroup->disabled)) {
+              $fieldgroup->disabled = FALSE;
+            }
+            ctools_export_crud_save('field_group', $fieldgroup);
+            ctools_export_crud_set_status('field_group', $fieldgroup, $fieldgroup->disabled);
+          }
+          cache_clear_all('field_groups', 'cache_field');
+        }
+      }
+    }
+
+    // Clone Display Suite configuration.
+    if (module_exists('ds')) {
+      ctools_include('export');
+
+      // To clone DS settings, we will export, modify, and import ctools objects
+      // from DS tables.
+      $tables = array(
+        'ds_field_settings',
+        'ds_layout_settings',
+      );
+
+      foreach ($tables as $table) {
+        // Load CTools exportable objects for this table.
+        $exportables = ctools_export_crud_load_all($table);
+
+        foreach ($exportables as $id => $export) {
+          if ($export->entity_type == $entity_type && $export->bundle == $src_btype) {
+
+            // Modify exported object.
+            $export->id = $entity_type . '|' . $new_btype . '|' . $export->view_mode;
+            $export->export_type = 2;
+            if (!isset($export->disabled)) {
+              $export->disabled = FALSE;
+            }
+            $export->bundle = $new_btype;
+            unset($export->export_module);
+
+            // Save the object to DB.
+            ctools_export_crud_save($table, $export);
+            ctools_export_crud_set_status($table, $export, $export->disabled);
+          }
+        }
+      }
+    }
+
+    field_info_cache_clear();
+    $form_state['redirect'] = str_replace("clone", "list", $bc_info[$entity_type]['clone_menu']['path']);
+  }
+}

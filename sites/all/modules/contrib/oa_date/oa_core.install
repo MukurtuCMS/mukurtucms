@@ -1,0 +1,470 @@
+<?php
+
+/**
+ * @file
+ * Provides update and install hooks to oa_core.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function oa_core_install() {
+  oa_core_create_default_terms();
+  // disable comments on Groups by default
+  variable_set('comment_oa_group', 0);
+  // disable comments on Spaces by default
+  variable_set('comment_oa_space', 0);
+}
+
+/**
+ * Implements hook_update_dependencies().
+ */
+function oa_core_update_dependencies() {
+  $dependencies['oa_core'][7224] = array(
+    'entityreference' => 7003,
+  );
+  return $dependencies;
+}
+
+/**
+ * Create the default Space and Section taxonomy terms
+ */
+function oa_core_create_default_terms() {
+  $params = array(
+    'description' => 'This is the default space layout with the Recent Activity stream in the main region.',
+    'node_options' => array(),
+    'layout' => 'node:oa_space:default',
+  );
+  oa_core_create_term('space_type', 'Default', $params);
+
+  $params = array(
+    'description' => 'This is the default section layout with the Recent Activity stream in the main region.',
+    'node_options' => array(),
+    'layout' => 'node:oa_section:default',
+  );
+  oa_core_create_term('section_type', 'Default', $params);
+}
+
+/**
+ * Enable oa_search.
+ */
+function oa_core_update_7001() {
+  module_enable(array('oa_search'));
+}
+
+/**
+ * Ensure entity_token is enabled for oa_river.
+ */
+function oa_core_update_7002() {
+  module_enable(array('entity_token'));
+}
+
+/**
+ * Enable colorizer.
+ */
+function oa_core_update_7003() {
+  module_enable(array('colorizer'));
+}
+
+/**
+ * Enable message_digest and bootstrap_tour.
+ */
+function oa_core_update_7203() {
+  module_enable(array('message_digest', 'bootstrap_tour'));
+}
+
+/**
+ * Enable OA Appearance
+ */
+function oa_core_update_7204() {
+  module_enable(array('oa_appearance'));
+}
+
+/**
+ * Enable oa_tour.
+ */
+function oa_core_update_7205() {
+  module_enable(array('oa_tour'));
+}
+
+/**
+ * Enable oa_messages_digest.
+ */
+function oa_core_update_7206() {
+  module_enable(array('oa_messages_digest'));
+}
+
+/**
+ * Enable oa_sandbox
+ */
+function oa_core_update_7207() {
+  module_enable(array('oa_sandbox'));
+}
+
+/**
+ * Enable oa_responsive_regions
+ */
+function oa_core_update_7208() {
+  module_enable(array('oa_responsive_regions'));
+}
+
+/**
+ * Enable oa_tour_defaults.
+ */
+function oa_core_update_7209() {
+  module_enable(array('oa_tour_defaults'));
+}
+
+/**
+ * Enable oa_update.
+ */
+function oa_core_update_7210() {
+  module_enable(array('oa_update'));
+}
+
+/**
+ * Enable oa_htmlmail.
+ */
+function oa_core_update_7211() {
+  module_enable(array('htmlmail', 'oa_htmlmail'));
+}
+
+/**
+ * Enable oa_adminrole.
+ */
+function oa_core_update_7213() {
+  module_enable(array('oa_adminrole'));
+}
+
+/**
+ * Enable trash_flag, oa_archive.
+ */
+function oa_core_update_7214() {
+  module_enable(array('trash_flag', 'oa_archive'));
+}
+
+/**
+ * Enable clone, oa_clone.
+ */
+function oa_core_update_7215() {
+  module_enable(array('clone', 'oa_clone'));
+}
+
+/**
+ * Enable advagg.
+ */
+function oa_core_update_7216() {
+  module_enable(array('advagg'));
+}
+
+/**
+ * Enable conditional_styles.
+ */
+function oa_core_update_7217() {
+  module_enable(array('conditional_styles'));
+}
+
+/**
+ * Create wide breakpoint for navbar if one does not exist.
+ *
+ * Without this breakpoint, the navbar breaks in IE10+
+ */
+function oa_core_update_7218() {
+  if (module_exists('breakpoints')) {
+    if (!$breakpoint = breakpoints_breakpoint_load('wide', 'navbar', 'module')) {
+      // Add a breakpoint for switching between horizontal and vertical tray
+      // orientation.
+      $breakpoint = new stdClass();
+      $breakpoint->disabled = FALSE;
+      $breakpoint->api_version = 1;
+      $breakpoint->name = 'wide';
+      $breakpoint->breakpoint = 'only screen and (min-width: 50em)';
+      $breakpoint->source = 'navbar';
+      $breakpoint->source_type = 'module';
+      $breakpoint->status = 1;
+      $breakpoint->weight = 0;
+      $breakpoint->multipliers = array();
+      breakpoints_breakpoint_save($breakpoint);
+    }
+  }
+}
+
+/**
+ * Call media update 7226 missed because of past media patches
+ */
+function oa_core_update_7219() {
+  // patch used in OA 2.19: http://drupal.org/files/issues/media_remove_file_display_alter-2104193-23.patch
+  // added a media_update_7226 hook which prevents update.php from seeing the
+  // REAL media_update_7226 hook.
+  module_load_install('media');
+  media_update_7226();
+}
+
+/**
+ * Enable oa_toolbar, radix_layouts, bootstrap_library
+ */
+function oa_core_update_7220() {
+  module_enable(array('oa_toolbar', 'radix_layouts', 'bootstrap_library'));
+}
+
+/**
+ * Enable ultimate_cron
+ */
+function oa_core_update_7221() {
+  module_enable(array('ultimate_cron'));
+}
+
+/**
+ * Rebuild registry to handle modules that have moved
+ */
+function oa_core_update_7222() {
+  // rebuild the registry for other module moves
+  cache_clear_all('ctools_plugin_type_info', 'cache');
+  cache_clear_all('lookup_cache', 'cache_bootstrap');
+  cache_clear_all('variables', 'cache_bootstrap');
+  cache_clear_all('module_implements', 'cache_bootstrap');
+  drupal_static_reset('ctools_plugin_type_info_loaded');
+  drupal_static_reset('ctools_plugin_type_info');
+  registry_rebuild();
+}
+
+/**
+ * Enable sitemap and wizard apps
+ */
+function oa_core_update_7223() {
+  module_enable(array('oa_sitemap', 'oa_wizard'));
+}
+
+/**
+ * Enable paragraphs module
+ */
+function oa_core_update_7224() {
+  module_enable(array('paragraphs'));
+}
+
+/**
+ * Enable oa_angular module
+ */
+function oa_core_update_7225() {
+  module_enable(array('oa_angular'));
+}
+
+/**
+ * Enable features_template, references_dialog, oa_files and oa_related, select2widget modules
+ */
+function oa_core_update_7226() {
+  module_enable(array('features_template', 'references_dialog', 'oa_files', 'oa_related', 'select2widget'));
+}
+
+/**
+ * Helper function to remove groups that are using default permissions but
+ * still have entries in og_role table
+ */
+function _oa_core_remove_orphaned_og_roles() {
+  $query = db_select('og_role', 'og');
+  $query->join('field_data_og_roles_permissions', 'f', "og.gid = f.entity_id AND f.entity_type = 'node'");
+  $query->fields('og', array('gid'))
+    ->condition('f.og_roles_permissions_value', 0);
+  $gids = $query->execute()->fetchCol();
+  if (!empty($gids)) {
+    db_delete('og_role')
+      ->condition('gid', $gids, 'IN')
+      ->execute();
+  }
+}
+
+/**
+ * Fix accidentatly given roles.
+ */
+function oa_core_update_7227() {
+  // NOTE: The original version of this update hook did not remove orphaned
+  // entries in the og_role table.  This was added here when update 7232 was
+  // added to help users who might not have run 7227 yet.
+  // Without this, the DELETE statement below could remove roles from users
+  // that had bad entries in the og_role table left over from this issue:
+  // https://www.drupal.org/node/2411041
+  _oa_core_remove_orphaned_og_roles();
+
+  // Now we can remove user roles that are associated with groups using
+  // overridden permissions but having rid values from the default permissions.
+  db_query("DELETE FROM {og_users_roles} where gid in (SELECT gid from {og_role} where gid > 0) and rid in (SELECT rid from {og_role} where gid = 0)");
+}
+
+/**
+ * Change the oa_unpublished gids from nid to uid.
+ *
+ * Since the access change is rather simple, we're just scripting it for so big
+ * sites do not have a super long update.
+ */
+function oa_core_update_7228() {
+  db_query('DELETE from {node_access} WHERE realm = :realm', array(':realm' => OA_UNPUBLISHED_REALM));
+  db_query('INSERT into {node_access} SELECT nid, uid, :realm, 1, 0, 0 from {node} WHERE status = 0 AND uid > 1', array(':realm' => OA_UNPUBLISHED_REALM));
+}
+
+
+/**
+ * Mark that node access needs to be rebuilt.
+ */
+function oa_core_update_7229() {
+  // Finds all private groups.
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', array('oa_group', 'oa_space'))
+    ->propertyCondition('status', NODE_PUBLISHED)
+    ->fieldCondition('group_access', 'value', 1)
+    ->addTag('DANGEROUS_ACCESS_CHECK_OPT_OUT');
+  $result = $query->execute();
+
+  if (isset($result['node'])) {
+    // Finds if any private group has the wrong node access record.
+    $nids = db_select('node_access')
+      ->condition('nid', array_keys($result['node']))
+      ->condition('realm', 'all')
+      ->condition('gid', '0')
+      ->fields('node_access', array('nid'))
+      ->execute()
+      ->fetchCol();
+    if ($nids) {
+      node_access_needs_rebuild(TRUE);
+    }
+  }
+}
+
+/**
+ * Mark that node access needs to be rebuilt.
+ */
+function oa_core_update_7231() {
+  if (module_exists('oa_plupload') || module_exists('media_multiselect')) {
+    drupal_set_message(t('oa_plupload and media_multiselect have been deprecated for oa_media and will be disabled.'));
+    module_disable(array('oa_plupload', 'media_multiselect'));
+    module_enable(array('oa_media'));
+  }
+}
+
+/**
+ * Remove orphaned records in og_role table.
+ */
+function oa_core_update_7232() {
+  // See update_7227.  7227 originally didn't remove orphaned records, causing
+  // some roles to be removed by mistake.  7227 has now been updated, but we
+  // still need to remove orphaned records for sites that have already run the
+  // old version of update 7227.
+  _oa_core_remove_orphaned_og_roles();
+}
+
+/**
+ * Mark that node access needs to be rebuilt.
+ */
+function oa_core_update_7233() {
+  // Finds all private groups.
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', array('oa_group', 'oa_space'))
+    ->propertyCondition('status', NODE_PUBLISHED)
+    ->fieldCondition('group_access', 'value', 1)
+    ->addTag('DANGEROUS_ACCESS_CHECK_OPT_OUT');
+  $result = $query->execute();
+
+  if (isset($result['node'])) {
+    // Finds if any private group has the wrong node access record.
+    $nids = db_select('node_access')
+      ->condition('nid', array_keys($result['node']))
+      ->condition('realm', 'all')
+      ->condition('gid', '0')
+      ->fields('node_access', array('nid'))
+      ->execute()
+      ->fetchCol();
+    if ($nids) {
+      node_access_needs_rebuild(TRUE);
+    }
+  }
+}
+
+/**
+ * Update default file extensions.
+ */
+function oa_core_update_7235() {
+  $file_extensions = variable_get('file_entity_default_allowed_extensions', '');
+  if (_oa_core_is_default_allowed_extensions($file_extensions)) {
+    variable_set('file_entity_default_allowed_extensions', OA_FILE_EXTENSIONS_DEFAULT);
+  }
+}
+
+/**
+ * Update Group and Space node access grants.
+ */
+function oa_core_update_7236(&$sandbox) {
+  // This is the first time through.
+  if (!isset($sandbox['total'])) {
+    // Set a default count.
+    $sandbox['current'] = 0;
+
+    // Finds all private Groups and Spaces.
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', array('oa_group', 'oa_space'))
+      ->propertyCondition('status', NODE_PUBLISHED)
+      ->fieldCondition('group_access', 'value', 1)
+      ->addTag('DANGEROUS_ACCESS_CHECK_OPT_OUT');
+
+    $result = $query->execute();
+
+    if (isset($result['node'])) {
+
+      $sandbox['nids'] = $private_nids = array_keys($result['node']);
+
+      foreach ($private_nids as $nid) {
+        // Get membership nids of the private group using the og_group_ref field.
+        $membership_nids = oa_core_get_membership_nodes($nid);
+        // Merge the results.
+        $new_array = array_merge($sandbox['nids'], $membership_nids);
+        // Update the sandbox.
+        $sandbox['nids'] = $new_array;
+      }
+
+      // Total number of nodes that will be updated.
+      $sandbox['total'] = count($sandbox['nids']);
+    }
+  }
+
+  // Number of nodes we will update per pass.
+  $records_per_pass = 100;
+
+  // Define the records to run for this pass.
+  $current_records = array_splice($sandbox['nids'], 0, $records_per_pass);
+
+  // Store an array of realms before the update.
+  foreach ($current_records as $record) {
+    $realms = db_select('node_access', 'na')
+      ->fields('na', array('realm'))
+      ->condition('na.nid', $record)
+      ->execute()
+      ->fetchCol(0);
+
+    $sandbox['realms'][$record]['before'] = $realms;
+  }
+
+  // Update the node access records for this pass.
+  oa_core_update_access_records($current_records);
+
+  // Store an array of realms after the update.
+  foreach ($current_records as $record) {
+    $realms = db_select('node_access', 'na')
+      ->fields('na', array('realm'))
+      ->condition('na.nid', $record)
+      ->execute()
+      ->fetchCol(0);
+
+    $sandbox['realms'][$record]['after'] = $realms;
+  }
+
+  // We are done when the sandbox nids array is empty.
+  $sandbox['#finished'] = empty($sandbox['nids']) ? 1 : 0;
+  if ($sandbox['#finished'] === 1) {
+    drupal_set_message(t('Total records checked: @count.', array('@count' => $sandbox['total'])));
+  }
+
+  return t('Updated private node access (@count/@max)', array(
+    '@count' => ($sandbox['total'] - count($sandbox['nids'])),
+    '@max' => $sandbox['total']));
+}

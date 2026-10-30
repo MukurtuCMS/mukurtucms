@@ -6,14 +6,22 @@
  */
 
 class CommentHelperCase extends DrupalWebTestCase {
+  protected $super_user;
   protected $admin_user;
   protected $web_user;
   protected $node;
 
   function setUp() {
-    parent::setUp('comment', 'search');
+    $modules = func_get_args();
+    if (isset($modules[0]) && is_array($modules[0])) {
+      $modules = $modules[0];
+    }
+    $modules[] = 'comment';
+    parent::setUp($modules);
+
     // Create users and test node.
-    $this->admin_user = $this->drupalCreateUser(array('administer content types', 'administer comments', 'administer blocks', 'administer actions'));
+    $this->super_user = $this->drupalCreateUser(array('access administration pages', 'administer modules'));
+    $this->admin_user = $this->drupalCreateUser(array('administer content types', 'administer comments', 'administer blocks', 'administer actions', 'administer fields'));
     $this->web_user = $this->drupalCreateUser(array('access comments', 'post comments', 'create article content', 'edit own comments'));
     $this->node = $this->drupalCreateNode(array('type' => 'article', 'promote' => 1, 'uid' => $this->web_user->uid));
   }
@@ -255,6 +263,9 @@ class CommentHelperCase extends DrupalWebTestCase {
 }
 
 class CommentInterfaceTest extends CommentHelperCase {
+  protected $web_user2;
+  protected $comment;
+
   public static function getInfo() {
     return array(
       'name' => 'Comment interface',
@@ -995,7 +1006,7 @@ class CommentPreviewTest extends CommentHelperCase {
    */
   function testCommentEditPreviewSave() {
     $langcode = LANGUAGE_NONE;
-    $web_user = $this->drupalCreateUser(array('access comments', 'post comments', 'skip comment approval'));
+    $web_user = $this->drupalCreateUser(array('access comments', 'post comments', 'skip comment approval', 'edit own comments'));
     $this->drupalLogin($this->admin_user);
     $this->setCommentPreview(DRUPAL_OPTIONAL);
     $this->setCommentForm(TRUE);
@@ -1009,7 +1020,7 @@ class CommentPreviewTest extends CommentHelperCase {
     $edit['date'] = '2008-03-02 17:23 +0300';
     $raw_date = strtotime($edit['date']);
     $expected_text_date = format_date($raw_date);
-    $expected_form_date = format_date($raw_date, 'custom', 'Y-m-d H:i O');
+    $expected_form_date = format_date($raw_date, 'custom', 'Y-m-d H:i:s O');
     $comment = $this->postComment($this->node, $edit['subject'], $edit['comment_body[' . $langcode . '][0][value]'], TRUE);
     $this->drupalPost('comment/' . $comment->id . '/edit', $edit, t('Preview'));
 
@@ -1051,7 +1062,16 @@ class CommentPreviewTest extends CommentHelperCase {
     $this->assertEqual($comment_loaded->comment_body[$langcode][0]['value'], $edit['comment_body[' . $langcode . '][0][value]'], 'Comment body loaded.');
     $this->assertEqual($comment_loaded->name, $edit['name'], 'Name loaded.');
     $this->assertEqual($comment_loaded->created, $raw_date, 'Date loaded.');
+    $this->drupalLogout();
 
+    // Check that the date and time of the comment are correct when edited by
+    // non-admin users.
+    $user_edit = array();
+    $expected_created_time = $comment_loaded->created;
+    $this->drupalLogin($web_user);
+    $this->drupalPost('comment/' . $comment->id . '/edit', $user_edit, t('Save'));
+    $comment_loaded = comment_load($comment->id, TRUE);
+    $this->assertEqual($comment_loaded->created, $expected_created_time, 'Expected date and time for comment edited.');
   }
 
 }
@@ -1490,7 +1510,7 @@ class CommentNodeAccessTest extends CommentHelperCase {
   }
 
   function setUp() {
-    DrupalWebTestCase::setUp('comment', 'search', 'node_access_test');
+    parent::setUp('search', 'node_access_test');
     node_access_rebuild();
 
     // Create users and test node.
@@ -2009,6 +2029,37 @@ class CommentActionsTestCase extends CommentHelperCase {
   }
 
   /**
+   * Test comment publish and unpublish hooks.
+   */
+  function testCommentPublishUnpublishHooks() {
+    $this->drupalLogin($this->web_user);
+    module_enable(array('comment_hook_test'));
+    $_SESSION['comment_hook_test'] = array();
+
+    // Publishing a comment should trigger hook_comment_publish().
+    $comment = (object) array(
+      'cid' => NULL,
+      'nid' => $this->node->nid,
+      'node_type' => $this->node->type,
+      'pid' => 0,
+      'uid' => $this->loggedInUser->uid,
+      'status' => COMMENT_PUBLISHED,
+      'subject' => $this->randomName(),
+      'hostname' => ip_address(),
+      'language' => LANGUAGE_NONE,
+      'comment_body' => array(LANGUAGE_NONE => array($this->randomName())),
+    );
+    comment_save($comment);
+    $this->assertHookMessage('comment_hook_test_comment_publish called');
+
+    // Unpublishing a comment should trigger hook_comment_unpublish().
+    $comment = comment_load($comment->cid);
+    $comment->status = COMMENT_NOT_PUBLISHED;
+    comment_save($comment);
+    $this->assertHookMessage('comment_hook_test_comment_unpublish called');
+  }
+
+  /**
    * Verify that a watchdog message has been entered.
    *
    * @param $watchdog_message
@@ -2028,6 +2079,27 @@ class CommentActionsTestCase extends CommentHelperCase {
    */
   function clearWatchdog() {
     db_truncate('watchdog')->execute();
+  }
+
+  /**
+   * Pass if the message $text was set by one of the comment hooks in
+   * comment_hook_test.module, i.e., if the $text is an element of
+   * $_SESSION['comment_hook_test'].
+   *
+   * @param $text
+   *   Plain text to look for.
+   * @param $message
+   *   Message to display.
+   * @param $group
+   *   The group this message belongs to, defaults to 'Other'.
+   * @return
+   *   TRUE on pass, FALSE on fail.
+   */
+  protected function assertHookMessage($text, $message = NULL, $group = 'Other') {
+    if (!isset($message)) {
+      $message = $text;
+    }
+    return $this->assertTrue(array_search($text, $_SESSION['comment_hook_test']) !== FALSE, $message, $group);
   }
 }
 
@@ -2256,5 +2328,112 @@ class CommentNodeChangesTestCase extends CommentHelperCase {
     $this->assertTrue(comment_load($comment->id), 'The comment could be loaded.');
     node_delete($this->node->nid);
     $this->assertFalse(comment_load($comment->id), 'The comment could not be loaded after the node was deleted.');
+  }
+}
+
+/**
+ * Tests the behavior of comments when the comment author is deleted.
+ */
+class CommentAuthorDeletionTestCase extends CommentHelperCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Comment author deletion',
+      'description' => 'Test the behavior of comments when the comment author is deleted.',
+      'group' => 'Comment',
+    );
+  }
+
+  /**
+   * Tests that comments are correctly deleted when their author is deleted.
+   */
+  function testAuthorDeletion() {
+    // Create a comment as the admin user.
+    $this->drupalLogin($this->admin_user);
+    $comment = $this->postComment($this->node, $this->randomName());
+    $this->assertTrue($this->commentExists($comment), t('Comment is displayed initially.'));
+    $this->drupalLogout();
+
+    // Delete the admin user, and check that the node which displays the
+    // comment can still be viewed, but the comment itself does not appear
+    // there.
+    user_delete($this->admin_user->uid);
+    $this->drupalGet('node/' . $this->node->nid);
+    $this->assertResponse(200, t('Node page is accessible after the comment author is deleted.'));
+    $this->assertFalse($this->commentExists($comment), t('Comment is not displayed after the comment author is deleted.'));
+  }
+
+  /**
+   * Test comment author deletion while the comment module is disabled.
+   */
+  function testAuthorDeletionCommentModuleDisabled() {
+    // Create a comment as the admin user.
+    $this->drupalLogin($this->admin_user);
+    $comment = $this->postComment($this->node, $this->randomName());
+    $this->assertTrue($this->commentExists($comment), t('Comment is displayed initially.'));
+    $this->drupalLogout();
+
+    // Delete the admin user while the comment module is disabled, and ensure
+    // that the missing comment author is still handled correctly (the node
+    // itself should be displayed, but the comment should not be displayed on
+    // it).
+    module_disable(array('comment'));
+    user_delete($this->admin_user->uid);
+    module_enable(array('comment'));
+    $this->drupalGet('node/' . $this->node->nid);
+    $this->assertResponse(200, t('Node page is accessible after the comment author is deleted.'));
+    $this->assertFalse($this->commentExists($comment), t('Comment is not displayed after the comment author is deleted.'));
+  }
+}
+
+/**
+ * Tests uninstalling the comment module.
+ */
+class CommentUninstallTestCase extends CommentHelperCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Comment module uninstallation',
+      'description' => 'Tests that the comments module can be properly uninstalled.',
+      'group' => 'Comment',
+    );
+  }
+
+  function testCommentUninstall() {
+    $this->drupalLogin($this->super_user);
+
+    // Disable comment module.
+    $edit['modules[Core][comment][enable]'] = FALSE;
+    $this->drupalPost('admin/modules', $edit, t('Save configuration'));
+    $this->assertText(t('The configuration options have been saved.'), 'Comment module was disabled.');
+
+    // Uninstall comment module.
+    $edit = array('uninstall[comment]' => 'comment');
+    $this->drupalPost('admin/modules/uninstall', $edit, t('Uninstall'));
+    $this->drupalPost(NULL, NULL, t('Uninstall'));
+    $this->assertText(t('The selected modules have been uninstalled.'), 'Comment module was uninstalled.');
+
+    // Run cron and clear field cache so that comment fields and instances
+    // marked for deletion are actually removed.
+    $this->cronRun();
+    field_cache_clear();
+
+    // Verify that comment fields have been removed.
+    $all_fields = array_keys(field_info_field_map());
+    $this->assertFalse(in_array('comment_body', $all_fields), 'Comment fields were removed by uninstall.');
+
+    // Verify that comment field instances have been removed (or at least marked
+    // for deletion).
+    // N.B. field_read_instances does an INNER JOIN on field_config so if the
+    // comment_body row has been removed successfully from there no instances
+    // will be returned, but that does not guarantee that no rows are left over
+    // in the field_config_instance table.
+    $count = db_select('field_config_instance', 'fci')
+      ->condition('entity_type', 'comment')
+      ->condition('field_name', 'comment_body')
+      ->condition('deleted', 0)
+      ->countQuery()
+      ->execute()
+      ->fetchField();
+    $this->assertTrue($count == 0, 'Comment field instances were removed by uninstall.');
   }
 }

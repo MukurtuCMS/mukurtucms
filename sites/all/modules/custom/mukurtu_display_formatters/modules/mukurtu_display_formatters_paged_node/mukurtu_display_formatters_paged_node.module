@@ -1,0 +1,106 @@
+<?php
+/**
+* @file
+* Define Mukurtu paged node display formatter
+*
+*/
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function mukurtu_display_formatters_paged_node_field_formatter_info() {
+    return array(
+        'mukurtu_paged_node_formatter' => array(
+            'label' => t('Mukurtu Paged Node Display'),
+            'field types' => array('entityreference'),
+            'settings' => array('items_per_page' => 10, 'item_view_mode' => 'teaser')
+        ),
+    );
+}
+
+/**
+* Implements hook_field_formatter_settings_form().
+*/
+function mukurtu_display_formatters_paged_node_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+    $display = $instance['display'][$view_mode];
+    $settings = $display['settings'];
+    $element = array();
+    $element['items_per_page'] = array(
+        '#title' => t('Items per page'),
+        '#type' => 'textfield',
+        '#size' => 20,
+        '#default_value' => isset($settings['items_per_page']) ? $settings['items_per_page'] : 10,
+        '#element_validate' => array('element_validate_integer_positive'),
+        '#required' => FALSE,
+    );
+
+    // Build option list of view modes
+    $entity_info = entity_get_info('node');
+    $options = array();
+    foreach($entity_info['view modes'] as $machine_name => $mode) {
+        $options[$machine_name] = $mode['label'];
+    }
+
+    $element['item_view_mode'] = array(
+        '#title' => t('Item View Mode'),
+        '#type' => 'select',
+        '#options' => $options,
+        '#default_value' => isset($settings['item_view_mode']) ? $settings['item_view_mode'] : 'teaser',
+        '#required' => FALSE,
+    );
+
+    return $element;
+}
+
+/**
+* Implements hook_field_formatter_settings_summary().
+*/
+function mukurtu_display_formatters_paged_node_field_formatter_settings_summary($field, $instance, $view_mode) {
+    $display = $instance['display'][$view_mode];
+    $settings = $display['settings'];
+    $items_per_page = isset($settings['items_per_page']) ? $settings['items_per_page'] : 10;
+
+    $summary = t("Display @items items in a paged display.", array('@items' => $items_per_page));
+    return $summary;
+}
+
+/**
+* Implements hook_field_formatter_view().
+*/
+function mukurtu_display_formatters_paged_node_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+    $element = array();
+
+    // Load settings from formatter
+    $settings = $display['settings'];
+    $items_per_page = isset($settings['items_per_page']) ? $settings['items_per_page'] : 10;
+    $item_view_mode = isset($settings['item_view_mode']) ? $settings['item_view_mode'] : 'teaser';
+
+    // Build simple list of referenced nodes to split up in pager
+    $nodes = array();
+    foreach ($items as $delta => $item) {
+        if(isset($item['target_id'])) {
+            $node = node_load($item['target_id']);
+            if(node_access('view', $node)) {                
+                $nodes[] = $node;
+            }
+        }
+    }
+
+    // Initialize the pager
+    $current_page = pager_default_initialize(count($nodes), $items_per_page, 1);
+    $chunks = array_chunk($nodes, $items_per_page, TRUE);
+
+    // Load the nodes for only that page
+    foreach($chunks[$current_page] as $node) {
+        $element[] = node_view($node, $item_view_mode);
+    }
+
+    // Show the pager controls
+    $element[] = array (
+        '#theme' => 'pager',
+        '#quantity' => count($chunks),
+        '#element' => 1,
+    );
+
+    return $element;
+}

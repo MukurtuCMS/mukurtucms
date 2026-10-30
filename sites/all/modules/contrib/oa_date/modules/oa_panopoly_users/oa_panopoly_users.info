@@ -1,0 +1,30 @@
+name = Open Atrium Panopoly Users
+description = Overrides for Panopoly Users
+core = 7.x
+package = Open Atrium
+dependencies[] = ctools
+dependencies[] = features
+dependencies[] = image
+dependencies[] = oa_core
+dependencies[] = oa_river
+dependencies[] = panelizer
+dependencies[] = panopoly_users
+dependencies[] = strongarm
+features[ctools][] = strongarm:strongarm:1
+features[features_api][] = api:2
+features[features_override_items][] = page_manager_handlers.pm_existing_pages_user_login_panel_context
+features[features_overrides][] = page_manager_handlers.pm_existing_pages_user_login_panel_context.conf|body_classes_to_add
+features[features_overrides][] = page_manager_handlers.pm_existing_pages_user_login_panel_context.conf|body_classes_to_remove
+features[features_overrides][] = page_manager_handlers.pm_existing_pages_user_login_panel_context.conf|display|content|new-36405db8-54c5-495c-ba8a-0a5f7ade185a|configuration|override_title_text
+features[features_overrides][] = page_manager_handlers.pm_existing_pages_user_login_panel_context.conf|display|hide_title
+features[features_overrides][] = page_manager_handlers.pm_existing_pages_user_login_panel_context.conf|display|layout
+features[features_overrides][] = page_manager_handlers.pm_existing_pages_user_login_panel_context.conf|display|panel_settings|contentmain
+features[variable][] = panelizer_defaults_user_user
+features_exclude[field_base][field_user_about] = field_user_about
+features_exclude[field_base][field_user_picture] = field_user_picture
+
+; Information added by Drupal.org packaging script on 2018-10-18
+version = "7.x-2.91"
+core = "7.x"
+project = "oa_core"
+datestamp = "1539884795"

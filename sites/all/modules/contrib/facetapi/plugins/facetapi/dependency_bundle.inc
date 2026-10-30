@@ -10,7 +10,7 @@
  *
  * The bundle dependency plugin adds conditions based on active bundle facets.
  * For example, the administrator can configure whether a facet is displayed
- * based on wheter certain bundles are active. If a facet stores field data,
+ * based on whether certain bundles are active. If a facet stores field data,
  * then an option is exposed to only show the facet if a bundle the field is
  * attached to is active. This is most commonly used with taxonomy facets.
  *

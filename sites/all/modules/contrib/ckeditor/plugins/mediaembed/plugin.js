@@ -4,7 +4,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
 /**
- * @file Plugin for inserting Drupal embeded media
+ * @file Plugin for embedding HTML snippets
  */
 ( function() {
   var numberRegex = /^\d+(?:\.\d+)?$/;
@@ -39,7 +39,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
       editor.addCommand( 'mediaembedDialog', new CKEDITOR.dialogCommand( 'mediaembedDialog', { allowedContent : 'div(media_embed);iframe[*](*)' } ) );
       editor.ui.addButton( 'MediaEmbed',
       {
-        label: 'Embed Media',
+        label: Drupal.t('Embed Media'),
         command: 'mediaembedDialog',
         icon: this.path + 'images/icon.png'
       } );

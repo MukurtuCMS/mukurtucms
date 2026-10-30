@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the oa_user module.
+ */
+
+/**
+ * Implements hook_enable().
+ */
+function oa_users_enable() {
+  // Weight oa_users after panels so menu alter can take effect.
+  db_update('system')
+    ->fields(array('weight' =>  100))
+    ->condition('name', 'oa_users')
+    ->condition('type', 'module')
+    ->execute();
+  oa_users_enable_pages();
+}
+
+/**
+ * Enable the user_view page manager page
+ */
+function oa_users_enable_pages() {
+  // Add pages
+  $pages = array(
+    'user_view' => FALSE,
+  );
+  ctools_include('export');
+  ctools_export_load_object_reset('page_manager_pages');
+  foreach ($pages as $page_name => $disable) {
+    $page = page_manager_cache_load($page_name);
+    if ($function = ctools_plugin_get_function($page->subtask, 'enable callback')) {
+      $function($page, $disable);
+    }
+  }
+  menu_rebuild();
+}
+
+/**
+ * Ensure user dashboard is panelized.
+ */
+function oa_users_update_7001() {
+  oa_users_enable_pages();
+}

@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * @file
+ * Tests for File Hash module.
+ */
+
+/**
+ * Tests File Hash module.
+ */
+class FileHashTestCase extends DrupalWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'File Hash',
+      'description' => 'Tests for File Hash module.',
+      'group' => 'File Hash',
+    );
+  }
+
+  /**
+   * Enable modules.
+   */
+  public function setUp() {
+    parent::setUp(array('filehash'));
+  }
+
+  /**
+   * Tests File Hash module functionality.
+   */
+  public function testFileHash() {
+  }
+
+}

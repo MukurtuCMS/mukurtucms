@@ -38,14 +38,23 @@ class RESTServer {
     $formatter = $this->getResponseFormatter();
 
     services_set_server_info('resource_uri_formatter', array(&$this, 'uri_formatter'));
-
+    // Initializing $arguments because an exception can be thrown for required
+    // arguments and before $arguments is initialized for the exception handler.
+    $arguments = array();
     try {
       // Parse the request data
       $arguments = $this->getControllerArguments($controller);
       $result = services_controller_execute($controller, $arguments);
     }
     catch (ServicesException $e) {
-      $result = $this->handleException($e);
+      $result = $this->handleException($e, $controller, $arguments);
+
+      $no_body = variable_get('services_no_body_responses', array(204, 304));
+      $generate_body = variable_get('services_generate_error_body', TRUE);
+
+      if (in_array($e->getCode(), $no_body) && !$generate_body) {
+        return '';
+      }
     }
 
     return $this->render($formatter, $result);
@@ -108,7 +117,7 @@ class RESTServer {
   protected function resolveControllerApplyVersion($resource, $resource_name) {
     $apply_version_method = '';
     $controller = $this->resolveController($resource, $apply_version_method);
-    services_request_apply_version($controller, array('method' => $apply_version_method, 'resource' => $resource_name));
+    services_request_apply_version($controller, array('method' => $apply_version_method, 'resource' => $resource['key']));
 
     return $controller;
   }
@@ -248,7 +257,7 @@ class RESTServer {
    *  Returns the formatted resource uri
    */
   public function uri_formatter($path) {
-    return url($this->context->getEndpointPath() . '/' . join($path, '/'), array(
+    return url($this->context->getEndpointPath() . '/' . join('/', $path), array(
       'absolute' => TRUE,
     ));
   }
@@ -332,7 +341,16 @@ class RESTServer {
       // throw a exception if the argument isn't optional.
       if (!isset($arguments[$argument_number])) {
         if (!isset($argument_info['optional']) || !$argument_info['optional']) {
-          return services_error(t('Missing required argument @arg', array('@arg' => $argument_info['name'])), 401);
+          // Send 401 on error for backward compatibility.
+          // To override this behavior with the more appropriate http status
+          // code 400 Bad Request, add this to settings.php:
+          // $conf['services_deprecated_missing_arg_code'] = 400;
+          //
+          // @see See https://www.drupal.org/node/2880909
+          return services_error(
+            t('Missing required argument @arg', array('@arg' => $argument_info['name'])),
+            variable_get('services_deprecated_missing_arg_code', 401)
+          );
         }
         // Set default value or NULL if default value is not set.
         $arguments[$argument_number] = isset($argument_info['default value']) ? $argument_info['default value'] : NULL;
@@ -664,12 +682,16 @@ class RESTServer {
         break;
       case 200:
         $error_header_status_message = $this->formatHttpHeaderStatusMessage('200', $error_message);
+	break;
+      case 201:
+        $error_header_status_message = $this->formatHttpHeaderStatusMessage('201', $error_message);
         break;
       default:
         if ($error_code >= 400 && $error_code < 600) {
           $error_header_status_message = $this->formatHttpHeaderStatusMessage($error_code, $error_message);
         }
         else {
+          watchdog_exception('Services', $exception);
           $error_header_status_message = $this->formatHttpHeaderStatusMessage('500 Internal Server Error', "An error occurred ({$error_code}): {$error_message}");
         }
         break;
@@ -682,7 +704,7 @@ class RESTServer {
     );
     drupal_alter('rest_server_execute_errors', $error_alter_array, $controller, $arguments);
 
-    drupal_add_http_header('Status', strip_tags(str_replace(PHP_EOL, '', $error_header_status_message)));
+    drupal_add_http_header('Status', strip_tags(str_replace(array("\r", "\n"), '', $error_header_status_message)));
 
     return $error_data;
   }

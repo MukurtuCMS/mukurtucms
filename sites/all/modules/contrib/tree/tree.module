@@ -1,0 +1,55 @@
+<?php
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function tree_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'tree') {
+    return $plugin;
+  }
+}
+
+/**
+ * Implements hook_ctools_plugin_type().
+ */
+function tree_ctools_plugin_type() {
+  $plugins['provider'] = array(
+    'classes' => array('class'),
+  );
+  $plugins['storage'] = array(
+    'classes' => array('class'),
+  );
+  return $plugins;
+}
+
+/**
+ * Return the tree providers usable on a given storage.
+ */
+function tree_get_providers($storage = NULL) {
+  ctools_include('plugins');
+  $handlers = ctools_get_plugins('tree', 'provider');
+  uasort($handlers, 'ctools_plugin_sort');
+
+  if (!empty($storage)) {
+    $storage_reflection = new ReflectionClass($storage);
+  }
+
+  $output = array();
+  foreach ($handlers as $plugin => $plugin_info) {
+    $valid = FALSE;
+    if (empty($storage) || empty($plugin_info['storages'])) {
+      $valid = TRUE;
+    }
+    else {
+      foreach ($plugin_info['storages'] as $provider_storage) {
+        if ($storage_reflection->isSubclassOf($provider_storage)) {
+          $valid = TRUE;
+        }
+      }
+    }
+    if ($valid) {
+      $output[$plugin] = $plugin_info;
+    }
+  }
+  return $output;
+}

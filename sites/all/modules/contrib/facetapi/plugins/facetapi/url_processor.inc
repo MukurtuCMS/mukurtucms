@@ -10,7 +10,7 @@
  *
  * Url processor plugins provide a pluggable method of retrieving facet data.
  * Most commonly facet data is retrieved from a query string variable via $_GET,
- * however custom plugis can be written to retrieve data from the path as well.
+ * however custom plugins can be written to retrieve data from the path as well.
  * In addition to facet data retrieval, the url processor plugin is also
  * responsible for building facet links and setting breadcrumb trails.
  *

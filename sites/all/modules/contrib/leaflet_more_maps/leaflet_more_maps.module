@@ -30,31 +30,6 @@ function leaflet_more_maps_default_settings() {
 }
 
 /**
- * Implements hook_leaflet_map_info().
- *
- * All maps show at lat=31, long=-89, zoom=4
- */
-function leaflet_more_maps_leaflet_map_info() {
-
-  $map_info = array();
-  $default_settings = leaflet_more_maps_default_settings();
-
-  _leaflet_more_maps_assemble_default_map_info($map_info, $default_settings);
-
-  $custom_maps = variable_get('leaflet_more_maps_custom_maps', array());
-
-  foreach ($custom_maps as $custom_map) {
-    _leaflet_more_maps_assemble_custom_map_info(
-      $custom_map['map-key'],
-      $custom_map['layer-keys'],
-      $map_info, $default_settings,
-      $custom_map['reverse-order']
-    );
-  }
-  return $map_info;
-}
-
-/**
  * Preprocess function for leaflet_more_maps.
  */
 function leaflet_more_maps_leaflet_map_prebuild_alter(&$variables = NULL) {
@@ -68,6 +43,20 @@ function leaflet_more_maps_leaflet_map_prebuild_alter(&$variables = NULL) {
  * Implements hook_leaflet_map_info_alter().
  */
 function leaflet_more_maps_leaflet_map_info_alter(&$map_info) {
+
+  $default_settings = leaflet_more_maps_default_settings();
+
+  _leaflet_more_maps_assemble_default_map_info($map_info, $default_settings);
+
+  $custom_maps = variable_get('leaflet_more_maps_custom_maps', array());
+  foreach ($custom_maps as $custom_map) {
+    _leaflet_more_maps_assemble_custom_map_info(
+      $custom_map['map-key'],
+      $custom_map['layer-keys'],
+      $map_info, $default_settings,
+      $custom_map['reverse-order']
+    );
+  }
   @ksort($map_info, SORT_NATURAL | SORT_FLAG_CASE);
 }
 
@@ -196,7 +185,7 @@ function _leaflet_more_maps_assemble_default_map_info(&$map_info, $default_setti
   }
 
   $attr_google = 'Map data &copy; <a target="attr" href="http://googlemaps.com">Google</a>';
-  $v = variable_get('google_satellite_version', 183);
+  $v = variable_get('google_satellite_version', 713);
   $map_info['google-satellite'] = array(
     'label' => 'Google satellite (zoom 0..21)',
     'description' => t('Google satellite'),
@@ -256,7 +245,6 @@ function _leaflet_more_maps_assemble_default_map_info(&$map_info, $default_setti
           'detectRetina' => TRUE,
           'subdomains' => array(0, 1, 2, 3),
         ),
-        'layer_type' => 'base',
       ),
       'terrain' => array(
         'type' => 'google',
@@ -266,12 +254,11 @@ function _leaflet_more_maps_assemble_default_map_info(&$map_info, $default_setti
           'detectRetina' => TRUE,
           'subdomains' => array(0, 1, 2, 3),
         ),
-        'layer_type' => 'base',
       ),
     ),
   );
 
-  // MapBox/OSM http://mapbox.com
+  /* MapBox/OSM http://mapbox.com
   $mapbox_names = array(
     // 'Streets', // as used by foursquare
     // 'Chester',
@@ -284,7 +271,7 @@ function _leaflet_more_maps_assemble_default_map_info(&$map_info, $default_setti
     // 'St-Clair',
     // 'Union',
     // 'Zenburn',
-    'Warden',
+    // 'Warden',
   );
   $attr_mapbox = 'Tiles by <a target="attr" href="http://mapbox.com">MapBox</a>. Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> and contributors';
   foreach ($mapbox_names as $mapbox_name) {
@@ -303,10 +290,12 @@ function _leaflet_more_maps_assemble_default_map_info(&$map_info, $default_setti
       ),
     );
   }
+  */
+  
   // OpenStreetMap OSM Mapnik classic map is available via leaflet.module
   $attr_osm = 'Map data &copy; <a target="attr" href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
-  // MapQuest OSM. Two non-transparent layers.
+  /* MapQuest OSM. Two non-transparent layers.
   $attr_mapquest = 'Tiles by <a target="attr" href="http://mapquest.com">MapQuest</a>. ' . $attr_osm;
   $map_info['mapquest'] = array(
     'label' => 'MapQuest OSM & Aerial (zoom 0..19)',
@@ -319,7 +308,6 @@ function _leaflet_more_maps_assemble_default_map_info(&$map_info, $default_setti
           'attribution' => $attr_mapquest,
           'subdomains' => array(1, 2, 3, 4),
         ),
-        'layer_type' => 'base',
       ),
       'aerial layer' => array(
         'urlTemplate' => $prot . "otile{s}.mqcdn.com/tiles/1.0.0/sat/$zxy",
@@ -327,11 +315,10 @@ function _leaflet_more_maps_assemble_default_map_info(&$map_info, $default_setti
           'attribution' => $attr_mapquest,
           'subdomains' => array(1, 2, 3, 4),
         ),
-        'layer_type' => 'base',
       ),
     ),
   );
-
+  */
   $attr_thunderforest = 'Thunderforest <a target="attr" href="http://thunderforest.com">OpenCycleMap</a>. ' . $attr_osm;
   $map_info['osm-cycle'] = array(
     'label' => 'OSM Thunderforest Cycle (zoom 0..19)',
@@ -368,6 +355,7 @@ function _leaflet_more_maps_assemble_default_map_info(&$map_info, $default_setti
       ),
     ),
   );
+  /*
   $attr_piste = '<a target="attr" href="http://openpistemap.org">OpenPisteMap</a> ' . $attr_osm;
   $map_info['osm-piste'] = array(
     'label' => 'OSM OpenPisteMap (zoom 0..19)',
@@ -377,7 +365,6 @@ function _leaflet_more_maps_assemble_default_map_info(&$map_info, $default_setti
       'base' => array(
         'urlTemplate' => $prot . "{s}.tile.openstreetmap.org/$zxy",
         'options' => array('attribution' => $attr_piste),
-        'layer_type' => 'base',
       ),
       'relief shading' => array(
         // Or tiles2?
@@ -392,6 +379,7 @@ function _leaflet_more_maps_assemble_default_map_info(&$map_info, $default_setti
       ),
     ),
   );
+  */
   // OpenSeeMap http://openseamap.org
   $attr_ocm = 'OpenSeaMap. ' . $attr_osm;
   $map_info['osm-sea'] = array(
@@ -399,10 +387,9 @@ function _leaflet_more_maps_assemble_default_map_info(&$map_info, $default_setti
     'description' => t('OpenStreetMap with sea marks overlay'),
     'settings' => array('layerControl' => TRUE) + $default_settings,
     'layers' => array(
-      'base' => array(
+      'sea base' => array(
         'urlTemplate' => $prot . "{s}.tile.openstreetmap.org/$zxy",
         'options' => array('attribution' => $attr_ocm),
-        'layer_type' => 'base',
       ),
       'sea marks' => array(
         'urlTemplate' => $prot . "tiles.openseamap.org/seamark/$zxy",
@@ -412,8 +399,9 @@ function _leaflet_more_maps_assemble_default_map_info(&$map_info, $default_setti
     ),
   );
 
-  // OpenWeatherMap http://openweathermap.org
-  $attr_owm = 'OpenWeatherMap. ' . $attr_osm;
+  /* OpenWeatherMap http://openweathermap.org
+  // See https://github.com/buche/leaflet-openweathermap/blob/master/leaflet-openweathermap.js
+  $attr_owm = 'Weather from <a href="http://openweathermap.org" title="World Map and worldwide Weather Forecast online">OpenWeatherMap</a>';
   $map_info['osm-weather'] = array(
     'label' => 'OSM OpenWeatherMap (zoom 0..19)',
     'description' => t('Precipitation with pressure contours'),
@@ -422,37 +410,20 @@ function _leaflet_more_maps_assemble_default_map_info(&$map_info, $default_setti
       'base' => array(
         'urlTemplate' => $prot . "{s}.tile.openstreetmap.org/$zxy",
         'options' => array('attribution' => $attr_owm),
-        'layer_type' => 'base',
       ),
       'precipitation' => array(
-        'urlTemplate' => $prot . "{s}.tile.openweathermap.org/map/precipitation/$zxy",
+        'urlTemplate' => "http://{s}.tile.openweathermap.org/map/precipitation/$zxy",
         'options' => array('attribution' => $attr_owm),
         'layer_type' => 'overlay',
       ),
       'pressure' => array(
-        'urlTemplate' => $prot . "{s}.tile.openweathermap.org/map/pressure_cntr/$zxy",
+        'urlTemplate' => "http://{s}.tile.openweathermap.org/map/pressure_cntr/$zxy",
         'options' => array('attribution' => $attr_owm),
         'layer_type' => 'overlay',
       ),
     ),
   );
-
-  // geocommons http://geocommons.com
-  $attr_geocommons = 'Tiles by Geocommons &copy; <a target="attr" href="http://geocommons.com/overlays/acetate">Esri & Stamen</a>. ' . $attr_osm;
-  $map_info['geocommons'] = array(
-    'label' => 'Geocommons Acetate (zoom 2..19)',
-    'description' => t('Neutral basemap'),
-    'settings' => array('minZoom' => 2) + $default_settings,
-    'layers' => array(
-      'acetate' => array(
-        'urlTemplate' => $prot . "a{s}.acetate.geoiq.com/tiles/acetate/$zxy",
-        'options' => array(
-          'attribution' => $attr_geocommons,
-          'subdomains' => array(0, 1, 2, 3, 4, 5, 6),
-        ),
-      ),
-    ),
-  );
+  */
 
   // Stamen http://stamen.com
   $attr_stamen = 'Tiles by <a target="attr" href="http://stamen.com">Stamen Design</a> under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. ' . $attr_osm;
@@ -479,6 +450,21 @@ function _leaflet_more_maps_assemble_default_map_info(&$map_info, $default_setti
       ),
     );
   }
+  
+  // Wikimedia
+  $attr_wiki= 'Wikimedia maps beta | ' . $attr_osm;
+  $map_info['wikimedia'] = array(
+    'label' => 'Wikimedia (zoom 0..18)',
+    'description' => t('Wikimedia Maps'),
+    'settings' =>  array('maxZoom' => 18) + $default_settings,
+    'layers' => array(
+      'layer' => array(
+        'urlTemplate' => $prot . "maps.wikimedia.org/osm-intl/$zxy",
+        'options' => array('attribution' => $attr_wiki),
+        'detectRetina' => TRUE,
+      ),
+    ),
+  );
 
   // Yandex
   $attr_yandex = 'Map data &copy; <a target="attr" href="http://maps.yandex.ru">Yandex.Maps</a>';

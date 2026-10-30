@@ -22,7 +22,7 @@ class ServicesSpycLibraryTests extends DrupalUnitTestCase {
    * Testing whether link in make file is valid.
    */
   public function testMakeFileLinkValid() {
-    $makefile_path = drupal_get_path('module', 'services') . '/services.make';
+    $makefile_path = drupal_get_path('module', 'services') . '/services.make.example';
     $makefile_content = file_get_contents($makefile_path);
     // libraries[spyc][download][url] = "https://raw.github.com/mustangostang/spyc/79f61969f63ee77e0d9460bc254a27a671b445f3/spyc.php"
     $matches = array();

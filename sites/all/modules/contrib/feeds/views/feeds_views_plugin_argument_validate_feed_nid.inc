@@ -9,6 +9,7 @@
  * Validates whether an argument is a valid Feed node.
  */
 class feeds_views_plugin_argument_validate_feed_nid extends views_plugin_argument_validate {
+
   /**
    * Validates if argument is a valid Feed node.
    */
@@ -22,4 +23,5 @@ class feeds_views_plugin_argument_validate_feed_nid extends views_plugin_argumen
     }
     return FALSE;
   }
+
 }

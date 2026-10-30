@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * Check for missing database fields needed for subcollections.
+ */
+function ma_collection_update_7100() {
+  $tables = array(
+    'field_data_field_collections_child_coll',
+    'field_data_field_collections_parent_coll',
+    'field_revision_field_collections_child_coll',
+    'field_revision_field_collections_parent_coll',
+  );
+  $schema = _treeable_columns();
+
+  foreach ($tables as $table) {
+    $field_name = str_replace('field_revision_', '', str_replace('field_data_', '', $table)) . '_parent_delta';
+    $parent_delta = db_field_exists($table, $field_name);
+    if (!$parent_delta) {
+      db_add_field($table, $field_name, $schema['parent_delta']);
+    }
+  }
+}

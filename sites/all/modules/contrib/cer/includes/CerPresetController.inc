@@ -12,9 +12,13 @@ class CerPresetController extends EntityAPIControllerExportable {
     $variables = get_object_vars($entity);
     
     // I really wish Entity API tried to notify the entity that it's being
-    // exported so that it could clean itself up first, but it doesn't. So
-    // we gotta do this bizness.
+    // exported so that it could clean itself up first, but it doesn't. So we
+    // gotta do this bizness.
     unset($variables['pid'], $variables['wrapper'], $variables['status'], $variables['module'], $variables['label_variables'], $variables['uid']);
+    // Features 2.x checks for overriddenness using sorted keys, which means
+    // that if the variables aren't key-sorted the presets will always be
+    // considered overridden, even if they actually aren't.
+    ksort($variables);
 
     return entity_var_json_export($variables, $prefix);
   }

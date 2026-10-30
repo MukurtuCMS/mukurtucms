@@ -17,9 +17,9 @@
 | Setup |
 |=======|
 
-  (admin/config/entity-delete-log)
+  (admin/config/system/entity-delete-log)
 
-  Configuration -> Entity Delete Log
+  Configuration -> System -> Entity Delete Log
 
     Choose which entity types will have delete logging enabled.
 

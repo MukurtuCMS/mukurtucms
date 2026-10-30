@@ -12,15 +12,22 @@ class ServicesArgumentsTestCase extends ServicesWebTestCase {
    * Implements getInfo().
    */
   public static function getInfo() {
-   return array(
-     'name'        => 'Arguments handling',
-     'description' => 'Test of arguments handling.',
-     'group'       => 'Services',
-   );
+    return array(
+      'name'        => 'Arguments handling',
+      'description' => 'Test of arguments handling.',
+      'group'       => 'Services',
+      // The libraries module is required by rest_service, which is used by
+      // ServicesEndpointTests.
+      'dependencies' => array('ctools', 'libraries'),
+    );
   }
 
-  public function setUp() {
-    parent::setUp('ctools', 'services', 'services_test_resource');
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    $modules[] = 'services_test_resource';
+    parent::setUp($modules);
     // Set up endpoint.
     $this->endpoint =  $this->saveNewEndpoint();
   }

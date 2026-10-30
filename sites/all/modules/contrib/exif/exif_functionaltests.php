@@ -141,6 +141,7 @@ abstract class ExifFunctionalTestCase extends DrupalWebTestCase {
       'administer image metadata',
       'administer content types',
       'administer nodes',
+      'administer fields',
       'administer taxonomy',
 	  'create photo content',	
 	  'edit any photo content'

@@ -1,0 +1,57 @@
+.scald-atom {
+    .field-name-download-atom,
+    div > div.popup-element {
+        text-align: center;
+        padding-top: 30px;
+
+        a {
+            background-color: @brand-primary;
+            color: #fff;
+            padding: 10px 20px 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+
+            &:hover,
+            &:focus {
+                background-color: @mukurtu-navbar-default-link-hover-bg;
+                text-decoration: none;
+            }
+        }
+    }
+
+    // Video controls take up extra space, increase padding for "access" link.
+    .scald_video + .field-name-download-atom {
+        padding-top: 50px;
+    }
+
+    // Metadata.
+    div > div.popup-element {
+        padding-top: 20px;
+        text-align: center;
+        display: block;
+
+        a {
+            padding: 8px 14px;
+        }
+    }
+}
+
+.scald-menu {
+    .view-filters {
+        .views-exposed-form {
+            .views-exposed-widgets {
+                .input-group {
+                    .form-control {
+                        z-index: 0;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.node-lesson .group-480-thumbnail-and-link,
+.node-unit-plan .group-480-thumbnail-and-link {
+    margin: auto;
+    width: 480px;
+}

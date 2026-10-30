@@ -1,0 +1,254 @@
+<?php
+
+/**
+ * @file
+ * owlcarousel.module
+ *
+ * @todo,
+ *  Theme responsive administration.
+ *  Ignore responsive attributes which are same as parent.
+ *  Test lazyLoad class support.
+ *  Responsive base element support.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function owlcarousel_theme() {
+  return array(
+    'owlcarousel' => array(
+      'variables' => array('items' => array(), 'settings' => array()),
+      'file' => 'theme/owlcarousel.theme.inc',
+    ),
+    'owlcarousel_list' => array(
+      'variables' => array('items' => array(), 'settings' => array()),
+      'file' => 'theme/owlcarousel.theme.inc',
+    ),
+    'owlcarousel_list_item' => array(
+      'variables' => array('item' => array()),
+      'file' => 'theme/owlcarousel.theme.inc',
+    ),
+    'owlcarousel_wrapper' => array(
+      'variables' => array('output' => array()),
+      'file' => 'theme/owlcarousel.theme.inc',
+    ),
+  );
+}
+
+/**
+ * Implements hook_library().
+ */
+function owlcarousel_library() {
+  $library = libraries_get_path('owlcarousel');
+
+  // Check for CSS file type.
+  $css = $library . '/assets/owl.carousel.min.css';
+  if (!file_exists($css)) {
+    $css = $library . '/assets/owl.carousel.css';
+  }
+
+  $libraries['owlcarousel'] = array(
+    'title' => 'Owl Carousel',
+    'website' => 'http://owlgraphic.com/owlcarousel',
+    'version' => array(),
+    'js' => array(
+      $library . '/owl.carousel.min.js' => array(
+        'scope' => 'footer',
+      ),
+    ),
+    'css' => array(
+      $css => array(
+        'type' => 'file',
+        'media' => 'screen',
+      ),
+      $library . '/assets/owl.theme.default.min.css' => array(
+        'type' => 'file',
+        'media' => 'screen',
+      )
+    ),
+  );
+
+  return $libraries;
+}
+
+/**
+ * Load Owl Carousel settings.
+ *
+ * @param string $instance
+ *  The target HTML id.
+ *
+ * @param array/int $settings
+ *  Either managed settings id or array of settings.
+ */
+function owlcarousel_settings($instance, $settings) {
+  // Temporary warning for 2.x users, remove before RC1.
+  $library = libraries_get_path('owlcarousel');
+  if (!file_exists($library . '/owl.carousel.min.js')) {
+    drupal_set_message('Owl Carousel path folder has changed, please update folder name from owl.carousel to owlcarousel.', 'warning');
+  }
+
+  // Load responsive settings.
+  $breakpoint_settings = array();
+  $breakpoints = owlcarousel_responsive_instance_callback_list($settings);
+  foreach ($breakpoints as $breakpoint) {
+    $breakpoint_settings[str_replace($settings . '_', '', $breakpoint)] = owlcarousel_load_settings($breakpoint);
+  }
+
+  // Load carousel settings from the instance id.
+  if (is_string($settings)) {
+    $settings = owlcarousel_load_settings($settings);
+  }
+
+  // Merge responsive (breakpoint) settings into settings.
+  $settings['responsive'] = $breakpoint_settings;
+
+  // Group settings before alter.
+  $group = array(
+    'settings' => $settings,
+    'views' => array(
+      'ajax_pagination' => variable_get('owlcarousel_override_ajax_pagination_' . $instance)
+    ),
+  );
+
+  // Provide alter for instance settings.
+  drupal_alter('owlcarousel_settings', $group, $instance);
+
+  return $group;
+}
+
+/**
+ * Return Owl Carousel settings or default.
+ *
+ * @param int $instance
+ *  Name of the settings instance to include
+ *  with the pattern owlcarousel_{settings_name}
+ */
+function owlcarousel_load_settings($instance) {
+  if ($cache = cache_get($instance)) {
+    $settings = $cache->data;
+  }
+  else {
+    $settings = array(
+      'items' => (int)owlcarousel_get('owlcarousel_items_', $instance),
+      'margin' => (int)owlcarousel_get('owlcarousel_margin_', $instance),
+      'loop' => (boolean)owlcarousel_get('owlcarousel_loop_', $instance),
+      'center' => (boolean)owlcarousel_get('owlcarousel_center_', $instance),
+      'mouseDrag' => (boolean)owlcarousel_get('owlcarousel_mouse_drag_', $instance),
+      'touchDrag' => (boolean)owlcarousel_get('owlcarousel_touch_drag_', $instance),
+      'pullDrag' => (boolean)owlcarousel_get('owlcarousel_pull_drag_', $instance),
+      'freeDrag' => (boolean)owlcarousel_get('owlcarousel_free_drag_', $instance),
+      'stagePadding' => (int)owlcarousel_get('owlcarousel_stage_padding_', $instance),
+      'merge' => (boolean)owlcarousel_get('owlcarousel_merge_', $instance),
+      'mergeFit' => (boolean)owlcarousel_get('owlcarousel_merge_fit_', $instance),
+      'autoWidth' => (boolean)owlcarousel_get('owlcarousel_auto_width_', $instance),
+      'startPosition' => owlcarousel_get('owlcarousel_start_position_', $instance) ? owlcarousel_get('owlcarousel_start_position_', $instance) : 0,
+      'urlHashListner' => (boolean)owlcarousel_get('owlcarousel_url_hash_listner_', $instance),
+      'nav' => (boolean)owlcarousel_get('owlcarousel_nav_', $instance),
+      'navRewind' => (boolean)owlcarousel_get('owlcarousel_nav_rewind_', $instance),
+      'navText' => owlcarousel_get('owlcarousel_nav_text_', $instance),
+      'slideBy' => (int)owlcarousel_get('owlcarousel_slide_by_', $instance),
+      'dots' => (boolean)owlcarousel_get('owlcarousel_dots_', $instance),
+      'dotsEach' => owlcarousel_get('owlcarousel_dots_each_', $instance) ? owlcarousel_get('owlcarousel_dots_each_', $instance) : FALSE,
+      'dotsData' => (boolean)owlcarousel_get('owlcarousel_dots_data_', $instance),
+      'lazyLoad' => (boolean)owlcarousel_get('owlcarousel_lazy_load_', $instance),
+      'lazyContent' => (boolean)owlcarousel_get('owlcarousel_lazy_content_', $instance),
+      'autoplay' => (boolean)owlcarousel_get('owlcarousel_autoplay_', $instance),
+      'autoplayTimeout' => (int)owlcarousel_get('owlcarousel_autoplay_timeout_', $instance),
+      'autoplayHoverPause' => (boolean)owlcarousel_get('owlcarousel_autoplay_hover_pause_', $instance),
+      'smartSpeed' => (int)owlcarousel_get('owlcarousel_smart_speed_', $instance),
+      'fluidSpeed' => (int)owlcarousel_get('owlcarousel_fluid_speed_', $instance),
+      'autoplaySpeed' => owlcarousel_get('owlcarousel_autoplay_speed_', $instance) ? (int)owlcarousel_get('owlcarousel_autoplay_speed_', $instance) : FALSE,
+      'navSpeed' => owlcarousel_get('owlcarousel_nav_speed_', $instance) ? (int)owlcarousel_get('owlcarousel_nav_speed_', $instance) : FALSE,
+      'dotsSpeed' => owlcarousel_get('owlcarousel_dots_speed_', $instance) ? (int)owlcarousel_get('owlcarousel_dots_speed_', $instance) : FALSE,
+      'dragEndSpeed' => owlcarousel_get('owlcarousel_drag_end_speed_', $instance) ? (int)owlcarousel_get('owlcarousel_drag_end_speed_', $instance) : FALSE,
+      'callbacks' => (boolean)owlcarousel_get('owlcarousel_callbacks_', $instance),
+      'responsiveRefreshRate' => (int)owlcarousel_get('owlcarousel_responsive_refresh_rate_', $instance),
+      'responsiveClass' => (boolean)owlcarousel_get('owlcarousel_responsive_class_', $instance),
+      'video' => (boolean)owlcarousel_get('owlcarousel_video_', $instance),
+      'videoHeight' => owlcarousel_get('owlcarousel_video_height_', $instance) ? (int)owlcarousel_get('owlcarousel_video_height_', $instance) : FALSE,
+      'videoWidth' => owlcarousel_get('owlcarousel_video_width_', $instance) ? (int)owlcarousel_get('owlcarousel_video_width_', $instance) : FALSE,
+      'animateOut' => owlcarousel_get('owlcarousel_animate_out_', $instance) ? owlcarousel_get('owlcarousel_animate_out_', $instance) : FALSE,
+      'animateIn' => owlcarousel_get('owlcarousel_animate_in_', $instance) ? owlcarousel_get('owlcarousel_animate_in_', $instance) : FALSE,
+      'fallbackEasing' => owlcarousel_get('owlcarousel_fallback_easing_', $instance),
+      'info' => owlcarousel_get('owlcarousel_info_', $instance) ? owlcarousel_get('owlcarousel_info_', $instance) : FALSE,
+      'nestedItemSelector' => owlcarousel_get('owlcarousel_nested_item_selector_', $instance) ? owlcarousel_get('owlcarousel_nested_item_selector_', $instance) : FALSE,
+      'itemElement' => owlcarousel_get('owlcarousel_item_element_', $instance),
+      'stageElement' => owlcarousel_get('owlcarousel_stage_element_', $instance),
+      'navContainer' => owlcarousel_get('owlcarousel_nav_container_', $instance) ? owlcarousel_get('owlcarousel_nav_container_', $instance) : FALSE,
+      'dotsContainer' => owlcarousel_get('owlcarousel_dots_container_', $instance) ? owlcarousel_get('owlcarousel_dots_container_', $instance) : FALSE
+    );
+
+    // Update settings cache.
+    cache_set($instance, $settings, 'cache');
+  }
+
+  return $settings;
+}
+
+/**
+ * Wrapper function for variable_get
+ *
+ * @param string $name
+ * @param string $instance
+ */
+function owlcarousel_get($name, $instance) {
+  $function = !module_exists('variable') ? 'variable_get' : 'variable_get_value';
+  $result = $function($name . $instance);
+
+  return $result;
+}
+
+/**
+ * Return Owl Carousel instance settings list.
+ */
+function owlcarousel_instance_callback_list() {
+  $content = array();
+  $instances = _owlcarousel_return_instances();
+
+  // Format array as callback option list.
+  foreach ($instances as $instance) {
+    $content[$instance->name] = $instance->name;
+  }
+
+  return $content;
+}
+
+/**
+ * Return Owl Carousel responsive (breakpoint) settings list.
+ */
+function owlcarousel_responsive_instance_callback_list($name = FALSE) {
+  $content = array();
+  $instances = _owlcarousel_return_instances_name($name ? $name : 'owlcarousel_settings_');
+
+  // Format array as callback option list.
+  foreach ($instances as $instance) {
+    if (is_numeric(substr($instance->name, -1, 1))) {
+      $content[$instance->name] = $instance->name;
+    }
+  }
+
+  return $content;
+}
+
+/**
+ * Helper function, return active instances by name.
+ */
+function _owlcarousel_return_instances() {
+  $results = &drupal_static(__FUNCTION__);
+
+  if (!isset($results)) {
+    $results = _owlcarousel_return_instances_name('owlcarousel_settings_');
+  }
+
+  return $results;
+}
+
+/**
+ * Helper function, query active settings groups by name.
+ */
+function _owlcarousel_return_instances_name($name) {
+  $query = 'SELECT name FROM {variable} WHERE name LIKE :name';
+  $results = db_query($query, array(':name' => db_like($name) . '%'))->fetchAll();
+
+  return $results;
+}

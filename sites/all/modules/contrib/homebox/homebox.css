@@ -65,9 +65,6 @@
 #homebox .homebox-portlet div.views-exposed-widgets {
   padding: 0 7px;
 }
-#homebox div.view-header {
-  text-align: right;
-}
 #homebox .portlet-maximized {
   clear: both;
 }
@@ -116,7 +113,6 @@
   visibility: visible !important;
   margin: 5px 0;
   padding: 0;
-  /*background: #FFFFDD;*/
   border: 3px dashed #ccc;
 }
 #homebox .homebox-placeholder * {

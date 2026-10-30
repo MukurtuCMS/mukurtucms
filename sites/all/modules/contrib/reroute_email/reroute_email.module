@@ -1,0 +1,342 @@
+<?php
+
+/**
+ * @file
+ * Intercepts all outgoing emails to be rerouted to a configurable destination.
+ */
+
+define('REROUTE_EMAIL_ENABLE', 'reroute_email_enable');
+define('REROUTE_EMAIL_ADDRESS', 'reroute_email_address');
+define('REROUTE_EMAIL_WHITELIST', 'reroute_email_whitelist');
+define('REROUTE_EMAIL_ENABLE_MESSAGE', 'reroute_email_enable_message');
+define('REROUTE_EMAIL_ENABLE_DSM', 'reroute_email_enable_dsm');
+define('REROUTE_EMAIL_MAIL_KEYS', 'reroute_email_mail_keys');
+define('REROUTE_EMAIL_ADDRESS_EMPTY_PLACEHOLDER', '[No reroute email address configured]');
+
+/**
+ * Implements hook_module_implements_alter().
+ *
+ * Ensure reroute_email runs last when hook_mail_alter is invoked.
+ */
+function reroute_email_module_implements_alter(&$implementations, $hook) {
+  // Testing with isset is only necessary if module doesn't implement the hook.
+  if ($hook == 'mail_alter') {
+    // Move our hook implementation to the bottom.
+    $group = $implementations['reroute_email'];
+    unset($implementations['reroute_email']);
+    $implementations['reroute_email'] = $group;
+
+    // If the queue_mail module is installed, ensure that comes after ours so
+    // queued emails are still rerouted.
+    if (isset($implementations['queue_mail'])) {
+      $group = $implementations['queue_mail'];
+      unset($implementations['queue_mail']);
+      $implementations['queue_mail'] = $group;
+    }
+  }
+}
+
+/**
+ * Implements hook_permission().
+ */
+function reroute_email_permission() {
+  return array(
+    'administer reroute email' => array(
+      'title' => t('Administer Reroute Email'),
+      'description' => t('Administer the Reroute Email module.'),
+      'restrict access' => TRUE,
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function reroute_email_menu() {
+  $items['admin/config/development/reroute_email'] = array(
+    'title' => 'Reroute Email',
+    'description' => 'Reroute emails to a test address.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('reroute_email_settings'),
+    'access arguments' => array('administer reroute email'),
+    'file' => 'reroute_email.admin.inc',
+  );
+
+  $items['admin/config/development/reroute_email/settings'] = array(
+    'title' => 'Settings',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+
+  $items['admin/config/development/reroute_email/test'] = array(
+    'title' => 'Test email form',
+    'type' => MENU_LOCAL_TASK,
+    'description' => 'Form for sending test email.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('reroute_email_test_email_form'),
+    'access arguments' => array('administer reroute email'),
+    'file' => 'reroute_email.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_mail_alter().
+ *
+ * This hook is required to change the destination of outgoing emails.
+ */
+function reroute_email_mail_alter(&$message) {
+  global $base_url;
+
+  if (empty($message) || !is_array($message)) {
+    return;
+  }
+
+  // Allow other modules to decide whether the email should be rerouted by
+  // specify a special header 'X-Rerouted-Force' to TRUE or FALSE. Any module
+  // can add this header to any own emails in hook_mail or any other emails in
+  // hook_mail_alter() implementations.
+  if (!empty($message['headers']) && isset($message['headers']['X-Rerouted-Force'])) {
+    if (FALSE === (bool) $message['headers']['X-Rerouted-Force']) {
+      return;
+    }
+
+    // We ignore all module settings if X-Rerouted-Force header was set to TRUE.
+  }
+
+  // There is no value for X-Rerouted-Force header in the message. Let's
+  // determine if the message should be rerouted according to the module
+  // settings values.
+  elseif (reroute_email_check($message) === FALSE) {
+    return;
+  }
+
+  $mailkey = isset($message['id']) ? $message['id'] : t('[mail id] is missing');
+  $to = isset($message['to']) ? $message['to'] : t('[to] is missing');
+
+  $message['headers']['X-Rerouted-Mail-Key'] = $mailkey;
+  $message['headers']['X-Rerouted-Website'] = $base_url;
+
+  // Unset Bcc and Cc fields to prevent emails from going to those addresses.
+  if (isset($message['headers']) && is_array($message['headers'])) {
+
+    // Ensure we catch all Cc and Bcc headers, regardless of case,
+    // and protecting against multiple instances of the "same" header.
+    $header_keys = array();
+    foreach (array_keys($message['headers']) as $key) {
+      $header_keys[strtolower($key)][] = $key;
+    }
+
+    if (!empty($header_keys['cc'])) {
+      foreach ($header_keys['cc'] as $header) {
+        $message['headers']['X-Rerouted-Original-Cc'] = $message['headers'][$header];
+        unset($message['headers'][$header]);
+      }
+    }
+    if (!empty($header_keys['bcc'])) {
+      foreach ($header_keys['bcc'] as $header) {
+        $message['headers']['X-Rerouted-Original-Bcc'] = $message['headers'][$header];
+        unset($message['headers'][$header]);
+      }
+    }
+  }
+
+  // Get reroute_email_address, or use system.site.mail if not set.
+  $rerouting_addresses = variable_get(REROUTE_EMAIL_ADDRESS, variable_get('site_mail', ini_get('sendmail_from')));
+  $message['headers']['X-Rerouted-Original-To'] = $to;
+  $message['to'] = empty($rerouting_addresses) ? REROUTE_EMAIL_ADDRESS_EMPTY_PLACEHOLDER : $rerouting_addresses;
+
+  // Format a message to show at the top.
+  if (variable_get(REROUTE_EMAIL_ENABLE_MESSAGE, 1)) {
+    $message_lines = array(
+      t('This email was rerouted.'),
+      t('Web site: @site', array('@site' => $base_url)),
+      t('Mail key: @key', array('@key' => $mailkey)),
+      t('Originally to: @to', array('@to' => $to)),
+    );
+
+    // Add Cc/Bcc values to the message only if they are set.
+    if (!empty($message['headers']['X-Rerouted-Original-Cc'])) {
+      $message_lines[] = t('Originally cc: @cc', array('@cc' => $message['headers']['X-Rerouted-Original-Cc']));
+    }
+    if (!empty($message['headers']['X-Rerouted-Original-Bcc'])) {
+      $message_lines[] = t('Originally bcc: @bcc', array('@bcc' => $message['headers']['X-Rerouted-Original-Bcc']));
+    }
+
+    // Simple separator between reroute and original messages.
+    $message_lines[] = '-----------------------';
+    $message_lines[] = '';
+
+    $msg = implode(PHP_EOL, $message_lines);
+
+    // Prepend explanation message to the body of the email. This must be
+    // handled differently depending on whether the body came in as a
+    // string or an array. If it came in as a string (despite the fact it
+    // should be an array) we'll respect that and leave it as a string.
+    if (is_string($message['body'])) {
+      $message['body'] = $msg . $message['body'];
+    }
+    else {
+      array_unshift($message['body'], $msg);
+    }
+  }
+
+  // Abort sending of the email if the no rerouting addresses provided.
+  if ($rerouting_addresses === '') {
+    $message['send'] = FALSE;
+
+    // Extensive params keys cause OOM error in var_export().
+    unset($message['params']);
+
+    // Record a variable dump of the email in the recent log entries.
+    $message_string = var_export($message, TRUE);
+
+    // Record a variable dump of the email in the recent log entries.
+    watchdog('reroute_email', 'Aborted email sending for <em>@message_id</em>.<br />Detailed email data: Array $message <pre>@message</pre>', array(
+      '@message_id' => $message['id'],
+      '@message' => $message_string,
+    ));
+
+    // Let users know email has been aborted, but logged.
+    if (variable_get(REROUTE_EMAIL_ENABLE_DSM, 1)) {
+      drupal_set_message(t('<em>@message_id</em> was aborted by reroute email; site administrators can check the recent log entries for complete details on the rerouted email.', array('@message_id' => $message['id'])));
+    }
+  }
+  elseif (variable_get(REROUTE_EMAIL_ENABLE_DSM, 1)) {
+
+    // Display a Drupal status message to let users know email was rerouted.
+    drupal_set_message(t('Submitted email, with ID: <em>@message_id</em>, was rerouted to configured address: <em>@reroute_target</em>. For more details please refer to Reroute Email settings.', array(
+      '@message_id' => $message['id'],
+      '@reroute_target' => $message['to'],
+    )));
+  }
+}
+
+/**
+ * Implements hook_mail().
+ */
+function reroute_email_mail($key, &$message, $params) {
+  if ('reroute_email_test_email_form' !== $message['id']) {
+    return;
+  }
+  $message['headers']['Cc'] = $params['cc'];
+  $message['headers']['Bcc'] = $params['bcc'];
+  $message['subject'] = $params['subject'];
+  $message['body'][] = $params['body'];
+}
+
+/**
+ * Helper function to determine a need to reroute.
+ *
+ * @param array $message
+ *   A message array, as described in hook_mail_alter().
+ *
+ * @return bool
+ *   Return TRUE if should be rerouted, FALSE otherwise.
+ */
+function reroute_email_check(array $message) {
+  // Disable rerouting according to admin settings.
+  if (!variable_get(REROUTE_EMAIL_ENABLE, FALSE)) {
+    return FALSE;
+  }
+
+  // Check configured mail keys filters.
+  $keys = reroute_email_split_string(variable_get(REROUTE_EMAIL_MAIL_KEYS, ''));
+  if (!empty($keys) && !(in_array($message['id'], $keys, TRUE) || in_array($message['module'], $keys, TRUE))) {
+    $message['header']['X-Reroute-Status'] = 'MAILKEY-IGNORED';
+    return FALSE;
+  }
+
+  // Split addresses into arrays.
+  $original_addresses = reroute_email_split_string($message['to']);
+  $whitelisted_addresses = reroute_email_split_string(variable_get(REROUTE_EMAIL_WHITELIST, ''));
+  $whitelisted_domains = array();
+
+  // Split whitelisted domains from whitelisted addresses.
+  foreach ($whitelisted_addresses as $key => $email) {
+    if (preg_match('/^\*@(.*)$/', $email, $matches)) {
+
+      // The part after the @ sign is the domain and according to RFC 1035,
+      // section 3.1: "Name servers and resolvers must compare [domains] in a
+      // case-insensitive manner".
+      $domain = drupal_strtolower($matches[1]);
+
+      $whitelisted_domains[$domain] = $domain;
+      unset($whitelisted_addresses[$key]);
+    }
+  }
+
+  // Compare original addresses with whitelisted.
+  $invalid = 0;
+  foreach ($original_addresses as $email) {
+
+    // Check whitelisted emails and domains.
+    $domain = drupal_strtolower(drupal_substr(strrchr($email, '@'), 1));
+    if (in_array($email, $whitelisted_addresses, TRUE) ||
+      in_array($domain, $whitelisted_domains, TRUE)) {
+      continue;
+    }
+
+    // Just ignore all invalid email addresses.
+    if (valid_email_address($email) === FALSE) {
+      $invalid++;
+      continue;
+    }
+
+    // No need to continue if at least one address should be rerouted.
+    $message['header']['X-Reroute-Status'] = 'REROUTED';
+    return TRUE;
+  }
+
+  // Reroute if all addresses are invalid.
+  if (count($original_addresses) === $invalid) {
+    $message['header']['X-Reroute-Status'] = 'INVALID-ADDRESSES';
+    return TRUE;
+  }
+
+  // All addresses passes whitelist checks.
+  $message['header']['X-Reroute-Status'] = 'WHITELISTED';
+  return FALSE;
+}
+
+/**
+ * Split a string into an array by pre defined allowed delimiters.
+ *
+ * Items may be separated by any number and combination of:
+ * spaces, commas, semicolons, or newlines.
+ *
+ * @param string $string
+ *   A string to be split into an array.
+ *
+ * @return array
+ *   An array of unique values from a string.
+ */
+function reroute_email_split_string($string) {
+  $array = preg_split('/[\s,;\n]+/', $string, -1, PREG_SPLIT_NO_EMPTY);
+
+  // Remove duplications.
+  $array = array_unique($array);
+
+  return $array;
+}
+
+/**
+ * Validate multiple email addresses field.
+ */
+function reroute_email_element_validate_addresses($element, &$form_state, $form) {
+  $field_name = $element['#name'];
+
+  // Allow only valid email addresses.
+  $addresses = reroute_email_split_string($form_state['values'][$field_name]);
+  foreach ($addresses as $address) {
+    if (!valid_email_address($address)) {
+      form_set_error($field_name, t('@address is not a valid email address.', array('@address' => $address)));
+    }
+  }
+
+  // Save value in usable way to use as `to` param in drupal_mail.
+  // String "email@example.com; ;; , ,," save just as "email@example.com".
+  // This will be ignored if any validation errors occur.
+  form_set_value($form[$field_name], implode(',', $addresses), $form_state);
+}

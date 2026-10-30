@@ -1,0 +1,53 @@
+diff --git a/search_api_glossary.module b/search_api_glossary.module
+index 27cffed..69b6621 100644
+--- a/search_api_glossary.module
++++ b/search_api_glossary.module
+@@ -177,7 +177,9 @@ function search_api_glossary_entity_property_info() {
+  */
+ function search_api_glossary_title_getter_callback($node, $name) {
+   // @TODO: remove hardcoded node title field and expose this as a setting.
+-  $first_letter = strtoupper($node->title[0]);
++  // Mukurtu patch.
++  // Return the unicode of the first character, whatever it is.
++  return mb_strtoupper(mb_substr($node->title, 0, 1));
+   $key = search_api_glossary_getter_helper($first_letter);
+   return $key;
+ }
+@@ -249,6 +251,10 @@ function search_api_glossary_sort_glossary(array $a, array $b) {
+   elseif ($b_value == "0-9" && $a_value == "#") {
+     return -1;
+   }
++  // Mukurtu patch for custom character sorting.
++  else {
++    return ma_dictionary_glossary_sort($a_value, $b_value);
++  }
+ }
+
+
+@@ -293,8 +299,15 @@ class SearchApiGlossaryRewriteItems extends FacetapiFilter {
+    */
+   public function padListItems(&$build) {
+     $glossary_array = range('A', 'Z');
+-    $glossary_array[] = "#";
+-    $glossary_array[] = "0-9";
++    // Mukurtu patch
++    // Special characters and numbers are now printed, so do not pad them with their alternate links.
++    // $glossary_array[] = "#";
++    // $glossary_array[] = "0-9";
++    // If skip padding var is set, then do not pad.
++    if (variable_get('field_aod_letter_padding')) {
++      return $build;
++    }
++    // end Mukurtu patch
+
+     foreach ($glossary_array as $key) {
+       if (!array_key_exists($key, $build)) {
+@@ -412,7 +425,7 @@ class SearchApiGlossaryWidget extends FacetapiWidgetLinks {
+
+     foreach ($build as $value => $item) {
+       $row = array('class' => array());
+-
++
+       if(!isset($item['#active'])){
+         $item['#active'] = FALSE;
+       }

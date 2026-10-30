@@ -33,7 +33,39 @@ class ScaldAtomController extends DrupalDefaultEntityController {
       if (file_prepare_directory($directory, FILE_CREATE_DIRECTORY)) {
         return $directory;
       }
+      drupal_set_message(t('The directory "@directory" must be writable by the webserver. Your upload will not be saved. Please contact your server administrator to configure permissions.', array('@directory' => $directory)), 'error', FALSE);
     }
+  }
+
+  /**
+   * Returns the default description for a file or image field for an atom type.
+   */
+  public static function getFieldDescription($type, $field_name = 'scald_thumbnail') {
+    $description = '';
+    $field = field_info_field($field_name);
+    $instance = field_info_instance('scald_atom', $field_name, $type);
+    if ($field && $instance) {
+      $description = $instance['description'];
+    }
+    return $description;
+  }
+
+  /**
+   * Returns the default upload validators for a file or image field for an atom type.
+   */
+  public static function getFieldUploadValidators($type, $field_name = 'scald_thumbnail') {
+    $upload_validators = array();
+    $field = field_info_field($field_name);
+    $instance = field_info_instance('scald_atom', $field_name, $type);
+    if ($field && $instance) {
+      // Add upload file validation.
+      $upload_validators = file_field_widget_upload_validators($field, $instance);
+      if ($type === 'image' && (!empty($instance['settings']['max_resolution']) || !empty($instance['settings']['min_resolution']))) {
+        // Add upload image validation.
+        $upload_validators['file_validate_image_resolution'] = array($instance['settings']['max_resolution'], $instance['settings']['min_resolution']);
+      }
+    }
+    return $upload_validators;
   }
 
   /**
@@ -84,7 +116,11 @@ class ScaldAtomController extends DrupalDefaultEntityController {
       field_update_instance($instance);
     }
 
-    // Instantiate the Scald Authors field.
+    // Instantiate the Scald Authors field, if the vocabulary exists, and if
+    // the field exists for us to instantiate. Otherwise, assume that one or
+    // both were intentionally deleted and don't re-create.
+    $vocabulary_name = variable_get('scald_author_vocabulary', 'scald_authors');
+    $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_name);
     $instance = array(
       'field_name' => 'scald_authors',
       'entity_type' => 'scald_atom',
@@ -95,11 +131,14 @@ class ScaldAtomController extends DrupalDefaultEntityController {
         'type' => 'taxonomy_autocomplete',
       ),
     );
-    if (!field_read_instance($instance['entity_type'], $instance['field_name'], $instance['bundle'])) {
+    if ($vocabulary && field_read_field($instance['field_name']) && !field_read_instance($instance['entity_type'], $instance['field_name'], $instance['bundle'])) {
       field_create_instance($instance);
     }
 
-    // Instantiate the Scald Tags field.
+    // Instantiate the Scald Tags field. As with Scald Authors above, only do
+    // this if the vocabulary and the field already exist.
+    $vocabulary_name = variable_get('scald_tags_vocabulary', 'scald_tags');
+    $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_name);
     $instance = array(
       'field_name' => 'scald_tags',
       'entity_type' => 'scald_atom',
@@ -110,7 +149,7 @@ class ScaldAtomController extends DrupalDefaultEntityController {
         'type' => 'taxonomy_autocomplete',
       ),
     );
-    if (!field_read_instance($instance['entity_type'], $instance['field_name'], $instance['bundle'])) {
+    if ($vocabulary && field_read_field($instance['field_name']) && !field_read_instance($instance['entity_type'], $instance['field_name'], $instance['bundle'])) {
       field_create_instance($instance);
     }
 
@@ -140,6 +179,13 @@ class ScaldAtomController extends DrupalDefaultEntityController {
         ->condition('type', $type)
         ->execute();
       scald_types(TRUE);
+
+      foreach (array('scald_thumbnail', 'scald_authors', 'scald_tags') as $field_name) {
+        $instance = field_info_instance('scald_atom', $field_name, $type);
+        if (!empty($instance)) {
+          field_delete_instance($instance, FALSE);
+        }
+      }
       return TRUE;
     }
 

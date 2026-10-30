@@ -1,0 +1,19 @@
+/**
+ * @file
+ * CSS goodness for feeds_ex.
+ */
+
+#feeds-ex-source-table .form-type-machine-name .description {
+  margin-bottom: 0;
+  max-width: 250px;
+  white-space: normal;
+}
+
+#feeds-ex-source-table .feeds-ex-add-name  .form-item {
+  float: left;
+}
+
+#feeds-ex-source-table .feeds-ex-context-value,
+#feeds-ex-source-table .feeds-ex-context-value + .description {
+  display: inline-block;
+}

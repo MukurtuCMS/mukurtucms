@@ -1,11 +1,99 @@
 <?php
 
 /**
+ * Implements hook_install().
+ */
+function ma_core_install() {
+    mukurtu_create_default_contexts();
+    module_enable(array('ma_dictionary', 'mukurtu_content_warnings', 'mukurtu_taxonomy_records', 'ma_person'));
+    module_disable(array('ma_dictionary'));
+}
+
+/**
  * Implements hook_update().
  */
 
 /**
- * Recreate the frontpage context since the old one gets deleted as it's been removed from the ma_core feature */
+ * Recreate the frontpage context since the old one gets deleted as it's been removed from the ma_core feature
+ */
 function ma_core_update_7100() {
   mukurtu_create_default_contexts();
+}
+
+/**
+ * Delete old references to the views_fluid_grid module. This is necessary as of Drupal
+ * core v7.50 which gives a warning about missing module files.
+ */
+function ma_core_update_7101() {
+    $modules = array(
+        'views_fluid_grid',
+    );
+    db_delete('system')
+        ->condition('name', $modules, 'IN')
+        ->execute();
+}
+
+/**
+ * For sites that pre-date the dictionary feature, we need to enable the dictionary in order to
+ * build the dictionary DB tables. After that we disable the dictionary and let the user enable if desired.
+ */
+function ma_core_update_7102() {
+  module_enable(array('ma_dictionary'));
+  module_disable(array('ma_dictionary'));
+}
+
+/**
+ * Enable Mukurtu Content Warnings
+ */
+function ma_core_update_7103() {
+    module_enable(array('mukurtu_content_warnings'));
+}
+
+/**
+ * Enable Mukurtu Taxonomy Records
+ */
+function ma_core_update_7104() {
+    module_enable(array('mukurtu_taxonomy_records', 'ma_person'));
+}
+
+/**
+ * Bulk add file hashes
+ */
+function ma_core_update_7105() {
+  module_enable(array('ma_file_fixity'));
+  features_revert_module('ma_file_fixity');
+  ma_file_fixity_bulk_generate_file_hashes();
+}
+
+/**
+ * Remove old maillog module configuration, if needed.
+ */
+function ma_core_update_7106() {
+  $mail_system = variable_get('mail_system');
+  if (isset($mail_system['default-system']) && $mail_system['default-system'] == 'MaillogMailSystem') {
+    $mail_system['default-system'] = 'DefaultMailSystem';
+    if (isset($mail_system['maillog']) && $mail_system['maillog'] == 'MaillogMailSystem') {
+      unset($mail_system['maillog']);
+    }
+    variable_set('mail_system', $mail_system);
+  }
+}
+
+/**
+ * Set default 403 page, if not already set.
+ */
+function ma_core_update_7107() {
+  $page = variable_get('site_403');
+  if (!$page) {
+    variable_set('site_403', 'mukurtu/access-denied');
+  }
+}
+
+/**
+ * Disable and uninstall the Community Tags module.
+ */
+function ma_core_update_7108() {
+  if (module_exists('community_tags')) {
+    module_disable(array('community_tags'));
+  }
 }

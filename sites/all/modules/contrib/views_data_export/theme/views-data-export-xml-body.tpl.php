@@ -13,8 +13,10 @@
 ?>
 <?php foreach ($themed_rows as $count => $row): ?>
   <<?php print $item_node; ?>>
-<?php foreach ($row as $field => $content): ?>
-    <<?php print $xml_tag[$field]; ?>><?php print $content; ?></<?php print $xml_tag[$field]; ?>>
+<?php foreach ($row as $field => $values): ?>
+<?php foreach ($values as $value): ?>
+    <<?php print $xml_tag[$field]; ?>><?php print $value; ?></<?php print $xml_tag[$field]; ?>>
+<?php endforeach; ?>
 <?php endforeach; ?>
   </<?php print $item_node; ?>>
 <?php endforeach; ?>

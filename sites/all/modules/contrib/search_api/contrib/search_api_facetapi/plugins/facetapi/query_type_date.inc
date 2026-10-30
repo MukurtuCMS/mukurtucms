@@ -54,31 +54,56 @@ class SearchApiFacetapiDate extends SearchApiFacetapiTerm implements FacetapiQue
       $options['search_api_facets'][$this->facet['name']]['limit'] = -1;
     }
 
-    if ($active = $this->adapter->getActiveItems($this->facet)) {
-      $item = end($active);
+    if ($active_items = $this->adapter->getActiveItems($this->facet)) {
       $field = $this->facet['field'];
-      $filter = $this->createRangeFilter($item['value']);
-      $this->addFacetFilter($query, $field, $filter);
+      $operator = 'OR';
+      if ($settings['operator'] !== FACETAPI_OPERATOR_OR) {
+        $operator = 'AND';
+        // If the operator is AND, we just need to apply the lowest-level
+        // filter(s) to make this work correctly. For single-valued fields, this
+        // will always just be the last value, so just use that to improve
+        // performance for that case.
+        $fields = $query->getIndex()->getFields();
+        if (isset($fields[$field]['type'])
+            && !search_api_is_list_type($fields[$field]['type'])) {
+          $active_items = array(end($active_items));
+        }
+      }
+      $date_query = $query->createFilter($operator, array("facet:$field"));
+      foreach($active_items as $active_item) {
+        $filter = $this->createRangeFilter($active_item['value']);
+        if ($filter) {
+          $this->addFacetFilter($date_query, $field, $filter, $query);
+        }
+      }
+      $query->filter($date_query);
     }
   }
 
   /**
    * Rewrites the handler-specific date range syntax to the normal facet syntax.
    *
-   * @param $value
+   * @param string $value
    *   The user-facing facet value.
    *
-   * @return string
+   * @return string|null
    *   A facet to add as a filter, in the format used internally in this module.
+   *   Or NULL if the raw facet in $value is not valid.
    */
   protected function createRangeFilter($value) {
-    // Gets the granularity. Ignore any filters passed directly from the server
-    // (range or missing). We always create filters starting with a year.
-    if (!$value || !ctype_digit($value[0])) {
-      return $value;
+    // Ignore any filters passed directly from the server (range or missing).
+    if (!$value || $value == '!' || (!ctype_digit($value[0]) && preg_match('/^[\[(][^ ]+ TO [^ ]+[\])]$/', $value))) {
+      return $value ? $value : NULL;
     }
 
-    $parts = explode('-', $value);
+    // Parse into date parts.
+    $parts = $this->parseRangeFilter($value);
+
+    // Return NULL if the date parts are invalid or none were found.
+    if (empty($parts)) {
+      return NULL;
+    }
+
     $date = new DateTime();
     switch (count($parts)) {
       case 1:
@@ -141,6 +166,48 @@ class SearchApiFacetapiDate extends SearchApiFacetapiTerm implements FacetapiQue
   }
 
   /**
+   * Parses the date range filter value into parts.
+   *
+   * @param string $value
+   *   The user-facing facet value.
+   *
+   * @return int[]|null
+   *   An array of date parts, or NULL if an invalid value was provided.
+   */
+  protected static function parseRangeFilter($value) {
+    $parts = explode('-', $value);
+
+    foreach ($parts as $i => $part) {
+      // Invalidate if part is not an integer.
+      if ($part === '' || !is_numeric($part) || intval($part) != $part) {
+        return NULL;
+      }
+      $parts[$i] = (int) $part;
+      // Depending on the position, negative numbers or 0 are invalid.
+      switch ($i) {
+        case 0:
+          // Years can contain anything – negative values are unlikely, but
+          // technically possible.
+          break;
+        case 1:
+        case 2:
+          // Days and months have to be positive.
+          if ($part <= 0) {
+            return NULL;
+          }
+          break;
+        default:
+          // All others can be 0, but not negative.
+          if ($part < 0) {
+            return NULL;
+          }
+      }
+    }
+
+    return $parts;
+  }
+
+  /**
    * Replacement callback for replacing ISO dates with timestamps.
    *
    * Not used anymore, but kept for backwards compatibility with potential
@@ -159,10 +226,11 @@ class SearchApiFacetapiDate extends SearchApiFacetapiTerm implements FacetapiQue
   public function build() {
     $facet = $this->adapter->getFacet($this->facet);
     $search_ids = drupal_static('search_api_facetapi_active_facets', array());
-    if (empty($search_ids[$facet['name']]) || !search_api_current_search($search_ids[$facet['name']])) {
+    $facet_key = $facet['name'] . '@' . $this->adapter->getSearcher();
+    if (empty($search_ids[$facet_key]) || !search_api_current_search($search_ids[$facet_key])) {
       return array();
     }
-    $search_id = $search_ids[$facet['name']];
+    $search_id = $search_ids[$facet_key];
     $build = array();
     $search = search_api_current_search($search_id);
     $results = $search[1];
@@ -172,8 +240,9 @@ class SearchApiFacetapiDate extends SearchApiFacetapiTerm implements FacetapiQue
     // Executes query, iterates over results.
     if (isset($results['search_api_facets']) && isset($results['search_api_facets'][$this->facet['name']])) {
       $values = $results['search_api_facets'][$this->facet['name']];
+      $mincount = $facet->getSettings()->settings['facet_mincount'];
       foreach ($values as $value) {
-        if ($value['count']) {
+        if ($value['count'] >= $mincount) {
           $filter = $value['filter'];
           // We only process single values further. The "missing" filter and
           // range filters will be passed on unchanged.
@@ -193,9 +262,19 @@ class SearchApiFacetapiDate extends SearchApiFacetapiTerm implements FacetapiQue
       }
     }
 
-    // Get the finest level of detail we're allowed to drill down to.
     $settings = $facet->getSettings()->settings;
-    $max_granularity = isset($settings['date_granularity']) ? $settings['date_granularity'] : FACETAPI_DATE_MINUTE;
+
+    // Get the finest level of detail we're allowed to drill down to.
+    $max_granularity = FACETAPI_DATE_MINUTE;
+    if (isset($settings['date_granularity'])) {
+      $max_granularity = $settings['date_granularity'];
+    }
+
+    // Get the coarsest level of detail we're allowed to start at.
+    $min_granularity = FACETAPI_DATE_YEAR;
+    if (isset($settings['date_granularity_min'])) {
+      $min_granularity = $settings['date_granularity_min'];
+    }
 
     // Gets active facets, starts building hierarchy.
     $parent = $granularity = NULL;
@@ -224,9 +303,6 @@ class SearchApiFacetapiDate extends SearchApiFacetapiTerm implements FacetapiQue
         $build[$parent]['#item_children'][$value] = &$build[$value];
         $build[$value]['#item_parents'][$parent] = $parent;
       }
-
-      // Stores the last value iterated over.
-      $parent = $value;
     }
 
     if (empty($raw_values)) {
@@ -249,10 +325,13 @@ class SearchApiFacetapiDate extends SearchApiFacetapiTerm implements FacetapiQue
           FACETAPI_DATE_MINUTE => 2,
           FACETAPI_DATE_SECOND => 1,
         );
-        // Gets gap numbers for both the gap and minimum gap, checks if the gap
-        // is within the limit set by the $granularity parameter.
+        // Gets gap numbers for both the gap, minimum and maximum gap, checks if
+        // the gap is within the limit set by the $granularity parameters.
         if ($gap_numbers[$granularity] < $gap_numbers[$max_granularity]) {
           $granularity = $max_granularity;
+        }
+        if ($gap_numbers[$granularity] > $gap_numbers[$min_granularity]) {
+          $granularity = $min_granularity;
         }
       }
       else {

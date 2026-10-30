@@ -1,0 +1,24 @@
+<?php
+/**
+ * @file
+ * Scald Video Installation
+ */
+
+/**
+ * Implements hook_install().
+ */
+function scald_video_install() {
+  ScaldAtomController::addType('video', 'Video', 'Scald provider to host your videos in your drupal site.');
+  variable_set('scald_video_upload_location', 'public://atoms/video/');
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function scald_video_uninstall() {
+  drupal_load('module', 'scald');
+  // If Scald is disabled, its classes are not autoloaded.
+  module_load_include('inc', 'scald', 'includes/ScaldAtomController');
+  ScaldAtomController::removeType('video');
+  variable_del('scald_video_upload_location');
+}

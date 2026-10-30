@@ -48,6 +48,7 @@ function og_invite_install() {
  */
 function og_invite_uninstall() {
   module_load_include('module', 'og_invite');
+  module_load_include('module', 'og');
 
   // Delete all pending invitations.
   $query = new EntityFieldQuery();

@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Features integration for 'node' module.
+ */
+
+/**
  * Implements hook_features_api().
  */
 function node_features_api() {
@@ -8,6 +13,7 @@ function node_features_api() {
     'node' => array(
       'name' => t('Content types'),
       'feature_source' => TRUE,
+      /* @see \hook_node_info() */
       'default_hook' => 'node_info',
       'alter_type' => FEATURES_ALTER_TYPE_INLINE,
     ),
@@ -31,7 +37,8 @@ function node_features_export($data, &$export, $module_name = '') {
   foreach ($data as $type) {
     // Poll node module to determine who provides the node type.
     if ($info = node_type_get_type($type)) {
-      // If this node type is provided by a different module, add it as a dependency
+      // If this node type is provided by a different module, add it as a
+      // dependency.
       if (isset($map[$type]) && $map[$type] != $module_name) {
         $export['dependencies'][$map[$type]] = $map[$type];
       }
@@ -117,7 +124,7 @@ function node_features_revert($module = NULL) {
 }
 
 /**
- * Implements hook_features_disable().
+ * Implements hook_features_disable_feature().
  *
  * When a features module is disabled, modify any node types it provides so
  * they can be deleted manually through the content types UI.
@@ -125,7 +132,7 @@ function node_features_revert($module = NULL) {
  * @param $module
  *   Name of module that has been disabled.
  */
-function node_features_disable($module) {
+function node_features_disable_feature($module) {
   if ($default_types = features_get_default('node', $module)) {
     foreach ($default_types as $type_name => $type_info) {
       $type_info = node_type_load($type_name);
@@ -133,22 +140,26 @@ function node_features_disable($module) {
       $type_info->custom = 1;
       $type_info->modified = 1;
       $type_info->locked = 0;
+      $type_info->disabled = 0;
       node_type_save($type_info);
     }
   }
 }
 
 /**
- * Implements hook_features_enable().
+ * Implements hook_features_enable_feature().
  *
  * When a features module is enabled, modify any node types it provides so
  * they can no longer be deleted manually through the content types UI.
  *
+ * Update the database cache of node types if needed.
+ *
  * @param $module
  *   Name of module that has been enabled.
  */
-function node_features_enable($module) {
+function node_features_enable_feature($module) {
   if ($default_types = features_get_default('node', $module)) {
+    $rebuild = FALSE;
     foreach ($default_types as $type_name => $type_info) {
       // Ensure the type exists.
       if ($type_info = node_type_load($type_name)) {
@@ -156,8 +167,15 @@ function node_features_enable($module) {
         $type_info->custom = 0;
         $type_info->modified = 0;
         $type_info->locked = 1;
+        $type_info->disabled = 0;
         node_type_save($type_info);
       }
+      else {
+        $rebuild = TRUE;
+      }
+    }
+    if ($rebuild) {
+      node_types_rebuild();
     }
   }
 }

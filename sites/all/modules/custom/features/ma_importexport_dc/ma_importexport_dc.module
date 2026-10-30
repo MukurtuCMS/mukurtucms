@@ -1,0 +1,786 @@
+<?php
+/**
+ * @file
+ * Code for the Mukurtu Import/Export Dublin Core and MODS feature.
+ */
+
+include_once 'ma_importexport_dc.features.inc';
+
+/**
+ * Helper function to return if a given feeds importer is an XML importer.
+ */
+function ma_importexport_dc_is_xml_importer($importer_name) {
+  if (in_array($importer_name, ['digital_heritage_dc', 'digital_heritage_mods'])) {
+    return TRUE;
+  }
+}
+
+/**
+ * Implementation of hook_menu()
+ */
+function ma_importexport_dc_menu() {
+
+  $items['import/digital-heritage-xml-file'] = array(
+    'title' => 'Import Digital Heritage XML - File',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ma_importexport_dc_import_form_standalone'),
+    'access arguments' => array('import digital_heritage_metadata feeds'),
+  );
+
+  $items['import/digital-heritage-xml-context'] = array(
+    'title' => 'Import Digital Heritage XML - Context',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ma_importexport_dc_import_form_context'),
+    'access arguments' => array('import digital_heritage_metadata feeds'),
+  );
+
+  $items['import/digital-heritage-xml-options'] = array(
+    'title' => 'Import Digital Heritage XML - Options',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ma_importexport_dc_import_form_options'),
+    'access arguments' => array('import digital_heritage_metadata feeds'),
+  );
+
+  $items['import/digital-heritage-xml-complete'] = array(
+    'title' => 'Import Digital Heritage XML - Complete',
+    'page callback' => 'ma_importexport_dc_import_complete',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('import digital_heritage_metadata feeds'),
+  );
+
+  return $items;
+}
+
+/**
+ * Custom form for user to upload the XML.
+ */
+function ma_importexport_dc_import_form_standalone($form, $form_state) {
+
+  $form['xml_file'] = array(
+    '#type' => 'managed_file',
+    '#title' => t('File'),
+    '#description' => 'Select a Dublin Core or MODS XML file from your local system.',
+    '#size' => 22,
+    '#upload_location' => 'private://mukurtu_xml_xml_import',
+    '#upload_validators' => array(
+      'file_validate_extensions' => array('xml')
+    ),
+    '#default_value' => variable_get('dh_xml_import_fid'),
+    '#required' => TRUE,
+  );
+
+  $form['after_upload']['submit'] = [
+    '#type' => 'submit',
+    '#value' => t('Continue'),
+  ];
+
+  return $form;
+}
+
+/**
+ * On submission, set the file FID to a var (to be used in the options form),
+ * and redirect to the options form.
+ */
+function ma_importexport_dc_import_form_standalone_submit($form, $form_state) {
+  variable_set('dh_xml_import_fid', $form_state['values']['xml_file']);
+  variable_set ('dh_xml_import_is_batch', 0);
+  drupal_goto('import/digital-heritage-xml-context');
+}
+
+
+/**
+ * Custom form for the XML context.
+ */
+function ma_importexport_dc_import_form_context($form, $form_state) {
+
+  $fid = variable_get('dh_xml_import_fid');
+  if (!$fid) { // This should never happen.
+    drupal_goto('import/digital-heritage-xml-standalone');
+  }
+
+  // Get the indvidual attributes (the fields) from the XML file to use for the context option below.
+  $file = file_load ($fid);
+  $path_to_file = drupal_realpath($file->uri);
+  $file_contents = file_get_contents($path_to_file);
+
+  ////////
+  // Tried doing this with simplexml but it fails on test imports
+  // (it's excessively sensitive to character formatting and xmlns specs).
+  // Also tried using the DOM but it was overkill.
+
+
+  // Get individual attributes
+  $parser = xml_parser_create();
+  xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
+  xml_parse_into_struct($parser, $file_contents, $values, $index);
+  xml_parser_free($parser);
+  $individual_attributes = array_keys($index);
+  $individual_attributes = array_combine($individual_attributes, $individual_attributes);
+
+  // Determine if is a MODS file
+  $mods_file = 0;
+  $mods_attributes = ['mods', 'modsCollection'];
+  foreach ($mods_attributes as $mods_attribute) {
+    if (in_array($mods_attribute, $individual_attributes)) {
+      $mods_file = 1;
+      break;
+    }
+  }
+  $form['#mods_file'] = $mods_file;
+
+  // Context checkboxes.
+  $form['context'] = array(
+    '#type' => 'checkboxes',
+    '#title' => 'Context',
+    '#description' => "Select which attribute(s) to use as the XML file's context.",
+    '#options' => $individual_attributes,
+    '#required' => TRUE,
+  );
+  if (!$mods_file) {
+    $form['context']['#description'] .= " For Dublin Core files, this will normally be all the attribute(s) before the ones starting with \"dc:\"";
+  }
+  $typical_context_values = ['metadata', 'rdf:RDF', 'rdf:Description', 'mods', 'modsCollection'];
+  $available_typical_context_values = [];
+  foreach ($typical_context_values as $typical_context_value) {
+    if (isset($individual_attributes[$typical_context_value])) {
+      $available_typical_context_values[] = $typical_context_value;
+    }
+  }
+  if (isset($available_typical_context_values)) {
+    $form['context']['#default_value'] = $available_typical_context_values;
+  }
+
+  // Continue button
+  $form['submit'] = [
+    '#type' => 'submit',
+    '#value' => t('Continue'),
+  ];
+
+  // Return form.
+  return $form;
+}
+
+/**
+ * Submit handler for the context form.
+ */
+function ma_importexport_dc_import_form_context_submit(&$form, &$form_state) {
+
+  // Set the contexts.
+  $contexts = [];
+  foreach ($form_state['values']['context'] as $context_part) {
+    if ($context_part) {
+      $contexts[] = $context_part;
+    }
+  }
+
+  // Set the options variable
+  $import_options = [
+    'mods_file' => $form['#mods_file'],
+    'context' => $contexts,
+  ];
+  variable_set ('dh_xml_import_options', $import_options);
+
+  // Go to the options form.
+  $form_state['redirect'] = 'import/digital-heritage-xml-options';
+
+}
+
+
+/**
+ * Custom form for the XML options.
+ */
+function ma_importexport_dc_import_form_options($form, $form_state) {
+
+  // Pull context and mods_file from the options.
+  $import_options = variable_get('dh_xml_import_options');
+  $mods_file = $import_options['mods_file'];
+  $contexts = $import_options['context'];
+
+  $fid = variable_get('dh_xml_import_fid');
+  if (!$fid) { // This should never happen.
+    drupal_goto('import/digital-heritage-xml-standalone');
+  }
+
+  // Get the attributes (the fields) from the XML file to use for the GUID and Media options below.
+  $file = file_load ($fid);
+  $path_to_file = drupal_realpath($file->uri);
+  $file_contents = file_get_contents($path_to_file);
+
+  ////////
+  // Tried doing this with simplexml but it fails on test imports
+  // (it's excessively sensitive to character formatting and xmlns specs).
+  // Also tried using the DOM but it was overkill.
+  // Get nested attributes
+  require_once('XmlElement.php');
+  $structure = xml_to_object($file_contents);
+  $nested_attributes = ma_importexport_nested_xml_from_structure($structure, $contexts);
+
+
+  // GUID source checkboxes.
+  $description = 'Select which attributes(s) to use for the GUID (globally unique identifier). This is used to match records to already-imported Digital Heritage items when re-importing from updated source data. Typically, you would use "dc:identifier", but if this is not available, not unique per record, or not populated for all records, then you need to use another attribute which is. If there is no such attribute, you can select multiple attributes which will combine to create the GUID. Only choose as many as is required to create a unique value. Choose attributes(s) that will not be edited in the source XML prior to a re-import, as that will result in a new, separate Digital Heritage item. Also be sure not to choose any attributes which you chose for context.';
+  if ($mods_file) {
+    $description = str_replace('dc:', '', $description);
+  }
+  $form['guid'] = array(
+    '#type' => 'checkboxes',
+    '#title' => 'GUID',
+    '#description' => $description,
+    '#options' => $nested_attributes,
+    '#required' => TRUE,
+  );
+  $typical_guid_values = ['dc:identifier', 'identifier'];
+  foreach ($typical_guid_values as $typical_guid_value) {
+    if (isset($nested_attributes[$typical_guid_value])) {
+      $form['guid']['#default_value'] = [$typical_guid_value];
+      break;
+    }
+  }
+
+  // Media source radio.
+  $description = 'Select which attribute contains the reference to media for the Digital Heritage item.';
+  if (!$mods_file) {
+    $description .= ' This is typically "dc:hasFormat" or "dc:relation".';
+  }
+  else {
+    $description .= ' This is typically "location/url" or "relateditem".';
+  }
+  $options = [
+    'none' => 'None',
+    'rdf_about' => "rdf:about attribute of the containing rdf:Description",
+  ];
+  $form['media'] = array(
+    '#type' => 'radios',
+    '#title' => 'Media',
+    '#description' => $description,
+    '#options' => array_merge($options, $nested_attributes),
+  );
+  $typical_media_values = ['dc:hasFormat', 'dc:relation', 'location/url', 'relatedItem'];
+  foreach ($typical_media_values as $typical_media_value) {
+    if (isset($nested_attributes[$typical_media_value])) {
+      $form['media']['#default_value'] = $typical_media_value;
+      break;
+    }
+  }
+
+  // Custom protocol field.
+  list ($form, $form_state) = mukurtu_protocol_field_custom_field($form, $form_state, NULL, TRUE);
+
+  // Sharing settings radio.
+  $sharing_options = [
+    'any' => 'The imported Digital Heritage items will be viewable by members of ANY Protocols selected above (or all users if any of the Protocols are set to Open).',
+    'all' => 'The imported Digital Heritage items will be viewable only by members of ALL Protocols selected above (or all users if all of the Protocols are set to Open).'
+  ];
+  $form['sharing'] = array(
+    '#type' => 'radios',
+    '#title' => 'Items Sharing Setting',
+    '#options' =>   $sharing_options,
+    '#default_value' => 'all',
+    '#required' => TRUE,
+  );
+
+  // Category select2.
+  $vocabulary = taxonomy_vocabulary_machine_name_load('Category');
+  $categories = entity_load('taxonomy_term', FALSE, array('vid' => $vocabulary->vid));
+  $options = [];
+  foreach ($categories as $tid => $term) {
+    $options[$tid] = $term->name;
+  }
+  $form['category'] = array(
+    '#type' => 'select',
+    '#select2' => [],
+    '#multiple' => TRUE,
+    '#title' => 'Category',
+    '#options' => $options,
+    // '#required' => TRUE, // Should this be required?
+  );
+
+  // Traditional Knowledge Labels select2.
+  $field = field_info_field('field_licence_trad');
+  $options = list_allowed_values($field);
+  $form['tk_label'] = array(
+    '#type' => 'select',
+    '#select2' => [],
+    '#multiple' => TRUE,
+    '#title' => 'Traditional Knowledge Labels',
+    '#options' => $options,
+  );
+
+  // Licensing Option select2 (single val).
+  $field = field_info_field('field_licence_std_cc');
+  $options = array_merge(['_none' => '- None -'], list_allowed_values($field));
+  $form['licensing'] = array(
+    '#type' => 'select',
+    '#select2' => [],
+    '#title' => 'Licensing Options',
+    '#options' => $options,
+  );
+
+  // Import button
+  $form['submit'] = [
+    '#type' => 'submit',
+    '#value' => t('Import'),
+  ];
+
+  // Return form.
+  return $form;
+}
+
+/**
+ * Validation handler for the options form.
+ */
+function ma_importexport_dc_import_form_options_validate($form, $form_state) {
+  if ($form_state['triggering_element']['#type'] == 'submit') { // This validation function will fire after a community is added but before a protocol is added, which will fail validation. So check to make sure this is fired from the submit button first.
+    if (!$form_state['values']['oggroup_fieldset'][0]['dropdown_second']) {
+      form_set_error('', "At least one Community and Protocol needs to be selected.");
+    }
+  }
+}
+
+/**
+ * Submit handler for the options form.
+ */
+function ma_importexport_dc_import_form_options_submit(&$form, &$form_state) {
+
+  $import_options = variable_get('dh_xml_import_options');
+
+  // Get the importer name.
+  if ($import_options['mods_file']) {
+    $importer_name = 'digital_heritage_mods';
+  }
+  else {
+    $importer_name = 'digital_heritage_dc';
+  }
+
+  // Set the fetcher source and file.
+  $source = feeds_source($importer_name);
+  $fetcher_config = $source->getConfigFor($source->importer->fetcher);
+
+  // Nasty hack to save the initiating user's UID before
+  // feeds switches to UID 1 to do the import.
+  if ($importer_name == 'digital_heritage_dc') {
+    global $user;
+    $fetcher_config['mukurtu_uid'] = $user->uid;
+  }
+
+  $file = file_load (variable_get('dh_xml_import_fid'));
+  $fetcher_config['source'] = $file->uri;
+  $fetcher_config['file'] = $file;
+  $source->setConfigFor($source->importer->fetcher, $fetcher_config);
+  $source->save();
+
+  // Set the importer context.
+  $importer = feeds_importer($importer_name);
+  $config = $importer->parser->getConfig();
+  $config['context']['value'] = implode('/', $import_options['context']);
+  $importer->parser->setConfig($config);
+  $importer->save();
+
+  // Go to the status page after it's done.
+  $form_state['redirect'] = 'import/digital-heritage-xml-complete';
+
+  // Add the importer and form options Drupal var 'dh_xml_import_options', to be picked up by hook_feeds_after_parse().
+  variable_set ('dh_xml_import_options', array_merge(variable_get('dh_xml_import_options'), ['importer' => $importer_name], $form_state['values']));
+
+  // Do the import
+  $source->startImport();
+
+}
+
+/**
+ * Implements hook_feeds_after_parse().
+ */
+function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserResult $result) {
+  if (ma_importexport_dc_is_xml_importer($source->id)) {
+
+    $import_options = variable_get('dh_xml_import_options');
+
+    // Get the xpath mapping from the attribute name to its xpath field machine name
+    $importer = feeds_importer($import_options['importer']);
+    $config = $importer->parser->getConfig();
+    $xpath_mapping = [];
+    foreach ($config['sources'] as $xpath_field_machine_name => $field_properties) {
+      $xpath_mapping[$field_properties['value']] = $xpath_field_machine_name;
+    }
+
+    // Trim all the elements of all items. This removes whitespace as well as newlines.
+    $result->items = trim_multi_assoc_array($result->items);
+
+    // Combine multival attributes that map to singleval fields.
+    $processor_config = $importer->processor->getConfig();
+    $singleval_fields = [];
+    foreach ($processor_config['mappings'] as $feeds_mapping) {
+      $field_info = field_info_field($feeds_mapping['target']);
+      if ($field_info['cardinality'] == 1) {
+        $singleval_fields[] = $feeds_mapping['source'];
+      }
+    }
+    foreach ($result->items as $i => $item) {
+      foreach ($singleval_fields as $singleval_field) {
+        if (isset($item[$singleval_field]) AND is_array($item[$singleval_field]) AND count($item[$singleval_field]) > 1) {
+          $result->items[$i][$singleval_field] = implode("\n\n", $item[$singleval_field]); // Results in a paragraph break for long text fields and a single space for short text fields, which is what we want.
+        }
+      }
+    }
+
+    /////
+    /// Special field handling
+
+    $guid_parts = [];
+    foreach ($import_options['guid'] as $attribute) {
+      if ($attribute) {
+        $guid_parts[] = $xpath_mapping[$attribute];
+      }
+    }
+
+    $name_fields = [
+      'unknown' => 'dc_creator', // TODO: fill this with the roleTerm for creators
+      'ctb' => 'dc_contributor',
+    ];
+
+    // Loop through the items.
+    foreach ($result->items as $item_index => &$item) {
+
+      // Set the GUID and dc:hasformat field values according to their source as selected in the options form.
+      $guid_values = [];
+      foreach ($guid_parts as $guid_part) {
+        $guid_values[] = $item[$guid_part];
+      }
+      $item['guid'] = implode(':', $guid_values);
+
+      // Set the media field.
+      $media_value = '';
+      if ($import_options['media'] <> 'none') {
+        if ($import_options['media'] == 'rdf_about') {
+          $media_value = is_array($item['rdf_about']) ? $item['rdf_about'][$item_index] : $item['rdf_about']; // unable to create xpath query for this to just select the child. It selects all children, so we grab the value based on the item index.
+        }
+        else {
+          $media_value = is_array($item[$xpath_mapping[$import_options['media']]]) ? $item[$xpath_mapping[$import_options['media']]][$item_index] : $item[$xpath_mapping[$import_options['media']]];
+        }
+      }
+      // If the media file path is not an absolute URL, try to grab it from the extraction of the zip.
+      if (substr( $media_value, 0, 4 ) <> "http") {
+        $relative_path = is_array($media_value) ? reset($media_value) : $media_value;
+        if (substr($relative_path, 0, 1) != DIRECTORY_SEPARATOR) {
+          $relative_path = DIRECTORY_SEPARATOR . $relative_path;
+        }
+        $media_value = drupal_realpath($_SESSION['mukurtu_zip_import']['temp_extract_path'] . $relative_path);
+      }
+      $item['dc_hasformat'] = $media_value;
+
+      // Special handling for Creator and Contributor Fields
+      // TODO: this should be for MODS only (see https://kanopi.teamwork.com/#tasks/20893887?c=8803928). It is causing
+      // breakages however, so disable it and come back to this if MODS is ever enabled. And only run this in case of MODS, not DC.
+//      foreach ($name_fields as $name_field_role_term => $name_field) {
+//
+//        foreach ($item[$name_field] as $name_field_value) {
+//          $skip = 0;
+//          $xml_data = new SimpleXMLElement($name_field_value);
+//
+//          // Exclude name values for contributor that have a role term denoting creator,
+//          // and exclude name values for creator that have a role term denoting contributor.
+//          // TODO: need the role term for contributor. Add above.
+//          if (isset($xml_data->role->roleTerm)) {
+//            $role_term = (string) $xml_data->role->roleTerm;
+//            if (array_key_exists($role_term, $name_fields) && $name_fields[$role_term] <> $name_field) {
+//              unset ($item[$name_field]); // Exclude it
+//              $skip = 1;
+//            }
+//          }
+//          // For the remaining names:
+//          // 1) extract the names out of namePart (otherwise names would end up with the whole xml content of Name)
+//          // 2) merge the multiple nameParts into singles (combines last and first names into single names), when needed.
+//          // This might need more work as more sample data comes in.
+//          if (!$skip) {
+//            $nameParts = (array) $xml_data->namePart;
+//            foreach ($nameParts as $key => $namePart) {
+//              if (!is_int($key)) { // Need to drop out the Attirbutes, possibly other, items, and keep just the numeric ones which are the actual nameParts.
+//                unset ($nameParts[$key]);
+//              }
+//            }
+//            $name_field_value = implode (', ', $nameParts);
+//          }
+//        }
+//      }
+    }
+  }
+}
+
+// Trim values in an array or multidimensional mrray, including associative arrays
+// http://www.beliefmedia.com/code/php-snippets/trim-array-values
+function trim_multi_assoc_array($data) {
+  if ($data == null) {
+    return null;
+  }
+  if (is_array($data)) {
+    return array_map('trim_multi_assoc_array', $data);
+  }
+  else return trim($data);
+}
+
+/**
+ * Implements hook_feeds_presave().
+ */
+function ma_importexport_dc_feeds_presave(FeedsSource $source, $entity, $item) {
+  if (ma_importexport_dc_is_xml_importer($source->id)) {
+    $import_options = variable_get('dh_xml_import_options');
+
+    // Set the author to the importing user (on the non-MODS import only, as the MODS import includes a username mapping)
+    if ($source->id == 'digital_heritage_dc') {
+      $config = $source->getConfigFor($source->importer->fetcher);
+      if ($config && !empty($config['mukurtu_uid'])) {
+        $entity->uid = $config['mukurtu_uid'];
+      }
+    }
+
+    // Set the protocol(s) (the community(s) gets added in mukurtu_protocol_field_node_presave()).
+    $protocols = [];
+    foreach ($import_options['oggroup_fieldset'] as $ogg_fieldset) {
+      if (isset($ogg_fieldset['dropdown_second'])) {
+        foreach ($ogg_fieldset['dropdown_second'] as $protocols_per_comm) {
+          $protocols[]['target_id'] = $protocols_per_comm;
+        }
+      }
+    }
+    $entity->og_group_ref[LANGUAGE_NONE] = $protocols;
+
+    // Set the item privacy setting.
+    $entity->field_item_privacy_setting[LANGUAGE_NONE][0]['value'] = $import_options['sharing'];
+
+    // Set the category
+    $categories = [];
+    foreach ($import_options['category'] as $category) {
+      $categories[]['tid'] = $category;
+    }
+    if (isset($categories)) {
+      $entity->field_category[LANGUAGE_NONE] = $categories;
+    }
+
+    // Set the TK Label(s)
+    $tk_labels = [];
+    foreach ($import_options['tk_label'] as $tk_label) {
+      $tk_labels[]['value'] = $tk_label;
+    }
+    if (isset($tk_labels)) {
+      $entity->field_licence_trad[LANGUAGE_NONE] = $tk_labels;
+    }
+
+    // Set the Licensing Option
+    if (isset($import_options['licensing']) && $import_options['licensing'] <> '_none') {
+      $entity->field_licence_std_cc[LANGUAGE_NONE][0]['value'] = $import_options['licensing'];
+    }
+
+    // Ensure no duplicate name components were created as a result of the name merging in the after_parse.
+    $name_fields = [
+      'field_creator',
+      'field_contributor'
+    ];
+    foreach ($name_fields as $name_field) {
+      $tids = [];
+      foreach ($entity->{$name_field}[LANGUAGE_NONE] as $name_field_index => $name_field_value) {
+        $tid = $name_field_value['tid'];
+        if (in_array($tid, $tids)) {
+          unset($entity->{$name_field}[LANGUAGE_NONE][$name_field_index]);
+        }
+        else {
+          $tids[] = $tid;
+        }
+      }
+    }
+
+  }
+}
+
+/**
+ * Page callback to show at the end of the XML import.
+ */
+function ma_importexport_dc_import_complete() {
+  $output = '';
+
+  $import_options = variable_get('dh_xml_import_options');
+  $source = feeds_source($import_options['importer']);
+
+  // Taken from feeds_source_status();
+  $progress_importing = $source->progressImporting();
+  $v = array();
+  if ($progress_importing != FEEDS_BATCH_COMPLETE) {
+    $v['progress_importing'] = $progress_importing;
+  }
+  $progress_clearing = $source->progressClearing();
+  if ($progress_clearing != FEEDS_BATCH_COMPLETE) {
+    $v['progress_clearing'] = $progress_clearing;
+  }
+  $v['imported'] = $source->imported;
+  $v['count'] = $source->itemCount();
+  if (!empty($v)) {
+    $output = theme('feeds_source_status', $v);
+  }
+
+  // Add some buttons
+  $output .= '<br />';
+  $import_more_path = 'import/digital-heritage-xml-file';
+  if (variable_get('dh_xml_import_is_batch')) {
+    $import_more_path = 'manage/zip_import';
+  }
+  $output .=  l('Import More', $import_more_path, ['attributes' => ['class' => 'button'], 'html' => 'TRUE']);
+  $output .=  l('Return to Dashboard', 'dashboard', ['attributes' => ['class' => 'button'], 'html' => 'TRUE']);
+
+  // Return the page.
+  return $output;
+}
+
+/**
+ * Recursive function that turns xml_to_object()'s structure into an array of nested XML attributes
+ */
+function ma_importexport_nested_xml_from_structure($element, $contexts) {
+  static $nest_level = 0;
+  static $attributes;
+  static $attributes_parts;
+  foreach ($element->children as $child) {
+    $element_name = $child->name;
+    if (!in_array($element_name, $contexts)) {
+      $attributes_parts[$nest_level] = $element_name;
+    }
+    if (isset($child->children)) {
+      $nest_level++;
+      ma_importexport_nested_xml_from_structure($child, $contexts);
+      $nest_level--;
+    }
+    else {
+      $attributes[] = implode('/', $attributes_parts);
+      unset ($attributes_parts[$nest_level]);
+    }
+  }
+  return array_unique(array_combine($attributes, $attributes));
+}
+
+
+////////////////////////
+// Custom VBO action to export to XML, added as a VBO action to the existing DH bulk export view
+// There is no in-built functionality to combine VBO with views_data_export,
+// so this is (heavily) adapted from https://www.drupal.org/project/views_data_export/issues/1436726#comment-9924326
+//
+
+/**
+ * Implements hook_action_info().
+ */
+function ma_importexport_dc_action_info() {
+  return [
+    'ma_importexport_dc_action_xml_export' => [
+      'type' => 'entity',
+      'label' => t('Mukurtu XML Export'),
+      'configurable' => FALSE,
+      'aggregate' => TRUE,
+      'behavior' => ['ma_importexport_dc_export_xml'],
+    ],
+  ];
+}
+
+// tw26032281 - Disable MODS export. DC only.
+///**
+// * XML export action form to select XML type.
+// */
+//function ma_importexport_dc_action_xml_export_form() {
+//  $form = array();
+//  $form['xml_type'] = array(
+//    '#type' => 'radios',
+//    '#title' => t('Select XML Type'),
+//    '#options' => array(
+//      'dc_xml' => t('Dublin Core'),
+//      'mods_xml' => t('MODS'),
+//    ),
+//    '#required' => TRUE,
+//  );
+//  return $form;
+//}
+//
+///**
+// * XML export action set the view dispay ID according to the XML type form selection.
+// */
+//function ma_importexport_dc_action_xml_export_submit($form, &$form_state) {
+//  return array(
+//    'display_id' => $form_state['values']['xml_type'],
+//  );
+//}
+
+/**
+ * XML export action callback.
+ */
+function ma_importexport_dc_action_xml_export($entity, &$context) {
+
+  $view = views_get_view($context['view_info']['name']);
+  if (isset($context['view_info']['total_rows'])) {
+    $total_rows = $context['view_info']['total_rows'];
+  }
+  else {
+    $countView = clone $view;
+    $countView->execute($context['view_info']['display']);
+    $total_rows = $countView->total_rows;
+  }
+  $entity_ids = array_keys($entity);
+  if (count($entity_ids) < $total_rows) {
+    $args['entity_ids'] = $entity_ids;
+  }
+  $view = views_get_view('dh_xml_export');
+  $view->execute_display('dc_xml', $args);
+  drupal_exit();
+
+}
+
+/**
+ * Implements hook_views_query_alter().
+ */
+function ma_importexport_dc_views_query_alter(&$view, &$query) {
+  if ($view->display_handler->plugin_name == 'views_data_export') {
+    // If an explicit list of entity IDs was provided, use that to refine the
+    // query.
+    if (isset($view->args['entity_ids'])) {
+      $query->add_where(0, $view->base_table . '.' . $view->base_field, $view->args['entity_ids'], 'IN');
+      // Now remove this fake argument to avoid confusion.
+      unset($view->args['entity_ids']);
+    }
+  }
+}
+
+//
+// end custom VBO action
+////////////////////////
+
+
+/**
+ * Implements hook_views_pre_render().
+ */
+function ma_importexport_dc_views_pre_render(&$view) {
+  // Rewrite the Media Assets field values on the XML exports (MODS and DC) to provide a link to the atom.
+  // This is too complex for views "rewrite results".
+  if ($view->name == 'dh_xml_export') {
+    foreach ($view->result as &$view_row) {
+      foreach ($view_row->field_field_media_asset as &$media_item) {
+        $atom = scald_atom_load($media_item['raw']['sid']);
+        $media_item['rendered'] = $atom->rendered->file_source_url;
+      }
+    }
+  }
+}
+
+/**
+ * Helper function to get the DC relation field in the DC export view for both CR children and parents
+ */
+function ma_importexport_dc_get_relation_field($node) {
+  global $base_url;
+  if (isset($node->field_community_record_parent[LANGUAGE_NONE][0]["target_id"])) {
+    // Currently on a Child Record
+    print $base_url . '/' . drupal_get_path_alias('node/' . $node->field_community_record_parent[LANGUAGE_NONE][0]["target_id"]);
+  }
+  elseif (isset($node->field_community_record_children[LANGUAGE_NONE])) {
+    // Currently on a Parent Record
+    $child_count = 0;
+    foreach ($node->field_community_record_children[LANGUAGE_NONE] as $child) {
+      $child_count++;
+      if ($child_count > 1) {
+        print "</dcterms:relation>\n    <dcterms:relation>"; // This is hacky, but it works.
+      }
+      print $base_url . '/' . drupal_get_path_alias('node/' .$child["target_id"]);
+    }
+  }
+}
+
