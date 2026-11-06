@@ -13,9 +13,6 @@ define('MUKURTU_PRERELEASE_FUNCTIONALITY', 'mukurtu_prerelease_functionality');
  */
 function ma_core_init() {
 
-  // Fix for bootstrap help tooltip not working on select widgets.
-  drupal_add_js(drupal_get_path('module', 'ma_core') . '/js/bootstrap_tooltips_over_select2_widget.js');
-
   // Suppress status messages during profile installation.
   if (isset($_GET['profile']) && $_GET['profile'] == 'mukurtu') {
     // Clears the message queue by default.
@@ -34,7 +31,7 @@ function ma_core_user_login(&$edit, $account) {
   $current_path = current_path();
 
   // Do not redirect when user is logged in during profile installation, as more work needs to complete first
-  if ($_GET['profile']) {
+  if (!empty($_GET['profile'])) {
     return;
   }
   // Do not redirect when not coming from the login page, eg.
